@@ -23,7 +23,6 @@
 		F45788F21D3A1D2C0063D60A /* CrashTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45788F11D3A1D2C0063D60A /* CrashTableViewController.swift */; };
 		F49A8B631D3A8BE300B951AD /* CSwiftV.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B621D3A8BE300B951AD /* CSwiftV.swift */; };
 		F49A8B651D3B28DF00B951AD /* DsymTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */; };
-		F49A8B681D3B28FF00B951AD /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B661D3B28FF00B951AD /* TableViewController.swift */; };
 		F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */; };
 		F49BD1F21D2FF46300024AAE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BD1F11D2FF46300024AAE /* MainViewController.swift */; };
 		F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F49BD1F51D2FF46300024AAE /* Main.storyboard */; };
@@ -49,7 +48,6 @@
 		F45788F11D3A1D2C0063D60A /* CrashTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashTableViewController.swift; sourceTree = "<group>"; };
 		F49A8B621D3A8BE300B951AD /* CSwiftV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSwiftV.swift; sourceTree = "<group>"; };
 		F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DsymTableViewController.swift; sourceTree = "<group>"; };
-		F49A8B661D3B28FF00B951AD /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
 		F49BD1EC1D2FF46300024AAE /* SYM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SYM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F49BD1F11D2FF46300024AAE /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -97,7 +95,6 @@
 				51C4D4141D41DDCA0007898B /* WindowController.swift */,
 				F49BD1F11D2FF46300024AAE /* MainViewController.swift */,
 				F45788EF1D3A0FB90063D60A /* FrameViewController.swift */,
-				F49A8B661D3B28FF00B951AD /* TableViewController.swift */,
 				F45788F11D3A1D2C0063D60A /* CrashTableViewController.swift */,
 				F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
@@ -237,7 +234,6 @@
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				F422C7C31D36A66800066837 /* FileSearch.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
-				F49A8B681D3B28FF00B951AD /* TableViewController.swift in Sources */,
 				F40A36A21D3E675A00F3B00C /* Then.swift in Sources */,
 				51C4D4151D41DDCA0007898B /* WindowController.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,

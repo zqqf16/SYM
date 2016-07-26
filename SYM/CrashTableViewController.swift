@@ -32,19 +32,22 @@ class CrashTableCellView: NSTableCellView {
     @IBOutlet weak var deleteButton: NSButton!
 }
 
-class CrashTableViewController: TableViewController {
+class CrashTableViewController: NSViewController {
+    @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var deleteCell: NSButton!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do view setup here.
+
         self.registerNotifications()
     }
-
+    
     @IBAction func deleteCell(sender: NSButton) {
         let row = self.tableView.rowForView(sender)
         CrashManager.sharedInstance.crashes.removeAtIndex(row)
         self.tableView.removeRowsAtIndexes(NSIndexSet(index: row), withAnimation: .SlideLeft)
+        
+        // Update selected row
         let selectedRow = self.tableView.selectedRow
         self.selectRowAtIndex(selectedRow)
     }
@@ -59,13 +62,26 @@ class CrashTableViewController: TableViewController {
     }
 
     func didOpenCrash(notification: NSNotification) {
-        self.selectedRow = 0
         self.tableView.reloadData()
-        self.selectRowAtIndex(0)
+        asyncMain {
+            self.selectRowAtIndex(0)
+        }
     }
     
-    override func didSelectRowAtIndex(index: Int) {
+    func selectRowAtIndex(index: Int) {
+        self.tableView.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: true)
+        self.didSelectRowAtIndex(index)
+    }
+
+    func didSelectRowAtIndex(index: Int) {
         NSNotificationCenter.defaultCenter().postNotificationName(CTDidSelectCrashNotification, object: index)
+    }
+}
+
+extension CrashTableViewController: NSTableViewDelegate {
+    func tableView(tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
+        self.didSelectRowAtIndex(row)
+        return true
     }
 }
 
