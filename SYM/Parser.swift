@@ -38,7 +38,7 @@ class FrameParser: Parser {
             if line.type != .Plain {
                 continue
             }
-            if let bt = Frame(input: line.value) {
+            if let bt = Frame(input: line.value.strip()) {
                 bt.lineNumber = index
                 crash.backtrace[index] = bt
             }
@@ -192,7 +192,7 @@ class AppleParser: Parser {
 class CSVParser: BatchParser {
     func parse(raw: String) -> [Crash]? {
         let csv = CSwiftV(string: raw)
-        if csv.headers.count != 24 {
+        if csv.headers.count < 7 {
             return nil
         }
         
