@@ -48,7 +48,7 @@ func typeOfFile(path: String) -> FileType? {
             return .Dsym
         case "public.comma-separated-values-text":
             return .CSV
-        case "public.data":
+        case "public.unix-executable", "public.data":
             return .Binary
         default:
             break
