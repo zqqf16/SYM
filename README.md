@@ -16,4 +16,4 @@ A tool for crash symbolicating.
 
 1. Import your dSYM file. This is optional, for SYM can search all dSYM files from your disk automatically.
 2. Import or paste in the crash log.
-3. Click the “Symbolicate” button.
+3. Click menu "Symbol" -> "Symbolicate" or command + R.
