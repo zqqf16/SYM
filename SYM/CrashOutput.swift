@@ -29,37 +29,63 @@ let defaultAttrs: [String: AnyObject] = [
     NSFontAttributeName: NSFont(name: "Menlo", size: 11)!
 ]
 
-let backtraceAttrs:[String: AnyObject] = [
+let backtraceAttrs: [String: AnyObject] = [
     NSForegroundColorAttributeName: NSColor.redColor(),
     NSFontAttributeName: NSFontManager.sharedFontManager().fontWithFamily("Menlo", traits: .BoldFontMask, weight: 0, size: 11)!
 ]
 
 
 extension Crash {
+
     func pretty() -> NSAttributedString {
-        let result = NSMutableAttributedString()
-        let newLine = NSMutableAttributedString(string: "\n")
-        for (index, line) in self.lines.enumerate() {
-            result.appendAttributedString(self.pretty(index, line: line))
-            result.appendAttributedString(newLine)
+        
+        var keyFrameRanges = [NSRange]()
+        
+        if self.images == nil || self.images!.count == 0 {
+            return NSAttributedString(string: self.content, attributes: defaultAttrs)
         }
         
-        return result
-    }
-    
-    func pretty(index: Int, line: LineEntry) -> NSAttributedString {
-        switch line.type {
-        case .Backtrace:
-            let frame = self.backtrace[index]!
-            let frameStr = self.formatFrame(frame)
-            if frame.image == self.binary {
-                return NSAttributedString(string: frameStr, attributes: backtraceAttrs)
-            } else {
-                return NSAttributedString(string: frameStr, attributes: defaultAttrs)
+        var backtrace = [Int: Frame]()
+        
+        for image in self.images!.values {
+            if let bt = image.backtrace {
+                for frame in bt {
+                    backtrace[frame.lineNumber!] = frame
+                }
             }
-        default:
-            return NSAttributedString(string: line.value, attributes: defaultAttrs)
         }
+        
+        if backtrace.count == 0 {
+            return NSAttributedString(string: self.content, attributes: defaultAttrs)
+        }
+        
+        let lines = self.content.componentsSeparatedByString("\n")
+        let result = NSMutableString()
+        
+        for (index, line) in lines.enumerate() {
+            if let frame = backtrace[index] {
+                if frame.image == self.appName {
+                    let startIndex = result.length
+                    result.appendString(self.formatFrame(frame))
+                    let endIndex = result.length
+                    keyFrameRanges.append(NSMakeRange(startIndex, endIndex-startIndex))
+                } else {
+                    result.appendString(self.formatFrame(frame))
+                }
+            } else {
+                result.appendString(line)
+            }
+            
+            result.appendString("\n")
+        }
+        
+        let attr = NSMutableAttributedString(string: (result as String), attributes: defaultAttrs)
+        
+        for r in keyFrameRanges {
+            attr.setAttributes(backtraceAttrs, range: r)
+        }
+        
+        return attr
     }
     
     func formatFrame(frame: Frame) -> String {

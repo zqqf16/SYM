@@ -26,18 +26,7 @@ import Foundation
 
 // MARK: - Bracktrace Frame
 
-func parseBacktrace(input: String) -> [String] {
-    let btPattern = "^(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)"
-    let matcher: RegexHelper
-    do {
-        matcher = try RegexHelper(btPattern)
-    } catch _ {
-        return []
-    }
-    return matcher.match(input)
-}
-
-// 0       TheElements   0x00000001000effdc 0x1000e4000 + 49116
+// 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
 // index   image         address            symbol
 
 class Frame {
@@ -45,88 +34,60 @@ class Frame {
     var image: String
     var address: String
     var symbol: String?
-    var raw: String
     var lineNumber: Int?
     
-    init?(input: String) {
-        self.raw = input
-        let groups = parseBacktrace(input)
-        if groups.count != 5 {
+    static let re = RE.compile("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)")!
+    
+    init?(line: String) {
+        guard let g = Frame.re.match(line) else {
             return nil
         }
         
-        self.index = groups[1]
-        self.image = groups[2]
-        self.address = groups[3]
-        self.symbol = groups[4]
+        self.index = g[0]
+        self.image = g[1]
+        self.address = g[2]
+        self.symbol = g[3]
+        self.lineNumber = nil
     }
 }
 
-
-// MARK: - Crash
-
-// MARK: Crash line
-enum LineType: Int {
-    case Plain
-    case Reason
-    case Info
-    case Backtrace
-    case Arch
-    case LoadAddress
-    case SlideAddress
-    case UUID
-    case Binary
-}
-
-struct LineEntry {
-    var type: LineType = .Plain
-    var value: String
-}
-
-// MARK: Crash class
-class Crash {
-    var lines = [LineEntry]()
-    var reason: String?
-    var crashInfo: String?
-    var arch: String = "arm64"
-    var loadAddress: String?
+class Image {
+    var name: String?
     var uuid: String?
-    var binary: String?
-    var backtrace = [Int: Frame]()
-    var filePath: String?
-    var isChanged: Bool = false
+    var loadAddress: String?
+    var backtrace: [Frame]?
+}
+
+class Crash {
+    let content: String
+    var reason: String?
+    var arch: String = "arm64"
+    var appName: String?
+    var images:[String: Image]?
     
-    var appVersion: String?
-    var numberOfErrors: Int?
-    
-    init(content: String?) {
-        if content == nil {
-            return
-        }
-        let lines = content!.componentsSeparatedByString("\n")
-        for line in lines {
-            self.lines.append(LineEntry(type: .Plain, value: line))
-        }
+    init(content: String) {
+        self.content = content
     }
+}
+
+enum CrashType: Int {
+    case Umeng = 0
+    case Apple = 1
+    case CSV = 2
     
-    func isValid() -> Bool {
-        return self.uuid != nil
-            && self.binary != nil
-            && self.loadAddress != nil
-    }
-    
-    func isEmpty() -> Bool {
-        return self.lines.count == 0 && self.filePath == nil
-    }
-    
-    func keyFrames() -> [Frame]? {
-        if self.binary == nil {
+    static func fromContent(content: String?) -> CrashType? {
+        guard let crash = content else {
             return nil
         }
         
-        return self.backtrace.values.filter{
-            (frame: Frame) -> Bool in
-            return frame.image == self.binary!
+        if crash.containsString("摘要,应用版本,错误次数") {
+            return .CSV
+        } else if crash.containsString("Application received") {
+            return .Umeng
+        } else if crash.containsString("Incident Identifier") {
+            return .Apple
         }
+        
+        return nil
     }
 }

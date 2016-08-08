@@ -35,30 +35,6 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
         self.setupMenu()
     }
     
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        self.tableView.reloadData()
-        self.registerNotifications()
-    }
-    
-    override func viewDidDisappear() {
-        super.viewWillDisappear()
-        self.unregisterNotifications()
-    }
-    
-    private func registerNotifications() {
-        let nc = NSNotificationCenter.defaultCenter()
-        nc.addObserver(self, selector: #selector(didImportDsym), name: DidImportDsymNotification, object: nil)
-    }
-    
-    private func unregisterNotifications() {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-    }
-    
-    func didImportDsym(notification: NSNotification) {
-        self.tableView.reloadData()
-    }
-    
     private func setupMenu() {
         let menu = NSMenu(title: "dSYM")
         let showItem = NSMenuItem(title: "Show in Finder", action: #selector(showDsymFileInFinder), keyEquivalent: "")

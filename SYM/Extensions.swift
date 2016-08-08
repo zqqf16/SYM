@@ -90,12 +90,6 @@ extension Dictionary {
     }
 }
 
-// MARK: - NSViewController
-extension NSViewController {
-    var windowController: WindowController? {
-        return self.view.window?.windowController as? WindowController
-    }
-}
 
 // MARK: - NSFileManager
 enum FileError: ErrorType {
@@ -136,5 +130,10 @@ extension NSFileManager {
         }
         
         return path
+    }
+    
+    func temporaryPath() -> String {
+        let uuid = NSProcessInfo.processInfo().globallyUniqueString
+        return (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(uuid)
     }
 }

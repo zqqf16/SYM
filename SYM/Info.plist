@@ -10,22 +10,17 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>crash</string>
-				<string>log</string>
 				<string>sym</string>
-				<string>csv</string>
+				<string>log</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>file</string>
 			<key>CFBundleTypeName</key>
 			<string>Crash</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>????</string>
-			</array>
 			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>$(PRODUCT_MODULE_NAME).Document</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

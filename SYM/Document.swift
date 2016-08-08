@@ -23,15 +23,38 @@
 
 import Cocoa
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
-        // Insert code here to initialize your application
-        DsymManager.sharedInstance.findAllDsyms()
+
+class Document: NSDocument {
+
+    var content: String?
+    
+    override func makeWindowControllers() {
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+        let windowController = storyboard.instantiateControllerWithIdentifier("Main Window Controller") as! NSWindowController
+        self.addWindowController(windowController)
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
-        // Insert code here to tear down your application
+    override func windowControllerDidLoadNib(aController: NSWindowController) {
+        super.windowControllerDidLoadNib(aController)
+    }
+
+    override func dataOfType(typeName: String) throws -> NSData {
+        if self.content == nil {
+            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
+        }
+
+        return self.content!.dataUsingEncoding(NSUTF8StringEncoding)!
+    }
+
+    override func readFromData(data: NSData, ofType typeName: String) throws {
+        self.content = String(data: data, encoding: NSUTF8StringEncoding)
+    }
+
+    override class func autosavesInPlace() -> Bool {
+        return true
+    }
+    
+    override class func autosavesDrafts() -> Bool {
+        return false
     }
 }
-

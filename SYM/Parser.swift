@@ -23,171 +23,157 @@
 
 import Foundation
 
-protocol Parser {
-    func parse(crash: Crash)
-}
 
-protocol BatchParser {
-    func parse(raw: String) -> [Crash]?
-}
-
-class FrameParser: Parser {
-
-    func parse(crash: Crash) {
-        for (index, line) in crash.lines.enumerate() {
-            if line.type != .Plain {
-                continue
-            }
-            if let bt = Frame(input: line.value.strip()) {
-                bt.lineNumber = index
-                crash.backtrace[index] = bt
-            }
-        }
-        for index in crash.backtrace.keys {
-            crash.lines[index].type = .Backtrace
-        }
-    }
-}
-
-func metaValue(content: String) -> String? {
-    let list = content.componentsSeparatedByString(":")
-    if list.count < 2 {
-        return nil
-    }
-    
-    let value = list[1].strip()
-    if value.characters.count == 0 {
-        return nil
-    }
-    return value
-}
-
-class UmentMetaParser: Parser {
-
-    func parse(crash: Crash) {
-        var metas = [Int: LineType]()
-        for (index, line) in crash.lines.enumerate() {
-            if line.type == .Backtrace {
-                continue
-            }
-            let content = line.value.strip()
-            if content.hasPrefix("Application received") {
-                metas[index] = .Reason
-                crash.reason = content.componentsSeparatedByString(" ").last
-            } else if content.hasPrefix("dSYM UUID") {
-                if let value = metaValue(content) {
-                    metas[index] = .UUID
-                    crash.uuid = value
-                }
-            } else if content.hasPrefix("CPU Type") {
-                if let value = metaValue(content) {
-                    metas[index] = .Arch
-                    crash.arch = value
-                }
-            } else if content.hasPrefix("Binary Image") {
-                if let value = metaValue(content) {
-                    metas[index] = .Binary
-                    crash.binary = value
-                }
-            } else if content.hasPrefix("Slide Address") {
-                if let value = metaValue(content) {
-                    metas[index] = .LoadAddress
-                    crash.loadAddress = value
-                }
-            }
-        }
-        
-        for (index, type) in metas {
-            crash.lines[index].type = type
-        }
-    }
-}
-
-class AppleParser: Parser {
-    
-    var binaryImagesSectionStarted = false
-    
-    lazy var matcher: RegexHelper? = {
-        let binaryPattern = "\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>"
-        let matcher: RegexHelper?
-        do {
-            matcher = try RegexHelper(binaryPattern)
-        } catch _ {
+extension String {
+    var separatedValue: String? {
+        let list = self.componentsSeparatedByString(":")
+        if list.count < 2 {
             return nil
         }
         
-        return matcher
-    }()
-    
-    func parse(crash: Crash) {
-        self.binaryImagesSectionStarted = false
+        let value = list[1].strip()
+        if value.characters.count == 0 {
+            return nil
+        }
+        
+        return value
+    }
+}
 
-        var metas = [Int: LineType]()
-        for (index, line) in crash.lines.enumerate() {
-            if line.type == .Backtrace {
-                continue
-            }
-            let content = line.value.strip()
-            if content.hasPrefix("Exception Type: ") {
-                if let value = metaValue(content) {
-                    metas[index] = .Reason
-                    crash.reason = value
-                }
-            } else if content.hasPrefix("*** ") {
-                metas[index] = .Info
-                crash.crashInfo = content
-            } else if content.hasPrefix("Process") {
-                if let value = self.binary(content) {
-                    metas[index] = .Binary
-                    crash.binary = value
-                }
-            } else if content.hasPrefix("Binary Images:") {
-                self.binaryImagesSectionStarted = true
-            } else {
-                if !self.binaryImagesSectionStarted {
-                    continue
-                }
-                if let result = self.parseBinaryLine(content, binaryName: crash.binary) {
-                    crash.loadAddress = result.loadAddress
-                    crash.uuid = result.uuid
-                    crash.arch = result.arch
-                    metas[index] = .Binary
-                    self.binaryImagesSectionStarted = false
-                }
+
+extension Image {
+    func addFrame(frame: Frame) {
+        if self.backtrace == nil{
+            self.backtrace = [Frame]()
+        }
+        
+        self.backtrace?.append(frame)
+    }
+    
+    // 0x19a8d8000 - 0x19a8f4fff libsystem_m.dylib arm64  <ee3277089d2b310c81263e5fbcbb3138> /usr/lib/system/libsystem_m.dylib
+
+    static let re = RE.compile("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")!
+
+    convenience init?(line: String) {
+        guard let g = Image.re.match(line) else {
+            return nil
+        }
+        
+        self.init()
+        
+        self.loadAddress = g[0]
+        self.name = g[1]
+        self.uuid = g[3].uuidFormat()
+    }
+}
+
+extension Crash {
+    func addFrame(frame: Frame) {
+        if self.images == nil {
+            self.images = [String: Image]()
+        }
+        
+        let image = self.images![frame.image] ?? Image()
+        image.addFrame(frame)
+        image.name = frame.image
+        self.images![frame.image] = image
+    }
+}
+
+
+class Parser {
+
+    static func parse(raw: String) -> Crash? {
+        var crash = Crash(content: raw)
+        guard let type = CrashType.fromContent(raw) else {
+            return nil
+        }
+        
+        switch type {
+        case .Umeng:
+            self.parseUmengCrash(&crash)
+        case .Apple:
+            self.parseAppleCrash(&crash)
+        default:
+            break
+        }
+        
+        return crash
+    }
+    
+    static func parseUmengCrash(inout crash: Crash) {
+        let lines = crash.content.componentsSeparatedByString("\n")
+        
+        var loadAddress: String?
+        var uuid: String?
+        
+        for (index, line) in lines.enumerate() {
+            let value = line.strip()
+            if value.hasPrefix("Application received") {
+                crash.reason = value.componentsSeparatedByString(" ").last
+            } else if value.hasPrefix("dSYM UUID") {
+                uuid = value.separatedValue
+            } else if value.hasPrefix("CPU Type") {
+                crash.arch = value.separatedValue ?? "arm64"
+            } else if value.hasPrefix("Binary Image") {
+                crash.appName = value.separatedValue
+            } else if value.hasPrefix("Slide Address") {
+                loadAddress = value.separatedValue
+            } else if let frame = Frame(line: line) {
+                frame.lineNumber = index
+                crash.addFrame(frame)
             }
         }
         
-        for (index, type) in metas {
-            crash.lines[index].type = type
+        if crash.images == nil || crash.appName == nil {
+            return
+        }
+        
+        if let image = crash.images![crash.appName!] {
+            image.uuid = uuid
+            image.loadAddress = loadAddress
         }
     }
     
-    func binary(line: String) -> String? {
+    static func getBinary(line: String) -> String? {
         // Process:         Simple-Example [24203]
-        if let process = metaValue(line) {
+        if let process = line.separatedValue {
             return process.componentsSeparatedByString(" ")[0]
         }
         return nil
     }
     
-    func parseBinaryLine(input: String, binaryName: String?) -> (loadAddress: String, arch: String, uuid: String)? {
-        
-        if self.matcher == nil {
-            return nil
+    static func parseAppleCrash(inout crash: Crash) {
+        let lines = crash.content.componentsSeparatedByString("\n")
+        var binaryImagesSectionStarted = false
+
+        for (index, line) in lines.enumerate() {
+            let value = line.strip()
+            if value.hasPrefix("Exception Type: ") {
+                crash.reason = value.separatedValue
+            } else if value.hasPrefix("Process") {
+                crash.appName = self.getBinary(line)
+            } else if value.hasPrefix("Binary Images:") {
+                binaryImagesSectionStarted = true
+            } else if let frame = Frame(line: line) {
+                frame.lineNumber = index
+                crash.addFrame(frame)
+            } else {
+                if !binaryImagesSectionStarted || crash.images == nil {
+                    continue
+                } else if let new = Image(line: line) {
+                    if let old = crash.images![new.name!] {
+                        old.loadAddress = new.loadAddress
+                        old.uuid = new.uuid
+                    }
+                }
+            }
         }
-        
-        let groups = self.matcher!.match(input)
-        if groups.count != 5 {
-            return nil
-        }
-        
-        if groups[2] != binaryName {
-            return nil
-        }
-        
-        return (groups[1], groups[3], groups[4].uuidFormat())
     }
 }
+
+
+/*
 
 class CSVParser: BatchParser {
     func parse(raw: String) -> [Crash]? {
@@ -202,13 +188,8 @@ class CSVParser: BatchParser {
             guard let str: String? = row[6] else {
                 continue
             }
-            
-            let version = row[1] ?? ""
-            let errors = row[2] ?? "0"
 
             let crash = Crash(content: trimCSVCrashInfo(str!))
-            crash.appVersion = version
-            crash.numberOfErrors = Int(errors)
             result.append(crash)
         }
         
@@ -223,3 +204,5 @@ class CSVParser: BatchParser {
         return origin.stringByReplacingOccurrencesOfString("\"\"", withString: "").stringByReplacingOccurrencesOfString(",", withString: "\n").stringByReplacingOccurrencesOfString("\\t", withString: "\t").stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "[]"))
     }
 }
+
+ */

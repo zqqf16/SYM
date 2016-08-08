@@ -23,7 +23,7 @@
 
 import Foundation
 
-struct RegexHelper {
+struct RE {
     let regex: NSRegularExpression
     
     var groups: [String]?
@@ -33,32 +33,31 @@ struct RegexHelper {
                                         options: .CaseInsensitive)
     }
     
-    func match(input: String) -> [String] {
+    static func compile(pattern: String) -> RE? {
+        do {
+            return try RE(pattern)
+        } catch {
+            return nil
+        }
+    }
+    
+    func match(input: String) -> [String]? {
         let matches = regex.matchesInString(input,
                                             options: [],
                                             range: NSMakeRange(0, input.utf16.count))
         if matches.count == 0 {
-            return [input]
+            return nil
         }
-        
+
         let match = matches[0]
         let number = match.numberOfRanges
         var groups = [String]()
-        
-        for index in 0..<number {
+
+        for index in 1..<number {
             let range = match.rangeAtIndex(index)
             groups.append(input[range.toRange()!])
         }
         
         return groups
-    }
-    
-    func test(input: String) -> Bool {
-        let matches = self.match(input)
-        if matches.count == 0 {
-            return false
-        }
-        
-        return true
     }
 }

@@ -37,15 +37,14 @@ class SubProcess: NSOperation {
     
     var cmd: String
     var arguments: [String]?
-    
     var result: String?
-        
+
     init(cmd: String, arguments: [String]?) {
         self.cmd = cmd
         self.arguments = arguments
         super.init()
     }
-    
+
     override func main() {
         if self.cancelled {
             return
@@ -123,6 +122,18 @@ extension SubProcess {
     }
 }
 
+
+// MARK: symbolicatecrash
+
+extension SubProcess {
+    convenience init(crashPath: String) {
+        let cmd = NSBundle.mainBundle().pathForResource("symbolicatecrash", ofType: nil)
+        assert(cmd != nil)
+
+        let arguments = [crashPath]
+        self.init(cmd: cmd!, arguments: arguments)
+    }
+}
 
 // MARK: - GCD
 
