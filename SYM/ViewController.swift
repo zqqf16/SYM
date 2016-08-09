@@ -114,6 +114,7 @@ extension ContentViewController: SymDelegate {
         }
         
         document.content = self.textView.string
+        document.updateChangeCount(.ChangeDone)
     }
 }
 
@@ -125,6 +126,10 @@ extension ContentViewController: NSTextViewDelegate {
         menu.addItem(showItem)
         menu.allowsContextMenuPlugIns = true
         return menu
+    }
+    
+    func undoManagerForTextView(view: NSTextView) -> NSUndoManager? {
+        return self.document()?.undoManager
     }
 }
 
