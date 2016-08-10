@@ -24,10 +24,16 @@
 import Cocoa
 
 
+protocol DocumentContentDelegate: class {
+    func contentToSave() -> String?
+}
+
+
 class Document: NSDocument {
 
     var content: String?
-    
+    weak var delegate: DocumentContentDelegate?
+
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
         let windowController = storyboard.instantiateControllerWithIdentifier("Main Window Controller") as! NSWindowController
@@ -39,6 +45,10 @@ class Document: NSDocument {
     }
 
     override func dataOfType(typeName: String) throws -> NSData {
+        if let newContent = self.delegate?.contentToSave() {
+            self.content = newContent
+        }
+
         if self.content == nil {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }

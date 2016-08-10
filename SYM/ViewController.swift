@@ -53,6 +53,7 @@ class ContentViewController: NSViewController {
         
         if let document = self.document() {
             self.textView.string = document.content ?? ""
+            document.delegate = self
         }
         
         if self.textView.string != nil {
@@ -62,6 +63,12 @@ class ContentViewController: NSViewController {
         }
         
         self.view.window?.center()
+    }
+}
+
+extension ContentViewController: DocumentContentDelegate {
+    func contentToSave() -> String? {
+        return self.textView.string
     }
 }
 
@@ -113,7 +120,11 @@ extension ContentViewController: SymDelegate {
             return
         }
         
-        document.content = self.textView.string
+        if self.textView.string == document.content {
+            return
+        }
+        
+        //document.content = self.textView.string
         document.updateChangeCount(.ChangeDone)
     }
 }

@@ -79,6 +79,9 @@ extension Crash {
             result.appendString("\n")
         }
         
+        // Remove the last "\n".
+        result.deleteCharactersInRange(NSMakeRange(result.length - 1, 1))
+        
         let attr = NSMutableAttributedString(string: (result as String), attributes: defaultAttrs)
         
         for r in keyFrameRanges {
