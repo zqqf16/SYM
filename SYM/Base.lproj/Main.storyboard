@@ -552,13 +552,23 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jQO-Tk-XrS">
-                                <rect key="frame" x="310" y="13" width="89" height="32"/>
-                                <buttonCell key="cell" type="push" title="Website" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qeO-ni-8aK">
+                                <rect key="frame" x="332" y="13" width="67" height="32"/>
+                                <buttonCell key="cell" type="push" title="Blog" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qeO-ni-8aK">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="systemLight" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="gotoWebsite:" target="PAq-bZ-5Xh" id="t8c-OO-vL0"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fwf-Au-kLz">
+                                <rect key="frame" x="252" y="13" width="80" height="32"/>
+                                <buttonCell key="cell" type="push" title="Github" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="thC-WT-ob8">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="systemLight" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="gotoGithub:" target="BQJ-8w-mFZ" id="dfD-pP-cO1"/>
                                 </connections>
                             </button>
                         </subviews>

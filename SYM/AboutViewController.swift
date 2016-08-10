@@ -44,7 +44,12 @@ class AboutViewController: NSViewController {
     }
     
     @IBAction func gotoWebsite(sender: AnyObject) {
-        let url = NSURL(string: "http://blog.zorro.im")!
+        let url = NSURL(string: "http://blog.zorro.im?utm_source=share&utm_medium=sym")!
+        NSWorkspace.sharedWorkspace().openURL(url)
+    }
+    
+    @IBAction func gotoGithub(sender: AnyObject) {
+        let url = NSURL(string: "https://github.com/zqqf16/SYM")!
         NSWorkspace.sharedWorkspace().openURL(url)
     }
 }
