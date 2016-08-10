@@ -2,16 +2,17 @@
 
 # SYM
 
-A tool for crash symbolicating. 
+An app for crash symbolicating. 
 
 ## Features
 
-1. Support Umeng and Apple format crash log.
-2. <s>Support Umeng CSV file.</s>
-3. Automatically search dSYM files.
+1. Support Umeng and Apple crash log
+2. Automatically search dSYM files
+3. Highlight key backtrace frames
 
 ## Usage
 
-1. Import your dSYM file. This is optional, for SYM can search all dSYM files from your disk automatically.
-2. Import or paste in the crash log.
-3. Click menu "Symbol" -> "Symbolicate" or command + R.
+1. Make sure that the .dSYM or .xcarchive file exists on your disk.
+2. Open a crash log file (.crash, .ips or .txt) or paste in the crash info.
+3. Click menu "Symbol" -> "Symbolicate" or shortcuts command + R.
+4. Done.
