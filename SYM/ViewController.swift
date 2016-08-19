@@ -129,7 +129,7 @@ extension ContentViewController: SymDelegate {
     }
 }
 
-extension ContentViewController: NSTextViewDelegate {
+extension ContentViewController: TextViewDelegate {
     func textView(view: NSTextView, menu: NSMenu, forEvent event: NSEvent, atIndex charIndex: Int) -> NSMenu? {
         let menu = NSMenu(title: "dSYM")
         let showItem = NSMenuItem(title: "Symbolicate", action: #selector(symbolicate), keyEquivalent: "")
@@ -141,6 +141,12 @@ extension ContentViewController: NSTextViewDelegate {
     
     func undoManagerForTextView(view: NSTextView) -> NSUndoManager? {
         return self.document()?.undoManager
+    }
+    
+    func textViewDidreadSelectionFromPasteboard() {
+        asyncMain {
+            self.symbolicate(nil)
+        }
     }
 }
 

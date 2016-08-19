@@ -10,6 +10,7 @@
 		519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */ = {isa = PBXBuildFile; fileRef = 519FF5871D54BB2600B07A65 /* symbolicatecrash */; };
 		51B8D7051D4F620100F2C24C /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* Document.swift */; };
 		51B8D7281D4F6A0000F2C24C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ViewController.swift */; };
+		51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C491D66AB8800379BFC /* TextView.swift */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A21D3E675A00F3B00C /* Then.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A11D3E675A00F3B00C /* Then.swift */; };
@@ -34,6 +35,7 @@
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
 		51B8D7041D4F620100F2C24C /* Document.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 		51B8D7271D4F6A0000F2C24C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		51BF9C491D66AB8800379BFC /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A11D3E675A00F3B00C /* Then.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Then.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				F40543691D321E37009B2923 /* Window.swift */,
+				51BF9C491D66AB8800379BFC /* TextView.swift */,
 				51B8D7271D4F6A0000F2C24C /* ViewController.swift */,
 				F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
@@ -256,6 +259,7 @@
 				F49A8B631D3A8BE300B951AD /* CSwiftV.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ViewController.swift in Sources */,
+				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,
 				51B8D7051D4F620100F2C24C /* Document.swift in Sources */,
 				F41D592E1D43A2930046C623 /* Parser.swift in Sources */,
 			);

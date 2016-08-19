@@ -71,14 +71,6 @@ extension String {
 }
 
 
-// MARK: - NSTextView
-extension NSTextView {
-    func setAttributeString(attributeString: NSAttributedString) {
-        self.textStorage?.setAttributedString(attributeString)
-    }
-}
-
-
 // MARK: - Dictionary
 extension Dictionary {
     init(keys: [Key], values: [Value]) {
