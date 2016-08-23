@@ -11,6 +11,8 @@
 		51B8D7051D4F620100F2C24C /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* Document.swift */; };
 		51B8D7281D4F6A0000F2C24C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ViewController.swift */; };
 		51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C491D66AB8800379BFC /* TextView.swift */; };
+		51BF9C521D6C7A1C00379BFC /* SYMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C511D6C7A1C00379BFC /* SYMTests.swift */; };
+		51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */ = {isa = PBXBuildFile; fileRef = 51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A21D3E675A00F3B00C /* Then.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A11D3E675A00F3B00C /* Then.swift */; };
@@ -31,11 +33,25 @@
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		51BF9C541D6C7A1C00379BFC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F49BD1E41D2FF46300024AAE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F49BD1EB1D2FF46300024AAE;
+			remoteInfo = SYM;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
 		51B8D7041D4F620100F2C24C /* Document.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 		51B8D7271D4F6A0000F2C24C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		51BF9C491D66AB8800379BFC /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
+		51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SYMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		51BF9C511D6C7A1C00379BFC /* SYMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYMTests.swift; sourceTree = "<group>"; };
+		51BF9C531D6C7A1C00379BFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UmengDemo.crash; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A11D3E675A00F3B00C /* Then.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Then.swift; sourceTree = "<group>"; };
@@ -59,6 +75,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		51BF9C4C1D6C7A1C00379BFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F49BD1E91D2FF46300024AAE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -83,6 +106,16 @@
 				51B8D7041D4F620100F2C24C /* Document.swift */,
 			);
 			name = Document;
+			sourceTree = "<group>";
+		};
+		51BF9C501D6C7A1C00379BFC /* SYMTests */ = {
+			isa = PBXGroup;
+			children = (
+				51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */,
+				51BF9C511D6C7A1C00379BFC /* SYMTests.swift */,
+				51BF9C531D6C7A1C00379BFC /* Info.plist */,
+			);
+			path = SYMTests;
 			sourceTree = "<group>";
 		};
 		F43C129D1D39CEE0004952B4 /* images */ = {
@@ -129,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				F49BD1EE1D2FF46300024AAE /* SYM */,
+				51BF9C501D6C7A1C00379BFC /* SYMTests */,
 				F49BD1ED1D2FF46300024AAE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				F49BD1EC1D2FF46300024AAE /* SYM.app */,
+				51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -174,6 +209,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		51BF9C4E1D6C7A1C00379BFC /* SYMTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 51BF9C581D6C7A1C00379BFC /* Build configuration list for PBXNativeTarget "SYMTests" */;
+			buildPhases = (
+				51BF9C4B1D6C7A1C00379BFC /* Sources */,
+				51BF9C4C1D6C7A1C00379BFC /* Frameworks */,
+				51BF9C4D1D6C7A1C00379BFC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				51BF9C551D6C7A1C00379BFC /* PBXTargetDependency */,
+			);
+			name = SYMTests;
+			productName = SYMTests;
+			productReference = 51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F49BD1EB1D2FF46300024AAE /* SYM */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F49BD2111D2FF46400024AAE /* Build configuration list for PBXNativeTarget "SYM" */;
@@ -201,6 +254,10 @@
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = zqqf16;
 				TargetAttributes = {
+					51BF9C4E1D6C7A1C00379BFC = {
+						CreatedOnToolsVersion = 7.3.1;
+						TestTargetID = F49BD1EB1D2FF46300024AAE;
+					};
 					F49BD1EB1D2FF46300024AAE = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = BPL95996PK;
@@ -221,11 +278,20 @@
 			projectRoot = "";
 			targets = (
 				F49BD1EB1D2FF46300024AAE /* SYM */,
+				51BF9C4E1D6C7A1C00379BFC /* SYMTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		51BF9C4D1D6C7A1C00379BFC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F49BD1EA1D2FF46300024AAE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,6 +306,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		51BF9C4B1D6C7A1C00379BFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				51BF9C521D6C7A1C00379BFC /* SYMTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F49BD1E81D2FF46300024AAE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -267,6 +341,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		51BF9C551D6C7A1C00379BFC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F49BD1EB1D2FF46300024AAE /* SYM */;
+			targetProxy = 51BF9C541D6C7A1C00379BFC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		F49BD1F51D2FF46300024AAE /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -279,6 +361,32 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		51BF9C561D6C7A1C00379BFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = SYMTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
+			};
+			name = Debug;
+		};
+		51BF9C571D6C7A1C00379BFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = SYMTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
+			};
+			name = Release;
+		};
 		F49BD20F1D2FF46400024AAE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -392,6 +500,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		51BF9C581D6C7A1C00379BFC /* Build configuration list for PBXNativeTarget "SYMTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				51BF9C561D6C7A1C00379BFC /* Debug */,
+				51BF9C571D6C7A1C00379BFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		F49BD1E71D2FF46300024AAE /* Build configuration list for PBXProject "SYM" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

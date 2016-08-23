@@ -1,0 +1,41 @@
+Application received signal SIGSEGV
+(null)
+((
+  0  CoreFoundation                 0x00000001823b0f60 <redacted> + 148
+  1  libobjc.A.dylib                0x000000019785bf80 objc_exception_throw + 56
+  2  CoreFoundation                 0x00000001823b0e90 <redacted> + 0
+  3  DemoApp                        0x100b32844        UmengSignalHandler (in DemoApp) + 128
+  4  libsystem_platform.dylib       0x000000019827d93c _sigtramp + 52
+  5  libcache.dylib                 0x0000000197ff2004 <redacted> + 184
+  6  libcache.dylib                 0x0000000197ff2240 cache_remove_with_block + 200
+  7  CoreFoundation                 0x00000001823f3ddc <redacted> + 124
+  8  CoreFoundation                 0x000000018235660c <redacted> + 20
+  9  CoreFoundation                 0x0000000182355e2c <redacted> + 396
+  10 CoreFoundation                 0x0000000182355bac <redacted> + 60
+  11 CoreFoundation                 0x00000001823bb424 <redacted> + 1532
+  12 CoreFoundation                 0x0000000182296714 _CFXNotificationPost + 368
+  13 Foundation                     0x0000000183206dcc <redacted> + 68
+  14 UIKit                          0x0000000187bf0860 <redacted> + 320
+  15 UIKit                          0x0000000187cba5f0 <redacted> + 128
+  16 UIKit                          0x0000000187bf06cc <redacted> + 100
+  17 UIKit                          0x0000000187bf0c48 <redacted> + 700
+  18 UIKit                          0x0000000187c004c4 <redacted> + 448
+  19 UIKit                          0x0000000187beaf14 <redacted> + 152
+  20 UIKit                          0x0000000187beab9c <redacted> + 708
+  21 FrontBoardServices             0x000000018c5177c4 <redacted> + 184
+  22 FrontBoardServices             0x000000018c517b44 <redacted> + 56
+  23 CoreFoundation                 0x0000000182368544 <redacted> + 24
+  24 CoreFoundation                 0x0000000182367fd8 <redacted> + 540
+  25 CoreFoundation                 0x0000000182365cd8 <redacted> + 724
+  26 CoreFoundation                 0x0000000182294ca0 CFRunLoopRunSpecific + 384
+  27 GraphicsServices               0x000000018d818088 GSEventRunModal + 180
+  28 UIKit                          0x00000001879acffc UIApplicationMain + 204
+  29 DemoApp                        0x100100ea0        main (in DemoApp) (main.m:14)
+  30 libdyld.dylib                  0x000000019809e8b8 <redacted> + 4
+)
+
+dSYM UUID: E5B0A378-6816-3D90-86FD-2AEF15894A85
+CPU Type: arm64
+Slide Address: 0x0000000100000000
+Binary Image: DemoApp
+Base Address: 0x00000001000e4000

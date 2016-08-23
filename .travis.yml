@@ -1,0 +1,12 @@
+branches:
+  only:
+    - master
+
+os: osx
+osx_image: xcode7.3
+
+xcode_project: SYM.xcodeproj
+xcode_scheme: SYMTests
+
+script:
+  - xcodebuild clean build test -project SYM.xcodeproj -scheme SYMTests
