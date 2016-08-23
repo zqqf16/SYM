@@ -1,5 +1,7 @@
 ![image](images/demo.png)
 
+[![Build Status](https://travis-ci.org/zqqf16/SYM.svg?branch=master)](https://travis-ci.org/zqqf16/SYM)
+
 # SYM
 
 An app for crash symbolicating. 
