@@ -126,12 +126,14 @@ sub try_batch_symbolicate {
     }, $file);
 
     foreach my $crash (@crash_files) {
-        print "Symbolicate $crash\n";
+        print "➜ $crash\n";
         our $opt_output = "/tmp/".basename($crash);
         symbolicate_log($crash, @extra_search_paths);
         move($opt_output, $crash);
         print STDERR "✓ $crash\n";
     }
+    
+    print STDERR "🍻 Done\n";
 }
 
 ##############
