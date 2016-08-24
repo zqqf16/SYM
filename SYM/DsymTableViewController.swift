@@ -28,8 +28,8 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.setDelegate(self)
-        self.tableView.setDataSource(self)
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
 
         //self.tableView.columnAutoresizingStyle = .UniformColumnAutoresizingStyle
         self.setupMenu()
@@ -38,7 +38,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
     private func setupMenu() {
         let menu = NSMenu(title: "dSYM")
         let showItem = NSMenuItem(title: "Show in Finder", action: #selector(showDsymFileInFinder), keyEquivalent: "")
-        showItem.enabled = true
+        showItem.isEnabled = true
         menu.addItem(showItem)
         menu.allowsContextMenuPlugIns = true
         self.tableView.menu = menu
@@ -47,18 +47,18 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
     func showDsymFileInFinder() {
         let row = self.tableView.clickedRow
         let dsym = DsymManager.sharedInstance.dsyms![row]
-        let fileURL = NSURL(fileURLWithPath: dsym.path)
-        NSWorkspace.sharedWorkspace().activateFileViewerSelectingURLs([fileURL])
+        let fileURL = URL(fileURLWithPath: dsym.path)
+        NSWorkspace.shared().activateFileViewerSelecting([fileURL])
     }
     
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+    func numberOfRows(in tableView: NSTableView) -> Int {
         if let dsyms = DsymManager.sharedInstance.dsyms {
             return dsyms.count
         }
         return 0
     }
     
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         
         let dsym = DsymManager.sharedInstance.dsyms![row]
 
@@ -70,7 +70,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
             text = dsym.name
         } else if tableColumn == tableView.tableColumns[1] {
             cellID = "DsymUUIDCell"
-            text = dsym.uuids.joinWithSeparator(" | ")
+            text = dsym.uuids.joined(separator: " | ")
         } else if tableColumn == tableView.tableColumns[2] {
             cellID = "DsymPathCell"
             text = dsym.path
@@ -78,7 +78,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
             return nil
         }
         
-        if let cell = tableView.makeViewWithIdentifier(cellID!, owner: nil) as? NSTableCellView {
+        if let cell = tableView.make(withIdentifier: cellID!, owner: nil) as? NSTableCellView {
             cell.textField?.stringValue = text!
             cell.toolTip = text!
             return cell

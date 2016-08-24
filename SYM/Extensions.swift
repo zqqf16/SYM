@@ -29,44 +29,44 @@ import Cocoa
 extension String {
     subscript (r: Range<Int>) -> String {
         get {
-            let startIndex = self.startIndex.advancedBy(r.startIndex)
-            let endIndex = self.startIndex.advancedBy(r.endIndex)
+            let startIndex = self.characters.index(self.startIndex, offsetBy: r.lowerBound)
+            let endIndex = self.characters.index(self.startIndex, offsetBy: r.upperBound)
             
             return self[startIndex..<endIndex]
         }
     }
 
     func strip() -> String {
-        return self.stringByTrimmingCharactersInSet(
-            NSCharacterSet.whitespaceAndNewlineCharacterSet()
+        return self.trimmingCharacters(
+            in: CharacterSet.whitespacesAndNewlines
         )
     }
 
-    func matchGroups(match: NSTextCheckingResult) -> [String] {
+    func matchGroups(_ match: NSTextCheckingResult) -> [String] {
         let number = match.numberOfRanges
         var result = [String]()
         
         for index in 0..<number {
-            let range = match.rangeAtIndex(index)
+            let range = match.rangeAt(index)
             result.append(self[range.toRange()!])
         }
         return result
     }
 
-    func extendToLength(length: Int, withString padString: String=" ") -> String {
-        return self.stringByPaddingToLength(length, withString: padString, startingAtIndex: 0)
+    func extendToLength(_ length: Int, withString padString: String=" ") -> String {
+        return self.padding(toLength: length, withPad: padString, startingAt: 0)
     }
 
     func uuidFormat() -> String {
         var uuid = ""
-        for (index, char) in self.characters.enumerate() {
+        for (index, char) in self.characters.enumerated() {
             if [8, 12, 16, 20].contains(index) {
                 uuid.append("-" as Character)
             }
             uuid.append(char)
         }
         
-        return uuid.uppercaseString
+        return uuid.uppercased()
     }
 }
 
@@ -84,39 +84,39 @@ extension Dictionary {
 
 
 // MARK: - NSFileManager
-enum FileError: ErrorType {
-    case DirectoryNotExist
-    case CreateFailed
+enum FileError: Error {
+    case directoryNotExist
+    case createFailed
 }
 
-extension NSFileManager {
-    func findOrCreateDirectory(searchPathDirectory directory: NSSearchPathDirectory, inDomain domain: NSSearchPathDomainMask, appendPathComponent component: String?) throws -> String {
+extension FileManager {
+    func findOrCreateDirectory(searchPathDirectory directory: FileManager.SearchPathDirectory, inDomain domain: FileManager.SearchPathDomainMask, appendPathComponent component: String?) throws -> String {
         let paths = NSSearchPathForDirectoriesInDomains(directory, domain, true)
         
         if paths.count == 0 {
-            throw FileError.DirectoryNotExist
+            throw FileError.directoryNotExist
         }
     
         var path = paths[0]
         if component != nil {
-            path = (path as NSString).stringByAppendingPathComponent(component!)
+            path = (path as NSString).appendingPathComponent(component!)
         }
         
         do {
-            try self.createDirectoryAtPath(path, withIntermediateDirectories: true, attributes: nil)
+            try self.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
         } catch {
-            throw FileError.CreateFailed
+            throw FileError.createFailed
         }
         
         return path
     }
     
     func appSupportDirectory() -> String? {
-        let app = NSBundle.mainBundle().infoDictionary!["CFBundleExecutable"] as! String
+        let app = Bundle.main.infoDictionary!["CFBundleExecutable"] as! String
         
         let path: String
         do {
-            path = try self.findOrCreateDirectory(searchPathDirectory: .ApplicationSupportDirectory, inDomain: .UserDomainMask, appendPathComponent: app)
+            path = try self.findOrCreateDirectory(searchPathDirectory: .applicationSupportDirectory, inDomain: .userDomainMask, appendPathComponent: app)
         } catch {
             return nil
         }
@@ -125,7 +125,7 @@ extension NSFileManager {
     }
     
     func temporaryPath() -> String {
-        let uuid = NSProcessInfo.processInfo().globallyUniqueString
-        return (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(uuid)
+        let uuid = ProcessInfo.processInfo.globallyUniqueString
+        return (NSTemporaryDirectory() as NSString).appendingPathComponent(uuid)
     }
 }

@@ -30,8 +30,8 @@ let defaultAttrs: [String: AnyObject] = [
 ]
 
 let backtraceAttrs: [String: AnyObject] = [
-    NSForegroundColorAttributeName: NSColor.redColor(),
-    NSFontAttributeName: NSFontManager.sharedFontManager().fontWithFamily("Menlo", traits: .BoldFontMask, weight: 0, size: 11)!
+    NSForegroundColorAttributeName: NSColor.red,
+    NSFontAttributeName: NSFontManager.shared().font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
 ]
 
 
@@ -59,28 +59,28 @@ extension Crash {
             return NSAttributedString(string: self.content, attributes: defaultAttrs)
         }
         
-        let lines = self.content.componentsSeparatedByString("\n")
+        let lines = self.content.components(separatedBy: "\n")
         let result = NSMutableString()
         
-        for (index, line) in lines.enumerate() {
+        for (index, line) in lines.enumerated() {
             if let frame = backtrace[index] {
                 if frame.image == self.appName {
                     let startIndex = result.length
-                    result.appendString(self.formatFrame(frame))
+                    result.append(self.formatFrame(frame))
                     let endIndex = result.length
                     keyFrameRanges.append(NSMakeRange(startIndex, endIndex-startIndex))
                 } else {
-                    result.appendString(self.formatFrame(frame))
+                    result.append(self.formatFrame(frame))
                 }
             } else {
-                result.appendString(line)
+                result.append(line)
             }
             
-            result.appendString("\n")
+            result.append("\n")
         }
         
         // Remove the last "\n".
-        result.deleteCharactersInRange(NSMakeRange(result.length - 1, 1))
+        result.deleteCharacters(in: NSMakeRange(result.length - 1, 1))
         
         let attr = NSMutableAttributedString(string: (result as String), attributes: defaultAttrs)
         
@@ -91,7 +91,7 @@ extension Crash {
         return attr
     }
     
-    func formatFrame(frame: Frame) -> String {
+    func formatFrame(_ frame: Frame) -> String {
         let index = frame.index.extendToLength(2)
         let image = frame.image.extendToLength(30)
         let address = frame.address.extendToLength(18)

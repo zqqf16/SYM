@@ -30,10 +30,10 @@ struct RE {
     
     init(_ pattern: String) throws {
         try regex = NSRegularExpression(pattern: pattern,
-                                        options: .CaseInsensitive)
+                                        options: .caseInsensitive)
     }
     
-    static func compile(pattern: String) -> RE? {
+    static func compile(_ pattern: String) -> RE? {
         do {
             return try RE(pattern)
         } catch {
@@ -41,10 +41,10 @@ struct RE {
         }
     }
     
-    func match(input: String) -> [String]? {
-        let matches = regex.matchesInString(input,
-                                            options: [],
-                                            range: NSMakeRange(0, input.utf16.count))
+    func match(_ input: String) -> [String]? {
+        let matches = regex.matches(in: input,
+                                    options: [],
+                                    range: NSMakeRange(0, input.utf16.count))
         if matches.count == 0 {
             return nil
         }
@@ -54,7 +54,7 @@ struct RE {
         var groups = [String]()
 
         for index in 1..<number {
-            let range = match.rangeAtIndex(index)
+            let range = match.rangeAt(index)
             groups.append(input[range.toRange()!])
         }
         

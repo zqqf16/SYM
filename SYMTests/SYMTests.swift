@@ -31,8 +31,8 @@ class SYMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        let bundle = NSBundle(forClass: self.dynamicType)
-        let path = bundle.pathForResource("UmengDemo", ofType: "crash")!
+        let bundle = Bundle(for: self.dynamicType)
+        let path = bundle.path(forResource: "UmengDemo", ofType: "crash")!
         do {
             self.umengDemo = try String(contentsOfFile: path)
         } catch {
@@ -47,7 +47,7 @@ class SYMTests: XCTestCase {
     
     func testCrashType() {
         let type = CrashType.fromContent(self.umengDemo!)
-        XCTAssertEqual(type, CrashType.Umeng)
+        XCTAssertEqual(type, CrashType.umeng)
     }
     
     func testCrashParser() {
@@ -73,7 +73,7 @@ class SYMTests: XCTestCase {
     
     func testParserPerformance() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
             let _ = Parser.parse(self.umengDemo!)!
         }
