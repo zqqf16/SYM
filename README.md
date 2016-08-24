@@ -1,4 +1,4 @@
-![image](images/demo.png)
+![image](images/slogan.png)
 
 [![Build Status](https://travis-ci.org/zqqf16/SYM.svg?branch=master)](https://travis-ci.org/zqqf16/SYM)
 
@@ -18,3 +18,7 @@ An app for crash symbolicating.
 2. Open a crash log file (.crash, .ips or .txt) or paste in the crash info.
 3. Click menu "Symbol" -> "Symbolicate" or shortcuts command + R.
 4. Done.
+
+## Example
+
+![Demo](images/demo.png)
