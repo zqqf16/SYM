@@ -1,6 +1,6 @@
 ![image](images/slogan.png)
 
-[![Build Status](https://travis-ci.org/zqqf16/SYM.svg?branch=master)](https://travis-ci.org/zqqf16/SYM)
+[![Build Status](https://travis-ci.org/zqqf16/SYM.svg?branch=master)](https://travis-ci.org/zqqf16/SYM) [![GitHub stars](https://img.shields.io/github/stars/zqqf16/SYM.svg)](https://github.com/zqqf16/SYM/stargazers) [![GitHub forks](https://img.shields.io/github/forks/zqqf16/SYM.svg)](https://github.com/zqqf16/SYM/network) [![GitHub issues](https://img.shields.io/github/issues/zqqf16/SYM.svg)](https://github.com/zqqf16/SYM/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/zqqf16/SYM/master/LICENSE) [![Contact](https://img.shields.io/badge/Contact-%40zqqf16-blue.svg)](https://twitter.com/zqqf16)
 
 # SYM
 
