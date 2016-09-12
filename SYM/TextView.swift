@@ -30,7 +30,14 @@ import Cocoa
 
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
-        self.textStorage?.setAttributedString(attributeString)
+        let len: Int
+        if let origin = self.string {
+            let originString = origin as NSString
+            len = originString.length
+        } else {
+            len = 0
+        }
+        self.insertText(attributeString, replacementRange: NSRange(location: 0, length: len))
     }
 }
 

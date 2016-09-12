@@ -31,6 +31,10 @@ extension NSViewController {
         }
         return nil
     }
+    
+    func window() -> MainWindow? {
+        return self.view.window as? MainWindow
+    }
 }
 
 class ContentViewController: NSViewController {
@@ -45,6 +49,7 @@ class ContentViewController: NSViewController {
     private func setupTextView() {
         self.textView.font = NSFont(name: "Menlo", size: 11)
         self.textView.textContainerInset = CGSize(width: 10, height: 10)
+        self.textView.allowsUndo = true
         self.textView.delegate = self
     }
     
@@ -95,7 +100,7 @@ extension ContentViewController: SymDelegate {
         default:
             return
         }
-        
+        self.window()?.updateProgress(true)
         sym?.symbolicate(crash)
     }
     
@@ -111,21 +116,9 @@ extension ContentViewController: SymDelegate {
     func didFinish(crash: Crash) {
         asyncMain {
             self.textView.setAttributeString(crash.pretty())
-            self.updateDocument()
+            self.textView.scrollToBeginningOfDocument(nil)
+            self.window()?.updateProgress(false)
         }
-    }
-    
-    func updateDocument() {
-        guard let document = self.document() else {
-            return
-        }
-        
-        if self.textView.string == document.content {
-            return
-        }
-        
-        //document.content = self.textView.string
-        document.updateChangeCount(.ChangeDone)
     }
 }
 
@@ -137,10 +130,6 @@ extension ContentViewController: TextViewDelegate {
         menu.addItem(showItem)
         menu.allowsContextMenuPlugIns = true
         return menu
-    }
-    
-    func undoManagerForTextView(view: NSTextView) -> NSUndoManager? {
-        return self.document()?.undoManager
     }
     
     func textViewDidreadSelectionFromPasteboard() {

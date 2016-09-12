@@ -40,6 +40,8 @@ class BaseWindow: NSWindow {
 
 
 class MainWindow: BaseWindow {
+    var indicator: NSProgressIndicator?
+    
     required init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
         self.styleMask ^= NSFullSizeContentViewWindowMask
@@ -47,6 +49,29 @@ class MainWindow: BaseWindow {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func updateProgress(start: Bool) {
+        var frame = CGRectZero
+        let iconButton = self.standardWindowButton(.DocumentIconButton)
+        if iconButton != nil {
+            frame = iconButton!.frame
+            frame.origin.x -= 24
+        }
+        if indicator == nil {
+            indicator = NSProgressIndicator(frame: frame)
+            indicator!.style = .SpinningStyle
+            iconButton?.superview?.addSubview(indicator!)
+        } else {
+            indicator?.frame = frame
+        }
+        
+        if start {
+            indicator?.startAnimation(nil)
+        } else {
+            indicator?.stopAnimation(nil)
+        }
+        indicator?.hidden = !start
     }
 }
 
@@ -65,7 +90,6 @@ class Window: NSWindow, NSDraggingDestination {
 
         self.registerForDraggedTypes([NSStringPboardType, NSFilenamesPboardType])
     }
-
 
     // MARK: Dragging
     
