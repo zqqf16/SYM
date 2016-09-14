@@ -30,6 +30,10 @@ import Cocoa
 
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
+        if (self.string == attributeString.string) {
+            self.textStorage?.setAttributedString(attributeString)
+            return
+        }
         let len: Int
         if let origin = self.string {
             let originString = origin as NSString

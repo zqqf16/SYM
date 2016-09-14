@@ -53,10 +53,10 @@ class MainWindow: BaseWindow {
 
     func updateProgress(start: Bool) {
         var frame = CGRectZero
-        let iconButton = self.standardWindowButton(.DocumentIconButton)
+        let iconButton = self.standardWindowButton(.ZoomButton)
         if iconButton != nil {
             frame = iconButton!.frame
-            frame.origin.x -= 24
+            frame.origin.x += 24
         }
         if indicator == nil {
             indicator = NSProgressIndicator(frame: frame)

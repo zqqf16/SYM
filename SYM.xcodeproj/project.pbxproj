@@ -507,6 +507,7 @@
 				51BF9C571D6C7A1C00379BFC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F49BD1E71D2FF46300024AAE /* Build configuration list for PBXProject "SYM" */ = {
 			isa = XCConfigurationList;
