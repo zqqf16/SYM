@@ -8,9 +8,9 @@ An app for crash symbolicating.
 
 ## Features
 
-1. Support Umeng and Apple crash log
-2. Automatically search dSYM files
-3. Highlight key backtrace frames
+1. Support Umeng and Apple crash log.
+2. Automatically search dSYM files.
+3. Highlight key backtrace frames.
 
 ## Usage
 
