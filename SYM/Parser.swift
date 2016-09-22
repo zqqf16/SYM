@@ -26,7 +26,7 @@ import Foundation
 
 extension String {
     var separatedValue: String? {
-        let list = self.componentsSeparatedByString(":")
+        let list = self.components(separatedBy: ":")
         if list.count < 2 {
             return nil
         }
@@ -42,7 +42,7 @@ extension String {
 
 
 extension Image {
-    func addFrame(frame: Frame) {
+    func addFrame(_ frame: Frame) {
         if self.backtrace == nil{
             self.backtrace = [Frame]()
         }
@@ -68,7 +68,7 @@ extension Image {
 }
 
 extension Crash {
-    func addFrame(frame: Frame) {
+    func addFrame(_ frame: Frame) {
         if self.images == nil {
             self.images = [String: Image]()
         }
@@ -83,16 +83,16 @@ extension Crash {
 
 class Parser {
 
-    static func parse(raw: String) -> Crash? {
+    static func parse(_ raw: String) -> Crash? {
         var crash = Crash(content: raw)
         guard let type = CrashType.fromContent(raw) else {
             return nil
         }
         
         switch type {
-        case .Umeng:
+        case .umeng:
             self.parseUmengCrash(&crash)
-        case .Apple:
+        case .apple:
             self.parseAppleCrash(&crash)
         default:
             break
@@ -101,16 +101,16 @@ class Parser {
         return crash
     }
     
-    static func parseUmengCrash(inout crash: Crash) {
-        let lines = crash.content.componentsSeparatedByString("\n")
+    static func parseUmengCrash(_ crash: inout Crash) {
+        let lines = crash.content.components(separatedBy: "\n")
         
         var loadAddress: String?
         var uuid: String?
         
-        for (index, line) in lines.enumerate() {
+        for (index, line) in lines.enumerated() {
             let value = line.strip()
             if value.hasPrefix("Application received") {
-                crash.reason = value.componentsSeparatedByString(" ").last
+                crash.reason = value.components(separatedBy: " ").last
             } else if value.hasPrefix("dSYM UUID") {
                 uuid = value.separatedValue
             } else if value.hasPrefix("CPU Type") {
@@ -135,19 +135,19 @@ class Parser {
         }
     }
     
-    static func getBinary(line: String) -> String? {
+    static func getBinary(_ line: String) -> String? {
         // Process:         Simple-Example [24203]
         if let process = line.separatedValue {
-            return process.componentsSeparatedByString(" ")[0]
+            return process.components(separatedBy: " ")[0]
         }
         return nil
     }
     
-    static func parseAppleCrash(inout crash: Crash) {
-        let lines = crash.content.componentsSeparatedByString("\n")
+    static func parseAppleCrash(_ crash: inout Crash) {
+        let lines = crash.content.components(separatedBy: "\n")
         var binaryImagesSectionStarted = false
 
-        for (index, line) in lines.enumerate() {
+        for (index, line) in lines.enumerated() {
             let value = line.strip()
             if value.hasPrefix("Exception Type: ") {
                 crash.reason = value.separatedValue

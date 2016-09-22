@@ -36,15 +36,15 @@ class Document: NSDocument {
 
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateControllerWithIdentifier("Main Window Controller") as! NSWindowController
+        let windowController = storyboard.instantiateController(withIdentifier: "Main Window Controller") as! NSWindowController
         self.addWindowController(windowController)
     }
 
-    override func windowControllerDidLoadNib(aController: NSWindowController) {
+    override func windowControllerDidLoadNib(_ aController: NSWindowController) {
         super.windowControllerDidLoadNib(aController)
     }
 
-    override func dataOfType(typeName: String) throws -> NSData {
+    override func data(ofType typeName: String) throws -> Data {
         if let newContent = self.delegate?.contentToSave() {
             self.content = newContent
         }
@@ -53,11 +53,11 @@ class Document: NSDocument {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }
 
-        return self.content!.dataUsingEncoding(NSUTF8StringEncoding)!
+        return self.content!.data(using: String.Encoding.utf8)!
     }
 
-    override func readFromData(data: NSData, ofType typeName: String) throws {
-        self.content = String(data: data, encoding: NSUTF8StringEncoding)
+    override func read(from data: Data, ofType typeName: String) throws {
+        self.content = String(data: data, encoding: String.Encoding.utf8)
     }
 
     override class func autosavesInPlace() -> Bool {

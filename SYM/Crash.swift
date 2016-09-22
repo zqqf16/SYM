@@ -71,21 +71,21 @@ class Crash {
 }
 
 enum CrashType: Int {
-    case Umeng = 0
-    case Apple = 1
-    case CSV = 2
+    case umeng = 0
+    case apple = 1
+    case csv = 2
     
-    static func fromContent(content: String?) -> CrashType? {
+    static func fromContent(_ content: String?) -> CrashType? {
         guard let crash = content else {
             return nil
         }
         
-        if crash.containsString("摘要,应用版本,错误次数") {
-            return .CSV
-        } else if crash.containsString("Application received") {
-            return .Umeng
-        } else if crash.containsString("Incident Identifier") {
-            return .Apple
+        if crash.contains("摘要,应用版本,错误次数") {
+            return .csv
+        } else if crash.contains("Application received") {
+            return .umeng
+        } else if crash.contains("Incident Identifier") {
+            return .apple
         }
         
         return nil

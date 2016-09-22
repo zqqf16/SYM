@@ -24,16 +24,13 @@
 import Cocoa
 
 class BaseWindow: NSWindow {
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-    required override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
+    override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
         //self.titleVisibility = .Hidden
         self.titlebarAppearsTransparent = true
-        self.movableByWindowBackground = true
-        self.styleMask |= NSFullSizeContentViewWindowMask
-        self.backgroundColor = NSColor.whiteColor()
+        self.isMovableByWindowBackground = true
+        self.styleMask.insert(.fullSizeContentView)
+        self.backgroundColor = NSColor.white
         //self.center()
     }
 }
@@ -42,25 +39,21 @@ class BaseWindow: NSWindow {
 class MainWindow: BaseWindow {
     var indicator: NSProgressIndicator?
     
-    required init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
-        self.styleMask ^= NSFullSizeContentViewWindowMask
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    required override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
+        self.styleMask.remove(.fullSizeContentView)
     }
 
     func updateProgress(start: Bool) {
-        var frame = CGRectZero
-        let iconButton = self.standardWindowButton(.ZoomButton)
+        var frame = CGRect.zero
+        let iconButton = self.standardWindowButton(.zoomButton)
         if iconButton != nil {
             frame = iconButton!.frame
             frame.origin.x += 24
         }
         if indicator == nil {
             indicator = NSProgressIndicator(frame: frame)
-            indicator!.style = .SpinningStyle
+            indicator!.style = .spinningStyle
             iconButton?.superview?.addSubview(indicator!)
         } else {
             indicator?.frame = frame
@@ -71,43 +64,39 @@ class MainWindow: BaseWindow {
         } else {
             indicator?.stopAnimation(nil)
         }
-        indicator?.hidden = !start
+        indicator?.isHidden = !start
     }
 }
 
 
 class Window: NSWindow, NSDraggingDestination {
     @IBOutlet weak var navigationButton: NSSegmentedControl!
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
     
-    required override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
+    required override init(contentRect: NSRect, styleMask aStyle: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
-        self.titleVisibility = .Hidden
-        self.backgroundColor = NSColor.whiteColor()
+        self.titleVisibility = .hidden
+        self.backgroundColor = NSColor.white
 
         self.registerForDraggedTypes([NSStringPboardType, NSFilenamesPboardType])
     }
 
     // MARK: Dragging
     
-    func draggingEntered(sender: NSDraggingInfo) -> NSDragOperation {
+    func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
         Swift.print("dragging entered")
         let pasteboard = sender.draggingPasteboard()
         
         guard let types = pasteboard.types else {
-            return .None
+            return NSDragOperation()
         }
         
         if types.contains(NSFilenamesPboardType) {
             return sender.draggingSourceOperationMask()
         }
-        return .Generic
+        return .generic
     }
     
-    func performDragOperation(sender: NSDraggingInfo) -> Bool {
+    func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
 //        let pasteboard = sender.draggingPasteboard()
 //        
 //        guard let types = pasteboard.types else {

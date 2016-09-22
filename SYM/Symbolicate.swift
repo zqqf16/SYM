@@ -26,19 +26,19 @@ import Foundation
 
 protocol SymDelegate: class {
     func dsym(forUuid uuid: String) -> String?
-    func didFinish(crash: Crash)
+    func didFinish(_ crash: Crash)
 }
 
 protocol Sym {
     weak var delegate: SymDelegate? { get set }
     init(delegate: SymDelegate)
-    func symbolicate(crash: Crash)
+    func symbolicate(_ crash: Crash)
 }
 
 
 class Atos: Sym {
     
-    static let queue: NSOperationQueue = NSOperationQueue().then {
+    static let queue: OperationQueue = OperationQueue().then {
         $0.maxConcurrentOperationCount = 4
     }
     
@@ -51,7 +51,7 @@ class Atos: Sym {
         self.delegate = delegate
     }
     
-    func symbolicate(crash: Crash) {
+    func symbolicate(_ crash: Crash) {
         guard crash.images != nil && crash.images!.count != 0 else {
             self.delegate?.didFinish(crash)
             return
@@ -59,7 +59,7 @@ class Atos: Sym {
         
         self.crash = crash
         
-        var operations = [NSOperation]()
+        var operations = [Operation]()
         for image in crash.images!.values {
             if let task = self.symbolicate(image) {
                 operations.append(task)
@@ -80,7 +80,7 @@ class Atos: Sym {
         }
     }
     
-    func symbolicate(image: Image) -> SubProcess? {
+    func symbolicate(_ image: Image) -> SubProcess? {
         guard (image.backtrace != nil && image.backtrace!.count > 0) else {
             return nil
         }
@@ -113,7 +113,7 @@ class Atos: Sym {
                               arch: self.crash!.arch)
         
         task.completionBlock = {
-            if task.cancelled {
+            if task.isCancelled {
                 return
             }
             
@@ -122,7 +122,7 @@ class Atos: Sym {
             }
             
             asyncMain {
-                for (index, symbol) in result.enumerate() {
+                for (index, symbol) in result.enumerated() {
                     image.backtrace![index].symbol = symbol
                 }
                 self.taskCompleted()
@@ -141,10 +141,10 @@ class AppleTool: Sym {
         self.delegate = delegate
     }
     
-    func symbolicate(crash: Crash) {
-        let path = NSFileManager.defaultManager().temporaryPath()
+    func symbolicate(_ crash: Crash) {
+        let path = FileManager.default.temporaryPath()
         do {
-            try crash.content.writeToFile(path, atomically: true, encoding: NSUTF8StringEncoding)
+            try crash.content.write(toFile: path, atomically: true, encoding: String.Encoding.utf8)
         } catch {
             return
         }

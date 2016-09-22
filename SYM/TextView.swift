@@ -25,7 +25,7 @@ import Cocoa
 
 
 @objc protocol TextViewDelegate: NSTextViewDelegate {
-    optional func textViewDidreadSelectionFromPasteboard()
+    @objc optional func textViewDidreadSelectionFromPasteboard()
 }
 
 extension NSTextView {
@@ -47,14 +47,14 @@ extension NSTextView {
 
 class TextView: NSTextView {
 
-    override func drawRect(dirtyRect: NSRect) {
-        super.drawRect(dirtyRect)
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
 
         // Drawing code here.
     }
     
-    override func readSelectionFromPasteboard(pboard: NSPasteboard) -> Bool {
-        let result = super.readSelectionFromPasteboard(pboard)
+    override func readSelection(from pboard: NSPasteboard) -> Bool {
+        let result = super.readSelection(from: pboard)
         
         if let theDelegate = self.delegate as? TextViewDelegate {
             theDelegate.textViewDidreadSelectionFromPasteboard!()
@@ -63,7 +63,7 @@ class TextView: NSTextView {
         return result
     }
     
-    override func performDragOperation(sender: NSDraggingInfo) -> Bool {
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard()
         
         guard let types = pboard.types else {
@@ -71,9 +71,9 @@ class TextView: NSTextView {
         }
         
         if types.contains(NSFilenamesPboardType) {
-            if let paths = pboard.propertyListForType(NSFilenamesPboardType) as? Array<String> {
-                let fileURL = NSURL(fileURLWithPath: paths[0])
-                NSDocumentController.sharedDocumentController().openDocumentWithContentsOfURL(fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: NSError?) in
+            if let paths = pboard.propertyList(forType: NSFilenamesPboardType) as? Array<String> {
+                let fileURL = URL(fileURLWithPath: paths[0])
+                NSDocumentController.shared().openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
                     // Do nothing
                 })
                 return true

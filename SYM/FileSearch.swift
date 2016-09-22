@@ -26,30 +26,30 @@ import Cocoa
 
 
 enum FileType {
-    case Crash
-    case CSV
-    case Dsym
-    case Binary
-    case Archive
-    case Zip
+    case crash
+    case csv
+    case dsym
+    case binary
+    case archive
+    case zip
 }
 
-func typeOfFile(path: String) -> FileType? {
+func typeOfFile(_ path: String) -> FileType? {
     do {
-        let type = try NSWorkspace.sharedWorkspace().typeOfFile(path)
+        let type = try NSWorkspace.shared().type(ofFile: path)
         switch type {
         case "com.apple.crashreport", "public.plain-text", "public.text":
-            return .Crash
+            return .crash
         case "com.pkware.zip-archive":
-            return .Zip
+            return .zip
         case "com.apple.xcode.archive":
-            return .Archive
+            return .archive
         case "com.apple.xcode.dsym":
-            return .Dsym
+            return .dsym
         case "public.comma-separated-values-text":
-            return .CSV
+            return .csv
         case "public.unix-executable", "public.data":
-            return .Binary
+            return .binary
         default:
             break
         }
@@ -58,10 +58,10 @@ func typeOfFile(path: String) -> FileType? {
     }
 
     // file type by extension
-    let ext = (path as NSString).pathExtension.lowercaseString
+    let ext = (path as NSString).pathExtension.lowercased()
     switch ext {
     case "txt", "sym", "log", "crash":
-        return .Crash
+        return .crash
     default:
         return nil
     }
@@ -75,30 +75,30 @@ class FileSearch {
     var metadataSearch: NSMetadataQuery = NSMetadataQuery()
     var observer: AnyObject?
     
-    func search(condition: String, completion: FileSearchHandler) {
+    func search(_ condition: String, completion: @escaping FileSearchHandler) {
         let predicate = NSPredicate(fromMetadataQueryString: condition)
         self.metadataSearch.predicate = predicate
         
-        let notificationCenter = NSNotificationCenter.defaultCenter()
+        let notificationCenter = NotificationCenter.default
         
         weak var weakSelf = self
-        self.observer = notificationCenter.addObserverForName(NSMetadataQueryDidFinishGatheringNotification, object: metadataSearch, queue: nil) { (notification) in
+        self.observer = notificationCenter.addObserver(forName: NSNotification.Name.NSMetadataQueryDidFinishGathering, object: metadataSearch, queue: nil) { (notification) in
             
-            weakSelf!.metadataSearch.stopQuery()
+            weakSelf!.metadataSearch.stop()
             if (weakSelf!.observer != nil) {
-                NSNotificationCenter.defaultCenter().removeObserver(weakSelf!.observer!)
+                NotificationCenter.default.removeObserver(weakSelf!.observer!)
             }
             
             let results = weakSelf?.metadataSearch.results as! [NSMetadataItem]
             completion(results)
         }
 
-        metadataSearch.startQuery()
+        metadataSearch.start()
     }
     
     deinit {
         if (self.observer != nil) {
-            NSNotificationCenter.defaultCenter().removeObserver(self.observer!)
+            NotificationCenter.default.removeObserver(self.observer!)
         }
     }
 }
@@ -109,7 +109,7 @@ class FileSearch {
 typealias DsymSearchHandler = ([Dsym]?)->()
 
 extension FileSearch {
-    func search(uuid: String?, completion: DsymSearchHandler) {
+    func search(_ uuid: String?, completion: @escaping DsymSearchHandler) {
         var condition = "com_apple_xcode_dsym_uuids = "
         if uuid != nil {
             condition += uuid!
@@ -125,13 +125,13 @@ extension FileSearch {
             
             var dsyms = [Dsym]()
             for item in results! {
-                let name = item.valueForKey(NSMetadataItemFSNameKey) as! String
+                let name = item.value(forKey: NSMetadataItemFSNameKey) as! String
                 
                 // mdls xxx
-                let path = item.valueForKey(NSMetadataItemPathKey) as! String
-                let dsym = item.valueForKey("com_apple_xcode_dsym_paths") as! [String]
-                let uuids = item.valueForKey("com_apple_xcode_dsym_uuids") as! [String]
-                let dsymPath = path.stringByAppendingString("/\(dsym[0])")
+                let path = item.value(forKey: NSMetadataItemPathKey) as! String
+                let dsym = item.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
+                let uuids = item.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
+                let dsymPath = path + "/\(dsym[0])"
                 dsyms.append(Dsym(uuids:uuids, name:name, path:dsymPath))
             }
             

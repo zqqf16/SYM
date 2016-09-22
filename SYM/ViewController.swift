@@ -78,7 +78,7 @@ extension ContentViewController: DocumentContentDelegate {
 }
 
 extension ContentViewController: SymDelegate {
-    @IBAction func symbolicate(sender: AnyObject?) {
+    @IBAction func symbolicate(_ sender: AnyObject?) {
         guard let content = self.textView.string else {
             return
         }
@@ -93,14 +93,14 @@ extension ContentViewController: SymDelegate {
         
         var sym: Sym?
         switch type {
-        case .Apple:
+        case .apple:
             sym = AppleTool(delegate: self)
-        case .Umeng:
+        case .umeng:
             sym = Atos(delegate: self)
         default:
             return
         }
-        self.window()?.updateProgress(true)
+        self.window()?.updateProgress(start: true)
         sym?.symbolicate(crash)
     }
     
@@ -113,25 +113,25 @@ extension ContentViewController: SymDelegate {
     }
 
     
-    func didFinish(crash: Crash) {
+    func didFinish(_ crash: Crash) {
         asyncMain {
-            self.textView.setAttributeString(crash.pretty())
+            self.textView.setAttributeString(attributeString: crash.pretty())
             self.textView.scrollToBeginningOfDocument(nil)
-            self.window()?.updateProgress(false)
+            self.window()?.updateProgress(start: false)
         }
     }
 }
 
 extension ContentViewController: TextViewDelegate {
-    func textView(view: NSTextView, menu: NSMenu, forEvent event: NSEvent, atIndex charIndex: Int) -> NSMenu? {
+    func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
         let menu = NSMenu(title: "dSYM")
         let showItem = NSMenuItem(title: "Symbolicate", action: #selector(symbolicate), keyEquivalent: "")
-        showItem.enabled = true
+        showItem.isEnabled = true
         menu.addItem(showItem)
         menu.allowsContextMenuPlugIns = true
         return menu
     }
-    
+
     func textViewDidreadSelectionFromPasteboard() {
         asyncMain {
             self.symbolicate(nil)
@@ -140,30 +140,30 @@ extension ContentViewController: TextViewDelegate {
 }
 
 extension ContentViewController {
-    @IBAction func importDsymFile(sender: AnyObject?) {
+    @IBAction func importDsymFile(_ sender: AnyObject?) {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = false
-        panel.beginSheetModalForWindow(self.view.window!) {
+        panel.beginSheetModal(for: self.view.window!) {
             (result) in
             if result != NSFileHandlingPanelOKButton {
                 return
             }
             
-            if panel.URLs.count == 0 {
+            if panel.urls.count == 0 {
                 return
             }
             
-            let url = panel.URLs[0]
+            let url = panel.urls[0]
             
             DsymManager.sharedInstance.importDsym(fromURL: url, completion: { (uuids, success) in
                 if uuids == nil {
                     let alert = NSAlert()
-                    alert.addButtonWithTitle("OK")
-                    alert.addButtonWithTitle("Cancel")
+                    alert.addButton(withTitle: "OK")
+                    alert.addButton(withTitle: "Cancel")
                     alert.messageText = "This is not a dSYM file"
-                    alert.informativeText = url.path!
-                    alert.beginSheetModalForWindow(self.view.window!, completionHandler: nil)
+                    alert.informativeText = url.path
+                    alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
                     return
                 }
                 

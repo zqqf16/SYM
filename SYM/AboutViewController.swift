@@ -34,7 +34,7 @@ class AboutViewController: NSViewController {
         super.viewDidLoad()
 
         self.icon.image = NSApp.applicationIconImage
-        let infoDict = NSBundle.mainBundle().infoDictionary!
+        let infoDict = Bundle.main.infoDictionary!
         
         let shortVersion = infoDict["CFBundleShortVersionString"] as! String
         let buildVersion = infoDict["CFBundleVersion"] as! String
@@ -44,12 +44,12 @@ class AboutViewController: NSViewController {
     }
     
     @IBAction func gotoWebsite(sender: AnyObject) {
-        let url = NSURL(string: "http://blog.zorro.im?utm_source=sym")!
-        NSWorkspace.sharedWorkspace().openURL(url)
+        let url = URL(string: "http://blog.zorro.im?utm_source=sym")!
+        NSWorkspace.shared().open(url)
     }
     
-    @IBAction func gotoGithub(sender: AnyObject) {
-        let url = NSURL(string: "https://github.com/zqqf16/SYM")!
-        NSWorkspace.sharedWorkspace().openURL(url)
+    @IBAction func gotoGithub(_ sender: AnyObject) {
+        let url = URL(string: "https://github.com/zqqf16/SYM")!
+        NSWorkspace.shared().open(url)
     }
 }

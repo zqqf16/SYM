@@ -26,14 +26,14 @@ import Foundation
 
 // MARK: - Global task queue
 
-let globalTaskQueue = NSOperationQueue().then {
+let globalTaskQueue = OperationQueue().then {
     $0.maxConcurrentOperationCount = 4
 }
 
 
 // MARK: - Sub process task operation
 
-class SubProcess: NSOperation {
+class SubProcess: Operation {
     
     var cmd: String
     var arguments: [String]?
@@ -46,15 +46,15 @@ class SubProcess: NSOperation {
     }
 
     override func main() {
-        if self.cancelled {
+        if self.isCancelled {
             return
         }
 
-        let pipe = NSPipe()
+        let pipe = Pipe()
 
-        let task = NSTask().then {
-            $0.launchPath = cmd
-            $0.arguments = arguments
+        let task = Process().then {
+            $0.launchPath = self.cmd
+            $0.arguments = self.arguments
             $0.standardOutput = pipe
         }
 
@@ -62,7 +62,7 @@ class SubProcess: NSOperation {
         
         let output = pipe.fileHandleForReading
         let data = output.readDataToEndOfFile()
-        self.result = String(data: data, encoding: NSUTF8StringEncoding)
+        self.result = String(data: data, encoding: String.Encoding.utf8)
     }
 }
 
@@ -83,7 +83,7 @@ extension SubProcess {
             return nil
         }
 
-        let lines = result.componentsSeparatedByString("\n").filter {
+        let lines = result.components(separatedBy: "\n").filter {
             (content) -> Bool in
             return content.characters.count > 0
         }
@@ -107,7 +107,7 @@ extension SubProcess {
             return nil
         }
         
-        let lines = result.componentsSeparatedByString("\n").filter {
+        let lines = result.components(separatedBy: "\n").filter {
             (content) -> Bool in
             if content.characters.count == 0 {
                 return false
@@ -117,7 +117,7 @@ extension SubProcess {
         }
         
         return lines.map({ (line) -> String in
-            return line.componentsSeparatedByString(" ")[1]
+            return line.components(separatedBy: " ")[1]
         })
     }
 }
@@ -127,7 +127,7 @@ extension SubProcess {
 
 extension SubProcess {
     convenience init(crashPath: String) {
-        let cmd = NSBundle.mainBundle().pathForResource("symbolicatecrash", ofType: nil)
+        let cmd = Bundle.main.path(forResource: "symbolicatecrash", ofType: nil)
         assert(cmd != nil)
 
         let arguments = [crashPath]
@@ -137,10 +137,10 @@ extension SubProcess {
 
 // MARK: - GCD
 
-func asyncGlobal(block: dispatch_block_t) {
-    dispatch_async(dispatch_get_global_queue(0, 0), block)
+func asyncGlobal(_ block: @escaping ()->()) {
+    DispatchQueue.global().async(execute: block)
 }
 
-func asyncMain(block: dispatch_block_t) {
-    dispatch_async(dispatch_get_main_queue(), block)
+func asyncMain(_ block: @escaping ()->()) {
+    DispatchQueue.main.async(execute: block)
 }
