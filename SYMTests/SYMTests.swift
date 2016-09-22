@@ -31,7 +31,7 @@ class SYMTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        let bundle = Bundle(for: self.dynamicType)
+        let bundle = Bundle(for: type(of: self))
         let path = bundle.path(forResource: "UmengDemo", ofType: "crash")!
         do {
             self.umengDemo = try String(contentsOfFile: path)
