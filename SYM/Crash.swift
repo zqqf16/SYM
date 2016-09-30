@@ -82,7 +82,7 @@ enum CrashType: Int {
         
         if crash.contains("摘要,应用版本,错误次数") {
             return .csv
-        } else if crash.contains("Application received") {
+        } else if (crash.contains("dSYM UUID") && crash.contains("Slide Address")) {
             return .umeng
         } else if crash.contains("Incident Identifier") {
             return .apple
