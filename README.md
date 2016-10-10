@@ -8,16 +8,25 @@ An app for crash symbolicating.
 
 ## Features
 
-1. Support Umeng and Apple crash log.
+1. Support Umeng, Bugly and Apple crash log.
 2. Automatically search dSYM files.
 3. Highlight key backtrace frames.
 
 ## Usage
 
-1. Make sure that the .dSYM or .xcarchive file exists on your disk.
-2. Open a crash log file (.crash, .ips or .txt) or paste in the crash info.
-3. Click menu "Symbol" -> "Symbolicate" or shortcuts command + R.
-4. Done.
+#### Symbolicate
+
+You can:
+
+- paste in crash informations
+- go to "Menu"->"File"->"Open" to open a crash file
+- right click an .ips or .crash file, open with SYM
+
+SYM can detect the crash format and symbolicate it automatically when it is opened or pasted in. You can manually do this by "Menu"->"Symbol"->"Symbolicate" or "⌘R"
+
+#### Import a dSYM file
+
+By default, SYM indexes all the dSYM files on your disk. However, there may be some "informal" type of dSYM files. You can import theme by "Menu"->"dSYM"->"Import dSYM".
 
 ## Example
 
