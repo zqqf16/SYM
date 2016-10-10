@@ -93,7 +93,7 @@ extension ContentViewController: SymDelegate {
         
         var sym: Sym?
         switch type {
-        case .apple:
+        case .apple, .bugly:
             sym = AppleTool(delegate: self)
         case .umeng:
             sym = Atos(delegate: self)

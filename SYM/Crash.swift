@@ -74,6 +74,7 @@ enum CrashType: Int {
     case umeng = 0
     case apple = 1
     case csv = 2
+    case bugly = 3
     
     static func fromContent(_ content: String?) -> CrashType? {
         guard let crash = content else {
@@ -86,6 +87,8 @@ enum CrashType: Int {
             return .umeng
         } else if crash.contains("Incident Identifier") {
             return .apple
+        } else if crash.contains("App base addr:") && crash.contains("System Binary infos:") {
+            return .bugly
         }
         
         return nil

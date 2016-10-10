@@ -94,6 +94,8 @@ class Parser {
             self.parseUmengCrash(&crash)
         case .apple:
             self.parseAppleCrash(&crash)
+        case .bugly:
+            self.parseBuglyCrash(&crash)
         default:
             break
         }
@@ -168,6 +170,51 @@ class Parser {
                     }
                 }
             }
+        }
+    }
+    
+    static func parseBuglyCrash(_ crash: inout Crash) {
+        let lines = crash.content.components(separatedBy: "\n")
+        
+        var binaryImagesSectionStarted = false
+        var loadAddress: String?
+        var uuid: String?
+        
+        for (index, line) in lines.enumerated() {
+            let value = line.strip()
+            if value.contains("App UUID:") {
+                uuid = value.separatedValue?.uuidFormat().lowercased()
+            } else if value.contains("App base addr:") {
+                loadAddress = value.separatedValue
+            } else if value.contains("Cpu Arch:") {
+                crash.arch = value.separatedValue ?? "arm64"
+            } else if value.contains("System Binary infos:") {
+                binaryImagesSectionStarted = true
+            } else if let frame = Frame(line: line) {
+                frame.lineNumber = index
+                crash.addFrame(frame)
+            } else if binaryImagesSectionStarted {
+                // 11 AppName: arm64;ea32e9c69a9c3c3783895052475a1d0d;0x00000001000d0000
+                let list = value.components(separatedBy: ":")
+                if list.count < 2 {
+                    continue
+                }
+                let appName = list[0].components(separatedBy: " ")
+                if appName.count < 2 {
+                    continue
+                }
+                crash.appName = appName[1]
+                binaryImagesSectionStarted = false
+            }
+        }
+        
+        if crash.images == nil || crash.appName == nil {
+            return
+        }
+        
+        if let image = crash.images![crash.appName!] {
+            image.uuid = uuid
+            image.loadAddress = loadAddress
         }
     }
 }
