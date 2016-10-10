@@ -27,6 +27,15 @@ import Cocoa
 
 // MARK: - String
 extension String {
+    var drop0xPrefix:          String { return hasPrefix("0x") ? String(characters.dropFirst(2)) : self }
+    var drop0bPrefix:          String { return hasPrefix("0b") ? String(characters.dropFirst(2)) : self }
+    var hexaToDecimal:            Int { return Int(drop0xPrefix, radix: 16) ?? 0 }
+    var hexaToBinaryString:    String { return String(hexaToDecimal, radix: 2) }
+    var decimalToHexaString:   String { return String(Int(self) ?? 0, radix: 16) }
+    var decimalToBinaryString: String { return String(Int(self) ?? 0, radix: 2) }
+    var binaryToDecimal:          Int { return Int(drop0bPrefix, radix: 2) ?? 0 }
+    var binaryToHexaString:    String { return String(binaryToDecimal, radix: 16) }
+
     subscript (r: Range<Int>) -> String {
         get {
             let startIndex = self.characters.index(self.startIndex, offsetBy: r.lowerBound)
@@ -53,7 +62,16 @@ extension String {
         return result
     }
 
-    func extendToLength(_ length: Int, withString padString: String=" ") -> String {
+    func leftPadding(toLength: Int, withPad character: Character) -> String {
+        let newLength = self.characters.count
+        if newLength < toLength {
+            return String(repeatElement(character, count: toLength - newLength)) + self
+        } else {
+            return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
+        }
+    }
+    
+    func extendToLength(_ length: Int, withString padString: String=" ", atRight: Bool=true) -> String {
         return self.padding(toLength: length, withPad: padString, startingAt: 0)
     }
 

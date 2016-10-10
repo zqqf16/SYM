@@ -49,6 +49,27 @@ class Frame {
         self.symbol = g[3]
         self.lineNumber = nil
     }
+    
+    func fixAddress(_ loadAddress: String) {
+        guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
+              self.symbol != nil,
+              self.symbol!.hasPrefix("+")
+        else {
+            return
+        }
+        
+        let list = self.symbol!.components(separatedBy: " ")
+        if list.count < 2 {
+            return
+        }
+        
+        guard let offset = Int(list[1]) else {
+            return
+        }
+        let newAddress = String(self.address.hexaToDecimal + offset, radix: 16)
+        self.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
+        self.symbol = "+ 0"
+    }
 }
 
 class Image {

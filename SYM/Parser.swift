@@ -183,7 +183,7 @@ class Parser {
         for (index, line) in lines.enumerated() {
             let value = line.strip()
             if value.contains("App UUID:") {
-                uuid = value.separatedValue?.uuidFormat().lowercased()
+                uuid = value.separatedValue?.uuidFormat()
             } else if value.contains("App base addr:") {
                 loadAddress = value.separatedValue
             } else if value.contains("Cpu Arch:") {
@@ -215,6 +215,11 @@ class Parser {
         if let image = crash.images![crash.appName!] {
             image.uuid = uuid
             image.loadAddress = loadAddress
+            if image.backtrace != nil && loadAddress != nil {
+                for frame in image.backtrace! {
+                    frame.fixAddress(loadAddress!)
+                }
+            }
         }
     }
 }

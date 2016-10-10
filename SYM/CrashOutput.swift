@@ -95,7 +95,7 @@ extension Crash {
         let index = frame.index.extendToLength(2)
         let image = frame.image.extendToLength(30)
         let address = frame.address.extendToLength(18)
-        
-        return "\(index) \(image) \(address) \(frame.symbol!)"
+        let symbol = frame.symbol ?? ""
+        return "\(index) \(image) \(address) \(symbol)"
     }
 }
