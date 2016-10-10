@@ -6,6 +6,8 @@
 
 An app for crash symbolicating. 
 
+Download the latest version from [here](https://github.com/zqqf16/SYM/releases/latest).
+
 ## Features
 
 1. Support Umeng, Bugly and Apple crash log.
