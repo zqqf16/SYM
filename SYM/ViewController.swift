@@ -91,6 +91,11 @@ extension ContentViewController: SymDelegate {
             return
         }
         
+        if !crash.needSymbolicate {
+            self.didFinish(crash)
+            return
+        }
+        
         var sym: Sym?
         switch type {
         case .apple, .bugly:

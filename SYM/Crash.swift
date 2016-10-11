@@ -89,6 +89,24 @@ class Crash {
     init(content: String) {
         self.content = content
     }
+    
+    var needSymbolicate: Bool {
+        guard let images = self.images else {
+            return false
+        }
+        
+        for (_, image) in images {
+            if let bt = image.backtrace {
+                for frame in bt {
+                    if frame.symbol == nil || frame.symbol!.hasPrefix("0x") {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
 }
 
 enum CrashType: Int {
