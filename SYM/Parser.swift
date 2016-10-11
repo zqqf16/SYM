@@ -78,6 +78,24 @@ extension Crash {
         image.name = frame.image
         self.images![frame.image] = image
     }
+
+    func correct() {
+        if self.images == nil || self.appName == nil {
+            return
+        }
+
+        for (_, image) in self.images! {
+            guard let bt = image.backtrace,
+                  let load = image.loadAddress
+            else {
+                continue
+            }
+
+            for frame in bt {
+                frame.fixAddress(load)
+            }
+        }
+    }
 }
 
 
@@ -102,7 +120,7 @@ class Parser {
         
         return crash
     }
-    
+
     static func parseUmengCrash(_ crash: inout Crash) {
         let lines = crash.content.components(separatedBy: "\n")
         
@@ -135,8 +153,10 @@ class Parser {
             image.uuid = uuid
             image.loadAddress = loadAddress
         }
+
+        crash.correct()
     }
-    
+
     static func getBinary(_ line: String) -> String? {
         // Process:         Simple-Example [24203]
         if let process = line.separatedValue {
@@ -144,7 +164,7 @@ class Parser {
         }
         return nil
     }
-    
+
     static func parseAppleCrash(_ crash: inout Crash) {
         let lines = crash.content.components(separatedBy: "\n")
         var binaryImagesSectionStarted = false
@@ -179,7 +199,7 @@ class Parser {
         var binaryImagesSectionStarted = false
         var loadAddress: String?
         var uuid: String?
-        
+
         for (index, line) in lines.enumerated() {
             let value = line.strip()
             if value.contains("App UUID:") {
@@ -207,20 +227,17 @@ class Parser {
                 binaryImagesSectionStarted = false
             }
         }
-        
+
         if crash.images == nil || crash.appName == nil {
             return
         }
-        
+
         if let image = crash.images![crash.appName!] {
             image.uuid = uuid
             image.loadAddress = loadAddress
-            if image.backtrace != nil && loadAddress != nil {
-                for frame in image.backtrace! {
-                    frame.fixAddress(loadAddress!)
-                }
-            }
         }
+
+        crash.correct()
     }
 }
 

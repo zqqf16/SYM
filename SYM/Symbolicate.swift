@@ -81,20 +81,13 @@ class Atos: Sym {
     }
     
     func symbolicate(_ image: Image) -> SubProcess? {
-        guard (image.backtrace != nil && image.backtrace!.count > 0) else {
-            return nil
-        }
-        guard let binary = image.name else {
-            return nil
-        }
-        guard let uuid = image.uuid else {
-            return nil
-        }
-        guard let dsym = self.delegate?.dsym(forUuid: uuid) else {
-            return nil
-        }
-        guard let load = image.loadAddress else {
-            return nil
+        guard image.backtrace != nil && image.backtrace!.count > 0,
+              let binary = image.name,
+              let uuid = image.uuid,
+              let dsym = self.delegate?.dsym(forUuid: uuid),
+              let load = image.loadAddress
+        else {
+                return nil
         }
 
         var addresses = [String]()
