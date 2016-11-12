@@ -66,6 +66,11 @@ class Atos: Sym {
             }
         }
         
+        if operations.count == 0 {
+            self.delegate?.didFinish(self.crash!)
+            return
+        }
+        
         self.numberOfTask = operations.count
         
         Atos.queue.addOperations(operations, waitUntilFinished: false)

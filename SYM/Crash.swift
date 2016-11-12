@@ -85,12 +85,17 @@ class Crash {
     var arch: String = "arm64"
     var appName: String?
     var images:[String: Image]?
+    var type: CrashType = .umeng
     
     init(content: String) {
         self.content = content
     }
     
     var needSymbolicate: Bool {
+        if self.type == .umeng {
+            return true
+        }
+
         guard let images = self.images else {
             return false
         }

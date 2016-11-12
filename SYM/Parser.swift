@@ -107,6 +107,8 @@ class Parser {
             return nil
         }
         
+        crash.type = type
+        
         switch type {
         case .umeng:
             self.parseUmengCrash(&crash)
@@ -117,7 +119,7 @@ class Parser {
         default:
             break
         }
-        
+
         return crash
     }
 
