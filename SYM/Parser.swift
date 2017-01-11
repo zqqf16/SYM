@@ -24,225 +24,243 @@
 import Foundation
 
 
-extension String {
-    var separatedValue: String? {
-        let list = self.components(separatedBy: ":")
-        if list.count < 2 {
-            return nil
-        }
-        
-        let value = list[1].strip()
-        if value.characters.count == 0 {
-            return nil
-        }
-        
-        return value
-    }
-}
-
-
-extension Image {
-    func addFrame(_ frame: Frame) {
-        if self.backtrace == nil{
-            self.backtrace = [Frame]()
-        }
-        
-        self.backtrace?.append(frame)
-    }
+struct LineRE {
+    
+    // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
+    static let frame =  RE.compile("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)")!
     
     // 0x19a8d8000 - 0x19a8f4fff libsystem_m.dylib arm64  <ee3277089d2b310c81263e5fbcbb3138> /usr/lib/system/libsystem_m.dylib
+    static let image = RE.compile("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")!
+    
+    static let thread = RE.compile("Thread (\\d{1,3})(?:[: ])(?:(?:(Crashed):)|(?:name:\\s+(.*)))*$")!
+}
 
-    static let re = RE.compile("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")!
 
-    convenience init?(line: String) {
-        guard let g = Image.re.match(line) else {
+extension CrashReport.Frame {
+    convenience init?(content: String, lineNumber: Int) {
+        guard let match = LineRE.frame.match(content) else {
             return nil
         }
         
-        self.init()
-        
-        self.loadAddress = g[0]
-        self.name = g[1]
-        self.uuid = g[3].uuidFormat()
+        self.init(index: match[0], image: match[1], address: match[2], line: lineNumber)
+        self.symbol = match[3]
     }
-}
-
-extension Crash {
-    func addFrame(_ frame: Frame) {
-        if self.images == nil {
-            self.images = [String: Image]()
+    
+    fileprivate func fixAddress(_ loadAddress: String) {
+        guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
+            self.symbol != nil,
+            self.symbol!.hasPrefix("+")
+            else {
+                return
         }
         
-        let image = self.images![frame.image] ?? Image()
-        image.addFrame(frame)
-        image.name = frame.image
-        self.images![frame.image] = image
-    }
-
-    func correct() {
-        if self.images == nil || self.appName == nil {
+        let list = self.symbol!.components(separatedBy: " ")
+        if list.count < 2 {
             return
         }
-
-        for (_, image) in self.images! {
-            guard let bt = image.backtrace,
-                  let load = image.loadAddress
-            else {
-                continue
-            }
-
-            for frame in bt {
-                frame.fixAddress(load)
-            }
+        
+        guard let offset = Int(list[1]) else {
+            return
         }
+        let newAddress = String(self.address.hexaToDecimal + offset, radix: 16)
+        self.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
+        self.symbol = "+ 0"
     }
 }
 
-
-class Parser {
-
-    static func parse(_ raw: String) -> Crash? {
-        var crash = Crash(content: raw)
-        guard let type = CrashType.fromContent(raw) else {
+extension CrashReport.Image {
+    fileprivate func update(uuid: String?, loadAddress: String?) {
+        self.uuid = uuid
+        self.loadAddress = loadAddress
+    }
+    
+    fileprivate convenience init(match: [String]) {
+        self.init(name: match[1])
+        self.loadAddress = match[0]
+        self.uuid = match[3].uuidFormat()
+    }
+    
+    fileprivate convenience init?(content: String) {
+        guard let match = LineRE.image.match(content) else {
             return nil
         }
         
-        crash.type = type
+        self.init(name: match[1])
         
-        switch type {
+        self.loadAddress = match[0]
+        self.uuid = match[3].uuidFormat()
+    }
+}
+
+extension CrashReport {
+    convenience init(_ content: String) {
+        self.init()
+        self.content = content
+        self.parse()
+    }
+    
+    func update(content: String) {
+        self.content = content
+        self.cleanParseResult()
+        self.parse()
+    }
+    
+    func cleanParseResult() {
+        self.threads = []
+        self.images = [:]
+        self.reason = nil
+        self.appName = nil
+    }
+    
+    private func detectBrand() -> CrashReport.Brand {
+        var brand: CrashReport.Brand = .unknow
+        
+        if let content = self.content {
+            if content.contains("dSYM UUID") && content.contains("Slide Address") {
+                brand = .umeng
+            } else if content.contains("Incident Identifier") {
+                brand = .apple
+            } else if content.contains("App base addr:") && content.contains("System Binary infos:") {
+                brand = .bugly
+            }
+        }
+        
+        return brand
+    }
+    
+    private func parse() {
+        self.brand = self.detectBrand()
+
+        switch self.brand {
         case .umeng:
-            self.parseUmengCrash(&crash)
+            self.parseUmeng()
         case .apple:
-            self.parseAppleCrash(&crash)
-        case .bugly:
-            self.parseBuglyCrash(&crash)
+            return self.parseApple()
         default:
             break
         }
-
-        return crash
     }
-
-    static func parseUmengCrash(_ crash: inout Crash) {
-        let lines = crash.content.components(separatedBy: "\n")
-        
-        var loadAddress: String?
-        var uuid: String?
-        
-        for (index, line) in lines.enumerated() {
-            let value = line.strip()
-            if value.hasPrefix("Application received") {
-                crash.reason = value.components(separatedBy: " ").last
-            } else if value.hasPrefix("dSYM UUID") {
-                uuid = value.separatedValue
-            } else if value.hasPrefix("CPU Type") {
-                crash.arch = value.separatedValue ?? "arm64"
-            } else if value.hasPrefix("Binary Image") {
-                crash.appName = value.separatedValue
-            } else if value.hasPrefix("Slide Address") {
-                loadAddress = value.separatedValue
-            } else if let frame = Frame(line: line) {
-                frame.lineNumber = index
-                crash.addFrame(frame)
-            }
-        }
-        
-        if crash.images == nil || crash.appName == nil {
-            return
-        }
-        
-        if let image = crash.images![crash.appName!] {
-            image.uuid = uuid
-            image.loadAddress = loadAddress
-        }
-
-        crash.correct()
-    }
-
-    static func getBinary(_ line: String) -> String? {
-        // Process:         Simple-Example [24203]
-        if let process = line.separatedValue {
-            return process.components(separatedBy: " ")[0]
-        }
-        return nil
-    }
-
-    static func parseAppleCrash(_ crash: inout Crash) {
-        let lines = crash.content.components(separatedBy: "\n")
-        var binaryImagesSectionStarted = false
-
-        for (index, line) in lines.enumerated() {
-            let value = line.strip()
-            if value.hasPrefix("Exception Type: ") {
-                crash.reason = value.separatedValue
-            } else if value.hasPrefix("Process") {
-                crash.appName = self.getBinary(line)
-            } else if value.hasPrefix("Binary Images:") {
-                binaryImagesSectionStarted = true
-            } else if let frame = Frame(line: line) {
-                frame.lineNumber = index
-                crash.addFrame(frame)
-            } else {
-                if !binaryImagesSectionStarted || crash.images == nil {
-                    continue
-                } else if let new = Image(line: line) {
-                    if let old = crash.images![new.name!] {
-                        old.loadAddress = new.loadAddress
-                        old.uuid = new.uuid
+    
+    private func correct() {
+        for thread in self.threads {
+            for frame in thread.backtrace {
+                if self.appName == frame.image {
+                    frame.isKey = true
+                }
+                if let image = self.images[frame.image] {
+                    image.backtrace.append(frame)
+                    if let load = image.loadAddress {
+                        frame.fixAddress(load)
                     }
+                } else {
+                    let newImage = CrashReport.Image(name: frame.image)
+                    self.images[frame.image] = newImage
                 }
             }
         }
     }
     
-    static func parseBuglyCrash(_ crash: inout Crash) {
-        let lines = crash.content.components(separatedBy: "\n")
-        
-        var binaryImagesSectionStarted = false
+    private func parseUmeng() {
         var loadAddress: String?
         var uuid: String?
-
+        let thread = CrashReport.Thread()
+        thread.crashed = true
+        
+        let lines = self.content!.components(separatedBy: "\n")
         for (index, line) in lines.enumerated() {
             let value = line.strip()
-            if value.contains("App UUID:") {
-                uuid = value.separatedValue?.uuidFormat()
-            } else if value.contains("App base addr:") {
-                loadAddress = value.separatedValue
-            } else if value.contains("Cpu Arch:") {
-                crash.arch = value.separatedValue ?? "arm64"
-            } else if value.contains("System Binary infos:") {
-                binaryImagesSectionStarted = true
-            } else if let frame = Frame(line: line) {
-                frame.lineNumber = index
-                crash.addFrame(frame)
-            } else if binaryImagesSectionStarted {
-                // 11 AppName: arm64;ea32e9c69a9c3c3783895052475a1d0d;0x00000001000d0000
-                let list = value.components(separatedBy: ":")
-                if list.count < 2 {
-                    continue
+            if let (k, v) = value.parseKeyValue(separatedBy: ":") {
+                if k == "Application received" {
+                    self.reason = v
+                } else if k == "CPU Type" {
+                    self.arch = v
+                } else if k == "Binary Image" {
+                    self.appName = v
+                } else if k == "Slide Address" {
+                    loadAddress = v
+                } else if k == "dSYM UUID" {
+                    uuid = v
                 }
-                let appName = list[0].components(separatedBy: " ")
-                if appName.count < 2 {
-                    continue
+                
+                continue
+            }
+            
+            if let frame = CrashReport.Frame(content: value, lineNumber: index) {
+                if self.images[frame.image] == nil {
+                    self.images[frame.image] = CrashReport.Image(name: frame.image)
                 }
-                crash.appName = appName[1]
-                binaryImagesSectionStarted = false
+                
+                thread.backtrace.append(frame)
             }
         }
-
-        if crash.images == nil || crash.appName == nil {
-            return
+        
+        if self.appName != nil, let image = self.images[self.appName!] {
+            image.update(uuid: uuid, loadAddress: loadAddress)
         }
-
-        if let image = crash.images![crash.appName!] {
-            image.uuid = uuid
-            image.loadAddress = loadAddress
+        
+        self.correct()
+    }
+    
+    private func getBinary(_ line: String) -> String? {
+        // Process:         Simple-Example [24203]
+        if let (_, v) = line.parseKeyValue(separatedBy: ":") {
+            return v.components(separatedBy: " ")[0]
         }
-
-        crash.correct()
+        return nil
+    }
+    
+    private func parseApple() {
+        let lines = self.content!.components(separatedBy: "\n")
+        
+        var thread: CrashReport.Thread?
+        var imageSectionStarted = false
+        
+        for (index, line) in lines.enumerated() {
+            let value = line.strip()
+            
+            if imageSectionStarted {
+                if let image = CrashReport.Image(content: value) {
+                    self.images[image.name] = image
+                }
+                
+                continue
+            }
+            
+            if value.hasPrefix("Last Exception Backtrace") {
+                thread = CrashReport.Thread()
+                thread?.name = "Last Exception Backtrace"
+                self.threads.append(thread!)
+            } else if value.hasPrefix("Exception Type: ") {
+                self.reason = value.separatedValue()
+            } else if value.hasPrefix("Process:") {
+                self.appName = self.getBinary(line)
+            } else if value.hasPrefix("Binary Images:") {
+                imageSectionStarted = true
+            } else if let g = LineRE.thread.match(value) {
+                // Thread 0 name:  Dispatch queue: com.apple.main-thread
+                // Thread 0 Crashed:
+                let num = Int(g[0])
+                if thread?.number != num {
+                    thread = CrashReport.Thread()
+                    thread!.number = num
+                    self.threads.append(thread!)
+                }
+                
+                if g.count > 1 {
+                    if g[1].lowercased() == "crashed" {
+                        thread!.crashed = true
+                    } else {
+                        thread!.name = g[1]
+                    }
+                }
+            } else if let frame = CrashReport.Frame(content: value, lineNumber: index) {
+                thread?.backtrace.append(frame)
+            }
+        }
+        
+        self.correct()
     }
 }
-
 
 /*
 

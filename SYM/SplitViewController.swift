@@ -21,46 +21,37 @@
 // SOFTWARE.
 
 
-import Foundation
+import Cocoa
+import AppKit
 
 
-struct SubProcess {
-    static func execute(cmd: String, args: [String]?) -> String? {
-        let pipe = Pipe()
-        
-        let task = Process().then {
-            $0.launchPath = cmd
-            $0.arguments = args
-            $0.standardOutput = pipe
-        }
-        
-        task.launch()
-        
-        let output = pipe.fileHandleForReading
-        let data = output.readDataToEndOfFile()
-        return String(data: data, encoding: String.Encoding.utf8)
+class SplitViewController: NSSplitViewController {
+
+    private var myContext = 0
+    
+    var sidebar: NSSplitViewItem {
+        return self.splitViewItems[0]
     }
-}
-
-extension SubProcess {
-    static func dwarfdump(path: String) -> [String]? {
-        let cmd = "/usr/bin/dwarfdump"
-        let args = ["--uuid", path]
-        if let result = self.execute(cmd: cmd, args: args) {
-            let lines = result.components(separatedBy: "\n").filter {
-                (content) -> Bool in
-                if content.characters.count == 0 {
-                    return false
-                }
-                
-                return content.hasPrefix("UUID: ")
-            }
-            
-            return lines.map({ (line) -> String in
-                return line.components(separatedBy: " ")[1]
-            })
-        }
+    
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        // Do view setup here.
         
-        return nil
+        self.windowController()?.sidebarDelegate = { [weak self] sender in
+            self?.toggleSidebar(sender)
+        }
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        
+        if let doc = self.document(), doc is BundleDocument {
+            self.toggleSidebar(nil)
+        }
+    }
+    
+    override func splitViewDidResizeSubviews(_ notification: Notification) {
+        super.splitViewDidResizeSubviews(notification)
+        self.updateSidebarState(!self.sidebar.isCollapsed)
     }
 }

@@ -24,139 +24,115 @@
 import Foundation
 
 
-protocol SymDelegate: class {
-    func dsym(forUuid uuid: String) -> String?
-    func didFinish(_ crash: Crash)
-}
-
 protocol Sym {
-    weak var delegate: SymDelegate? { get set }
-    init(delegate: SymDelegate)
-    func symbolicate(_ crash: Crash)
+    static func symbolicate(_ crash: CrashReport, completion: @escaping (CrashReport)->Void);
 }
 
-
-class Atos: Sym {
-    
-    static let queue: OperationQueue = OperationQueue().then {
-        $0.maxConcurrentOperationCount = 4
-    }
-    
-    weak var delegate: SymDelegate?
-    var crash: Crash?
-    
-    var numberOfTask: Int = 0
-    
-    required init(delegate: SymDelegate) {
-        self.delegate = delegate
-    }
-    
-    func symbolicate(_ crash: Crash) {
-        guard crash.images != nil && crash.images!.count != 0 else {
-            self.delegate?.didFinish(crash)
-            return
-        }
-        
-        self.crash = crash
-        
-        var operations = [Operation]()
-        for image in crash.images!.values {
-            if let task = self.symbolicate(image) {
-                operations.append(task)
+extension SubProcess {
+    static func atos(loadAddress: String,
+                     addressess: [String],
+                     dSym: String,
+                     arch: String = "arm64") -> [String]? {
+        let cmd = "/usr/bin/atos"
+        let args = ["-arch", arch, "-o", dSym, "-l", loadAddress] + addressess
+        if let result = execute(cmd: cmd, args: args) {
+            return result.components(separatedBy: "\n").filter {
+                (content) -> Bool in
+                return content.characters.count > 0
             }
         }
         
-        if operations.count == 0 {
-            self.delegate?.didFinish(self.crash!)
-            return
-        }
-        
-        self.numberOfTask = operations.count
-        
-        Atos.queue.addOperations(operations, waitUntilFinished: false)
+        return nil
     }
     
-    func taskCompleted() {
-        self.numberOfTask -= 1
-        if self.numberOfTask <= 0 {
-            asyncMain {
-                self.delegate?.didFinish(self.crash!)
-            }
-        }
-    }
-    
-    func symbolicate(_ image: Image) -> SubProcess? {
-        guard image.backtrace != nil && image.backtrace!.count > 0,
-              let binary = image.name,
-              let uuid = image.uuid,
-              let dsym = self.delegate?.dsym(forUuid: uuid),
-              let load = image.loadAddress
-        else {
-                return nil
-        }
-
-        var addresses = [String]()
-        for frame in image.backtrace! {
-            addresses.append(frame.address)
-        }
-        
-        if addresses.count == 0 {
+    static func symbolicatecrash(crash: String) -> String? {
+        let path = FileManager.default.temporaryPath()
+        do {
+            try crash.write(toFile: path, atomically: true, encoding: String.Encoding.utf8)
+        } catch {
             return nil
         }
         
-        let task = SubProcess(loadAddress: load,
-                              addressess: addresses,
-                              dsym: dsym,
-                              binary: binary,
-                              arch: self.crash!.arch)
+        let cmd = Bundle.main.path(forResource: "symbolicatecrash", ofType: nil)
+        assert(cmd != nil)
         
-        task.completionBlock = {
-            if task.isCancelled {
-                return
-            }
-            
-            guard let result = task.atosResult() else {
-                return
-            }
-            
-            asyncMain {
-                for (index, symbol) in result.enumerated() {
-                    image.backtrace![index].symbol = symbol
-                }
-                self.taskCompleted()
-            }
-        }
-        
-        return task
+        let args = [path]
+        return execute(cmd: cmd!, args: args)
     }
 }
 
 
-class AppleTool: Sym {
-    weak var delegate: SymDelegate?
+extension CrashReport {
+    func symbolicate(completion: @escaping (CrashReport)->Void) {
+        let dSymValidate = self.fixDsym()
 
-    required init(delegate: SymDelegate) {
-        self.delegate = delegate
-    }
-    
-    func symbolicate(_ crash: Crash) {
-        let path = FileManager.default.temporaryPath()
-        do {
-            try crash.content.write(toFile: path, atomically: true, encoding: String.Encoding.utf8)
-        } catch {
+        switch self.brand {
+        case .umeng:
+            if !dSymValidate {
+                completion(self)
+                return
+            }
+            self.atos(completion)
+        case .apple:
+            self.appleTool(completion)
+        default:
+            completion(self)
             return
         }
+    }
+    
+    
+    func atos(_ completion: @escaping (CrashReport)->Void) {
+        let queue = DispatchQueue(label: "symbolicate", attributes: .concurrent)
+        let group = DispatchGroup()
         
-        let task = SubProcess(crashPath: path)
-        task.completionBlock = {
-            if task.result != nil {
-                let newCrash = Parser.parse(task.result!) ?? crash
-                self.delegate?.didFinish(newCrash)
-            } else {
-                self.delegate?.didFinish(crash)
+        group.notify(queue: queue) {
+            completion(self)
+        }
+        
+        for (_, image) in self.images {
+            if image.uuid == nil || image.loadAddress == nil {
+                continue
+            }
+            
+            queue.async(group: group) {
+                self.atos(image: image)
             }
         }
         
-        globalTaskQueue.addOperation(task)
+    }
+    
+    private func atos(image: Image) {
+        guard let loadAddress = image.loadAddress, let dSym = image.dSym else {
+            return
+        }
+        
+        var addresses = [String]()
+        for frame in image.backtrace {
+            addresses.append(frame.address)
+        }
+        
+        if let result = SubProcess.atos(loadAddress: loadAddress,
+                                        addressess: addresses,
+                                        dSym: dSym,
+                                        arch: self.arch) {
+            for (index, symbol) in result.enumerated() {
+                image.backtrace[index].symbol = symbol
+            }
+        }
+    }
+
+    func appleTool(_ completion: @escaping (CrashReport)->Void) {
+        guard let content = self.content else {
+            completion(self)
+            return
+        }
+
+        DispatchQueue.global().async {
+            if let new = SubProcess.symbolicatecrash(crash: content) {
+                self.update(content: new)
+            }
+            completion(self)
+        }
     }
 }

@@ -24,45 +24,20 @@
 import Cocoa
 
 
-@objc protocol TextViewDelegate: NSTextViewDelegate {
-    @objc optional func textViewDidreadSelectionFromPasteboard()
+protocol CrashTextViewDelegate: NSTextViewDelegate {
+    func contentDidChanged()
 }
+
 
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
-        if (self.string == attributeString.string) {
-            self.textStorage?.setAttributedString(attributeString)
-            return
-        }
-        let len: Int
-        if let origin = self.string {
-            let originString = origin as NSString
-            len = originString.length
-        } else {
-            len = 0
-        }
-        self.insertText(attributeString, replacementRange: NSRange(location: 0, length: len))
+        self.textStorage?.beginEditing()
+        self.textStorage?.setAttributedString(attributeString)
+        self.textStorage?.endEditing()
     }
 }
 
 class TextView: NSTextView {
-
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-
-        // Drawing code here.
-    }
-    
-    override func readSelection(from pboard: NSPasteboard) -> Bool {
-        let result = super.readSelection(from: pboard)
-        
-        if let theDelegate = self.delegate as? TextViewDelegate {
-            theDelegate.textViewDidreadSelectionFromPasteboard!()
-        }
-        
-        return result
-    }
-    
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard()
         
@@ -81,6 +56,13 @@ class TextView: NSTextView {
         }
         
         return super.performDragOperation(sender)
-
+    }
+    
+    override func didChangeText() {
+        super.didChangeText()
+        
+        if let delegate = self.delegate as? CrashTextViewDelegate {
+            delegate.contentDidChanged()
+        }
     }
 }

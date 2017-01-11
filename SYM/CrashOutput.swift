@@ -34,43 +34,53 @@ let backtraceAttrs: [String: AnyObject] = [
     NSFontAttributeName: NSFontManager.shared().font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
 ]
 
+extension CrashReport.Frame {
+    func description() -> String {
+        let index = self.index.extendToLength(2)
+        let image = self.image.extendToLength(30)
+        let address = self.address.extendToLength(18)
+        let symbol = self.symbol ?? ""
+        return "\(index) \(image) \(address) \(symbol)"
+    }
+}
 
-extension Crash {
+extension CrashReport {
 
     func pretty() -> NSAttributedString {
+        guard let content = self.content else {
+            return NSAttributedString()
+        }
         
         var keyFrameRanges = [NSRange]()
         
-        if self.images == nil || self.images!.count == 0 {
-            return NSAttributedString(string: self.content, attributes: defaultAttrs)
+        if self.threads.count == 0 {
+            return NSAttributedString(string: content, attributes: defaultAttrs)
         }
         
-        var backtrace = [Int: Frame]()
+        var backtrace: [Int: CrashReport.Frame] = [:]
         
-        for image in self.images!.values {
-            if let bt = image.backtrace {
-                for frame in bt {
-                    backtrace[frame.lineNumber!] = frame
-                }
+        for thread in self.threads {
+            for frame in thread.backtrace {
+                backtrace[frame.line] = frame
             }
         }
         
         if backtrace.count == 0 {
-            return NSAttributedString(string: self.content, attributes: defaultAttrs)
+            return NSAttributedString(string: self.content!, attributes: defaultAttrs)
         }
         
-        let lines = self.content.components(separatedBy: "\n")
+        let lines = content.components(separatedBy: "\n")
         let result = NSMutableString()
         
         for (index, line) in lines.enumerated() {
             if let frame = backtrace[index] {
-                if frame.image == self.appName {
+                if frame.isKey {
                     let startIndex = result.length
-                    result.append(self.formatFrame(frame))
+                    result.append(frame.description())
                     let endIndex = result.length
                     keyFrameRanges.append(NSMakeRange(startIndex, endIndex-startIndex))
                 } else {
-                    result.append(self.formatFrame(frame))
+                    result.append(frame.description())
                 }
             } else {
                 result.append(line)
@@ -89,13 +99,5 @@ extension Crash {
         }
         
         return attr
-    }
-    
-    func formatFrame(_ frame: Frame) -> String {
-        let index = frame.index.extendToLength(2)
-        let image = frame.image.extendToLength(30)
-        let address = frame.address.extendToLength(18)
-        let symbol = frame.symbol ?? ""
-        return "\(index) \(image) \(address) \(symbol)"
     }
 }

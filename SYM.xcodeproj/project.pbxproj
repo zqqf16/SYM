@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABB1E2394F8008755EE /* CrashFile.swift */; };
+		513D6ABE1E24D967008755EE /* ThreadTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABD1E24D967008755EE /* ThreadTitleView.swift */; };
 		519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */ = {isa = PBXBuildFile; fileRef = 519FF5871D54BB2600B07A65 /* symbolicatecrash */; };
-		51B8D7051D4F620100F2C24C /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* Document.swift */; };
-		51B8D7281D4F6A0000F2C24C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ViewController.swift */; };
+		51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* CrashDocument.swift */; };
+		51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */; };
 		51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C491D66AB8800379BFC /* TextView.swift */; };
 		51BF9C521D6C7A1C00379BFC /* SYMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C511D6C7A1C00379BFC /* SYMTests.swift */; };
 		51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */ = {isa = PBXBuildFile; fileRef = 51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */; };
@@ -21,13 +23,20 @@
 		F41D592E1D43A2930046C623 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D592D1D43A2930046C623 /* Parser.swift */; };
 		F422C7C31D36A66800066837 /* FileSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileSearch.swift */; };
 		F422C7C51D36A6A000066837 /* Dsym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C41D36A6A000066837 /* Dsym.swift */; };
+		F441BE681E214D540085F3DA /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441BE671E214D540085F3DA /* SplitViewController.swift */; };
+		F441BE6A1E21547A0085F3DA /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441BE691E21547A0085F3DA /* TabViewController.swift */; };
+		F441BE6C1E2155F60085F3DA /* ThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441BE6B1E2155F60085F3DA /* ThreadViewController.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
+		F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B68F21E227B8100128D8D /* MainWindowController.swift */; };
+		F499F02D1E1FDA84002701B2 /* FileListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F499F02C1E1FDA84002701B2 /* FileListViewController.swift */; };
 		F49A8B631D3A8BE300B951AD /* CSwiftV.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B621D3A8BE300B951AD /* CSwiftV.swift */; };
 		F49A8B651D3B28DF00B951AD /* DsymTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */; };
 		F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */; };
 		F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F49BD1F51D2FF46300024AAE /* Main.storyboard */; };
+		F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A679731E21319D009F93E7 /* BundleDocument.swift */; };
+		F4A679761E213CDD009F93E7 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A679751E213CDD009F93E7 /* Notifications.swift */; };
 		F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */; };
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
@@ -44,9 +53,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		513D6ABB1E2394F8008755EE /* CrashFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashFile.swift; sourceTree = "<group>"; };
+		513D6ABD1E24D967008755EE /* ThreadTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadTitleView.swift; sourceTree = "<group>"; };
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
-		51B8D7041D4F620100F2C24C /* Document.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
-		51B8D7271D4F6A0000F2C24C /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		51B8D7041D4F620100F2C24C /* CrashDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashDocument.swift; sourceTree = "<group>"; };
+		51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		51BF9C491D66AB8800379BFC /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SYMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		51BF9C511D6C7A1C00379BFC /* SYMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SYMTests.swift; sourceTree = "<group>"; };
@@ -60,15 +71,22 @@
 		F41D592D1D43A2930046C623 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileSearch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileSearch.swift; sourceTree = "<group>"; };
 		F422C7C41D36A6A000066837 /* Dsym.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dsym.swift; sourceTree = "<group>"; };
+		F441BE671E214D540085F3DA /* SplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		F441BE691E21547A0085F3DA /* TabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
+		F441BE6B1E2155F60085F3DA /* ThreadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadViewController.swift; sourceTree = "<group>"; };
 		F45320FA1D30A33C00639917 /* Crash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crash.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
+		F45B68F21E227B8100128D8D /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
+		F499F02C1E1FDA84002701B2 /* FileListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileListViewController.swift; sourceTree = "<group>"; };
 		F49A8B621D3A8BE300B951AD /* CSwiftV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSwiftV.swift; sourceTree = "<group>"; };
 		F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DsymTableViewController.swift; sourceTree = "<group>"; };
 		F49BD1EC1D2FF46300024AAE /* SYM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SYM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F49BD1F61D2FF46300024AAE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F49BD1F81D2FF46300024AAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F4A679731E21319D009F93E7 /* BundleDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BundleDocument.swift; sourceTree = "<group>"; };
+		F4A679751E213CDD009F93E7 /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Symbolicate.swift; sourceTree = "<group>"; };
 		F4CD14621D39D323006BAB2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4CD14641D39D5B7006BAB2B /* file.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = file.icns; sourceTree = "<group>"; };
@@ -103,7 +121,9 @@
 		51B8D7031D4F60EB00F2C24C /* Document */ = {
 			isa = PBXGroup;
 			children = (
-				51B8D7041D4F620100F2C24C /* Document.swift */,
+				513D6ABB1E2394F8008755EE /* CrashFile.swift */,
+				51B8D7041D4F620100F2C24C /* CrashDocument.swift */,
+				F4A679731E21319D009F93E7 /* BundleDocument.swift */,
 			);
 			name = Document;
 			sourceTree = "<group>";
@@ -133,6 +153,7 @@
 				F45321031D30CC4600639917 /* Extensions.swift */,
 				F45321091D30CCBF00639917 /* SubProcess.swift */,
 				F422C7C21D36A66800066837 /* FileSearch.swift */,
+				F4A679751E213CDD009F93E7 /* Notifications.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -141,8 +162,14 @@
 			isa = PBXGroup;
 			children = (
 				F40543691D321E37009B2923 /* Window.swift */,
+				F45B68F21E227B8100128D8D /* MainWindowController.swift */,
 				51BF9C491D66AB8800379BFC /* TextView.swift */,
-				51B8D7271D4F6A0000F2C24C /* ViewController.swift */,
+				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
+				F441BE671E214D540085F3DA /* SplitViewController.swift */,
+				F499F02C1E1FDA84002701B2 /* FileListViewController.swift */,
+				F441BE691E21547A0085F3DA /* TabViewController.swift */,
+				513D6ABD1E24D967008755EE /* ThreadTitleView.swift */,
+				F441BE6B1E2155F60085F3DA /* ThreadViewController.swift */,
 				F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 			);
@@ -321,6 +348,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
+				513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				F422C7C31D36A66800066837 /* FileSearch.swift in Sources */,
@@ -330,13 +358,21 @@
 				F49A8B651D3B28DF00B951AD /* DsymTableViewController.swift in Sources */,
 				F422C7C51D36A6A000066837 /* Dsym.swift in Sources */,
 				F4184EE31D32396100E08040 /* CrashOutput.swift in Sources */,
+				F499F02D1E1FDA84002701B2 /* FileListViewController.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
+				F441BE681E214D540085F3DA /* SplitViewController.swift in Sources */,
+				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
+				F441BE6A1E21547A0085F3DA /* TabViewController.swift in Sources */,
+				513D6ABE1E24D967008755EE /* ThreadTitleView.swift in Sources */,
 				F49A8B631D3A8BE300B951AD /* CSwiftV.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
-				51B8D7281D4F6A0000F2C24C /* ViewController.swift in Sources */,
+				F4A679761E213CDD009F93E7 /* Notifications.swift in Sources */,
+				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
+				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
+				F441BE6C1E2155F60085F3DA /* ThreadViewController.swift in Sources */,
 				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,
-				51B8D7051D4F620100F2C24C /* Document.swift in Sources */,
+				51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */,
 				F41D592E1D43A2930046C623 /* Parser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

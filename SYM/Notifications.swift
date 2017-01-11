@@ -20,45 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 
-struct RE {
-    let regex: NSRegularExpression
-    
-    var groups: [String]?
-    
-    init(_ pattern: String) throws {
-        try regex = NSRegularExpression(pattern: pattern,
-                                        options: [])
-    }
-    
-    static func compile(_ pattern: String) -> RE? {
-        do {
-            return try RE(pattern)
-        } catch {
-            return nil
-        }
-    }
-    
-    func match(_ input: String) -> [String]? {
-        let matches = regex.matches(in: input,
-                                    options: [],
-                                    range: NSMakeRange(0, input.utf16.count))
-        if matches.count == 0 {
-            return nil
-        }
-
-        let match = matches[0]
-        let number = match.numberOfRanges
-        var groups = [String]()
-
-        for index in 1..<number {
-            if let range = match.rangeAt(index).toRange() {
-                groups.append(input[range])
-            }
-        }
-        
-        return groups
-    }
+extension NSNotification.Name {
+    static let fileListRefresh = Notification.Name("sym.FileListRefresh")
+    static let openCrashReport = Notification.Name("sym.OpenCrashReport")
+    static let crashSymbolicated = Notification.Name("sym.CrashSymbolicated")
+    static let crashUpdated = Notification.Name("sym.CrashUpdated")
 }

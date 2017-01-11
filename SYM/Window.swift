@@ -26,15 +26,14 @@ import Cocoa
 class BaseWindow: NSWindow {
     override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
-        //self.titleVisibility = .Hidden
+        self.titleVisibility = .hidden
         self.titlebarAppearsTransparent = true
         self.isMovableByWindowBackground = true
         self.styleMask.insert(.fullSizeContentView)
-        self.backgroundColor = NSColor.white
+        //self.backgroundColor = NSColor.white
         //self.center()
     }
 }
-
 
 class MainWindow: BaseWindow {
     var indicator: NSProgressIndicator?
@@ -49,7 +48,7 @@ class MainWindow: BaseWindow {
         let iconButton = self.standardWindowButton(.zoomButton)
         if iconButton != nil {
             frame = iconButton!.frame
-            frame.origin.x += 24
+            frame.origin.x += 64
         }
         if indicator == nil {
             indicator = NSProgressIndicator(frame: frame)
@@ -69,15 +68,14 @@ class MainWindow: BaseWindow {
 }
 
 
-class Window: NSWindow, NSDraggingDestination {
-    @IBOutlet weak var navigationButton: NSSegmentedControl!
-    
+class Window: NSWindow, NSDraggingDestination {    
     required override init(contentRect: NSRect, styleMask aStyle: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
         self.titleVisibility = .hidden
         self.backgroundColor = NSColor.white
 
         self.registerForDraggedTypes([NSStringPboardType, NSFilenamesPboardType])
+        self.center()
     }
 
     // MARK: Dragging

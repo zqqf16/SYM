@@ -46,25 +46,25 @@ class SYMTests: XCTestCase {
     }
     
     func testCrashType() {
-        let type = CrashType.fromContent(self.umengDemo!)
-        XCTAssertEqual(type, CrashType.umeng)
+        let crash = CrashReport(self.umengDemo!)
+        XCTAssertEqual(crash.brand, CrashReport.Brand.umeng)
     }
     
     func testCrashParser() {
-        let crash = Parser.parse(self.umengDemo!)!
+        let crash = CrashReport(self.umengDemo!)
         XCTAssertEqual(crash.arch, "arm64")
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNotNil(crash.images)
 
-        let image = crash.images![crash.appName!]
+        let image = crash.images[crash.appName!]
         XCTAssertNotNil(image)
         XCTAssertEqual(image!.name, "DemoApp")
         XCTAssertEqual(image!.loadAddress, "0x0000000100000000")
         XCTAssertEqual(image!.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
         XCTAssertNotNil(image!.backtrace)
-        XCTAssertEqual(image!.backtrace?.count, 2)
+        XCTAssertEqual(image!.backtrace.count, 2)
         
-        let frame = image!.backtrace![0];
+        let frame = image!.backtrace[0];
         XCTAssertEqual(frame.address, "0x100b32844")
         XCTAssertEqual(frame.index, "3")
         XCTAssertEqual(frame.image, "DemoApp")
@@ -75,7 +75,7 @@ class SYMTests: XCTestCase {
         // This is an example of a performance test case.
         self.measure {
             // Put the code you want to measure the time of here.
-            let _ = Parser.parse(self.umengDemo!)!
+            let _ = CrashReport(self.umengDemo!)
         }
     }
     

@@ -24,26 +24,40 @@
 import Cocoa
 
 
-extension NSViewController {
-    func document() -> Document? {
-        if let windowController = self.view.window?.windowController {
-            return windowController.document as? Document
-        }
-        return nil
-    }
-    
-    func window() -> MainWindow? {
-        return self.view.window as? MainWindow
-    }
-}
-
 class ContentViewController: NSViewController {
 
     @IBOutlet var textView: NSTextView!
+    var crash: CrashReport?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupTextView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCrashSymbolicated), name: .crashSymbolicated, object: nil)
+    }
+    
+    func handleOpenCrash(notification: Notification) {
+        if let wc = notification.object as? MainWindowController {
+            if self.windowController() == nil || wc == self.windowController() {
+                self.loadData()
+            }
+        }
+    }
+    
+    func handleCrashSymbolicated(notification: Notification) {
+        if let crash = notification.object as? CrashReport, crash === self.crash {
+            self.loadData()
+        }
+    }
+    
+    func loadData() {
+        self.crash = self.currentCrashFile()?.crash
+        self.textView.string = self.crash?.content ?? ""
+        if let crash = self.crash {
+            self.textView.setAttributeString(attributeString: crash.pretty())
+            //self.textView.scrollToBeginningOfDocument(nil)
+        }
     }
     
     private func setupTextView() {
@@ -56,58 +70,28 @@ class ContentViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         
-        if let document = self.document() {
-            self.textView.string = document.content ?? ""
-            document.delegate = self
+        if self.crash == nil {
+            self.loadData()
         }
-        
-        if self.textView.string != nil {
-            asyncMain {
-                self.symbolicate(nil)
-            }
-        }
-        
-        self.view.window?.center()
     }
 }
 
-extension ContentViewController: DocumentContentDelegate {
-    func contentToSave() -> String? {
-        return self.textView.string
-    }
-}
-
-extension ContentViewController: SymDelegate {
+extension ContentViewController {
+    /*
     @IBAction func symbolicate(_ sender: AnyObject?) {
         guard let content = self.textView.string else {
             return
         }
         
-        guard let type = CrashType.fromContent(content) else {
-            return
-        }
-        
-        guard let crash = Parser.parse(content) else {
-            return
-        }
-        
+        let crash = CrashReport(content)
         if !crash.needSymbolicate {
             self.didFinish(crash)
             return
         }
         
-        var sym: Sym?
-        switch type {
-        case .apple, .bugly:
-            sym = AppleTool(delegate: self)
-        case .umeng:
-            sym = Atos(delegate: self)
-        default:
-            return
-        }
         self.window()?.updateProgress(start: true)
-        sym?.symbolicate(crash)
     }
+ */
     
     func dsym(forUuid uuid: String) -> String? {
         guard let dsym = DsymManager.sharedInstance.dsym(withUUID: uuid) else {
@@ -118,8 +102,8 @@ extension ContentViewController: SymDelegate {
     }
 
     
-    func didFinish(_ crash: Crash) {
-        asyncMain {
+    func didFinish(_ crash: CrashReport) {
+        DispatchQueue.main.async {
             self.textView.setAttributeString(attributeString: crash.pretty())
             self.textView.scrollToBeginningOfDocument(nil)
             self.window()?.updateProgress(start: false)
@@ -127,7 +111,7 @@ extension ContentViewController: SymDelegate {
     }
 }
 
-extension ContentViewController: TextViewDelegate {
+extension ContentViewController: CrashTextViewDelegate {
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {
         let menu = NSMenu(title: "dSYM")
         let showItem = NSMenuItem(title: "Symbolicate", action: #selector(symbolicate), keyEquivalent: "")
@@ -136,46 +120,14 @@ extension ContentViewController: TextViewDelegate {
         menu.allowsContextMenuPlugIns = true
         return menu
     }
-
-    func textViewDidreadSelectionFromPasteboard() {
-        asyncMain {
-            self.symbolicate(nil)
+    
+    func contentDidChanged() {
+        if let newContent = textView.string {
+            self.windowController()?.updateCrash(newContent)
         }
     }
-}
-
-extension ContentViewController {
-    @IBAction func importDsymFile(_ sender: AnyObject?) {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = false
-        panel.beginSheetModal(for: self.view.window!) {
-            (result) in
-            if result != NSFileHandlingPanelOKButton {
-                return
-            }
-            
-            if panel.urls.count == 0 {
-                return
-            }
-            
-            let url = panel.urls[0]
-            
-            DsymManager.sharedInstance.importDsym(fromURL: url, completion: { (uuids, success) in
-                if uuids == nil {
-                    let alert = NSAlert()
-                    alert.addButton(withTitle: "OK")
-                    alert.addButton(withTitle: "Cancel")
-                    alert.messageText = "This is not a dSYM file"
-                    alert.informativeText = url.path
-                    alert.beginSheetModal(for: self.view.window!, completionHandler: nil)
-                    return
-                }
-                
-                if (success) {
-                    // NSNotificationCenter.defaultCenter().postNotificationName(DidImportDsymNotification, object: uuids)
-                }
-            })
-        }
+    
+    func symbolicate(_ sender: AnyObject?) {
+        self.windowController()?.symbolicate(sender)
     }
 }

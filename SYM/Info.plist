@@ -9,6 +9,26 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>xccrashpoint</string>
+			</array>
+			<key>LSTypeIsPackage</key>
+			<true/>
+			<key>CFBundleTypeName</key>
+			<string>Crash Point File</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>crashpoint</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.apple.dt.document.xccrashpoint</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>NSDocumentClass</key>
+			<string>$(PRODUCT_MODULE_NAME).BundleDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>crash</string>
 				<string>ips</string>
 				<string>sym</string>
@@ -21,7 +41,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>NSDocumentClass</key>
-			<string>$(PRODUCT_MODULE_NAME).Document</string>
+			<string>$(PRODUCT_MODULE_NAME).CrashDocument</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -37,7 +57,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2.3</string>
+	<string>0.3</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>

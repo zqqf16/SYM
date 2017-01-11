@@ -24,117 +24,77 @@
 import Foundation
 
 
-// MARK: - Bracktrace Frame
-
-// 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
-// index   image         address            symbol
-
-class Frame {
-    var index: String
-    var image: String
-    var address: String
-    var symbol: String?
-    var lineNumber: Int?
-    
-    static let re = RE.compile("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)")!
-    
-    init?(line: String) {
-        guard let g = Frame.re.match(line) else {
-            return nil
-        }
-        
-        self.index = g[0]
-        self.image = g[1]
-        self.address = g[2]
-        self.symbol = g[3]
-        self.lineNumber = nil
+class CrashReport {
+    enum Brand {
+        case umeng
+        case apple
+        case bugly
+        case unknow
     }
     
-    func fixAddress(_ loadAddress: String) {
-        guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
-              self.symbol != nil,
-              self.symbol!.hasPrefix("+")
-        else {
-            return
-        }
+    class Frame {
+        var index: String
+        var image: String
+        var address: String
+        var line: Int
+        var symbol: String?
+        var isKey: Bool = false
         
-        let list = self.symbol!.components(separatedBy: " ")
-        if list.count < 2 {
-            return
+        init(index: String, image: String, address: String, line: Int) {
+            self.index = index
+            self.image = image
+            self.address = address
+            self.line = line
         }
-        
-        guard let offset = Int(list[1]) else {
-            return
-        }
-        let newAddress = String(self.address.hexaToDecimal + offset, radix: 16)
-        self.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
-        self.symbol = "+ 0"
     }
-}
+    
+    class Image {
+        var name: String
+        var uuid: String?
+        var loadAddress: String?
+        var dSym: String?
+        var backtrace: [Frame] = []
 
-class Image {
-    var name: String?
-    var uuid: String?
-    var loadAddress: String?
-    var backtrace: [Frame]?
-}
-
-class Crash {
-    let content: String
+        init(name: String) {
+            self.name = name
+        }
+    }
+    
+    class Thread {
+        var number: Int?
+        var name: String?
+        var crashed: Bool = false
+        var backtrace: [Frame] = []
+        
+        var description: String {
+            let num = self.number != nil ? " \(self.number!)": ""
+            let name = self.name != nil ? " name: \(self.name!)": ""
+            let crashed = self.crashed ? " [Crashed]": ""
+            return "Thread\(num)\(name)\(crashed)"
+        }
+    }
+    
+    var content: String?
+    var brand: Brand = .unknow
     var reason: String?
     var arch: String = "arm64"
     var appName: String?
-    var images:[String: Image]?
-    var type: CrashType = .umeng
-    
-    init(content: String) {
-        self.content = content
-    }
+   
+    var images:[String: Image] = [:]
+    var threads: [Thread] = []
     
     var needSymbolicate: Bool {
-        if self.type == .umeng {
+        if self.brand == .umeng {
             return true
         }
-
-        guard let images = self.images else {
-            return false
-        }
         
-        for (_, image) in images {
-            if let bt = image.backtrace {
-                for frame in bt {
-                    if frame.symbol == nil || frame.symbol!.hasPrefix("0x") {
-                        return true
-                    }
+        for thread in self.threads {
+            for frame in thread.backtrace {
+                if frame.symbol == nil || frame.symbol!.hasPrefix("0x") {
+                    return true
                 }
             }
         }
-        
         return false
-    }
-}
-
-enum CrashType: Int {
-    case umeng = 0
-    case apple = 1
-    case csv = 2
-    case bugly = 3
-    
-    static func fromContent(_ content: String?) -> CrashType? {
-        guard let crash = content else {
-            return nil
-        }
-        
-        if crash.contains("摘要,应用版本,错误次数") {
-            return .csv
-        } else if (crash.contains("dSYM UUID") && crash.contains("Slide Address")) {
-            return .umeng
-        } else if crash.contains("Incident Identifier") {
-            return .apple
-        } else if crash.contains("App base addr:") && crash.contains("System Binary infos:") {
-            return .bugly
-        }
-        
-        return nil
     }
 }

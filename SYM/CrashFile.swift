@@ -24,43 +24,40 @@
 import Foundation
 
 
-struct SubProcess {
-    static func execute(cmd: String, args: [String]?) -> String? {
-        let pipe = Pipe()
-        
-        let task = Process().then {
-            $0.launchPath = cmd
-            $0.arguments = args
-            $0.standardOutput = pipe
-        }
-        
-        task.launch()
-        
-        let output = pipe.fileHandleForReading
-        let data = output.readDataToEndOfFile()
-        return String(data: data, encoding: String.Encoding.utf8)
-    }
-}
+class CrashFile: Equatable {
+    var name: String
+    var url: URL?
 
-extension SubProcess {
-    static func dwarfdump(path: String) -> [String]? {
-        let cmd = "/usr/bin/dwarfdump"
-        let args = ["--uuid", path]
-        if let result = self.execute(cmd: cmd, args: args) {
-            let lines = result.components(separatedBy: "\n").filter {
-                (content) -> Bool in
-                if content.characters.count == 0 {
-                    return false
-                }
-                
-                return content.hasPrefix("UUID: ")
+    var fileWrapper: FileWrapper?
+
+    var crashGenerator: (()->CrashReport) = {
+        return CrashReport()
+    }
+
+    lazy var crash: CrashReport = {
+        return self.crashGenerator()
+    }()
+
+    var children: [CrashFile]?
+    
+    init(name: String = "") {
+        self.name = name
+    }
+    
+    convenience init(from fileWrapper: FileWrapper) {
+        self.init(name: fileWrapper.filename!)
+        self.fileWrapper = fileWrapper
+        
+        self.crashGenerator = {
+            if let data = fileWrapper.regularFileContents, let content = String(data: data, encoding: String.Encoding.utf8){
+                return CrashReport(content)
             }
             
-            return lines.map({ (line) -> String in
-                return line.components(separatedBy: " ")[1]
-            })
+            return CrashReport()
         }
-        
-        return nil
+    }
+    
+    static func ==(l:CrashFile, r:CrashFile) -> Bool {
+        return l.name == r.name && (l.url == r.url || l.fileWrapper == r.fileWrapper)
     }
 }

@@ -24,15 +24,22 @@
 import Cocoa
 
 
-protocol DocumentContentDelegate: class {
-    func contentToSave() -> String?
-}
-
-
-class Document: NSDocument {
+class CrashDocument: NSDocument {
 
     var content: String?
-    weak var delegate: DocumentContentDelegate?
+    var crashFile: CrashFile = CrashFile()
+    
+    override var displayName: String! {
+        didSet {
+            self.crashFile.name = displayName
+        }
+    }
+    
+    override var fileURL: URL? {
+        didSet {
+            self.crashFile.url = fileURL
+        }
+    }
 
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
@@ -45,10 +52,6 @@ class Document: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        if let newContent = self.delegate?.contentToSave() {
-            self.content = newContent
-        }
-
         if self.content == nil {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }
@@ -58,6 +61,11 @@ class Document: NSDocument {
 
     override func read(from data: Data, ofType typeName: String) throws {
         self.content = String(data: data, encoding: String.Encoding.utf8)
+        self.crashFile.crashGenerator = {
+            return CrashReport(self.content!)
+        }
+
+        self.openCrash(file: self.crashFile)
     }
 
     override class func autosavesInPlace() -> Bool {
@@ -66,5 +74,20 @@ class Document: NSDocument {
     
     override class func autosavesDrafts() -> Bool {
         return false
+    }
+    
+    func openCrash(file: CrashFile) {
+        DispatchQueue.main.async {
+            (self.windowControllers[0] as! MainWindowController).openCrash(file: file)
+        }
+    }
+    
+    func update(crashFile: CrashFile?, newContent: String) {
+        var file = crashFile
+        if crashFile == nil {
+            file = self.crashFile
+        }
+        
+        file!.crash.update(content: newContent)
     }
 }

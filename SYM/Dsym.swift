@@ -130,15 +130,13 @@ class DsymManager {
     }
     
     func uuidOfFile(_ path: String, completion: @escaping (([String]?) -> Void)) {
-        let operation = SubProcess(dsymPath: path)
-        operation.completionBlock = {
-            DispatchQueue.main.async(execute: {
-                let result = operation.dwarfResult()
-                completion(result)
-            })
+        DispatchQueue.global().async {
+            if let uuids = SubProcess.dwarfdump(path: path) {
+                completion(uuids)
+            } else {
+                completion(nil)
+            }
         }
-        
-        globalTaskQueue.addOperation(operation)
     }
     
     func importDsym(fromURL url: URL, completion: @escaping (([String]?, Bool)->Void)) {
@@ -164,5 +162,23 @@ class DsymManager {
             let result = self.addDsym(Dsym(uuids: uuids, name: url.lastPathComponent, path: url.path))
             completion(uuids, result)
         }
+    }
+}
+
+extension CrashReport {
+    func fixDsym() -> Bool {
+        for (_, image) in self.images {
+            if let uuid = image.uuid {
+                image.dSym = DsymManager.sharedInstance.dsym(withUUID: uuid)?.path
+            }
+        }
+        
+        if let appName = self.appName, let appImage = self.images[appName] {
+            if appImage.dSym != nil {
+                return true
+            }
+        }
+        
+        return false
     }
 }

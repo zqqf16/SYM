@@ -86,6 +86,35 @@ extension String {
         
         return uuid.uppercased()
     }
+    
+    func parseKeyValue(separatedBy: String) -> (String, String)? {
+        let list = self.components(separatedBy: separatedBy)
+        if list.count != 2 {
+            return nil
+        }
+        
+        let name = list[0].strip()
+        let value = list[1].strip()
+        if value.characters.count == 0 {
+            return nil
+        }
+        
+        return (name, value)
+    }
+    
+    func separatedValue() -> String? {
+        let list = self.components(separatedBy: ":")
+        if list.count != 2 {
+            return nil
+        }
+        
+        let value = list[1].strip()
+        if value.characters.count == 0 {
+            return nil
+        }
+        
+        return value
+    }
 }
 
 

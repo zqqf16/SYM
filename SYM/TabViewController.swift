@@ -21,44 +21,22 @@
 // SOFTWARE.
 
 
-import Foundation
+import Cocoa
 
-struct RE {
-    let regex: NSRegularExpression
-    
-    var groups: [String]?
-    
-    init(_ pattern: String) throws {
-        try regex = NSRegularExpression(pattern: pattern,
-                                        options: [])
-    }
-    
-    static func compile(_ pattern: String) -> RE? {
-        do {
-            return try RE(pattern)
-        } catch {
-            return nil
-        }
-    }
-    
-    func match(_ input: String) -> [String]? {
-        let matches = regex.matches(in: input,
-                                    options: [],
-                                    range: NSMakeRange(0, input.utf16.count))
-        if matches.count == 0 {
-            return nil
-        }
+class TabViewController: NSTabViewController {
 
-        let match = matches[0]
-        let number = match.numberOfRanges
-        var groups = [String]()
-
-        for index in 1..<number {
-            if let range = match.rangeAt(index).toRange() {
-                groups.append(input[range])
-            }
-        }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do view setup here.
         
-        return groups
+        self.tabView.selectTabViewItem(at: 0)
+    }
+    
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        
+        self.windowController()?.tabDelegate = { [weak self] (index) in
+            self?.tabView.selectTabViewItem(at: index)
+        }
     }
 }
