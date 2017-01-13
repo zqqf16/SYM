@@ -23,13 +23,15 @@
 
 import Cocoa
 
+
 class BaseWindow: NSWindow {
     override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
         self.titleVisibility = .hidden
-        self.titlebarAppearsTransparent = true
+        //self.titlebarAppearsTransparent = true
         self.isMovableByWindowBackground = true
         self.styleMask.insert(.fullSizeContentView)
+        self.styleMask.insert(.unifiedTitleAndToolbar)
         //self.backgroundColor = NSColor.white
         //self.center()
     }
@@ -40,7 +42,7 @@ class MainWindow: BaseWindow {
     
     required override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
-        self.styleMask.remove(.fullSizeContentView)
+        //self.styleMask.remove(.fullSizeContentView)
     }
 
     func updateProgress(start: Bool) {

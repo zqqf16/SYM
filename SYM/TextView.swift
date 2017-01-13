@@ -37,6 +37,7 @@ extension NSTextView {
     }
 }
 
+
 class TextView: NSTextView {
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard()

@@ -27,6 +27,7 @@ import Cocoa
 class AboutWindow: BaseWindow {
     override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
+        self.titlebarAppearsTransparent = true
         self.titleVisibility = .visible
         self.backgroundColor = NSColor.white
         //self.center()

@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
 import Cocoa
 
 
 class BundleDocument: CrashDocument {
-
     var info: [String: Any]?
     
     override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws {

@@ -24,9 +24,7 @@
 import Foundation
 
 
-protocol Sym {
-    static func symbolicate(_ crash: CrashReport, completion: @escaping (CrashReport)->Void);
-}
+// MARK: - SubProcess
 
 extension SubProcess {
     static func atos(loadAddress: String,
@@ -62,6 +60,8 @@ extension SubProcess {
 }
 
 
+// MARK: - Symbolicate
+
 extension CrashReport {
     func symbolicate(completion: @escaping (CrashReport)->Void) {
         let dSymValidate = self.fixDsym()
@@ -81,7 +81,7 @@ extension CrashReport {
         }
     }
     
-    
+    //MARK: Atos
     func atos(_ completion: @escaping (CrashReport)->Void) {
         let queue = DispatchQueue(label: "symbolicate", attributes: .concurrent)
         let group = DispatchGroup()
@@ -122,6 +122,7 @@ extension CrashReport {
         }
     }
 
+    //MARK: symbolicatecrash
     func appleTool(_ completion: @escaping (CrashReport)->Void) {
         guard let content = self.content else {
             completion(self)

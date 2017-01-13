@@ -23,6 +23,7 @@
 
 import Cocoa
 
+
 class ThreadViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
     @IBOutlet weak var titleView: ThreadTitleView!

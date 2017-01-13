@@ -45,7 +45,6 @@ extension CrashReport.Frame {
 }
 
 extension CrashReport {
-
     func pretty() -> NSAttributedString {
         guard let content = self.content else {
             return NSAttributedString()

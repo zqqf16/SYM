@@ -32,9 +32,14 @@ struct LineRE {
     // 0x19a8d8000 - 0x19a8f4fff libsystem_m.dylib arm64  <ee3277089d2b310c81263e5fbcbb3138> /usr/lib/system/libsystem_m.dylib
     static let image = RE.compile("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")!
     
+    // Thread 0:
+    // Thread 0 Crashed:
+    // Thread 0 name xxxxxx
     static let thread = RE.compile("Thread (\\d{1,3})(?:[: ])(?:(?:(Crashed):)|(?:name:\\s+(.*)))*$")!
 }
 
+
+// MARK: - CrashReport Extensions
 
 extension CrashReport.Frame {
     convenience init?(content: String, lineNumber: Int) {
@@ -68,6 +73,7 @@ extension CrashReport.Frame {
     }
 }
 
+
 extension CrashReport.Image {
     fileprivate func update(uuid: String?, loadAddress: String?) {
         self.uuid = uuid
@@ -91,6 +97,9 @@ extension CrashReport.Image {
         self.uuid = match[3].uuidFormat()
     }
 }
+
+
+// MARK: - Parser
 
 extension CrashReport {
     convenience init(_ content: String) {
@@ -160,6 +169,7 @@ extension CrashReport {
         }
     }
     
+    // MARK: Umeng
     private func parseUmeng() {
         var loadAddress: String?
         var uuid: String?
@@ -210,6 +220,7 @@ extension CrashReport {
         return nil
     }
     
+    // MARK: Apple
     private func parseApple() {
         let lines = self.content!.components(separatedBy: "\n")
         
