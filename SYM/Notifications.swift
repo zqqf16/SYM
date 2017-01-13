@@ -27,4 +27,6 @@ extension NSNotification.Name {
     static let openCrashReport = Notification.Name("sym.OpenCrashReport")
     static let crashSymbolicated = Notification.Name("sym.CrashSymbolicated")
     static let crashUpdated = Notification.Name("sym.CrashUpdated")
+    static let toggleFileList = Notification.Name("sym.ToggleFileList")
+    static let switchViewMode = Notification.Name("sym.SwitchViewMode")
 }

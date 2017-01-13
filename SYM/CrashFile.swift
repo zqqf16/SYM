@@ -30,18 +30,30 @@ class CrashFile: Equatable {
 
     var fileWrapper: FileWrapper?
 
-    var crashGenerator: (()->CrashReport) = {
-        return CrashReport()
+    private var _crash: CrashReport?
+    var crash: CrashReport? {
+        get {
+            return self._crash ?? self.crashGenerator()
+        }
+        set {
+            self._crash = newValue
+        }
     }
-
-    lazy var crash: CrashReport = {
-        return self.crashGenerator()
-    }()
+    
+    var crashGenerator: (()->CrashReport?) {
+        didSet {
+            self._crash = nil
+        }
+    }
 
     var children: [CrashFile]?
     
-    init(name: String = "") {
+    init(name: String = "Untitled") {
         self.name = name
+        
+        self.crashGenerator = {
+            return nil
+        }
     }
     
     convenience init(from fileWrapper: FileWrapper) {
@@ -49,11 +61,12 @@ class CrashFile: Equatable {
         self.fileWrapper = fileWrapper
         
         self.crashGenerator = {
-            if let data = fileWrapper.regularFileContents, let content = String(data: data, encoding: String.Encoding.utf8){
+            if let data = fileWrapper.regularFileContents,
+                let content = String(data: data, encoding: String.Encoding.utf8){
                 return CrashReport(content)
             }
             
-            return CrashReport()
+            return nil
         }
     }
     

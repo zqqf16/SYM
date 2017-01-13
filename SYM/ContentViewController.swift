@@ -33,20 +33,14 @@ class ContentViewController: NSViewController {
         super.viewDidLoad()
         self.setupTextView()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCrashSymbolicated), name: .crashSymbolicated, object: nil)
-    }
-    
-    func handleOpenCrash(notification: Notification) {
-        if let wc = notification.object as? MainWindowController {
-            if self.windowController() == nil || wc == self.windowController() {
-                self.loadData()
-            }
+        let _ = NotificationCenter.default.then {
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
         }
     }
     
-    func handleCrashSymbolicated(notification: Notification) {
-        if let crash = notification.object as? CrashReport, crash === self.crash {
+    func handleOpenCrash(notification: Notification) {
+        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.loadData()
         }
     }
@@ -57,6 +51,11 @@ class ContentViewController: NSViewController {
         if let crash = self.crash {
             self.textView.setAttributeString(attributeString: crash.pretty())
             //self.textView.scrollToBeginningOfDocument(nil)
+            //self.textView.isEditable = false
+            if self.document()?.crashFile.url != nil {
+                // this crash file is opened from file
+                self.textView.isEditable = false
+            }
         }
     }
     
@@ -123,7 +122,9 @@ extension ContentViewController: CrashTextViewDelegate {
     
     func contentDidChanged() {
         if let newContent = textView.string {
-            self.windowController()?.updateCrash(newContent)
+            DispatchQueue.main.async {
+                self.windowController()?.updateCrash(newContent)
+            }
         }
     }
     

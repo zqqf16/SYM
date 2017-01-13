@@ -11,18 +11,18 @@
 			<array>
 				<string>xccrashpoint</string>
 			</array>
-			<key>LSTypeIsPackage</key>
-			<true/>
-			<key>CFBundleTypeName</key>
-			<string>Crash Point File</string>
 			<key>CFBundleTypeIconFile</key>
 			<string>crashpoint</string>
+			<key>CFBundleTypeName</key>
+			<string>Crash Point File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.apple.dt.document.xccrashpoint</string>
 			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
+			<key>LSTypeIsPackage</key>
+			<true/>
 			<key>NSDocumentClass</key>
 			<string>$(PRODUCT_MODULE_NAME).BundleDocument</string>
 		</dict>
@@ -61,7 +61,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>17</string>
+	<string>19</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>

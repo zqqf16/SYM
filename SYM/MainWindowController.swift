@@ -24,50 +24,49 @@
 import Cocoa
 
 
-extension NSViewController {
-    func document() -> CrashDocument? {
-        if let windowController = self.view.window?.windowController {
-            return windowController.document as? CrashDocument
-        }
-        return nil
-    }
-    
-    func window() -> MainWindow? {
-        return self.view.window as? MainWindow
-    }
-    
-    func windowController() -> MainWindowController? {
-        return self.view.window?.windowController as? MainWindowController
-    }
-    
-    func updateNavigationState(_ index: Int) {
-        self.windowController()?.updateNavigationState(index)
-    }
-    
-    func updateSidebarState(_ on: Bool) {
-        self.windowController()?.updateSidebarState(on)
-    }
-    
-    func openCrash(_ file: CrashFile) {
-        self.windowController()?.currentCrashFile = file
-    }
-    
-    func currentCrashFile() -> CrashFile? {
-        return self.windowController()?.currentCrashFile
-    }
+enum ViewMode: Int {
+    case text = 0
+    case thread = 1
 }
 
 class MainWindowController: NSWindowController {
 
     @IBOutlet weak var navigationButton: NSSegmentedControl!
     @IBOutlet weak var sidebarButton: NSButton!
+    @IBOutlet weak var expandButton: NSButton!
 
-    var sidebarDelegate: ((_ sender: Any?)->Void)?
-    var tabDelegate: ((_ index: Int)->Void)?
+    var isFileListOpen: Bool {
+        get {
+            return self.sidebarButton.state == NSOnState
+        }
+        set {
+            let state = newValue ? NSOnState : NSOffState
+            if state != self.sidebarButton.state {
+                self.sidebarButton.state = state
+            }
+        }
+    }
+
+    var viewMode: ViewMode {
+        get {
+            return ViewMode(rawValue: self.navigationButton.selectedSegment)!
+        }
+        set {
+            if newValue == .thread {
+                self.window?.toolbar?.insertItem(withItemIdentifier: "Expand", at: 2)
+            } else {
+                let item = self.window?.toolbar?.items[2]
+                if item?.itemIdentifier == "Expand" {
+                    self.window?.toolbar?.removeItem(at: 2)
+                }
+            }
+            self.navigationButton.selectSegment(withTag: newValue.rawValue)
+        }
+    }
     
     var currentCrashFile: CrashFile? {
         didSet {
-            NotificationCenter.default.post(name: .openCrashReport, object: self)
+            self.sendNotification(.openCrashReport)
         }
     }
     
@@ -75,23 +74,17 @@ class MainWindowController: NSWindowController {
         super.init(coder:coder)
     }
     
-    func updateNavigationState(_ index: Int) {
-        self.navigationButton.selectSegment(withTag: index)
+    override func windowDidLoad() {
+        super.windowDidLoad()
     }
     
-    func updateSidebarState(_ on: Bool) {
-        var state = NSOnState
-        if (!on) {
-            state = NSOffState
+    fileprivate func sendNotification(_ name: Notification.Name) {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: name, object: self)
         }
-
-        if self.sidebarButton.state == state {
-            return
-        }
-        
-        self.sidebarButton.state = state
     }
     
+    // MARK: Crash
     func openCrash(file: CrashFile) {
         self.currentCrashFile = file
     }
@@ -104,26 +97,52 @@ class MainWindowController: NSWindowController {
         }
         document.update(crashFile: self.currentCrashFile, newContent: newContent)
         self.window!.isDocumentEdited = true
-        NotificationCenter.default.post(name: .crashUpdated, object: self.currentCrashFile?.crash)
+        self.sendNotification(.crashUpdated)
+    }
+    
+    private func updateSymbolicateProgress(start: Bool) {
+        (self.window as? MainWindow)?.updateProgress(start: start)
+    }
+    
+    @IBAction func symbolicate(_ sender: AnyObject?) {
+        if let crash = self.currentCrashFile?.crash {
+            self.updateSymbolicateProgress(start: true)
+            
+            crash.symbolicate(completion: { [weak self] (crash) in
+                DispatchQueue.main.async {
+                    self?.updateSymbolicateProgress(start: false)
+                    self?.sendNotification(.crashSymbolicated)
+                }
+            })
+        }
     }
 }
 
+// MARK: - UI
 extension MainWindowController {
+    func update(viewMode: ViewMode) {
+        self.viewMode = viewMode
+    }
+    
+    func updateSidebarState(_ on: Bool) {
+        self.isFileListOpen = on
+    }
+
     @IBAction func toggleFileList(_ sender: Any?) {
-        if let delegate = self.sidebarDelegate {
-            delegate(sender)
+        if let button = sender as? NSButton {
+            self.isFileListOpen = (button.state == NSOnState)
+            self.sendNotification(.toggleFileList)
         }
     }
     
     @IBAction func selectTabViewController(_ sender: Any?) {
-        if let delegate = self.tabDelegate, let ctrl = sender as? NSSegmentedControl {
-            delegate(ctrl.selectedSegment)
+        if let ctrl = sender as? NSSegmentedControl {
+            self.viewMode = ViewMode(rawValue: ctrl.selectedSegment)!
+            self.sendNotification(.switchViewMode)
         }
     }
-}
-
-extension MainWindowController {
     
+    // MARK: dSYM
     @IBAction func importDsymFile(_ sender: AnyObject?) {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = false
@@ -157,21 +176,30 @@ extension MainWindowController {
             })
         }
     }
-    
-    private func updateSymbolicateProgress(start: Bool) {
-        (self.window as? MainWindow)?.updateProgress(start: start)
+}
+
+
+extension NSViewController {
+    func document() -> CrashDocument? {
+        if let windowController = self.view.window?.windowController {
+            return windowController.document as? CrashDocument
+        }
+        return nil
     }
     
-    @IBAction func symbolicate(_ sender: AnyObject?) {
-        if let crash = self.currentCrashFile?.crash {
-            self.updateSymbolicateProgress(start: true)
-
-            crash.symbolicate(completion: { [weak self] (crash) in
-                DispatchQueue.main.async {
-                    self?.updateSymbolicateProgress(start: false)
-                    NotificationCenter.default.post(name: .crashSymbolicated, object: crash)
-                }
-            })
-        }
+    func window() -> MainWindow? {
+        return self.view.window as? MainWindow
+    }
+    
+    func windowController() -> MainWindowController? {
+        return self.view.window?.windowController as? MainWindowController
+    }
+    
+    func openCrash(_ file: CrashFile) {
+        self.windowController()?.currentCrashFile = file
+    }
+    
+    func currentCrashFile() -> CrashFile? {
+        return self.windowController()?.currentCrashFile
     }
 }

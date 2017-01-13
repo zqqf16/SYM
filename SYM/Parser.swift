@@ -165,6 +165,7 @@ extension CrashReport {
         var uuid: String?
         let thread = CrashReport.Thread()
         thread.crashed = true
+        self.threads.append(thread)
         
         let lines = self.content!.components(separatedBy: "\n")
         for (index, line) in lines.enumerated() {

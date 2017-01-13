@@ -25,16 +25,20 @@ import Cocoa
 
 
 class CrashDocument: NSDocument {
-
-    var content: String?
     var crashFile: CrashFile = CrashFile()
     
     override var displayName: String! {
-        didSet {
+        get {
+            let name = super.displayName
+            self.crashFile.name = name!
+            return name
+        }
+        set {
+            super.displayName = newValue
             self.crashFile.name = displayName
         }
     }
-    
+
     override var fileURL: URL? {
         didSet {
             self.crashFile.url = fileURL
@@ -52,19 +56,20 @@ class CrashDocument: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        if self.content == nil {
+        guard let content = self.crashFile.crash?.content else {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }
 
-        return self.content!.data(using: String.Encoding.utf8)!
+        return content.data(using: String.Encoding.utf8)!
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        self.content = String(data: data, encoding: String.Encoding.utf8)
-        self.crashFile.crashGenerator = {
-            return CrashReport(self.content!)
+        if let content = String(data: data, encoding: String.Encoding.utf8) {
+            self.crashFile.crashGenerator = {
+                return CrashReport(content)
+            }
         }
-
+        
         self.openCrash(file: self.crashFile)
     }
 
@@ -83,11 +88,14 @@ class CrashDocument: NSDocument {
     }
     
     func update(crashFile: CrashFile?, newContent: String) {
-        var file = crashFile
-        if crashFile == nil {
-            file = self.crashFile
-        }
+        let file = crashFile ?? self.crashFile
         
-        file!.crash.update(content: newContent)
+        DispatchQueue.global().async {
+            if let crash = file.crash {
+                crash.update(content: newContent)
+            } else {
+                file.crash = CrashReport(newContent)
+            }
+        }
     }
 }

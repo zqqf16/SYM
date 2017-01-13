@@ -48,7 +48,7 @@ class MainWindow: BaseWindow {
         let iconButton = self.standardWindowButton(.zoomButton)
         if iconButton != nil {
             frame = iconButton!.frame
-            frame.origin.x += 64
+            frame.origin.x += 74
         }
         if indicator == nil {
             indicator = NSProgressIndicator(frame: frame)

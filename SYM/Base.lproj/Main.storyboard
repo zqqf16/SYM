@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D25a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
@@ -472,6 +472,21 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="B85B2074-554E-415C-9B8B-50DF095A3510" explicitItemIdentifier="Expand" label="Expand" paletteLabel="Expand" toolTip="Toggle Sidebar" image="expand" id="0W4-LQ-b4d">
+                                    <size key="minSize" width="32" height="25"/>
+                                    <size key="maxSize" width="36" height="28"/>
+                                    <button key="view" verticalHuggingPriority="750" id="AVG-yt-XR9">
+                                        <rect key="frame" x="5" y="14" width="36" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="expand" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="mKg-5g-Ov6">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="expandThreads:" target="wBG-Uk-v7d" id="BQH-he-qdU"/>
+                                        </connections>
+                                    </button>
+                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="E7F1423A-A157-45A9-B44E-90697E12AE45" label="Symbolicate" paletteLabel="Custom View" toolTip="Symbolicate" image="Play" id="jOx-ar-DOP">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
@@ -497,6 +512,7 @@
                         </toolbar>
                     </window>
                     <connections>
+                        <outlet property="expandButton" destination="AVG-yt-XR9" id="8sx-JT-2WE"/>
                         <outlet property="navigationButton" destination="tiM-SZ-k5K" id="iaB-VN-73s"/>
                         <outlet property="sidebarButton" destination="Fu4-gN-mTw" id="yhs-6d-hbE"/>
                         <segue destination="PpI-WI-FN0" kind="relationship" relationship="window.shadowedContentViewController" id="Wy5-Fn-aO7"/>
@@ -1079,13 +1095,13 @@
                                 </connections>
                             </customView>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="21" horizontalPageScroll="10" verticalLineScroll="21" verticalPageScroll="10" usesPredominantAxisScrolling="NO" findBarPosition="aboveHorizontalRuler" translatesAutoresizingMaskIntoConstraints="NO" id="qLk-TK-kXw">
-                                <rect key="frame" x="0.0" y="0.0" width="800" height="570"/>
+                                <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                                 <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="16s-rW-0k7">
-                                    <rect key="frame" x="0.0" y="0.0" width="800" height="570"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" selectionHighlightStyle="none" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="4" outlineTableColumn="2vQ-d9-yvO" id="QGy-WM-RZl">
-                                            <rect key="frame" x="0.0" y="0.0" width="800" height="570"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="14" height="4"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1207,7 +1223,7 @@
                             <constraint firstItem="b8Q-pI-wge" firstAttribute="leading" secondItem="M9X-mU-UAg" secondAttribute="leading" id="0w7-vf-pBN"/>
                             <constraint firstAttribute="trailing" secondItem="b8Q-pI-wge" secondAttribute="trailing" id="4n9-2t-Q2l"/>
                             <constraint firstItem="b8Q-pI-wge" firstAttribute="top" secondItem="M9X-mU-UAg" secondAttribute="top" id="5le-Ez-6vm"/>
-                            <constraint firstItem="qLk-TK-kXw" firstAttribute="top" secondItem="M9X-mU-UAg" secondAttribute="top" constant="30" id="7dl-Ei-Cgm"/>
+                            <constraint firstItem="qLk-TK-kXw" firstAttribute="top" secondItem="M9X-mU-UAg" secondAttribute="top" id="7dl-Ei-Cgm"/>
                             <constraint firstItem="b8Q-pI-wge" firstAttribute="leading" secondItem="M9X-mU-UAg" secondAttribute="leading" id="K5e-oq-Mca"/>
                             <constraint firstItem="b8Q-pI-wge" firstAttribute="top" secondItem="M9X-mU-UAg" secondAttribute="top" id="L7b-K3-dH8"/>
                             <constraint firstAttribute="trailing" secondItem="b8Q-pI-wge" secondAttribute="trailing" id="XQ1-9K-fBf"/>

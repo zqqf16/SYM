@@ -33,12 +33,17 @@ class SplitViewController: NSSplitViewController {
         return self.splitViewItems[0]
     }
     
-    override func viewDidLayout() {
-        super.viewDidLayout()
-        // Do view setup here.
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(handleToggleFileList), name: .toggleFileList, object: nil)
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
         
-        self.windowController()?.sidebarDelegate = { [weak self] sender in
-            self?.toggleSidebar(sender)
+        // check and set sidebar state
+        if self.windowController()?.isFileListOpen != !self.sidebar.isCollapsed {
+            self.toggleSidebar(nil)
         }
     }
     
@@ -52,6 +57,12 @@ class SplitViewController: NSSplitViewController {
     
     override func splitViewDidResizeSubviews(_ notification: Notification) {
         super.splitViewDidResizeSubviews(notification)
-        self.updateSidebarState(!self.sidebar.isCollapsed)
+        self.windowController()?.updateSidebarState(!self.sidebar.isCollapsed)
+    }
+    
+    func handleToggleFileList(_ notification: Notification) {
+        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
+            self.toggleSidebar(nil)
+        }
     }
 }

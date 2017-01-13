@@ -99,7 +99,7 @@ extension CrashReport {
                 self.atos(image: image)
             }
         }
-        
+        group.wait()
     }
     
     private func atos(image: Image) {

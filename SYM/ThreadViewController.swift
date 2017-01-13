@@ -39,22 +39,15 @@ class ThreadViewController: NSViewController {
         self.outlineView.delegate = self
         self.outlineView.dataSource = self
         
-        let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
-        nc.addObserver(self, selector: #selector(handleCrashSymbolicated), name: .crashSymbolicated, object: nil)
-        nc.addObserver(self, selector: #selector(handleCrashSymbolicated), name: .crashUpdated, object: nil)
-    }
-    
-    func handleOpenCrash(notification: Notification) {
-        if let wc = notification.object as? MainWindowController {
-            if self.windowController() == nil || wc == self.windowController() {
-                self.reloadCrash()
-            }
+        let _ = NotificationCenter.default.then {
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
         }
     }
     
-    func handleCrashSymbolicated(notification: Notification) {
-        if let crash = notification.object as? CrashReport, crash === self.crash {
+    func handleOpenCrash(notification: Notification) {
+        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.reloadCrash()
         }
     }
@@ -165,5 +158,17 @@ extension ThreadViewController: NSOutlineViewDataSource {
 extension ThreadViewController: ThreadTitleViewDelegate {
     func didCollapseButtonClicked(_ isCollapse: Bool) {
         self.updateThreadState(isCollapse)
+    }
+    
+    @IBAction func expandThreads(_ sender: AnyObject?) {
+        if let button = sender as? NSButton {
+            if button.state == NSOnState {
+                button.image = NSImage(named: "collapse")
+                self.didCollapseButtonClicked(false)
+            } else {
+                button.image = NSImage(named: "expand")
+                self.didCollapseButtonClicked(true)
+            }
+        }
     }
 }
