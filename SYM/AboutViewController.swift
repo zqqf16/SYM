@@ -54,7 +54,7 @@ class AboutViewController: NSViewController {
     }
     
     @IBAction func gotoWebsite(sender: AnyObject) {
-        let url = URL(string: "http://blog.zorro.im?utm_source=sym")!
+        let url = URL(string: "https://zorro.im?utm_source=sym&utm_medium=referral")!
         NSWorkspace.shared().open(url)
     }
     
