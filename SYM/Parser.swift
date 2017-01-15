@@ -181,6 +181,7 @@ extension CrashReport {
         for (index, line) in lines.enumerated() {
             let value = line.strip()
             if let (k, v) = value.parseKeyValue(separatedBy: ":") {
+                var match = true
                 if k == "Application received" {
                     self.reason = v
                 } else if k == "CPU Type" {
@@ -191,9 +192,11 @@ extension CrashReport {
                     loadAddress = v
                 } else if k == "dSYM UUID" {
                     uuid = v
+                } else {
+                    match = false
                 }
                 
-                continue
+                if match { continue }
             }
             
             if let frame = CrashReport.Frame(content: value, lineNumber: index) {

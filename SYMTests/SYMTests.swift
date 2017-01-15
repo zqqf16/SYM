@@ -56,6 +56,14 @@ class SYMTests: XCTestCase {
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNotNil(crash.images)
 
+        let thread = crash.threads[0]
+        XCTAssertNotNil(thread)
+        XCTAssertNil(thread.number)
+        XCTAssertNil(thread.name)
+        XCTAssertEqual(thread.crashed, true)
+        XCTAssertNotNil(thread.backtrace)
+        XCTAssertEqual(thread.backtrace.count, 31)
+        
         let image = crash.images[crash.appName!]
         XCTAssertNotNil(image)
         XCTAssertEqual(image!.name, "DemoApp")
