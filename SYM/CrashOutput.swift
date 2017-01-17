@@ -34,15 +34,6 @@ let backtraceAttrs: [String: AnyObject] = [
     NSFontAttributeName: NSFontManager.shared().font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
 ]
 
-extension CrashReport.Frame {
-    func description() -> String {
-        let index = self.index.extendToLength(2)
-        let image = self.image.extendToLength(30)
-        let address = self.address.extendToLength(18)
-        let symbol = self.symbol ?? ""
-        return "\(index) \(image) \(address) \(symbol)"
-    }
-}
 
 extension CrashReport {
     func pretty() -> NSAttributedString {
@@ -75,11 +66,11 @@ extension CrashReport {
             if let frame = backtrace[index] {
                 if frame.isKey {
                     let startIndex = result.length
-                    result.append(frame.description())
+                    result.append(frame.description)
                     let endIndex = result.length
                     keyFrameRanges.append(NSMakeRange(startIndex, endIndex-startIndex))
                 } else {
-                    result.append(frame.description())
+                    result.append(frame.description)
                 }
             } else {
                 result.append(line)

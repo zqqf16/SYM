@@ -26,26 +26,14 @@ import Cocoa
 
 class ThreadViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
-    @IBOutlet weak var titleView: ThreadTitleView!
-
+    
     var crash: CrashReport?
     var threads: [CrashReport.Thread]?
+    
+    @IBOutlet weak var threadButton: NSPopUpButton!
+    @IBOutlet weak var searchField: NSSearchField!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        self.titleView.delegate = self
-        self.titleView.title.placeholderString = nil
-
-        self.outlineView.delegate = self
-        self.outlineView.dataSource = self
-        
-        let _ = NotificationCenter.default.then {
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
-        }
-    }
+    // MARK: - Load Crash
     
     func handleOpenCrash(notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
@@ -57,47 +45,49 @@ class ThreadViewController: NSViewController {
         self.crash = self.currentCrashFile()?.crash
         self.threads = self.crash?.threads
         self.outlineView?.reloadData()
-        self.titleView.title.stringValue = self.crash?.reason ?? ""
-        self.expandCrashedThread()
+        self.updateThreadState()
     }
     
-    private func expandCrashedThread() {
-        var firstRow: Int?
-        if let ts = self.threads {
-            for thread in ts {
+    @IBAction func expandThread(_ sender: NSPopUpButton) {
+        self.updateThreadState()
+    }
+
+    func updateThreadState() {
+        guard let threads = self.threads else {
+            return
+        }
+
+        let index = self.threadButton.indexOfSelectedItem
+        if index == 0 {
+            for thread in threads {
+                self.outlineView.expandItem(thread)
+            }
+        } else {
+            for thread in threads {
                 if thread.number == nil || thread.crashed {
-                    if firstRow == nil {
-                        firstRow = self.outlineView?.row(forItem: thread)
-                    }
                     self.outlineView.expandItem(thread)
+                } else {
+                    self.outlineView.collapseItem(thread)
                 }
             }
         }
         
-        if let row = firstRow {
-            self.outlineView.scrollRowToVisible(row)
-        }
+        self.outlineView.scrollRowToVisible(0)
     }
-    
-    func updateThreadState(_ isCollapse: Bool) {
-        var fun: (_ item: Any) -> Void
-        if isCollapse {
-            fun = { (item) in
-                self.outlineView.collapseItem(item)
-            }
-        } else {
-            fun = { (item) in
-                self.outlineView.expandItem(item)
-            }
-        }
 
-        if let ts = self.threads {
-            for thread in ts {
-                fun(thread)
-            }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.outlineView.delegate = self
+        self.outlineView.dataSource = self
+        
+        let _ = NotificationCenter.default.then {
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
         }
     }
-    
+
     override func viewDidLayout() {
         super.viewDidLayout()
         if self.crash == nil {
@@ -105,6 +95,9 @@ class ThreadViewController: NSViewController {
         }
     }
 }
+
+
+// MARK: - OutlineView Delegate
 
 extension ThreadViewController: NSOutlineViewDelegate {
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
@@ -122,7 +115,7 @@ extension ThreadViewController: NSOutlineViewDelegate {
                 view = outlineView.make(withIdentifier: "FrameCell", owner: self) as? NSTableCellView
             }
             if let textField = view?.textField {
-                textField.stringValue = frame.description()
+                textField.stringValue = frame.description
             }
         }
         
@@ -156,20 +149,44 @@ extension ThreadViewController: NSOutlineViewDataSource {
     }
 }
 
-extension ThreadViewController: ThreadTitleViewDelegate {
-    func didCollapseButtonClicked(_ isCollapse: Bool) {
-        self.updateThreadState(isCollapse)
+
+// MARK: - Find bar
+
+extension ThreadViewController: NSSearchFieldDelegate {
+    func searchFieldDidStartSearching(_ sender: NSSearchField) {
+        guard self.crash != nil else {
+            return
+        }
+        
+        let text = sender.stringValue
+        let predicate = NSPredicate(format: "description contains[cd] %@", text)
+        
+        DispatchQueue.main.async {
+            var threads: [CrashReport.Thread] = []
+            for t in self.crash!.threads {
+                let bt = t.backtrace.filter({ predicate.evaluate(with: $0) })
+                if bt.count > 0 {
+                    let thread = CrashReport.Thread()
+                    thread.name = t.name
+                    thread.number = t.number
+                    thread.crashed = t.crashed
+                    thread.backtrace = bt
+                    threads.append(thread)
+                }
+            }
+            
+            self.threads = threads
+            self.outlineView.reloadData()
+            self.updateThreadState()
+        }
+        self.becomeFirstResponder()
     }
     
-    @IBAction func expandThreads(_ sender: AnyObject?) {
-        if let button = sender as? NSButton {
-            if button.state == NSOnState {
-                button.image = NSImage(named: "collapse")
-                self.didCollapseButtonClicked(false)
-            } else {
-                button.image = NSImage(named: "expand")
-                self.didCollapseButtonClicked(true)
-            }
+    func searchFieldDidEndSearching(_ sender: NSSearchField) {
+        if let threads = self.crash?.threads {
+            self.threads = threads
+            self.outlineView.reloadData()
+            self.updateThreadState()
         }
     }
 }

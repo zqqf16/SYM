@@ -32,7 +32,7 @@ class CrashReport {
         case unknow
     }
     
-    class Frame {
+    class Frame: NSObject {
         var index: String
         var image: String
         var address: String
@@ -45,6 +45,14 @@ class CrashReport {
             self.image = image
             self.address = address
             self.line = line
+        }
+        
+        override var description: String {
+            let index = self.index.extendToLength(2)
+            let image = self.image.extendToLength(30)
+            let address = self.address.extendToLength(18)
+            let symbol = self.symbol ?? ""
+            return "\(index) \(image) \(address) \(symbol)"
         }
     }
     

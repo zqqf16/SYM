@@ -33,7 +33,6 @@ class MainWindowController: NSWindowController {
 
     @IBOutlet weak var navigationButton: NSSegmentedControl!
     @IBOutlet weak var sidebarButton: NSButton!
-    @IBOutlet weak var expandButton: NSButton!
 
     var isFileListOpen: Bool {
         get {
@@ -47,22 +46,7 @@ class MainWindowController: NSWindowController {
         }
     }
 
-    var viewMode: ViewMode {
-        get {
-            return ViewMode(rawValue: self.navigationButton.selectedSegment)!
-        }
-        set {
-            if newValue == .thread {
-                self.window?.toolbar?.insertItem(withItemIdentifier: "Expand", at: 2)
-            } else {
-                let item = self.window?.toolbar?.items[2]
-                if item?.itemIdentifier == "Expand" {
-                    self.window?.toolbar?.removeItem(at: 2)
-                }
-            }
-            self.navigationButton.selectSegment(withTag: newValue.rawValue)
-        }
-    }
+    var viewMode: ViewMode = .text
     
     var currentCrashFile: CrashFile? {
         didSet {
