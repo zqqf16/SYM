@@ -50,8 +50,6 @@ class ContentViewController: NSViewController {
         self.textView.string = self.crash?.content ?? ""
         if let crash = self.crash {
             self.textView.setAttributeString(attributeString: crash.pretty())
-            //self.textView.scrollToBeginningOfDocument(nil)
-            //self.textView.isEditable = false
             if self.document()?.crashFile.url != nil {
                 // this crash file is opened from file
                 self.textView.isEditable = false
@@ -75,40 +73,6 @@ class ContentViewController: NSViewController {
     }
 }
 
-extension ContentViewController {
-    /*
-    @IBAction func symbolicate(_ sender: AnyObject?) {
-        guard let content = self.textView.string else {
-            return
-        }
-        
-        let crash = CrashReport(content)
-        if !crash.needSymbolicate {
-            self.didFinish(crash)
-            return
-        }
-        
-        self.window()?.updateProgress(start: true)
-    }
- */
-    
-    func dsym(forUuid uuid: String) -> String? {
-        guard let dsym = DsymManager.sharedInstance.dsym(withUUID: uuid) else {
-            return nil
-        }
-        
-        return dsym.path
-    }
-
-    
-    func didFinish(_ crash: CrashReport) {
-        DispatchQueue.main.async {
-            self.textView.setAttributeString(attributeString: crash.pretty())
-            self.textView.scrollToBeginningOfDocument(nil)
-            self.window()?.updateProgress(start: false)
-        }
-    }
-}
 
 extension ContentViewController: CrashTextViewDelegate {
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {

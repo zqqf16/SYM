@@ -167,6 +167,8 @@ extension CrashReport {
                 }
             }
         }
+        
+        let _ = self.fixDsym()
     }
     
     // MARK: Umeng
@@ -251,6 +253,12 @@ extension CrashReport {
                 self.appName = self.getBinary(line)
             } else if value.hasPrefix("Binary Images:") {
                 imageSectionStarted = true
+            } else if value.hasPrefix("Version") {
+                self.version = value.separatedValue()
+            } else if value.hasPrefix("Hardware Model") {
+                self.device = value.separatedValue()
+            } else if value.hasPrefix("OS Version") {
+                self.osVersion = value.separatedValue()
             } else if let g = LineRE.thread.match(value) {
                 // Thread 0 name:  Dispatch queue: com.apple.main-thread
                 // Thread 0 Crashed:

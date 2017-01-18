@@ -37,38 +37,6 @@ class BaseWindow: NSWindow {
     }
 }
 
-class MainWindow: BaseWindow {
-    var indicator: NSProgressIndicator?
-    
-    required override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
-        //self.styleMask.remove(.fullSizeContentView)
-    }
-
-    func updateProgress(start: Bool) {
-        var frame = CGRect.zero
-        let iconButton = self.standardWindowButton(.zoomButton)
-        if iconButton != nil {
-            frame = iconButton!.frame
-            frame.origin.x += 74
-        }
-        if indicator == nil {
-            indicator = NSProgressIndicator(frame: frame)
-            indicator!.style = .spinningStyle
-            iconButton?.superview?.addSubview(indicator!)
-        } else {
-            indicator?.frame = frame
-        }
-        
-        if start {
-            indicator?.startAnimation(nil)
-        } else {
-            indicator?.stopAnimation(nil)
-        }
-        indicator?.isHidden = !start
-    }
-}
-
 
 class Window: NSWindow, NSDraggingDestination {    
     required override init(contentRect: NSRect, styleMask aStyle: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {

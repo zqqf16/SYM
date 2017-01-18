@@ -22,37 +22,23 @@
 
 
 import Cocoa
-import AppKit
 
+class ThreadBottomBar: NSView {
 
-class SplitViewController: NSSplitViewController {
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
 
-    private var myContext = 0
-    
-    var sidebar: NSSplitViewItem {
-        return self.splitViewItems[0]
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(handleToggleFileList), name: .toggleFileList, object: nil)
-    }
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-    }
-    
-    override func viewDidAppear() {
-        super.viewDidAppear()
+        NSColor.white.setFill()
+        NSRectFill(dirtyRect)
         
-        if let doc = self.document(), doc is BundleDocument {
-            self.toggleSidebar(nil)
-        }
+        let line = NSBezierPath()
+        line.lineWidth = 2
+        let start = NSPoint(x: self.bounds.minX, y: self.bounds.maxY)
+        let end = NSPoint(x: self.bounds.maxX, y: self.bounds.maxY)
+        line.move(to: start)
+        line.line(to: end)
+        NSColor.controlColor.set()
+        line.stroke()
     }
     
-    func handleToggleFileList(_ notification: Notification) {
-        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
-            self.toggleSidebar(nil)
-        }
-    }
 }

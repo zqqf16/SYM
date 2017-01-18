@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABB1E2394F8008755EE /* CrashFile.swift */; };
-		513D6ABE1E24D967008755EE /* ThreadTitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABD1E24D967008755EE /* ThreadTitleView.swift */; };
+		5157C7BC1E2E2D200035DFDE /* ThreadBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */; };
+		5157C7BE1E2F7F150035DFDE /* CrashInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5157C7BD1E2F7F150035DFDE /* CrashInfoViewController.swift */; };
 		519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */ = {isa = PBXBuildFile; fileRef = 519FF5871D54BB2600B07A65 /* symbolicatecrash */; };
 		51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* CrashDocument.swift */; };
 		51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */; };
@@ -54,7 +55,8 @@
 
 /* Begin PBXFileReference section */
 		513D6ABB1E2394F8008755EE /* CrashFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashFile.swift; sourceTree = "<group>"; };
-		513D6ABD1E24D967008755EE /* ThreadTitleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadTitleView.swift; sourceTree = "<group>"; };
+		5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadBottomBar.swift; sourceTree = "<group>"; };
+		5157C7BD1E2F7F150035DFDE /* CrashInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashInfoViewController.swift; sourceTree = "<group>"; };
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
 		51B8D7041D4F620100F2C24C /* CrashDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashDocument.swift; sourceTree = "<group>"; };
 		51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
@@ -110,6 +112,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		510403241E2C8FA000BF523F /* Tread View */ = {
+			isa = PBXGroup;
+			children = (
+				F441BE6B1E2155F60085F3DA /* ThreadViewController.swift */,
+				5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */,
+			);
+			name = "Tread View";
+			sourceTree = "<group>";
+		};
 		51B5D2981D52166000B979C8 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,15 +172,15 @@
 		F45321071D30CC6E00639917 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				510403241E2C8FA000BF523F /* Tread View */,
 				F40543691D321E37009B2923 /* Window.swift */,
 				F45B68F21E227B8100128D8D /* MainWindowController.swift */,
+				5157C7BD1E2F7F150035DFDE /* CrashInfoViewController.swift */,
 				51BF9C491D66AB8800379BFC /* TextView.swift */,
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F441BE671E214D540085F3DA /* SplitViewController.swift */,
 				F499F02C1E1FDA84002701B2 /* FileListViewController.swift */,
 				F441BE691E21547A0085F3DA /* TabViewController.swift */,
-				513D6ABD1E24D967008755EE /* ThreadTitleView.swift */,
-				F441BE6B1E2155F60085F3DA /* ThreadViewController.swift */,
 				F49A8B641D3B28DF00B951AD /* DsymTableViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 			);
@@ -347,8 +358,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5157C7BE1E2F7F150035DFDE /* CrashInfoViewController.swift in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */,
+				5157C7BC1E2E2D200035DFDE /* ThreadBottomBar.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				F422C7C31D36A66800066837 /* FileSearch.swift in Sources */,
@@ -364,7 +377,6 @@
 				F441BE681E214D540085F3DA /* SplitViewController.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F441BE6A1E21547A0085F3DA /* TabViewController.swift in Sources */,
-				513D6ABE1E24D967008755EE /* ThreadTitleView.swift in Sources */,
 				F49A8B631D3A8BE300B951AD /* CSwiftV.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F4A679761E213CDD009F93E7 /* Notifications.swift in Sources */,
@@ -467,7 +479,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -508,7 +520,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

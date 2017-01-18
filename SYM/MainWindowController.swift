@@ -25,42 +25,27 @@ import Cocoa
 
 
 enum ViewMode: Int {
-    case text = 0
-    case thread = 1
+    case text = 0    // NSOffState
+    case thread = 1  // NSOnState
 }
 
 class MainWindowController: NSWindowController {
 
-    @IBOutlet weak var navigationButton: NSSegmentedControl!
+    // Toolbar buttons
     @IBOutlet weak var sidebarButton: NSButton!
-    @IBOutlet weak var expandButton: NSButton!
+    @IBOutlet weak var viewModeButton: NSButton!
+    @IBOutlet weak var symButton: NSButton!
+    @IBOutlet weak var infoButton: NSButton!
+    @IBOutlet weak var indicator: NSProgressIndicator!
 
-    var isFileListOpen: Bool {
-        get {
-            return self.sidebarButton.state == NSOnState
-        }
-        set {
-            let state = newValue ? NSOnState : NSOffState
-            if state != self.sidebarButton.state {
-                self.sidebarButton.state = state
-            }
-        }
-    }
-
+    var popover: NSPopover?
+    
     var viewMode: ViewMode {
         get {
-            return ViewMode(rawValue: self.navigationButton.selectedSegment)!
+            return ViewMode(rawValue: self.viewModeButton.state)!
         }
         set {
-            if newValue == .thread {
-                self.window?.toolbar?.insertItem(withItemIdentifier: "Expand", at: 2)
-            } else {
-                let item = self.window?.toolbar?.items[2]
-                if item?.itemIdentifier == "Expand" {
-                    self.window?.toolbar?.removeItem(at: 2)
-                }
-            }
-            self.navigationButton.selectSegment(withTag: newValue.rawValue)
+            self.viewModeButton.state = newValue.rawValue
         }
     }
     
@@ -83,8 +68,12 @@ class MainWindowController: NSWindowController {
             NotificationCenter.default.post(name: name, object: self)
         }
     }
-    
-    // MARK: Crash
+}
+
+
+// MARK: - Crash
+
+extension MainWindowController {
     func openCrash(file: CrashFile) {
         self.currentCrashFile = file
     }
@@ -101,7 +90,12 @@ class MainWindowController: NSWindowController {
     }
     
     private func updateSymbolicateProgress(start: Bool) {
-        (self.window as? MainWindow)?.updateProgress(start: start)
+        if start {
+            self.indicator.startAnimation(nil)
+        } else {
+            self.indicator.stopAnimation(nil)
+        }
+        //(self.window as? MainWindow)?.updateProgress(start: start)
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
@@ -118,28 +112,16 @@ class MainWindowController: NSWindowController {
     }
 }
 
-// MARK: - UI
-extension MainWindowController {
-    func update(viewMode: ViewMode) {
-        self.viewMode = viewMode
-    }
-    
-    func updateSidebarState(_ on: Bool) {
-        self.isFileListOpen = on
-    }
 
-    @IBAction func toggleFileList(_ sender: Any?) {
-        if let button = sender as? NSButton {
-            self.isFileListOpen = (button.state == NSOnState)
-            self.sendNotification(.toggleFileList)
-        }
+// MARK: - UI control
+
+extension MainWindowController {
+    @IBAction func toggleFileList(_ sender: AnyObject?) {
+        self.sendNotification(.toggleFileList)
     }
     
-    @IBAction func selectTabViewController(_ sender: Any?) {
-        if let ctrl = sender as? NSSegmentedControl {
-            self.viewMode = ViewMode(rawValue: ctrl.selectedSegment)!
-            self.sendNotification(.switchViewMode)
-        }
+    @IBAction func swtichViewMode(_ sender: AnyObject?) {
+        self.sendNotification(.switchViewMode)
     }
     
     // MARK: dSYM
@@ -176,8 +158,32 @@ extension MainWindowController {
             })
         }
     }
+    
+    @IBAction func togglePopover(sender: AnyObject?) {
+        guard let crash = self.currentCrashFile?.crash,
+              let button = sender as? NSButton
+        else {
+            return
+        }
+        
+        if self.popover == nil {
+            let storyboard = NSStoryboard(name: "Main", bundle: nil)
+            let infoVC = storyboard.instantiateController(withIdentifier: "Crash Info ViewController") as! CrashInfoViewController
+            infoVC.crash = crash
+            self.popover = NSPopover()
+            self.popover!.behavior = .transient
+            self.popover!.contentViewController = infoVC
+        }
+        
+        if self.popover!.isShown {
+            self.popover!.close()
+        } else {
+            self.popover!.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        }
+    }
 }
 
+// MARK: - NSViewController extensions
 
 extension NSViewController {
     func document() -> CrashDocument? {
@@ -187,8 +193,8 @@ extension NSViewController {
         return nil
     }
     
-    func window() -> MainWindow? {
-        return self.view.window as? MainWindow
+    func window() -> BaseWindow? {
+        return self.view.window as? BaseWindow
     }
     
     func windowController() -> MainWindowController? {
