@@ -503,31 +503,9 @@
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <rect key="contentRect" x="385" y="219" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
+                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
-                                <toolbarItem implicitItemIdentifier="4032E910-E47F-4F61-BC4E-5A2CFBAC0400" label="Select view" paletteLabel="Custom View" toolTip="Select view" id="VLT-cO-LPh">
-                                    <size key="minSize" width="67" height="28"/>
-                                    <size key="maxSize" width="74" height="28"/>
-                                    <segmentedControl key="view" verticalHuggingPriority="750" id="tiM-SZ-k5K">
-                                        <rect key="frame" x="5" y="14" width="67" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="selectOne" id="0Fj-xG-Wne">
-                                            <font key="font" metaFont="system"/>
-                                            <segments>
-                                                <segment image="ShowText" width="32" selected="YES">
-                                                    <nil key="label"/>
-                                                </segment>
-                                                <segment image="ShowStruct" width="32" tag="1">
-                                                    <nil key="label"/>
-                                                </segment>
-                                            </segments>
-                                        </segmentedCell>
-                                        <connections>
-                                            <action selector="selectTabViewController:" target="wBG-Uk-v7d" id="T47-HJ-XaF"/>
-                                        </connections>
-                                    </segmentedControl>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="A0C3C155-8E99-47F2-9858-4137DE1E4C3F" label="Toggle Sidebar" paletteLabel="Toggle Sidebar" toolTip="Toggle Sidebar" image="Sidebar" id="Zfi-fM-Xgb">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
@@ -543,7 +521,7 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2897DC1D-A6D2-43AA-8DC7-68AD1C63C40B" label="Show Info" paletteLabel="Show Info" toolTip="Toggle Sidebar" image="info" id="YJq-4H-DvY">
+                                <toolbarItem implicitItemIdentifier="2897DC1D-A6D2-43AA-8DC7-68AD1C63C40B" label="Show Info" paletteLabel="Show Info" toolTip="Show Crash Info" image="info" id="YJq-4H-DvY">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="Bzc-2K-IYb">
@@ -573,11 +551,11 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="A8742044-FDF9-402E-A930-58C1DBE84056" label="Threa View" paletteLabel="Threa View" toolTip="Symbolicate" image="NSQuickLookTemplate" id="5Fp-s0-mU1" userLabel="Thread View">
+                                <toolbarItem implicitItemIdentifier="A8742044-FDF9-402E-A930-58C1DBE84056" label="Thread View" paletteLabel="Thread View" toolTip="Thread View" image="NSQuickLookTemplate" id="5Fp-s0-mU1" userLabel="Thread View">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="FOO-TU-jLD">
-                                        <rect key="frame" x="15" y="14" width="36" height="28"/>
+                                        <rect key="frame" x="19" y="14" width="36" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSQuickLookTemplate" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="G4T-bK-E9e">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -612,7 +590,6 @@
                     </window>
                     <connections>
                         <outlet property="indicator" destination="DVd-5H-ljI" id="hyH-GG-1qt"/>
-                        <outlet property="navigationButton" destination="tiM-SZ-k5K" id="iaB-VN-73s"/>
                         <outlet property="sidebarButton" destination="Fu4-gN-mTw" id="7g8-SQ-g0R"/>
                         <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
                         <outlet property="viewModeButton" destination="FOO-TU-jLD" id="RUJ-pE-Th6"/>
@@ -1470,8 +1447,6 @@
         <image name="NSFollowLinkFreestandingTemplate" width="14" height="14"/>
         <image name="NSQuickLookTemplate" width="19" height="12"/>
         <image name="Play" width="20" height="16"/>
-        <image name="ShowStruct" width="20" height="16"/>
-        <image name="ShowText" width="20" height="16"/>
         <image name="Sidebar" width="20" height="16"/>
         <image name="crash" width="18" height="18"/>
         <image name="file" width="512" height="512"/>
