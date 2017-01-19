@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABB1E2394F8008755EE /* CrashFile.swift */; };
+		514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 514B4F6A1E30AC9100171990 /* Foundation.framework */; };
 		5157C7BC1E2E2D200035DFDE /* ThreadBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */; };
 		5157C7BE1E2F7F150035DFDE /* CrashInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5157C7BD1E2F7F150035DFDE /* CrashInfoViewController.swift */; };
 		519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */ = {isa = PBXBuildFile; fileRef = 519FF5871D54BB2600B07A65 /* symbolicatecrash */; };
@@ -55,6 +56,7 @@
 
 /* Begin PBXFileReference section */
 		513D6ABB1E2394F8008755EE /* CrashFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashFile.swift; sourceTree = "<group>"; };
+		514B4F6A1E30AC9100171990 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadBottomBar.swift; sourceTree = "<group>"; };
 		5157C7BD1E2F7F150035DFDE /* CrashInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashInfoViewController.swift; sourceTree = "<group>"; };
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +122,14 @@
 				5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */,
 			);
 			name = "Tread View";
+			sourceTree = "<group>";
+		};
+		514B4F691E30AC9000171990 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				514B4F6A1E30AC9100171990 /* Foundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		51B5D2981D52166000B979C8 /* Tools */ = {
@@ -202,6 +213,7 @@
 				F49BD1EE1D2FF46300024AAE /* SYM */,
 				51BF9C501D6C7A1C00379BFC /* SYMTests */,
 				F49BD1ED1D2FF46300024AAE /* Products */,
+				514B4F691E30AC9000171990 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
