@@ -52,6 +52,7 @@ class MainWindowController: NSWindowController {
     var currentCrashFile: CrashFile? {
         didSet {
             self.sendNotification(.openCrashReport)
+            self.autoSymbolicate()
         }
     }
     
@@ -78,33 +79,35 @@ extension MainWindowController {
         self.currentCrashFile = file
     }
     
+    func autoSymbolicate() {
+        if NSUserDefaultsController.shared().defaults.bool(forKey: "autoSymbolicate") {
+            DispatchQueue.main.async {
+                self.symbolicate(nil)
+            }
+        }
+    }
+    
     func updateCrash(_ newContent: String) {
         let document = self.document as! CrashDocument
         
         if self.currentCrashFile == nil {
             self.currentCrashFile = document.crashFile
         }
-        document.update(crashFile: self.currentCrashFile, newContent: newContent)
-        self.window!.isDocumentEdited = true
-        self.sendNotification(.crashUpdated)
-    }
-    
-    private func updateSymbolicateProgress(start: Bool) {
-        if start {
-            self.indicator.startAnimation(nil)
-        } else {
-            self.indicator.stopAnimation(nil)
+        
+        document.update(crashFile: self.currentCrashFile, newContent: newContent) { [weak self] (crash) -> (Void) in
+            self?.window?.isDocumentEdited = true
+            self?.sendNotification(.crashUpdated)
+            self?.autoSymbolicate()
         }
-        //(self.window as? MainWindow)?.updateProgress(start: start)
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
         if let crash = self.currentCrashFile?.crash {
-            self.updateSymbolicateProgress(start: true)
+            self.indicator.startAnimation(nil)
             
             crash.symbolicate(completion: { [weak self] (crash) in
                 DispatchQueue.main.async {
-                    self?.updateSymbolicateProgress(start: false)
+                    self?.indicator.stopAnimation(nil)
                     self?.sendNotification(.crashSymbolicated)
                 }
             })

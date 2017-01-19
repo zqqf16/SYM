@@ -87,7 +87,7 @@ class CrashDocument: NSDocument {
         }
     }
     
-    func update(crashFile: CrashFile?, newContent: String) {
+    func update(crashFile: CrashFile?, newContent: String, completion:((_ crash: CrashReport)->(Void))?) {
         let file = crashFile ?? self.crashFile
         
         DispatchQueue.global().async {
@@ -95,6 +95,10 @@ class CrashDocument: NSDocument {
                 crash.update(content: newContent)
             } else {
                 file.crash = CrashReport(newContent)
+            }
+            
+            if let callback = completion {
+                callback(file.crash!)
             }
         }
     }
