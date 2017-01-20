@@ -33,7 +33,10 @@ class CrashFile: Equatable {
     private var _crash: CrashReport?
     var crash: CrashReport? {
         get {
-            return self._crash ?? self.crashGenerator()
+            if self._crash == nil {
+                self._crash = self.crashGenerator()
+            }
+            return self._crash
         }
         set {
             self._crash = newValue
