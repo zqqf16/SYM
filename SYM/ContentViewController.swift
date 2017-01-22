@@ -54,6 +54,8 @@ class ContentViewController: NSViewController {
                 // this crash file is opened from file
                 self.textView.isEditable = false
             }
+            
+            self.textView.scrollToBeginningOfDocument(nil)
         }
     }
     

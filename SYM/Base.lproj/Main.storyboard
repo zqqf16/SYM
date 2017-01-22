@@ -614,12 +614,12 @@
                                     <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView importsGraphics="NO" richText="NO" findStyle="bar" incrementalSearchingEnabled="YES" allowsUndo="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="RPb-Ml-heM" customClass="TextView" customModule="SYM" customModuleProvider="target">
+                                        <textView importsGraphics="NO" richText="NO" horizontallyResizable="YES" selectionGranularity="paragraph" findStyle="bar" incrementalSearchingEnabled="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="RPb-Ml-heM" customClass="TextView" customModule="SYM" customModuleProvider="target">
                                             <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <size key="minSize" width="800" height="600"/>
-                                            <size key="maxSize" width="800" height="10000000"/>
+                                            <size key="maxSize" width="10000" height="10000000"/>
                                             <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
                                     </subviews>
