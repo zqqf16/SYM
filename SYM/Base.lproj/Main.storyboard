@@ -1305,7 +1305,7 @@
                                                                 </imageView>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6fU-Wm-oQf">
                                                                     <rect key="frame" x="45" y="0.0" width="741" height="17"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="qQJ-h9-mqT">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" id="qQJ-h9-mqT">
                                                                         <font key="font" size="11" name="Menlo-Regular"/>
                                                                         <color key="textColor" red="0.99949365854263306" green="0.073871709406375885" blue="0.0040369546040892601" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1337,7 +1337,7 @@
                                                                 </imageView>
                                                                 <textField identifier="KeyFrameCell" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rE4-HM-12A">
                                                                     <rect key="frame" x="45" y="0.0" width="741" height="17"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="Up1-H0-wMR">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" id="Up1-H0-wMR">
                                                                         <font key="font" size="11" name="Menlo-Regular"/>
                                                                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
