@@ -49,7 +49,7 @@ class CrashReport {
         
         override var description: String {
             let index = self.index.extendToLength(2)
-            let image = self.image.extendToLength(30)
+            let image = self.image.extendToLength(26)
             let address = self.address.extendToLength(18)
             let symbol = self.symbol ?? ""
             return "\(index) \(image) \(address) \(symbol)"

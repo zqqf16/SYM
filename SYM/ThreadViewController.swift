@@ -24,6 +24,16 @@
 import Cocoa
 
 
+extension CrashReport.Frame {
+    var pretty: String {
+        let index = self.index.extendToLength(2)
+        let image = self.image.extendToLength(26)
+        let symbol = self.symbol ?? ""
+        return "\(index) \(image) \(symbol)"
+    }
+}
+
+
 class ThreadViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
     
@@ -114,7 +124,7 @@ extension ThreadViewController: NSOutlineViewDelegate {
                 view = outlineView.make(withIdentifier: "FrameCell", owner: self) as? NSTableCellView
             }
             if let textField = view?.textField {
-                textField.stringValue = frame.description
+                textField.stringValue = frame.pretty
             }
         }
         
@@ -153,7 +163,7 @@ extension ThreadViewController: NSOutlineViewDataSource {
 
 extension ThreadViewController: NSSearchFieldDelegate {
     func showSearchResult(_ text: String) {
-        let predicate = NSPredicate(format: "description contains[cd] %@", text)
+        let predicate = NSPredicate(format: "pretty contains[cd] %@", text)
         
         DispatchQueue.main.async {
             var threads: [CrashReport.Thread] = []
