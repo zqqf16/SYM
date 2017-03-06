@@ -167,6 +167,9 @@ class DsymManager {
 
 extension CrashReport {
     func fixDsym() -> Bool {
+        // Reload dSym files
+        DsymManager.sharedInstance.findAllDsyms()
+
         for (_, image) in self.images {
             if let uuid = image.uuid {
                 image.dSym = DsymManager.sharedInstance.dsym(withUUID: uuid)?.path

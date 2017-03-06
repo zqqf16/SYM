@@ -64,11 +64,9 @@ extension SubProcess {
 
 extension CrashReport {
     func symbolicate(completion: @escaping (CrashReport)->Void) {
-        let dSymValidate = self.fixDsym()
-
         switch self.brand {
         case .umeng:
-            if !dSymValidate {
+            if !self.fixDsym() {
                 completion(self)
                 return
             }
