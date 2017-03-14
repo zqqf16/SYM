@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		511F80721E77A14000C69C43 /* PlistDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511F80711E77A14000C69C43 /* PlistDocument.swift */; };
 		513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D6ABB1E2394F8008755EE /* CrashFile.swift */; };
 		514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 514B4F6A1E30AC9100171990 /* Foundation.framework */; };
 		5157C7BC1E2E2D200035DFDE /* ThreadBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */; };
@@ -55,6 +56,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		511F80711E77A14000C69C43 /* PlistDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlistDocument.swift; sourceTree = "<group>"; };
 		513D6ABB1E2394F8008755EE /* CrashFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashFile.swift; sourceTree = "<group>"; };
 		514B4F6A1E30AC9100171990 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5157C7BB1E2E2D200035DFDE /* ThreadBottomBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadBottomBar.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 			children = (
 				513D6ABB1E2394F8008755EE /* CrashFile.swift */,
 				51B8D7041D4F620100F2C24C /* CrashDocument.swift */,
+				511F80711E77A14000C69C43 /* PlistDocument.swift */,
 				F4A679731E21319D009F93E7 /* BundleDocument.swift */,
 			);
 			name = Document;
@@ -371,6 +374,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5157C7BE1E2F7F150035DFDE /* CrashInfoViewController.swift in Sources */,
+				511F80721E77A14000C69C43 /* PlistDocument.swift in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				513D6ABC1E2394F8008755EE /* CrashFile.swift in Sources */,
 				5157C7BC1E2E2D200035DFDE /* ThreadBottomBar.swift in Sources */,
