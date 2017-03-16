@@ -49,12 +49,7 @@ class MainWindowController: NSWindowController {
         }
     }
     
-    var currentCrashFile: CrashFile? {
-        didSet {
-            self.sendNotification(.openCrashReport)
-            self.autoSymbolicate()
-        }
-    }
+    var currentCrashFile: CrashFile?
     
     required init?(coder: NSCoder) {
         super.init(coder:coder)
@@ -77,11 +72,13 @@ class MainWindowController: NSWindowController {
 extension MainWindowController {
     func openCrash(file: CrashFile) {
         self.currentCrashFile = file
+        self.sendNotification(.openCrashReport)
+        self.autoSymbolicate()
     }
     
     func autoSymbolicate() {
         if NSUserDefaultsController.shared().defaults.bool(forKey: "autoSymbolicate") {
-            DispatchQueue.main.async {
+            DispatchQueue.global().async {
                 self.symbolicate(nil)
             }
         }

@@ -24,7 +24,7 @@
 import Foundation
 
 
-extension NSNotification.Name {
+extension Notification.Name {
     static let fileListRefresh = Notification.Name("sym.FileListRefresh")
     static let openCrashReport = Notification.Name("sym.OpenCrashReport")
     static let crashSymbolicated = Notification.Name("sym.CrashSymbolicated")

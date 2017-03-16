@@ -25,7 +25,7 @@ import Cocoa
 
 
 protocol CrashTextViewDelegate: NSTextViewDelegate {
-    func contentDidChanged()
+    func didChangeCrashContent()
 }
 
 
@@ -63,7 +63,7 @@ class TextView: NSTextView {
         super.didChangeText()
         
         if let delegate = self.delegate as? CrashTextViewDelegate {
-            delegate.contentDidChanged()
+            delegate.didChangeCrashContent()
         }
     }
 }

@@ -36,6 +36,7 @@ class ContentViewController: NSViewController {
         let _ = NotificationCenter.default.then {
             $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
             $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
+            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
         }
     }
     
@@ -55,7 +56,7 @@ class ContentViewController: NSViewController {
                 self.textView.isEditable = false
             }
             
-            self.textView.scrollToBeginningOfDocument(nil)
+            //self.textView.scrollToBeginningOfDocument(nil)
         }
     }
     
@@ -86,7 +87,7 @@ extension ContentViewController: CrashTextViewDelegate {
         return menu
     }
     
-    func contentDidChanged() {
+    func didChangeCrashContent() {
         if let newContent = textView.string {
             DispatchQueue.main.async {
                 self.windowController()?.updateCrash(newContent)

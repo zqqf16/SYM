@@ -78,6 +78,10 @@ class DsymManager {
     }
     
     func findAllDsyms() {
+        if self.fileSearch.metadataSearch.isStarted {
+            return
+        }
+
         self.fileSearch.search(nil) { (dsyms) in
             self.autoLoadedDsyms = dsyms
         }
