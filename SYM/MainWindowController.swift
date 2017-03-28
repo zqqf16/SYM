@@ -202,7 +202,7 @@ extension NSViewController {
     }
     
     func openCrash(_ file: CrashFile) {
-        self.windowController()?.currentCrashFile = file
+        self.windowController()?.openCrash(file: file)
     }
     
     func currentCrashFile() -> CrashFile? {
