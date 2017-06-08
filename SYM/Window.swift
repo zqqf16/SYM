@@ -25,8 +25,8 @@ import Cocoa
 
 
 class BaseWindow: NSWindow {
-    override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
         self.titleVisibility = .hidden
         //self.titlebarAppearsTransparent = true
         self.isMovableByWindowBackground = true
@@ -37,14 +37,14 @@ class BaseWindow: NSWindow {
     }
 }
 
-
+/*
 class Window: NSWindow, NSDraggingDestination {    
-    required override init(contentRect: NSRect, styleMask aStyle: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
+    required override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
         self.titleVisibility = .hidden
         self.backgroundColor = NSColor.white
 
-        self.registerForDraggedTypes([NSStringPboardType, NSFilenamesPboardType])
+        self.registerForDraggedTypes([NSPasteboard.PasteboardType.string, NSFilenamesPboardType])
         self.center()
     }
 
@@ -83,3 +83,4 @@ class Window: NSWindow, NSDraggingDestination {
         return false
     }
 }
+*/

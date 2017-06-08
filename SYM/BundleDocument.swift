@@ -70,7 +70,7 @@ class BundleDocument: CrashDocument {
         }
     }
 
-    override class func autosavesInPlace() -> Bool {
+    override class var autosavesInPlace: Bool {
         return false
     }
     

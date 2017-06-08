@@ -58,11 +58,11 @@ class FileListViewController: NSViewController {
         self.outlineView?.menu = menu
     }
     
-    func showCrashFileInFinder() {
+    @objc func showCrashFileInFinder() {
         let row = self.outlineView!.clickedRow
         if let file = self.outlineView?.item(atRow: row) as? CrashFile {
             if file.url != nil {
-                NSWorkspace.shared().activateFileViewerSelecting([file.url!])
+                NSWorkspace.shared.activateFileViewerSelecting([file.url!])
             }
         }
     }
@@ -71,7 +71,7 @@ class FileListViewController: NSViewController {
 extension FileListViewController: NSOutlineViewDelegate {
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
         var view: NSTableCellView?
-        view = outlineView.make(withIdentifier: "CrashCell", owner: self) as? NSTableCellView
+        view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "CrashCell"), owner: self) as? NSTableCellView
         if let textField = view?.textField {
             if let file = item as? CrashFile {
                 textField.stringValue = file.name
@@ -84,7 +84,7 @@ extension FileListViewController: NSOutlineViewDelegate {
         if let image = view?.imageView {
             if let file = item as? CrashFile {
                 if file.children != nil && file.children!.count > 0 {
-                    image.image = NSImage(named: "floder")
+                    image.image = NSImage(named: NSImage.Name("floder"))
                 }
             }
         }

@@ -50,7 +50,7 @@ class SplitViewController: NSSplitViewController {
         }
     }
     
-    func handleToggleFileList(_ notification: Notification) {
+    @objc func handleToggleFileList(_ notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.toggleSidebar(nil)
         }

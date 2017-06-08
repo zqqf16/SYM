@@ -42,10 +42,10 @@ class MainWindowController: NSWindowController {
     
     var viewMode: ViewMode {
         get {
-            return ViewMode(rawValue: self.viewModeButton.state)!
+            return ViewMode(rawValue: self.viewModeButton.state.rawValue)!
         }
         set {
-            self.viewModeButton.state = newValue.rawValue
+            self.viewModeButton.state = NSControl.StateValue(newValue.rawValue)
         }
     }
     
@@ -77,7 +77,7 @@ extension MainWindowController {
     }
     
     func autoSymbolicate() {
-        if NSUserDefaultsController.shared().defaults.bool(forKey: "autoSymbolicate") {
+        if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
             DispatchQueue.global().async {
                 self.symbolicate(nil)
             }
@@ -131,7 +131,7 @@ extension MainWindowController {
         panel.allowsMultipleSelection = false
         panel.beginSheetModal(for: self.window!) {
             (result) in
-            if result != NSFileHandlingPanelOKButton {
+            if result != .OK {
                 return
             }
             
@@ -167,8 +167,8 @@ extension MainWindowController {
         }
         
         if self.popover == nil {
-            let storyboard = NSStoryboard(name: "Main", bundle: nil)
-            let infoVC = storyboard.instantiateController(withIdentifier: "Crash Info ViewController") as! CrashInfoViewController
+            let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
+            let infoVC = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Crash Info ViewController")) as! CrashInfoViewController
             infoVC.crash = crash
             self.popover = NSPopover()
             self.popover!.behavior = .transient

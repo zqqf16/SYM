@@ -57,7 +57,7 @@ class TabViewController: NSTabViewController {
         }
     }
     
-    func handleSwitchViewMode(notification: Notification) {
+    @objc func handleSwitchViewMode(notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.tabView.selectTabViewItem(at: wc.viewMode.rawValue)
         }

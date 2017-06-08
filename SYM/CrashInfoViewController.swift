@@ -143,6 +143,6 @@ class CrashInfoViewController: NSViewController {
             return
         }
         let fileURL = URL(fileURLWithPath: dSym)
-        NSWorkspace.shared().activateFileViewerSelecting([fileURL])
+        NSWorkspace.shared.activateFileViewerSelecting([fileURL])
     }
 }

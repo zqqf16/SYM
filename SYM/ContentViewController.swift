@@ -40,7 +40,7 @@ class ContentViewController: NSViewController {
         }
     }
     
-    func handleOpenCrash(notification: Notification) {
+    @objc func handleOpenCrash(notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.loadData()
         }
@@ -88,14 +88,15 @@ extension ContentViewController: CrashTextViewDelegate {
     }
     
     func didChangeCrashContent() {
-        if let newContent = textView.string {
+        let newContent = textView.string
+        if newContent.count > 0 {
             DispatchQueue.main.async {
                 self.windowController()?.updateCrash(newContent)
             }
         }
     }
     
-    func symbolicate(_ sender: AnyObject?) {
+    @objc func symbolicate(_ sender: AnyObject?) {
         self.windowController()?.symbolicate(sender)
     }
 }

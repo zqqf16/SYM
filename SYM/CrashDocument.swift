@@ -46,8 +46,8 @@ class CrashDocument: NSDocument {
     }
 
     override func makeWindowControllers() {
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateController(withIdentifier: "Main Window Controller") as! NSWindowController
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
+        let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Main Window Controller")) as! NSWindowController
         self.addWindowController(windowController)
     }
 
@@ -72,12 +72,12 @@ class CrashDocument: NSDocument {
         
         self.openCrash(file: self.crashFile)
     }
-
-    override class func autosavesInPlace() -> Bool {
+    
+    override class var autosavesInPlace: Bool {
         return true
     }
     
-    override class func autosavesDrafts() -> Bool {
+    override class var autosavesDrafts: Bool {
         return false
     }
     

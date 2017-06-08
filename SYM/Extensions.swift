@@ -41,7 +41,7 @@ extension String {
             let startIndex = self.characters.index(self.startIndex, offsetBy: r.lowerBound)
             let endIndex = self.characters.index(self.startIndex, offsetBy: r.upperBound)
             
-            return self[startIndex..<endIndex]
+            return String(self[startIndex..<endIndex])
         }
     }
 
@@ -57,7 +57,7 @@ extension String {
         
         for index in 0..<number {
             let range = match.rangeAt(index)
-            result.append(self[range.toRange()!])
+            result.append(self[Range(range)!])
         }
         return result
     }

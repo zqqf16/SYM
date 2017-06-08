@@ -36,7 +36,7 @@ enum FileType {
 
 func typeOfFile(_ path: String) -> FileType? {
     do {
-        let type = try NSWorkspace.shared().type(ofFile: path)
+        let type = try NSWorkspace.shared.type(ofFile: path)
         switch type {
         case "com.apple.crashreport", "public.plain-text", "public.text":
             return .crash

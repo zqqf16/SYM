@@ -29,7 +29,7 @@ class ThreadBottomBar: NSView {
         super.draw(dirtyRect)
 
         NSColor.white.setFill()
-        NSRectFill(dirtyRect)
+        dirtyRect.fill()
         
         let line = NSBezierPath()
         line.lineWidth = 2

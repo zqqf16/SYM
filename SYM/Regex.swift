@@ -54,7 +54,7 @@ struct RE {
         var groups = [String]()
 
         for index in 1..<number {
-            if let range = match.rangeAt(index).toRange() {
+            if let range = Range(match.rangeAt(index)) {
                 groups.append(input[range])
             }
         }

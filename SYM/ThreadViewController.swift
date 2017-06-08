@@ -44,7 +44,7 @@ class ThreadViewController: NSViewController {
 
     // MARK: - Load Crash
     
-    func handleOpenCrash(notification: Notification) {
+    @objc func handleOpenCrash(notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
             self.reloadCrash()
         }
@@ -113,15 +113,15 @@ extension ThreadViewController: NSOutlineViewDelegate {
         var view: NSTableCellView?
         
         if let thread = item as? CrashReport.Thread {
-            view = outlineView.make(withIdentifier: "ThreadCell", owner: self) as? NSTableCellView
+            view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "ThreadCell"), owner: self) as? NSTableCellView
             if let textField = view?.textField {
                 textField.stringValue = thread.description
             }
         } else if let frame = item as? CrashReport.Frame {
             if frame.isKey {
-                view = outlineView.make(withIdentifier: "KeyFrameCell", owner: self) as? NSTableCellView
+                view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "KeyFrameCell"), owner: self) as? NSTableCellView
             } else {
-                view = outlineView.make(withIdentifier: "FrameCell", owner: self) as? NSTableCellView
+                view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "FrameCell"), owner: self) as? NSTableCellView
             }
             if let textField = view?.textField {
                 textField.stringValue = frame.pretty

@@ -25,13 +25,13 @@ import Foundation
 import Cocoa
 
 
-let defaultAttrs: [String: AnyObject] = [
-    NSFontAttributeName: NSFont(name: "Menlo", size: 11)!
+let defaultAttrs: [NSAttributedStringKey: AnyObject] = [
+    .font: NSFont(name: "Menlo", size: 11)!
 ]
 
-let backtraceAttrs: [String: AnyObject] = [
-    NSForegroundColorAttributeName: NSColor.red,
-    NSFontAttributeName: NSFontManager.shared().font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
+let backtraceAttrs: [NSAttributedStringKey: AnyObject] = [
+    .foregroundColor: NSColor.red,
+    .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
 ]
 
 

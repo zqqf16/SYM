@@ -45,11 +45,11 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
         self.tableView.menu = menu
     }
     
-    func showDsymFileInFinder() {
+    @objc func showDsymFileInFinder() {
         let row = self.tableView.clickedRow
         let dsym = DsymManager.sharedInstance.dsyms![row]
         let fileURL = URL(fileURLWithPath: dsym.path)
-        NSWorkspace.shared().activateFileViewerSelecting([fileURL])
+        NSWorkspace.shared.activateFileViewerSelecting([fileURL])
     }
     
     func numberOfRows(in tableView: NSTableView) -> Int {
@@ -79,7 +79,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
             return nil
         }
         
-        if let cell = tableView.make(withIdentifier: cellID!, owner: nil) as? NSTableCellView {
+        if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellID!), owner: nil) as? NSTableCellView {
             cell.textField?.stringValue = text!
             cell.toolTip = text!
             return cell

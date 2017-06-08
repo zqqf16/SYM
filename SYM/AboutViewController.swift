@@ -25,8 +25,8 @@ import Cocoa
 
 
 class AboutWindow: BaseWindow {
-    override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-        super.init(contentRect: contentRect, styleMask: style, backing: bufferingType, defer: flag)
+    override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
+        super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .visible
         self.backgroundColor = NSColor.white
@@ -56,11 +56,11 @@ class AboutViewController: NSViewController {
     
     @IBAction func gotoWebsite(sender: AnyObject) {
         let url = URL(string: "https://zorro.im?utm_source=sym&utm_medium=referral")!
-        NSWorkspace.shared().open(url)
+        NSWorkspace.shared.open(url)
     }
     
     @IBAction func gotoGithub(_ sender: AnyObject) {
         let url = URL(string: "https://github.com/zqqf16/SYM")!
-        NSWorkspace.shared().open(url)
+        NSWorkspace.shared.open(url)
     }
 }
