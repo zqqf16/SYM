@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,46 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 
-import Cocoa
 
+/*
+protocol Doctor {
+    func fix(_ crash: CrashInfo) -> CrashInfo
+}
 
-class TabViewController: NSTabViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-        
-        //self.tabView.selectTabViewItem(at: 0)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(self.handleSwitchViewMode), name: .switchViewMode, object: nil)
-    }
-    
-    var currentViewMode: ViewMode {
-        if let item = self.tabView.selectedTabViewItem {
-            if item == self.tabView.tabViewItem(at: 1) {
-                return .thread
+class AddressDoctor: Doctor {
+    func fix(_ crash: CrashInfo) -> CrashInfo {
+        for (_, image) in crash.images {
+            if let loadAddress = image.loadAddress {
+                for frame in image.backtrace {
+                    self.fix(frame: frame, loadAddress: loadAddress)
+                }
             }
         }
         
-        return .text
+        return crash
     }
     
-    override func viewWillAppear() {
-        super.viewWillAppear()
+    func fix(frame: CrashInfo.Frame, loadAddress: String) {
+        guard frame.address.hexaToDecimal == loadAddress.hexaToDecimal,
+            frame.symbol != nil,
+            frame.symbol!.hasPrefix("+")
+            else {
+                return
+        }
         
-        if let mode = self.windowController()?.viewMode {
-            if self.currentViewMode != mode {
-                self.tabView.selectTabViewItem(at: mode.rawValue)
-            }
-        } else {
-            self.tabView.selectTabViewItem(at: 0)
+        let list = frame.symbol!.components(separatedBy: " ")
+        if list.count < 2 {
+            return
         }
-    }
-    
-    @objc func handleSwitchViewMode(notification: Notification) {
-        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
-            self.tabView.selectTabViewItem(at: wc.viewMode.rawValue)
+        
+        guard let offset = Int(list[1]) else {
+            return
         }
+        let newAddress = String(frame.address.hexaToDecimal + offset, radix: 16)
+        frame.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
+        frame.symbol = "+ 0"
     }
 }
+ 
+*/
+ 

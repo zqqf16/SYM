@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Cocoa
 
-
 class CrashDocument: NSDocument {
-    var crashFile: CrashFile = CrashFile()
+    var content: String?
     
-    override var displayName: String! {
-        get {
-            let name = super.displayName
-            self.crashFile.name = name!
-            return name
-        }
-        set {
-            super.displayName = newValue
-            self.crashFile.name = displayName
-        }
-    }
-
-    override var fileURL: URL? {
-        didSet {
-            self.crashFile.url = fileURL
-        }
-    }
-
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
         let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Main Window Controller")) as! NSWindowController
         self.addWindowController(windowController)
     }
-
+    
+    var mainWindowController: MainWindowController {
+        return self.windowControllers[0] as! MainWindowController
+    }
+    
     override func windowControllerDidLoadNib(_ aController: NSWindowController) {
         super.windowControllerDidLoadNib(aController)
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        guard let content = self.crashFile.crash?.content else {
+        guard let content = self.content else {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }
 
@@ -64,42 +48,17 @@ class CrashDocument: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        if let content = String(data: data, encoding: String.Encoding.utf8) {
-            self.crashFile.crashGenerator = {
-                return CrashReport(content)
-            }
+        self.content = String(data: data, encoding: String.Encoding.utf8)
+        DispatchQueue.main.async {
+            self.mainWindowController.open(crash: self.content ?? "")
         }
-        
-        self.openCrash(file: self.crashFile)
     }
     
     override class var autosavesInPlace: Bool {
-        return true
+        return false
     }
     
     override class var autosavesDrafts: Bool {
         return false
-    }
-    
-    func openCrash(file: CrashFile) {
-        DispatchQueue.main.async {
-            (self.windowControllers[0] as! MainWindowController).openCrash(file: file)
-        }
-    }
-    
-    func update(crashFile: CrashFile?, newContent: String, completion:((_ crash: CrashReport)->(Void))?) {
-        let file = crashFile ?? self.crashFile
-        
-        DispatchQueue.global().async {
-            if let crash = file.crash {
-                crash.update(content: newContent)
-            } else {
-                file.crash = CrashReport(newContent)
-            }
-            
-            if let callback = completion {
-                callback(file.crash!)
-            }
-        }
     }
 }

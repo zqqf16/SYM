@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 
-
 // MARK: - SubProcess
-
 extension SubProcess {
     static func atos(loadAddress: String,
                      addressess: [String],
@@ -36,8 +33,28 @@ extension SubProcess {
         if let result = execute(cmd: cmd, args: args) {
             return result.components(separatedBy: "\n").filter {
                 (content) -> Bool in
-                return content.characters.count > 0
+                return content.count > 0
             }
+        }
+        
+        return nil
+    }
+    
+    static func atos(_ image: Crash.Image, dSYM: String? = nil) -> [String: String]? {
+        guard let loadAddress = image.loadAddress,
+              let dsym = dSYM,
+              let arch = image.arch,
+              let frames = image.frames
+        else {
+            return nil
+        }
+        
+        let addresses = frames.map { $0.address }
+        if let result = SubProcess.atos(loadAddress: loadAddress,
+                                        addressess: addresses,
+                                        dSym: dsym,
+                                        arch: arch) {
+            return Dictionary(uniqueKeysWithValues: zip(addresses, result))
         }
         
         return nil
@@ -59,79 +76,13 @@ extension SubProcess {
     }
 }
 
-
 // MARK: - Symbolicate
-
-extension CrashReport {
-    func symbolicate(completion: @escaping (CrashReport)->Void) {
-        switch self.brand {
-        case .umeng:
-            if !self.fixDsym() {
-                completion(self)
-                return
-            }
-            self.atos(completion)
-        case .apple:
-            self.appleTool(completion)
-        default:
-            completion(self)
-            return
-        }
+func symbolicate(crash: Crash, dSYM: String? = nil) -> String {
+    if let content = crash.toStandard() {
+        return SubProcess.symbolicatecrash(crash: content) ?? content
+    } else if let image = crash.binaryImage(), let result = SubProcess.atos(image) {
+        return crash.backfill(symbols: result)
     }
     
-    //MARK: Atos
-    func atos(_ completion: @escaping (CrashReport)->Void) {
-        let queue = DispatchQueue(label: "symbolicate", attributes: .concurrent)
-        let group = DispatchGroup()
-        
-        group.notify(queue: queue) {
-            completion(self)
-        }
-        
-        for (_, image) in self.images {
-            if image.uuid == nil || image.loadAddress == nil {
-                continue
-            }
-            
-            queue.async(group: group) {
-                self.atos(image: image)
-            }
-        }
-        group.wait()
-    }
-    
-    private func atos(image: Image) {
-        guard let loadAddress = image.loadAddress, let dSym = image.dSym else {
-            return
-        }
-        
-        var addresses = [String]()
-        for frame in image.backtrace {
-            addresses.append(frame.address)
-        }
-        
-        if let result = SubProcess.atos(loadAddress: loadAddress,
-                                        addressess: addresses,
-                                        dSym: dSym,
-                                        arch: self.arch) {
-            for (index, symbol) in result.enumerated() {
-                image.backtrace[index].symbol = symbol
-            }
-        }
-    }
-
-    //MARK: symbolicatecrash
-    func appleTool(_ completion: @escaping (CrashReport)->Void) {
-        guard let content = self.content else {
-            completion(self)
-            return
-        }
-
-        DispatchQueue.global().async {
-            if let new = SubProcess.symbolicatecrash(crash: content) {
-                self.update(content: new)
-            }
-            completion(self)
-        }
-    }
+    return crash.content
 }

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 import Cocoa
-
 
 enum FileType {
     case crash
@@ -68,74 +66,54 @@ func typeOfFile(_ path: String) -> FileType? {
 }
 
 
-typealias FileSearchHandler = ([NSMetadataItem]?)->()
-
-class FileSearch {
-    
-    var metadataSearch: NSMetadataQuery = NSMetadataQuery()
+class FileFinder {
     var observer: AnyObject?
     
-    func search(_ condition: String, completion: @escaping FileSearchHandler) {
-        let predicate = NSPredicate(fromMetadataQueryString: condition)
-        self.metadataSearch.predicate = predicate
+    func search(_ condition: String, completion: @escaping ([NSMetadataItem]?)->Void) {
+        let query = NSMetadataQuery()
+        query.predicate = NSPredicate(fromMetadataQueryString: condition)
         
-        let notificationCenter = NotificationCenter.default
-        
-        weak var weakSelf = self
-        self.observer = notificationCenter.addObserver(forName: NSNotification.Name.NSMetadataQueryDidFinishGathering, object: metadataSearch, queue: nil) { (notification) in
-            
-            weakSelf!.metadataSearch.stop()
-            if (weakSelf!.observer != nil) {
-                NotificationCenter.default.removeObserver(weakSelf!.observer!)
+        self.observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: nil, queue: nil) { (notification) in
+            query.stop()
+            if let observer = self.observer {
+                NotificationCenter.default.removeObserver(observer)
+                self.observer = nil
             }
             
-            let results = weakSelf?.metadataSearch.results as! [NSMetadataItem]
-            completion(results)
+            let result = query.results as! [NSMetadataItem]
+            completion(result)
         }
-
-        metadataSearch.start()
-    }
-    
-    deinit {
-        if (self.observer != nil) {
-            NotificationCenter.default.removeObserver(self.observer!)
+        
+        DispatchQueue.main.async {
+            query.start()
         }
     }
 }
 
-
-// MARK: - dSYM
-
-typealias DsymSearchHandler = ([Dsym]?)->()
-
-extension FileSearch {
-    func search(_ uuid: String?, completion: @escaping DsymSearchHandler) {
-        var condition = "com_apple_xcode_dsym_uuids = "
-        if uuid != nil {
-            condition += uuid!
-        } else {
-            condition += "*"
-        }
-        
-        self.search(condition) { results in
+extension FileFinder {
+    func search(uuid: String = "*", completion: @escaping ([DsymFile]?)->Void) {
+        let condition = "com_apple_xcode_dsym_uuids = \(uuid)"
+        self.search(condition) { (results) in
             if results == nil {
                 completion(nil)
                 return
             }
             
-            var dsyms = [Dsym]()
+            var dsymFiles: [DsymFile] = []
             for item in results! {
                 let name = item.value(forKey: NSMetadataItemFSNameKey) as! String
-                
-                // mdls xxx
                 let path = item.value(forKey: NSMetadataItemPathKey) as! String
-                let dsym = item.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
+                
+                let dsyms = item.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
                 let uuids = item.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
-                let dsymPath = path + "/\(dsym[0])"
-                dsyms.append(Dsym(uuids:uuids, name:name, path:dsymPath))
+                
+                for (index, uuid) in uuids.enumerated() {
+                    let dsym = DsymFile(uuid: uuid, path: "\(path)/\(dsyms[index])", name: name, displayedPath: path)
+                    dsymFiles.append(dsym)
+                }
             }
             
-            completion(dsyms)
+            completion(dsymFiles)
         }
     }
 }

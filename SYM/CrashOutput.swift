@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,51 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 import Cocoa
 
+struct Style {
+    static let plain = Style([.font: NSFont(name: "Menlo", size: 11)!])
+    static let keyFrame = Style([
+        .foregroundColor: NSColor.red,
+        .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
+    ])
+    
+    let attrs: [NSAttributedStringKey: AnyObject]
+    init(_ attrs: [NSAttributedStringKey: AnyObject]) {
+        self.attrs = attrs
+    }
+}
 
-let defaultAttrs: [NSAttributedStringKey: AnyObject] = [
-    .font: NSFont(name: "Menlo", size: 11)!
-]
-
-let backtraceAttrs: [NSAttributedStringKey: AnyObject] = [
-    .foregroundColor: NSColor.red,
-    .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
-]
-
-
-extension CrashReport {
+extension Crash {
     func pretty() -> NSAttributedString {
-        guard let content = self.content else {
-            return NSAttributedString()
-        }
-        
+        let lines = self.content.components(separatedBy: "\n")
+        let result = NSMutableString()
         var keyFrameRanges = [NSRange]()
         
-        if self.threads.count == 0 {
-            return NSAttributedString(string: content, attributes: defaultAttrs)
-        }
-        
-        var backtrace: [Int: CrashReport.Frame] = [:]
-        
-        for thread in self.threads {
-            for frame in thread.backtrace {
-                backtrace[frame.line] = frame
-            }
-        }
-        
-        if backtrace.count == 0 {
-            return NSAttributedString(string: self.content!, attributes: defaultAttrs)
-        }
-        
-        let lines = content.components(separatedBy: "\n")
-        let result = NSMutableString()
-        
-        for (index, line) in lines.enumerated() {
-            if let frame = backtrace[index] {
-                if frame.isKey {
+        for line in lines {
+            if let group = LineRE.frame.match(line) {
+                let frame = Frame(index: group[0], image: group[1], address: group[2], symbol: group[3])
+                if frame.image == self.appName {
                     let startIndex = result.length
                     result.append(frame.description)
                     let endIndex = result.length
@@ -79,13 +60,12 @@ extension CrashReport {
             result.append("\n")
         }
         
-        // Remove the last "\n".
+        // Remove the last "\n"
         result.deleteCharacters(in: NSMakeRange(result.length - 1, 1))
         
-        let attr = NSMutableAttributedString(string: (result as String), attributes: defaultAttrs)
-        
+        let attr = NSMutableAttributedString(string: result as String, attributes: Style.plain.attrs)
         for r in keyFrameRanges {
-            attr.setAttributes(backtraceAttrs, range: r)
+            attr.setAttributes(Style.keyFrame.attrs, range: r)
         }
         
         return attr

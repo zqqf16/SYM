@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,168 +24,77 @@
 import Foundation
 import Cocoa
 
-
-@objc class Dsym: NSObject, NSCoding {
-    var uuids: [String]
+struct DsymFile {
+    var uuid: String
     var path: String
     var name: String
-
-    @objc init(uuids: [String], name: String, path: String) {
-        self.uuids = uuids
+    
+    var displayedPath: String
+    
+    init(uuid: String, path: String, name: String, displayedPath: String) {
+        self.uuid = uuid
         self.path = path
         self.name = name
-    }
-
-    convenience required init?(coder aDecoder: NSCoder) {
-        let uuids = aDecoder.decodeObject(forKey: "uuids") as! [String]
-        let path = aDecoder.decodeObject(forKey: "path") as! String
-        let name = aDecoder.decodeObject(forKey: "name") as! String
-        self.init(uuids: uuids, name: name, path: path)
-    }
-
-    func encode(with aCoder: NSCoder) {
-        aCoder.encode(uuids, forKey: "uuids")
-        aCoder.encode(path, forKey: "path")
-        aCoder.encode(name, forKey: "name")
+        self.displayedPath = displayedPath
     }
 }
 
+extension DsymFile: Hashable {
+    var hashValue: Int {
+        return self.path.hashValue
+    }
+    
+    static func == (lhs: DsymFile, rhs: DsymFile) -> Bool {
+        return lhs.path == rhs.path
+    }
+}
 
 class DsymManager {
-    static let sharedInstance = DsymManager()
+    static let shared = DsymManager()
     
-    var dsyms: [Dsym]? {
-        var all = userImportDsyms ?? [Dsym]()
-        if autoLoadedDsyms != nil {
-            all += autoLoadedDsyms!
-        }
-        return all
-    }
-
-    var autoLoadedDsyms: [Dsym]?
-    var userImportDsyms: [Dsym]?
-
-    var fileSearch = FileSearch()
-
-    var filePath: String {
-        let fileName = "dSYM.list"
-        let fm = FileManager.default
-        guard let dir = fm.appSupportDirectory() else {
-            return fileName
-        }
-        
-        return (dir as NSString).appendingPathComponent(fileName)
-    }
+    private var queue = DispatchQueue(label: "dSYM serial", attributes: .concurrent)
+    private var cache: [String: DsymFile] = [:]
     
-    func findAllDsyms() {
-        if self.fileSearch.metadataSearch.isStarted {
-            return
+    var dsymList: [String: DsymFile] {
+        get {
+            var result: [String: DsymFile] = [:]
+            self.queue.sync {
+                result = self.cache
+            }
+            return result
         }
-
-        self.fileSearch.search(nil) { (dsyms) in
-            self.autoLoadedDsyms = dsyms
-        }
-        // User imported dSYMs
-        self.loadUserImportDsyms()
-    }
-    
-    func loadUserImportDsyms() {
-        let list = NSKeyedUnarchiver.unarchiveObject(withFile: self.filePath) as? [Dsym]
-        self.userImportDsyms = list?.filter(){ (dsym: Dsym) -> Bool in
-            return FileManager.default.fileExists(atPath: dsym.path)
-        }
-        
-        if self.userImportDsyms?.count != list?.count {
-            self.saveUserImportDsyms()
-        }
-    }
-
-    func saveUserImportDsyms() {
-        if self.userImportDsyms != nil {
-            NSKeyedArchiver.archiveRootObject(self.userImportDsyms!, toFile: self.filePath)
-        }
-    }
-    
-    func dsym(withUUID uuid: String) -> Dsym? {
-        if self.dsyms == nil {
-            return nil
-        }
-        for dsym in self.dsyms! {
-            if dsym.uuids.index(of: uuid) != nil {
-                return dsym
+        set {
+            self.queue.async(flags: .barrier) {
+                self.cache = newValue
             }
         }
-        
-        return nil
     }
     
-    func addDsym(_ new: Dsym) -> Bool {
-        if self.dsym(withUUID: new.uuids[0]) != nil {
-            return false
+    func loadAllDsymFiles(_ completion: @escaping (([DsymFile]?)->Void)) {
+        FileFinder().search() { (result) in
+            if let files = result {
+                self.cache(fileList: files)
+            }
+            completion(result)
         }
-        
-        if self.userImportDsyms == nil {
-            self.userImportDsyms = [Dsym]()
-        }
-        self.userImportDsyms!.append(new)
-        self.saveUserImportDsyms()
-        
-        return true
     }
     
-    func uuidOfFile(_ path: String, completion: @escaping (([String]?) -> Void)) {
+    func cache(fileList: [DsymFile]) {
+        for file in fileList {
+            self.dsymList[file.uuid] = file
+        }
+    }
+    
+    func findDsymFile(_ uuid: String, completion: @escaping ((DsymFile?)->Void)) {
+        if let dsym = self.dsymList[uuid] {
+            completion(dsym)
+            return
+        }
+        
         DispatchQueue.global().async {
-            if let uuids = SubProcess.dwarfdump(path: path) {
-                completion(uuids)
-            } else {
-                completion(nil)
+            self.loadAllDsymFiles { _ in
+                completion(self.dsymList[uuid])
             }
         }
-    }
-    
-    func importDsym(fromURL url: URL, completion: @escaping (([String]?, Bool)->Void)) {
-        guard let type = typeOfFile(url.path) else {
-            completion(nil, false)
-            return
-        }
-        
-        switch type {
-        case .archive, .binary, .dsym:
-            break
-        default:
-            completion(nil, false)
-            return
-        }
-        
-        self.uuidOfFile(url.path) { (result) in
-            guard let uuids = result else {
-                completion(nil, false)
-                return
-            }
-
-            let result = self.addDsym(Dsym(uuids: uuids, name: url.lastPathComponent, path: url.path))
-            completion(uuids, result)
-        }
-    }
-}
-
-extension CrashReport {
-    func fixDsym() -> Bool {
-        // Reload dSym files
-        DsymManager.sharedInstance.findAllDsyms()
-
-        for (_, image) in self.images {
-            if let uuid = image.uuid {
-                image.dSym = DsymManager.sharedInstance.dsym(withUUID: uuid)?.path
-            }
-        }
-        
-        if let appName = self.appName, let appImage = self.images[appName] {
-            if appImage.dSym != nil {
-                return true
-            }
-        }
-        
-        return false
     }
 }

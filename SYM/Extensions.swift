@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 import Cocoa
-
 
 // MARK: - String
 extension String {
@@ -51,15 +49,25 @@ extension String {
         )
     }
 
-    func matchGroups(_ match: NSTextCheckingResult) -> [String] {
-        let number = match.numberOfRanges
-        var result = [String]()
-        
-        for index in 0..<number {
-            let range = match.rangeAt(index)
-            result.append(self[Range(range)!])
+    func matchGroups(fromResult result: NSTextCheckingResult) -> [String] {
+        let number = result.numberOfRanges
+        if number == 1 {
+            if let range = Range(result.rangeAt(0)) {
+                return [self[range]]
+            } else {
+                return []
+            }
         }
-        return result
+        
+        var groups = [String]()
+        
+        for index in 1..<number {
+            if let range = Range(result.rangeAt(index)) {
+                groups.append(self[range])
+            }
+        }
+        
+        return groups
     }
 
     func leftPadding(toLength: Int, withPad character: Character) -> String {
@@ -115,8 +123,16 @@ extension String {
         
         return value
     }
+    
+    func separate(by: String = ":") -> (String, String)? {
+        let list = self.components(separatedBy: ":")
+        if list.count != 2 {
+            return nil
+        }
+        
+        return (list[0].strip(), list[1].strip())
+    }
 }
-
 
 // MARK: - Dictionary
 extension Dictionary {
@@ -128,7 +144,6 @@ extension Dictionary {
         }
     }
 }
-
 
 // MARK: - NSFileManager
 enum FileError: Error {

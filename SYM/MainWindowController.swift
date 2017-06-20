@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +20,72 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Cocoa
 
-
-enum ViewMode: Int {
-    case text = 0    // NSOffState
-    case thread = 1  // NSOnState
+extension NSImage.Name {
+    static let alert = NSImage.Name(rawValue: "alert")
+    static let symbol = NSImage.Name(rawValue: "symbol")
 }
 
 class MainWindowController: NSWindowController {
-
     // Toolbar buttons
-    @IBOutlet weak var sidebarButton: NSButton!
-    @IBOutlet weak var viewModeButton: NSButton!
     @IBOutlet weak var symButton: NSButton!
-    @IBOutlet weak var infoButton: NSButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
-
-    var popover: NSPopover?
+    @IBOutlet weak var dSYMButton: NSPopUpButton!
+    @IBOutlet weak var dSYMMenu: NSMenuItem!
     
-    var viewMode: ViewMode {
-        get {
-            return ViewMode(rawValue: self.viewModeButton.state.rawValue)!
-        }
-        set {
-            self.viewModeButton.state = NSControl.StateValue(newValue.rawValue)
+    private var dSYM: DsymFile? {
+        didSet {
+            DispatchQueue.main.async {
+                let item = self.dSYMButton.item(at: 0)!
+                if self.dSYM == nil {
+                    item.title = ".dSYM file not found"
+                    item.image = NSImage(named: .alert)
+                } else {
+                    item.title = self.dSYM!.name
+                    item.image = NSImage(named: .symbol)
+                }
+                self.dSYMButton.selectItem(at: 0)
+            }
         }
     }
     
-    var currentCrashFile: CrashFile?
-    
-    required init?(coder: NSCoder) {
-        super.init(coder:coder)
+    var crashContent: String? {
+        return (self.document as? CrashDocument)?.content
     }
     
     override func windowDidLoad() {
         super.windowDidLoad()
+        DsymManager.shared.loadAllDsymFiles { (result) in
+            if let files = result {
+                let unique = Set<DsymFile>(files)
+                for file in unique {
+                    let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
+                    item.toolTip = file.displayedPath
+                    item.representedObject = file
+                    if file.name == self.dSYM?.name {
+                        item.state = .on
+                    }
+                    self.dSYMMenu.submenu!.addItem(item)
+                }
+            }
+        }
+    }
+    
+    @objc func didSelectDsymFile(_ sender: AnyObject?) {
+        if let item = sender as? NSMenuItem, let file = item.representedObject as? DsymFile {
+            self.dSYM = file
+            item.state = .on
+            for menuItem in self.dSYMMenu.submenu!.items {
+                if menuItem != item {
+                    menuItem.state = .off
+                }
+            }
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder:coder)
     }
     
     fileprivate func sendNotification(_ name: Notification.Name) {
@@ -66,125 +95,63 @@ class MainWindowController: NSWindowController {
     }
 }
 
-
-// MARK: - Crash
-
+// MARK: - Crash operation
 extension MainWindowController {
-    func openCrash(file: CrashFile) {
-        self.currentCrashFile = file
+    func open(crash: String) {
         self.sendNotification(.openCrashReport)
-        self.autoSymbolicate()
+        self.updateDsym()
+    }
+    
+    func updateDsym() {
+        guard let content = self.crashContent,
+              let crash = parseCrash(fromContent: content),
+              let image = crash.binaryImage(),
+              let uuid = image.uuid
+        else {
+            return
+        }
+        
+        DsymManager.shared.findDsymFile(uuid) { (result) in
+            self.dSYM = result
+            DispatchQueue.main.async {
+                if result != nil {
+                    self.dSYMMenu.isEnabled = false
+                } else {
+                    self.dSYMMenu.isEnabled = true
+                }
+            }
+        }
     }
     
     func autoSymbolicate() {
         if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
-            DispatchQueue.global().async {
-                self.symbolicate(nil)
-            }
+            self.symbolicate(nil)
         }
     }
     
     func updateCrash(_ newContent: String) {
         let document = self.document as! CrashDocument
-        
-        if self.currentCrashFile == nil {
-            self.currentCrashFile = document.crashFile
-        }
-        
-        document.update(crashFile: self.currentCrashFile, newContent: newContent) { [weak self] (crash) -> (Void) in
-            self?.window?.isDocumentEdited = true
-            self?.sendNotification(.crashUpdated)
-            self?.autoSymbolicate()
-        }
+        document.content = newContent
+        self.window?.isDocumentEdited = (self.crashContent != newContent)
+        self.sendNotification(.crashUpdated)
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
-        if let crash = self.currentCrashFile?.crash {
+        if let content = self.crashContent, let crash = parseCrash(fromContent: content) {
             self.indicator.startAnimation(nil)
-            
-            crash.symbolicate(completion: { [weak self] (crash) in
-                DispatchQueue.main.async {
+            DispatchQueue.global().async {
+                let new = SYM.symbolicate(crash: crash, dSYM: self.dSYM?.path)
+                DispatchQueue.main.async { [weak self] in
                     self?.indicator.stopAnimation(nil)
+                    self?.updateCrash(new)
                     self?.sendNotification(.crashSymbolicated)
                 }
-            })
-        }
-    }
-}
-
-
-// MARK: - UI control
-
-extension MainWindowController {
-    @IBAction func toggleFileList(_ sender: AnyObject?) {
-        self.sendNotification(.toggleFileList)
-    }
-    
-    @IBAction func swtichViewMode(_ sender: AnyObject?) {
-        self.sendNotification(.switchViewMode)
-    }
-    
-    // MARK: dSYM
-    @IBAction func importDsymFile(_ sender: AnyObject?) {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = false
-        panel.allowsMultipleSelection = false
-        panel.beginSheetModal(for: self.window!) {
-            (result) in
-            if result != .OK {
-                return
             }
-            
-            if panel.urls.count == 0 {
-                return
-            }
-            
-            let url = panel.urls[0]
-            
-            DsymManager.sharedInstance.importDsym(fromURL: url, completion: { (uuids, success) in
-                if uuids == nil {
-                    let alert = NSAlert()
-                    alert.addButton(withTitle: "OK")
-                    alert.addButton(withTitle: "Cancel")
-                    alert.messageText = "This is not a dSYM file"
-                    alert.informativeText = url.path
-                    alert.beginSheetModal(for: self.window!, completionHandler: nil)
-                    return
-                }
-                
-                if (success) {
-                    // NSNotificationCenter.defaultCenter().postNotificationName(DidImportDsymNotification, object: uuids)
-                }
-            })
-        }
-    }
-    
-    @IBAction func togglePopover(sender: AnyObject?) {
-        guard let crash = self.currentCrashFile?.crash,
-              let button = sender as? NSButton
-        else {
-            return
-        }
-        
-        if self.popover == nil {
-            let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-            let infoVC = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Crash Info ViewController")) as! CrashInfoViewController
-            infoVC.crash = crash
-            self.popover = NSPopover()
-            self.popover!.behavior = .transient
-            self.popover!.contentViewController = infoVC
-        }
-        
-        if self.popover!.isShown {
-            self.popover!.close()
-        } else {
-            self.popover!.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
     }
 }
 
 // MARK: - NSViewController extensions
-
 extension NSViewController {
     func document() -> CrashDocument? {
         if let windowController = self.view.window?.windowController {
@@ -199,13 +166,5 @@ extension NSViewController {
     
     func windowController() -> MainWindowController? {
         return self.view.window?.windowController as? MainWindowController
-    }
-    
-    func openCrash(_ file: CrashFile) {
-        self.windowController()?.openCrash(file: file)
-    }
-    
-    func currentCrashFile() -> CrashFile? {
-        return self.windowController()?.currentCrashFile
     }
 }

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,43 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Cocoa
 
-
 class ContentViewController: NSViewController {
-
     @IBOutlet var textView: NSTextView!
-    var crash: CrashReport?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupTextView()
         
-        let _ = NotificationCenter.default.then {
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
-            $0.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
-        }
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
+        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
+        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
     }
     
     @objc func handleOpenCrash(notification: Notification) {
         if let wc = notification.object as? MainWindowController, wc == self.windowController() {
-            self.loadData()
+            self.loadData(notification.name != .crashUpdated)
         }
     }
     
-    func loadData() {
-        self.crash = self.currentCrashFile()?.crash
-        self.textView.string = self.crash?.content ?? ""
-        if let crash = self.crash {
-            self.textView.setAttributeString(attributeString: crash.pretty())
-            if self.document()?.crashFile.url != nil {
-                // this crash file is opened from file
-                self.textView.isEditable = false
-            }
-            
-            //self.textView.scrollToBeginningOfDocument(nil)
+    var crashContent: String {
+        return self.windowController()?.crashContent ?? ""
+    }
+    
+    func loadData(_ scrollToTop: Bool = true) {
+        let content = self.crashContent
+        if let crash = parseCrash(fromContent: content) {
+            let formatted = crash.pretty()
+            self.textView.setAttributeString(attributeString: formatted)
+        } else {
+            self.textView.string = content
+        }
+        if scrollToTop {
+            self.textView.scrollToBeginningOfDocument(nil)
         }
     }
     
@@ -70,12 +68,11 @@ class ContentViewController: NSViewController {
     override func viewWillAppear() {
         super.viewWillAppear()
         
-        if self.crash == nil {
+        if self.textView.string.strip().count == 0 {
             self.loadData()
         }
     }
 }
-
 
 extension ContentViewController: CrashTextViewDelegate {
     func textView(_ view: NSTextView, menu: NSMenu, for event: NSEvent, at charIndex: Int) -> NSMenu? {

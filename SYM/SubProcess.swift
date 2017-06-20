@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
-
 
 struct SubProcess {
     static func execute(cmd: String, args: [String]?) -> String? {
         let pipe = Pipe()
         
-        let task = Process().then {
-            $0.launchPath = cmd
-            $0.arguments = args
-            $0.standardOutput = pipe
-        }
+        let task = Process()
+        task.launchPath = cmd
+        task.arguments = args
+        task.standardOutput = pipe
         
         task.launch()
         

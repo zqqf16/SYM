@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,45 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
 
 struct RE {
     let regex: NSRegularExpression
     
-    var groups: [String]?
-    
-    init(_ pattern: String) throws {
+    init(_ pattern: String, optoins: NSRegularExpression.Options = []) throws {
         try regex = NSRegularExpression(pattern: pattern,
-                                        options: [])
+                                        options: optoins)
     }
     
-    static func compile(_ pattern: String) -> RE? {
-        do {
-            return try RE(pattern)
-        } catch {
-            return nil
+    func findFirst(_ input: String, options: NSRegularExpression.MatchingOptions = []) -> [String]? {
+        if let result = regex.firstMatch(in: input, options: options, range: NSMakeRange(0, input.utf16.count)) {
+            return input.matchGroups(fromResult: result)
         }
+        
+        return nil
     }
     
-    func match(_ input: String) -> [String]? {
+    func findAll(_ input: String, options: NSRegularExpression.MatchingOptions = []) -> [[String]]? {
         let matches = regex.matches(in: input,
-                                    options: [],
+                                    options: options,
                                     range: NSMakeRange(0, input.utf16.count))
         if matches.count == 0 {
             return nil
         }
-
-        let match = matches[0]
-        let number = match.numberOfRanges
-        var groups = [String]()
-
-        for index in 1..<number {
-            if let range = Range(match.rangeAt(index)) {
-                groups.append(input[range])
-            }
-        }
         
-        return groups
+        return matches.map { input.matchGroups(fromResult: $0) }
+    }
+    
+    func match(_ input: String, options: NSRegularExpression.MatchingOptions = []) -> [String]? {
+        return findFirst(input, options: options)
     }
 }

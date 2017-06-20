@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2016 zqqf16
+// Copyright (c) 2017 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Cocoa
-
 
 class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSource {
     @IBOutlet weak var tableView: NSTableView!
-
+    private var dsymList: [DsymFile] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
 
         //self.tableView.columnAutoresizingStyle = .UniformColumnAutoresizingStyle
         self.setupMenu()
+        
+        DsymManager.shared.loadAllDsymFiles { (result) in
+            if let files = result {
+                self.dsymList = files
+                self.tableView.delegate = self
+                self.tableView.dataSource = self
+                //self.tableView.reloadData()
+            }
+        }
     }
     
     private func setupMenu() {
@@ -47,22 +53,17 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
     
     @objc func showDsymFileInFinder() {
         let row = self.tableView.clickedRow
-        let dsym = DsymManager.sharedInstance.dsyms![row]
+        let dsym = self.dsymList[row]
         let fileURL = URL(fileURLWithPath: dsym.path)
         NSWorkspace.shared.activateFileViewerSelecting([fileURL])
     }
     
     func numberOfRows(in tableView: NSTableView) -> Int {
-        if let dsyms = DsymManager.sharedInstance.dsyms {
-            return dsyms.count
-        }
-        return 0
+        return self.dsymList.count
     }
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        
-        let dsym = DsymManager.sharedInstance.dsyms![row]
-
+        let dsym = self.dsymList[row]
         var cellID: String?
         var text: String?
 
@@ -71,7 +72,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
             text = dsym.name
         } else if tableColumn == tableView.tableColumns[1] {
             cellID = "DsymUUIDCell"
-            text = dsym.uuids.joined(separator: " | ")
+            text = dsym.uuid
         } else if tableColumn == tableView.tableColumns[2] {
             cellID = "DsymPathCell"
             text = dsym.path
