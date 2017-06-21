@@ -531,9 +531,9 @@
                                                 <items>
                                                     <menuItem state="on" image="symbol" hidden="YES" id="bBS-lF-e3X"/>
                                                     <menuItem isSeparatorItem="YES" id="T68-I6-87Z"/>
-                                                    <menuItem title="Select a .dSYM" id="tsA-mk-XGh">
+                                                    <menuItem title="Select a dSYM file" id="tsA-mk-XGh">
                                                         <modifierMask key="keyEquivalentModifierMask"/>
-                                                        <menu key="submenu" title="Select a .dSYM" id="qov-nx-J66"/>
+                                                        <menu key="submenu" title="Select a dSYM file" id="qov-nx-J66"/>
                                                     </menuItem>
                                                     <menuItem isSeparatorItem="YES" id="aHr-if-AEs"/>
                                                     <menuItem title="Show all" id="I6K-eO-27v">
@@ -722,7 +722,7 @@
         <!--Window Controller-->
         <scene sceneID="bqy-YX-0ST">
             <objects>
-                <windowController id="z2I-Um-ZPd" sceneMemberID="viewController">
+                <windowController showSeguePresentationStyle="single" id="z2I-Um-ZPd" sceneMemberID="viewController">
                     <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="hdh-dJ-f2o" customClass="BaseWindow" customModule="SYM" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -740,7 +740,7 @@
         <!--dSYM List-->
         <scene sceneID="nF0-m5-146">
             <objects>
-                <viewController title="dSYM List" id="NMd-Td-SlA" customClass="DsymTableViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="dSYM List" showSeguePresentationStyle="single" id="NMd-Td-SlA" customClass="DsymTableViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="Tsf-1t-LzH">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="400"/>
                         <autoresizingMask key="autoresizingMask"/>
