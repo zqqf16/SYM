@@ -35,27 +35,21 @@ extension NSTextView {
 }
 
 class TextView: NSTextView {
-    /*
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard()
-        
-        guard let types = pboard.types else {
-            return super.performDragOperation(sender)
-        }
-        
-        if types.contains(NSFilenamesPboardType) {
-            if let paths = pboard.propertyList(forType: NSFilenamesPboardType) as? Array<String> {
-                let fileURL = URL(fileURLWithPath: paths[0])
-                NSDocumentController.shared().openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
+        let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
+        if let paths = pboard.propertyList(forType: filenameType) as? [String] {
+            for path in paths {
+                let fileURL = URL(fileURLWithPath: path)
+                NSDocumentController.shared.openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
                     // Do nothing
                 })
-                return true
             }
+            
+            return true
         }
-        
         return super.performDragOperation(sender)
     }
-     */
     
     override func didChangeText() {
         super.didChangeText()
