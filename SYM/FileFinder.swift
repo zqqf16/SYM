@@ -65,7 +65,6 @@ func typeOfFile(_ path: String) -> FileType? {
     }
 }
 
-
 class FileFinder {
     var observer: AnyObject?
     
@@ -84,9 +83,7 @@ class FileFinder {
             completion(result)
         }
         
-        DispatchQueue.main.async {
-            query.start()
-        }
+        query.start()
     }
 }
 

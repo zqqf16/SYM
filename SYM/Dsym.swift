@@ -91,10 +91,8 @@ class DsymManager {
             return
         }
         
-        DispatchQueue.global().async {
-            self.loadAllDsymFiles { _ in
-                completion(self.dsymList[uuid])
-            }
+        self.loadAllDsymFiles { _ in
+            completion(self.dsymList[uuid])
         }
     }
 }
