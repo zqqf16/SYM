@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */ = {isa = PBXBuildFile; fileRef = 510777781EFBA4C30055E8BD /* AppleDemo.ips */; };
 		511F80721E77A14000C69C43 /* PlistDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511F80711E77A14000C69C43 /* PlistDocument.swift */; };
 		514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 514B4F6A1E30AC9100171990 /* Foundation.framework */; };
-		516EEE841EF3B1030035B874 /* AppleDemo.ips in Resources */ = {isa = PBXBuildFile; fileRef = 516EEE831EF3B1030035B874 /* AppleDemo.ips */; };
 		519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */ = {isa = PBXBuildFile; fileRef = 519FF5871D54BB2600B07A65 /* symbolicatecrash */; };
 		51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* CrashDocument.swift */; };
 		51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */; };
@@ -48,9 +48,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		510777781EFBA4C30055E8BD /* AppleDemo.ips */ = {isa = PBXFileReference; lastKnownFileType = text; path = AppleDemo.ips; sourceTree = "<group>"; };
 		511F80711E77A14000C69C43 /* PlistDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlistDocument.swift; sourceTree = "<group>"; };
 		514B4F6A1E30AC9100171990 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		516EEE831EF3B1030035B874 /* AppleDemo.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = AppleDemo.ips; path = ../../../../../../Downloads/AppleDemo.ips; sourceTree = "<group>"; };
 		519FF5871D54BB2600B07A65 /* symbolicatecrash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = symbolicatecrash; path = Tools/symbolicatecrash; sourceTree = "<group>"; };
 		51B8D7041D4F620100F2C24C /* CrashDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashDocument.swift; sourceTree = "<group>"; };
 		51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
@@ -131,7 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */,
-				516EEE831EF3B1030035B874 /* AppleDemo.ips */,
+				510777781EFBA4C30055E8BD /* AppleDemo.ips */,
 				51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */,
 				51BF9C531D6C7A1C00379BFC /* Info.plist */,
 			);
@@ -264,7 +264,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = zqqf16;
 				TargetAttributes = {
 					51BF9C4E1D6C7A1C00379BFC = {
@@ -303,7 +303,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				516EEE841EF3B1030035B874 /* AppleDemo.ips in Resources */,
+				510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */,
 				51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -419,14 +419,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -466,14 +472,20 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
