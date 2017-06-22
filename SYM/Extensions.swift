@@ -52,7 +52,7 @@ extension String {
     func matchGroups(fromResult result: NSTextCheckingResult) -> [String] {
         let number = result.numberOfRanges
         if number == 1 {
-            if let range = Range(result.rangeAt(0)) {
+            if let range = Range(result.range(at:0)) {
                 return [self[range]]
             } else {
                 return []
@@ -62,7 +62,7 @@ extension String {
         var groups = [String]()
         
         for index in 1..<number {
-            if let range = Range(result.rangeAt(index)) {
+            if let range = Range(result.range(at: index)) {
                 groups.append(self[range])
             }
         }
