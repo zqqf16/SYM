@@ -28,18 +28,19 @@ extension Notification.Name {
     static let dsymListUpdated = Notification.Name("sym.DsymListUpdated")
 }
 
-struct DsymFile {
+class DsymFile {
     var uuid: String
     var path: String
     var name: String
+    var arch: String?
     
-    var displayedPath: String
+    var displayPath: String
     
-    init(uuid: String, path: String, name: String, displayedPath: String) {
+    init(uuid: String, path: String, name: String, displayPath: String) {
         self.uuid = uuid
         self.path = path
         self.name = name
-        self.displayedPath = displayedPath
+        self.displayPath = displayPath
     }
 }
 
@@ -61,18 +62,11 @@ class DsymManager {
     private var finder = FileFinder()
     
     var dsymList: [String: DsymFile] {
-        get {
-            var result: [String: DsymFile] = [:]
-            self.queue.sync {
-                result = self.cache
-            }
-            return result
+        var result: [String: DsymFile] = [:]
+        self.queue.sync {
+            result = self.cache
         }
-        set {
-            self.queue.async(flags: .barrier) {
-                self.cache = newValue
-            }
-        }
+        return result
     }
     
     func updateDsymList() {
@@ -80,18 +74,38 @@ class DsymManager {
             return
         }
         
-        self.finder.search { (result) in
-            if let files = result {
-                self.cache(fileList: files)
+        self.finder.search { [weak self] (result) in
+            DispatchQueue.global().async {
+                self?.parseSearchResult(result)
             }
-            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
         }
     }
     
-    func cache(fileList: [DsymFile]) {
-        for file in fileList {
-            self.dsymList[file.uuid] = file
+    func parseSearchResult(_ result: [DsymFile]?) {
+        guard let files = result else {
+            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
+            return
         }
+        
+        var dsyms: [String: DsymFile] = [:]
+        for f in files {
+            dsyms[f.uuid] = f
+        }
+        
+        let pathes = Set<DsymFile>(files).map { $0.path }
+        if let archResult = SubProcess.dwarfdump(pathes) {
+            for arch in archResult {
+                if let file = dsyms[arch.0] {
+                    file.arch = arch.1
+                }
+            }
+        }
+        
+        self.queue.async(flags: .barrier) {
+            self.cache = dsyms
+        }
+        
+        NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
     }
     
     func findDsymFile(_ uuid: String) -> DsymFile? {

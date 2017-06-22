@@ -109,7 +109,7 @@ extension FileFinder {
                 let uuids = item.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
                 
                 for (index, uuid) in uuids.enumerated() {
-                    let dsym = DsymFile(uuid: uuid, path: "\(path)/\(dsyms[index])", name: name, displayedPath: path)
+                    let dsym = DsymFile(uuid: uuid, path: "\(path)/\(dsyms[index])", name: name, displayPath: path)
                     dsymFiles.append(dsym)
                 }
             }

@@ -40,22 +40,13 @@ struct SubProcess {
 }
 
 extension SubProcess {
-    static func dwarfdump(path: String) -> [String]? {
+    static func dwarfdump(_ paths: [String]) -> [(String, String)]? {
         let cmd = "/usr/bin/dwarfdump"
-        let args = ["--uuid", path]
-        if let result = self.execute(cmd: cmd, args: args) {
-            let lines = result.components(separatedBy: "\n").filter {
-                (content) -> Bool in
-                if content.characters.count == 0 {
-                    return false
-                }
-                
-                return content.hasPrefix("UUID: ")
-            }
-            
-            return lines.map({ (line) -> String in
-                return line.components(separatedBy: " ")[1]
-            })
+        let args = ["--uuid"] + paths
+        let re = try! RE("UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ", optoins: [.anchorsMatchLines, .caseInsensitive])
+        
+        if let output = self.execute(cmd: cmd, args: args), let uuids = re.findAll(output) {
+            return uuids.map { ($0[0], $0[1]) }
         }
         
         return nil

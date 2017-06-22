@@ -96,7 +96,7 @@ class MainWindowController: NSWindowController {
 
         for file in unique {
             let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
-            item.toolTip = file.displayedPath
+            item.toolTip = file.displayPath
             item.representedObject = file
             if file.name == self.dSYM?.name {
                 item.state = .on
