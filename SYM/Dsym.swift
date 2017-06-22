@@ -24,6 +24,10 @@
 import Foundation
 import Cocoa
 
+extension Notification.Name {
+    static let dsymListUpdated = Notification.Name("sym.DsymListUpdated")
+}
+
 struct DsymFile {
     var uuid: String
     var path: String
@@ -54,6 +58,7 @@ class DsymManager {
     
     private var queue = DispatchQueue(label: "dSYM serial", attributes: .concurrent)
     private var cache: [String: DsymFile] = [:]
+    private var finder = FileFinder()
     
     var dsymList: [String: DsymFile] {
         get {
@@ -70,12 +75,16 @@ class DsymManager {
         }
     }
     
-    func loadAllDsymFiles(_ completion: @escaping (([DsymFile]?)->Void)) {
-        FileFinder().search() { (result) in
+    func updateDsymList() {
+        if self.finder.isRunning {
+            return
+        }
+        
+        self.finder.search { (result) in
             if let files = result {
                 self.cache(fileList: files)
             }
-            completion(result)
+            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
         }
     }
     
@@ -85,14 +94,7 @@ class DsymManager {
         }
     }
     
-    func findDsymFile(_ uuid: String, completion: @escaping ((DsymFile?)->Void)) {
-        if let dsym = self.dsymList[uuid] {
-            completion(dsym)
-            return
-        }
-        
-        self.loadAllDsymFiles { _ in
-            completion(self.dsymList[uuid])
-        }
+    func findDsymFile(_ uuid: String) -> DsymFile? {
+        return self.dsymList[uuid]
     }
 }

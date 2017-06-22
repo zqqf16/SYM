@@ -67,19 +67,23 @@ func typeOfFile(_ path: String) -> FileType? {
 
 class FileFinder {
     var observer: AnyObject?
+    var query = NSMetadataQuery()
+    
+    var isRunning: Bool {
+        return self.query.isGathering
+    }
     
     func search(_ condition: String, completion: @escaping ([NSMetadataItem]?)->Void) {
-        let query = NSMetadataQuery()
         query.predicate = NSPredicate(fromMetadataQueryString: condition)
         
         self.observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: nil, queue: nil) { (notification) in
-            query.stop()
+            self.query.stop()
             if let observer = self.observer {
                 NotificationCenter.default.removeObserver(observer)
                 self.observer = nil
             }
             
-            let result = query.results as! [NSMetadataItem]
+            let result = self.query.results as! [NSMetadataItem]
             completion(result)
         }
         

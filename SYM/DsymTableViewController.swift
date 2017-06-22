@@ -32,14 +32,9 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
         //self.tableView.columnAutoresizingStyle = .UniformColumnAutoresizingStyle
         self.setupMenu()
         
-        DsymManager.shared.loadAllDsymFiles { (result) in
-            if let files = result {
-                self.dsymList = files
-                self.tableView.delegate = self
-                self.tableView.dataSource = self
-                //self.tableView.reloadData()
-            }
-        }
+        self.dsymList = Array<DsymFile>(DsymManager.shared.dsymList.values)
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
     }
     
     private func setupMenu() {

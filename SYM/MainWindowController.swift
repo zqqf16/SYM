@@ -56,19 +56,52 @@ class MainWindowController: NSWindowController {
     
     override func windowDidLoad() {
         super.windowDidLoad()
-        DsymManager.shared.loadAllDsymFiles { (result) in
-            if let files = result {
-                let unique = Set<DsymFile>(files)
-                for file in unique {
-                    let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
-                    item.toolTip = file.displayedPath
-                    item.representedObject = file
-                    if file.name == self.dSYM?.name {
-                        item.state = .on
-                    }
-                    self.dSYMMenu.submenu!.addItem(item)
-                }
+        
+        self.setupDsymMenu()
+        DsymManager.shared.updateDsymList()
+        NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
+    }
+    
+    @objc func dsymListDidUpdate(notification: Notification) {
+        self.setupDsymMenu()
+        self.findCurrentDsym()
+    }
+    
+    func findCurrentDsym(_ updateIfNotFound: Bool = false) {
+        guard let content = self.crashContent,
+            let crash = parseCrash(fromContent: content),
+            let image = crash.binaryImage(),
+            let uuid = image.uuid
+            else {
+                return
+        }
+        
+        self.dSYM = DsymManager.shared.findDsymFile(uuid)
+        if updateIfNotFound && self.dSYM == nil {
+            DsymManager.shared.updateDsymList()
+        }
+        DispatchQueue.main.async {
+            if self.dSYM != nil {
+                self.dSYMMenu.isEnabled = false
+            } else {
+                self.dSYMMenu.isEnabled = true
             }
+        }
+    }
+    
+    func setupDsymMenu() {
+        let dsymList = DsymManager.shared.dsymList.values
+        let unique = Set<DsymFile>(dsymList)
+        self.dSYMMenu.submenu!.removeAllItems()
+
+        for file in unique {
+            let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
+            item.toolTip = file.displayedPath
+            item.representedObject = file
+            if file.name == self.dSYM?.name {
+                item.state = .on
+            }
+            self.dSYMMenu.submenu!.addItem(item)
         }
     }
     
@@ -99,28 +132,7 @@ class MainWindowController: NSWindowController {
 extension MainWindowController {
     func open(crash: String) {
         self.sendNotification(.openCrashReport)
-        self.updateDsym()
-    }
-    
-    func updateDsym() {
-        guard let content = self.crashContent,
-              let crash = parseCrash(fromContent: content),
-              let image = crash.binaryImage(),
-              let uuid = image.uuid
-        else {
-            return
-        }
-        
-        DsymManager.shared.findDsymFile(uuid) { (result) in
-            self.dSYM = result
-            DispatchQueue.main.async {
-                if result != nil {
-                    self.dSYMMenu.isEnabled = false
-                } else {
-                    self.dSYMMenu.isEnabled = true
-                }
-            }
-        }
+        self.findCurrentDsym(true)
     }
     
     func autoSymbolicate() {
