@@ -559,8 +559,8 @@
                         </toolbar>
                     </window>
                     <connections>
-                        <outlet property="dSYMButton" destination="qmd-vK-YFc" id="Rpa-pd-Tls"/>
-                        <outlet property="dSYMMenu" destination="tsA-mk-XGh" id="Kbm-0d-ddl"/>
+                        <outlet property="dsymButton" destination="qmd-vK-YFc" id="Rpa-pd-Tls"/>
+                        <outlet property="dsymMenu" destination="tsA-mk-XGh" id="Kbm-0d-ddl"/>
                         <outlet property="indicator" destination="DVd-5H-ljI" id="hyH-GG-1qt"/>
                         <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
                         <segue destination="5WI-tf-yEY" kind="relationship" relationship="window.shadowedContentViewController" id="Lwr-gD-c6J"/>
@@ -723,7 +723,7 @@
         <scene sceneID="bqy-YX-0ST">
             <objects>
                 <windowController showSeguePresentationStyle="single" id="z2I-Um-ZPd" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="hdh-dJ-f2o" customClass="BaseWindow" customModule="SYM" customModuleProvider="target">
+                    <window key="window" title="dSYM List" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="hdh-dJ-f2o" customClass="BaseWindow" customModule="SYM" customModuleProvider="target">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="163" y="199" width="480" height="270"/>
@@ -811,7 +811,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="DsymUUIDCell" id="HUd-Rs-xRX">
-                                                            <rect key="frame" x="209" y="1" width="270.5" height="24"/>
+                                                            <rect key="frame" x="209" y="1" width="270" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vhp-jS-RDN">
@@ -849,7 +849,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="DsymPathCell" id="qwV-9t-4uD">
-                                                            <rect key="frame" x="482.5" y="1" width="385.5" height="24"/>
+                                                            <rect key="frame" x="482.5" y="1" width="385" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rzT-5B-7hj">

@@ -26,10 +26,10 @@ import Foundation
 extension SubProcess {
     static func atos(loadAddress: String,
                      addressess: [String],
-                     dSym: String,
+                     dsym: String,
                      arch: String = "arm64") -> [String]? {
         let cmd = "/usr/bin/atos"
-        let args = ["-arch", arch, "-o", dSym, "-l", loadAddress] + addressess
+        let args = ["-arch", arch, "-o", dsym, "-l", loadAddress] + addressess
         if let result = execute(cmd: cmd, args: args) {
             return result.components(separatedBy: "\n").filter {
                 (content) -> Bool in
@@ -40,9 +40,9 @@ extension SubProcess {
         return nil
     }
     
-    static func atos(_ image: Crash.Image, dSYM: String? = nil) -> [String: String]? {
+    static func atos(_ image: Crash.Image, dsym: String? = nil) -> [String: String]? {
         guard let loadAddress = image.loadAddress,
-              let dsym = dSYM,
+              let dsym = dsym,
               let arch = image.arch,
               let frames = image.frames
         else {
@@ -52,7 +52,7 @@ extension SubProcess {
         let addresses = frames.map { $0.address }
         if let result = SubProcess.atos(loadAddress: loadAddress,
                                         addressess: addresses,
-                                        dSym: dsym,
+                                        dsym: dsym,
                                         arch: arch) {
             return Dictionary(uniqueKeysWithValues: zip(addresses, result))
         }
@@ -77,7 +77,7 @@ extension SubProcess {
 }
 
 // MARK: - Symbolicate
-func symbolicate(crash: Crash, dSYM: String? = nil) -> String {
+func symbolicate(crash: Crash, dsym: String? = nil) -> String {
     if let content = crash.toStandard() {
         return SubProcess.symbolicatecrash(crash: content) ?? content
     } else if let image = crash.binaryImage(), let result = SubProcess.atos(image) {

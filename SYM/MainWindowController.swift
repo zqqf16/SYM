@@ -31,21 +31,21 @@ class MainWindowController: NSWindowController {
     // Toolbar buttons
     @IBOutlet weak var symButton: NSButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
-    @IBOutlet weak var dSYMButton: NSPopUpButton!
-    @IBOutlet weak var dSYMMenu: NSMenuItem!
+    @IBOutlet weak var dsymButton: NSPopUpButton!
+    @IBOutlet weak var dsymMenu: NSMenuItem!
     
-    private var dSYM: DsymFile? {
+    private var dsym: DsymFile? {
         didSet {
             DispatchQueue.main.async {
-                let item = self.dSYMButton.item(at: 0)!
-                if self.dSYM == nil {
-                    item.title = ".dSYM file not found"
+                let item = self.dsymButton.item(at: 0)!
+                if self.dsym == nil {
+                    item.title = "dSYM file not found"
                     item.image = NSImage(named: .alert)
                 } else {
-                    item.title = self.dSYM!.name
+                    item.title = self.dsym!.name
                     item.image = NSImage(named: .symbol)
                 }
-                self.dSYMButton.selectItem(at: 0)
+                self.dsymButton.selectItem(at: 0)
             }
         }
     }
@@ -76,15 +76,15 @@ class MainWindowController: NSWindowController {
                 return
         }
         
-        self.dSYM = DsymManager.shared.findDsymFile(uuid)
-        if updateIfNotFound && self.dSYM == nil {
+        self.dsym = DsymManager.shared.findDsymFile(uuid)
+        if updateIfNotFound && self.dsym == nil {
             DsymManager.shared.updateDsymList()
         }
         DispatchQueue.main.async {
-            if self.dSYM != nil {
-                self.dSYMMenu.isEnabled = false
+            if self.dsym != nil {
+                self.dsymMenu.isEnabled = false
             } else {
-                self.dSYMMenu.isEnabled = true
+                self.dsymMenu.isEnabled = true
             }
         }
     }
@@ -92,24 +92,24 @@ class MainWindowController: NSWindowController {
     func setupDsymMenu() {
         let dsymList = DsymManager.shared.dsymList.values
         let unique = Set<DsymFile>(dsymList)
-        self.dSYMMenu.submenu!.removeAllItems()
+        self.dsymMenu.submenu!.removeAllItems()
 
         for file in unique {
             let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
             item.toolTip = file.displayPath
             item.representedObject = file
-            if file.name == self.dSYM?.name {
+            if file.name == self.dsym?.name {
                 item.state = .on
             }
-            self.dSYMMenu.submenu!.addItem(item)
+            self.dsymMenu.submenu!.addItem(item)
         }
     }
     
     @objc func didSelectDsymFile(_ sender: AnyObject?) {
         if let item = sender as? NSMenuItem, let file = item.representedObject as? DsymFile {
-            self.dSYM = file
+            self.dsym = file
             item.state = .on
-            for menuItem in self.dSYMMenu.submenu!.items {
+            for menuItem in self.dsymMenu.submenu!.items {
                 if menuItem != item {
                     menuItem.state = .off
                 }
@@ -152,7 +152,7 @@ extension MainWindowController {
         if let content = self.crashContent, let crash = parseCrash(fromContent: content) {
             self.indicator.startAnimation(nil)
             DispatchQueue.global().async {
-                let new = SYM.symbolicate(crash: crash, dSYM: self.dSYM?.path)
+                let new = SYM.symbolicate(crash: crash, dsym: self.dsym?.path)
                 DispatchQueue.main.async { [weak self] in
                     self?.indicator.stopAnimation(nil)
                     self?.updateCrash(new)
