@@ -33,6 +33,9 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
         self.setupMenu()
         
         self.dsymList = Array<DsymFile>(DsymManager.shared.dsymList.values)
+        self.dsymList.sort { (a, b) -> Bool in
+            return (a.name > b.name)
+        }
         self.tableView.delegate = self
         self.tableView.dataSource = self
     }
@@ -64,13 +67,17 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
 
         if tableColumn == tableView.tableColumns[0] {
             cellID = "DsymNameCell"
-            text = dsym.name
+            if let arch = dsym.arch {
+                text = "\(dsym.name) (\(arch))"
+            } else {
+                text = dsym.name
+            }
         } else if tableColumn == tableView.tableColumns[1] {
             cellID = "DsymUUIDCell"
             text = dsym.uuid
         } else if tableColumn == tableView.tableColumns[2] {
             cellID = "DsymPathCell"
-            text = dsym.path
+            text = dsym.displayPath
         } else {
             return nil
         }
