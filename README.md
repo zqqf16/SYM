@@ -16,13 +16,7 @@ Download the latest version from [here](https://github.com/zqqf16/SYM/releases/l
 
 ## Usage
 
-#### Symbolicate
-
 Open or paste in a crash report, click the "Symbolicate" button.
-
-#### Import a dSYM file
-
-By default, SYM indexes all the dSYM files on your disk. However, there may be some "informal" type of dSYM files. You can import theme by "Menu"->"dSYM"->"Import dSYM".
 
 ## Example
 
