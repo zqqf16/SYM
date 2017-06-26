@@ -34,7 +34,7 @@ class DsymTableViewController: NSViewController, NSTableViewDelegate, NSTableVie
         
         self.dsymList = Array<DsymFile>(DsymManager.shared.dsymList.values)
         self.dsymList.sort { (a, b) -> Bool in
-            return (a.name > b.name)
+            return (a.name < b.name)
         }
         self.tableView.delegate = self
         self.tableView.dataSource = self

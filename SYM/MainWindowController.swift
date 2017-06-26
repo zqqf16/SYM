@@ -90,12 +90,15 @@ class MainWindowController: NSWindowController {
     }
     
     func setupDsymMenu() {
-        let dsymList = DsymManager.shared.dsymList.values
-        let unique = Set<DsymFile>(dsymList)
+        let dsymList = Set<DsymFile>(DsymManager.shared.dsymList.values)
+        let sorted = dsymList.sorted { (a, b) -> Bool in
+            return (a.name < b.name)
+        }
+        
         self.dsymMenu.submenu!.removeAllItems()
-
-        for file in unique {
-            let item = NSMenuItem(title: file.name, action: #selector(self.didSelectDsymFile), keyEquivalent: "")
+        for file in sorted {
+            let arch = file.arch ?? ""
+            let item = NSMenuItem(title: "\(file.name) (\(arch))", action: #selector(self.didSelectDsymFile), keyEquivalent: "")
             item.toolTip = file.displayPath
             item.representedObject = file
             if file.name == self.dsym?.name {

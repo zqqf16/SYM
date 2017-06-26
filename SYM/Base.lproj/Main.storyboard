@@ -421,12 +421,6 @@
                                                 <action selector="symbolicate:" target="Ady-hI-5gd" id="s2u-gg-Qbe"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Manual" id="My9-x1-9cd">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <connections>
-                                                <action selector="performZoom:" target="Ady-hI-5gd" id="gwY-VV-1Pu"/>
-                                            </connections>
-                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -811,7 +805,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="DsymUUIDCell" id="HUd-Rs-xRX">
-                                                            <rect key="frame" x="209" y="1" width="270" height="24"/>
+                                                            <rect key="frame" x="209" y="1" width="270.5" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vhp-jS-RDN">
@@ -835,7 +829,7 @@
                                                         </tableCellView>
                                                     </prototypeCellViews>
                                                 </tableColumn>
-                                                <tableColumn identifier="" editable="NO" width="385.58402792225604" minWidth="10" maxWidth="3.4028234663852886e+38" id="2dZ-Yv-VmC">
+                                                <tableColumn identifier="" editable="NO" width="430.58402792225604" minWidth="10" maxWidth="3.4028234663852886e+38" id="2dZ-Yv-VmC">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Path">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -849,11 +843,11 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="DsymPathCell" id="qwV-9t-4uD">
-                                                            <rect key="frame" x="482.5" y="1" width="385" height="24"/>
+                                                            <rect key="frame" x="482.5" y="1" width="430.5" height="24"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rzT-5B-7hj">
-                                                                    <rect key="frame" x="0.0" y="5" width="385" height="15"/>
+                                                                    <rect key="frame" x="0.0" y="5" width="430" height="15"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Table View Cell" id="nlq-GD-1KV">
                                                                         <font key="font" size="12" name="Monaco"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
