@@ -80,7 +80,7 @@ extension SubProcess {
 func symbolicate(crash: Crash, dsym: String? = nil) -> String {
     if let content = crash.toStandard() {
         return SubProcess.symbolicatecrash(crash: content) ?? content
-    } else if let image = crash.binaryImage(), let result = SubProcess.atos(image) {
+    } else if let image = crash.binaryImage(), let result = SubProcess.atos(image, dsym: dsym) {
         return crash.backfill(symbols: result)
     }
     

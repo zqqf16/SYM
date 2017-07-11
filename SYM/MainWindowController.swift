@@ -90,7 +90,7 @@ class MainWindowController: NSWindowController {
     }
     
     func setupDsymMenu() {
-        let dsymList = Set<DsymFile>(DsymManager.shared.dsymList.values)
+        let dsymList = DsymManager.shared.dsymList.values
         let sorted = dsymList.sorted { (a, b) -> Bool in
             return (a.name < b.name)
         }
@@ -149,6 +149,7 @@ extension MainWindowController {
         document.content = newContent
         self.window?.isDocumentEdited = (self.crashContent != newContent)
         self.sendNotification(.crashUpdated)
+        self.findCurrentDsym()
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
