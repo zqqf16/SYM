@@ -23,48 +23,6 @@
 import Foundation
 import Cocoa
 
-enum FileType {
-    case crash
-    case csv
-    case dsym
-    case binary
-    case archive
-    case zip
-}
-
-func typeOfFile(_ path: String) -> FileType? {
-    do {
-        let type = try NSWorkspace.shared.type(ofFile: path)
-        switch type {
-        case "com.apple.crashreport", "public.plain-text", "public.text":
-            return .crash
-        case "com.pkware.zip-archive":
-            return .zip
-        case "com.apple.xcode.archive":
-            return .archive
-        case "com.apple.xcode.dsym":
-            return .dsym
-        case "public.comma-separated-values-text":
-            return .csv
-        case "public.unix-executable", "public.data":
-            return .binary
-        default:
-            break
-        }
-    } catch _ {
-        return nil
-    }
-
-    // file type by extension
-    let ext = (path as NSString).pathExtension.lowercased()
-    switch ext {
-    case "txt", "sym", "log", "crash":
-        return .crash
-    default:
-        return nil
-    }
-}
-
 class FileFinder {
     var observer: AnyObject?
     var query = NSMetadataQuery()
@@ -92,7 +50,7 @@ class FileFinder {
 }
 
 extension FileFinder {
-    func search(uuid: String = "*", completion: @escaping ([DsymFile]?)->Void) {
+    func search(uuid: String = "*", completion: @escaping ([Dsym]?)->Void) {
         let condition = "com_apple_xcode_dsym_uuids = \(uuid)"
         self.search(condition) { (results) in
             if results == nil {
@@ -100,21 +58,55 @@ extension FileFinder {
                 return
             }
             
-            var dsymFiles: [DsymFile] = []
-            for item in results! {
-                let name = item.value(forKey: NSMetadataItemFSNameKey) as! String
-                let path = item.value(forKey: NSMetadataItemPathKey) as! String
-                
-                let dsyms = item.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
-                let uuids = item.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
-                
-                for (index, uuid) in uuids.enumerated() {
-                    let dsym = DsymFile(uuid: uuid, path: "\(path)/\(dsyms[index])", name: name, displayPath: path)
-                    dsymFiles.append(dsym)
-                }
+            let dsyms = results!.flatMap { item in
+                return self.parse(uuidSearchResult: item)
+            }
+            completion(dsyms)
+        }
+    }
+    
+    func parse(uuidSearchResult result: NSMetadataItem) -> Dsym? {
+        // `mdls xxx.xcarchive`
+        let name = result.value(forKey: NSMetadataItemFSNameKey) as! String
+        let path = result.value(forKey: NSMetadataItemPathKey) as! String
+        let type = result.value(forKey: NSMetadataItemContentTypeKey) as! String
+        
+        let dsymPaths = result.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
+        let dsymUUIDs = result.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
+        
+        if type == "com.apple.xcode.dsym" {
+            let realPath = "\(path)/\(dsymPaths[0])"
+            return Dsym(name: name, path: realPath, displayPath: path, uuids: dsymUUIDs)
+        }
+        
+        if dsymPaths.count != dsymUUIDs.count {
+            return nil
+        }
+        
+        // xcarchive
+        var pathGroup: [String: [String]] = [:]
+        for (index, path) in dsymPaths.enumerated() {
+            var uuids = pathGroup[path] ?? []
+            uuids.append(dsymUUIDs[index])
+            pathGroup[path] = uuids
+        }
+        
+        let dsyms = pathGroup.map { (tuple: (path: String, uuids: [String])) -> Dsym in
+            // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
+            var name = tuple.path
+            var displayPath = path
+            let realPath = "\(path)/\(tuple.path)"
+            let pathComponents = tuple.path.components(separatedBy: "/")
+            if pathComponents.count > 2 {
+                name = pathComponents[1]
+                displayPath += "/\(pathComponents[0])/\(pathComponents[1])"
+            } else {
+                displayPath = realPath
             }
             
-            completion(dsymFiles)
+            return Dsym(name: name, path: realPath, displayPath: displayPath, uuids: tuple.uuids)
         }
+        
+        return XCArchive(name: name, path: path, dsyms: dsyms)
     }
 }

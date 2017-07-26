@@ -24,91 +24,111 @@
 import Foundation
 import Cocoa
 
-extension Notification.Name {
-    static let dsymListUpdated = Notification.Name("sym.DsymListUpdated")
-}
 
-class DsymFile {
-    var uuid: String
-    var path: String
-    var name: String
-    var arch: String?
+class Dsym {
+    let name: String
+    let path: String
+    let uuids: [String]
+    var arches: [String]?
+    let displayPath: String
     
-    var displayPath: String
-    
-    init(uuid: String, path: String, name: String, displayPath: String) {
-        self.uuid = uuid
-        self.path = path
+    init(name: String, path: String, displayPath: String, uuids: [String]) {
         self.name = name
+        self.path = path
+        self.uuids = uuids
         self.displayPath = displayPath
     }
 }
 
-extension DsymFile: Hashable {
+class XCArchive: Dsym {
+    let dsyms: [Dsym]
+    
+    init(name: String, path: String, dsyms: [Dsym]) {
+        self.dsyms = dsyms
+        
+        var uuids: [String] = []
+        for dsym in dsyms {
+            uuids += dsym.uuids
+        }
+        super.init(name: name, path: path, displayPath: path, uuids: uuids)
+    }
+    
+    func dsym(withUUID uuid: String) -> Dsym? {
+        for dsym in self.dsyms {
+            if dsym.uuids.contains(uuid) {
+                return dsym
+            }
+        }
+        
+        return nil
+    }
+}
+
+
+extension Dsym: Hashable {
     var hashValue: Int {
         return self.path.hashValue
     }
     
-    static func == (lhs: DsymFile, rhs: DsymFile) -> Bool {
+    static func == (lhs: Dsym, rhs: Dsym) -> Bool {
         return lhs.path == rhs.path
     }
 }
+
+
+extension Notification.Name {
+    static let dsymListUpdated = Notification.Name("sym.DsymListUpdated")
+}
+
 
 class DsymManager {
     static let shared = DsymManager()
     
     private var queue = DispatchQueue(label: "dSYM serial", attributes: .concurrent)
-    private var cache: [String: DsymFile] = [:]
+    private var cache: [Dsym] = []
     private var finder = FileFinder()
     
-    var dsymList: [String: DsymFile] {
-        var result: [String: DsymFile] = [:]
+    var dsymList: [Dsym] {
+        var result: [Dsym] = []
         self.queue.sync {
             result = self.cache
         }
         return result
     }
     
-    func updateDsymList() {
+    func updateDsymList(_ completion: (([Dsym]?)->Void)?) {
         if self.finder.isRunning {
+            if let handler = completion {
+                handler(self.dsymList)
+            }
             return
         }
         
         self.finder.search { [weak self] (result) in
-            DispatchQueue.global().async {
-                self?.parseSearchResult(result)
+            self?.parse(searchResult: result)
+            if let handler = completion {
+                handler(self?.dsymList)
             }
+            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
         }
     }
     
-    func parseSearchResult(_ result: [DsymFile]?) {
-        guard let files = result else {
-            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
+    func parse(searchResult: [Dsym]?) {
+        guard let providers = searchResult else {
             return
         }
         
-        var dsyms: [String: DsymFile] = [:]
-        for f in files {
-            dsyms[f.uuid] = f
-        }
-        
-        let pathes = Set<DsymFile>(files).map { $0.path }
-        if let archResult = SubProcess.dwarfdump(pathes) {
-            for arch in archResult {
-                if let file = dsyms[arch.0] {
-                    file.arch = arch.1
-                }
-            }
-        }
-        
         self.queue.async(flags: .barrier) {
-            self.cache = dsyms
+            self.cache = providers
         }
-        
-        NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
     }
     
-    func findDsymFile(_ uuid: String) -> DsymFile? {
-        return self.dsymList[uuid]
+    func dsym(withUUID uuid: String) -> Dsym? {
+        for dsym in self.dsymList {
+            if dsym.uuids.contains(uuid) {
+                return dsym
+            }
+        }
+        return nil
     }
 }

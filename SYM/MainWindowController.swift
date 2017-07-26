@@ -31,21 +31,18 @@ class MainWindowController: NSWindowController {
     // Toolbar buttons
     @IBOutlet weak var symButton: NSButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
-    @IBOutlet weak var dsymButton: NSPopUpButton!
-    @IBOutlet weak var dsymMenu: NSMenuItem!
+    @IBOutlet weak var dsymButton: NSButton!
     
-    private var dsym: DsymFile? {
+    private var dsym: Dsym? {
         didSet {
             DispatchQueue.main.async {
-                let item = self.dsymButton.item(at: 0)!
                 if self.dsym == nil {
-                    item.title = "dSYM file not found"
-                    item.image = NSImage(named: .alert)
+                    self.dsymButton.title = "Select a dSYM file"
+                    self.dsymButton.image = NSImage(named: .alert)
                 } else {
-                    item.title = self.dsym!.name
-                    item.image = NSImage(named: .symbol)
+                    self.dsymButton.title = self.dsym!.name
+                    self.dsymButton.image = NSImage(named: .symbol)
                 }
-                self.dsymButton.selectItem(at: 0)
             }
         }
     }
@@ -57,17 +54,18 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         
-        self.setupDsymMenu()
-        DsymManager.shared.updateDsymList()
+        self.dsym = nil;
+        DsymManager.shared.updateDsymList(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
     }
     
     @objc func dsymListDidUpdate(notification: Notification) {
-        self.setupDsymMenu()
-        self.findCurrentDsym()
+        if self.dsym == nil {
+            self.findCurrentDsym()
+        }
     }
     
-    func findCurrentDsym(_ updateIfNotFound: Bool = false) {
+    func findCurrentDsym() {
         guard let content = self.crashContent,
             let crash = parseCrash(fromContent: content),
             let image = crash.binaryImage(),
@@ -76,48 +74,7 @@ class MainWindowController: NSWindowController {
                 return
         }
         
-        self.dsym = DsymManager.shared.findDsymFile(uuid)
-        if updateIfNotFound && self.dsym == nil {
-            DsymManager.shared.updateDsymList()
-        }
-        DispatchQueue.main.async {
-            if self.dsym != nil {
-                self.dsymMenu.isEnabled = false
-            } else {
-                self.dsymMenu.isEnabled = true
-            }
-        }
-    }
-    
-    func setupDsymMenu() {
-        let dsymList = DsymManager.shared.dsymList.values
-        let sorted = dsymList.sorted { (a, b) -> Bool in
-            return (a.name < b.name)
-        }
-        
-        self.dsymMenu.submenu!.removeAllItems()
-        for file in sorted {
-            let arch = file.arch ?? ""
-            let item = NSMenuItem(title: "\(file.name) (\(arch))", action: #selector(self.didSelectDsymFile), keyEquivalent: "")
-            item.toolTip = file.displayPath
-            item.representedObject = file
-            if file.name == self.dsym?.name {
-                item.state = .on
-            }
-            self.dsymMenu.submenu!.addItem(item)
-        }
-    }
-    
-    @objc func didSelectDsymFile(_ sender: AnyObject?) {
-        if let item = sender as? NSMenuItem, let file = item.representedObject as? DsymFile {
-            self.dsym = file
-            item.state = .on
-            for menuItem in self.dsymMenu.submenu!.items {
-                if menuItem != item {
-                    menuItem.state = .off
-                }
-            }
-        }
+        self.dsym = DsymManager.shared.dsym(withUUID: uuid)
     }
     
     required init?(coder: NSCoder) {
@@ -135,7 +92,7 @@ class MainWindowController: NSWindowController {
 extension MainWindowController {
     func open(crash: String) {
         self.sendNotification(.openCrashReport)
-        self.findCurrentDsym(true)
+        self.findCurrentDsym()
     }
     
     func autoSymbolicate() {
@@ -164,6 +121,19 @@ extension MainWindowController {
                 }
             }
         }
+    }
+}
+
+extension MainWindowController: DsymListViewControllerDelegate {
+    func didSelectDsym(_ dsym: Dsym) {
+        self.dsym = dsym
+    }
+    
+    @IBAction func showDsymList(_ sender: AnyObject?) {
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
+        let viewController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "DsymListViewController")) as! DsymListViewController
+        viewController.delegate = self
+        self.window?.contentViewController?.presentViewControllerAsSheet(viewController)
     }
 }
 
