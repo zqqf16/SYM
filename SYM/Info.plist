@@ -22,7 +22,7 @@
 				<string>com.apple.dt.document.xccrashpoint</string>
 			</array>
 			<key>LSTypeIsPackage</key>
-			<true/>
+			<integer>1</integer>
 			<key>NSDocumentClass</key>
 			<string>$(PRODUCT_MODULE_NAME).BundleDocument</string>
 		</dict>
@@ -40,6 +40,8 @@
 			<string>Crash</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<integer>1</integer>
 			<key>NSDocumentClass</key>
 			<string>$(PRODUCT_MODULE_NAME).CrashDocument</string>
 		</dict>
@@ -56,8 +58,10 @@
 			<array>
 				<string>com.apple.property-list</string>
 			</array>
+			<key>LSTypeIsPackage</key>
+			<integer>1</integer>
 			<key>NSDocumentClass</key>
-			<string>$(PRODUCT_MODULE_NAME).PlistDocument</string>
+			<string>$(PRODUCT_MODULE_NAME).CrashDocument</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -77,7 +81,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>29</string>
+	<string>30</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>

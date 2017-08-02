@@ -22,6 +22,11 @@
 
 import Cocoa
 
+struct CrashFileType {
+    static let crash = "Crash"
+    static let plist = "com.apple.property-list"
+}
+
 class CrashDocument: NSDocument {
     var content: String?
     
@@ -48,10 +53,32 @@ class CrashDocument: NSDocument {
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        self.content = String(data: data, encoding: String.Encoding.utf8)
+        if typeName == CrashFileType.crash {
+            try self.readCrash(from: data)
+        } else if typeName == CrashFileType.plist {
+            try self.readPlist(from: data)
+        }
         DispatchQueue.main.async {
             self.mainWindowController.open(crash: self.content ?? "")
         }
+    }
+    
+    private func readCrash(from data: Data) throws {
+        self.content = String(data: data, encoding: String.Encoding.utf8)
+    }
+    
+    private func readPlist(from data: Data) throws {
+        guard let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: AnyObject] else {
+            return
+        }
+        
+        guard let content = plist?["description"] as? String,
+            let data = content.data(using: .utf8)
+            else {
+                return
+        }
+        
+        try self.readCrash(from: data)
     }
     
     override class var autosavesInPlace: Bool {
