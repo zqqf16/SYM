@@ -126,6 +126,9 @@ class DsymManager {
     func dsym(withUUID uuid: String) -> Dsym? {
         for dsym in self.dsymList {
             if dsym.uuids.contains(uuid) {
+                if let archive = dsym as? XCArchive {
+                    return archive.dsym(withUUID:uuid)
+                }
                 return dsym
             }
         }
