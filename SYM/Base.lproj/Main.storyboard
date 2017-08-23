@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13122.19" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13122.19"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13189.4"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
@@ -17,6 +17,9 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="163" y="199" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+                        <connections>
+                            <outlet property="delegate" destination="SbN-gS-vg0" id="fQF-Ra-dyj"/>
+                        </connections>
                     </window>
                     <connections>
                         <segue destination="MhP-uL-K4P" kind="relationship" relationship="window.shadowedContentViewController" id="PRi-ce-dQq"/>
@@ -536,6 +539,9 @@
                                 <toolbarItem reference="fQX-8I-pLN"/>
                             </defaultToolbarItems>
                         </toolbar>
+                        <connections>
+                            <outlet property="delegate" destination="akE-CK-Bh4" id="Pfa-50-uNq"/>
+                        </connections>
                     </window>
                     <connections>
                         <outlet property="dsymButton" destination="Odo-Gj-xOa" id="bDZ-Za-dzm"/>
@@ -613,6 +619,9 @@
                                 <color key="value" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="delegate" destination="CQs-cB-Xak" id="M1r-aG-TA5"/>
+                        </connections>
                     </window>
                     <connections>
                         <segue destination="PAq-bZ-5Xh" kind="relationship" relationship="window.shadowedContentViewController" id="XDq-cA-R0d"/>
@@ -810,12 +819,14 @@ Gw
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Pis-RG-Nrk" secondAttribute="trailing" constant="20" symbolic="YES" id="98C-Lm-mir"/>
                             <constraint firstItem="yOy-2G-m74" firstAttribute="leading" secondItem="Tsf-1t-LzH" secondAttribute="leading" constant="20" id="Bxy-EN-Fmw"/>
                             <constraint firstAttribute="bottom" secondItem="hRz-6E-7bW" secondAttribute="bottom" constant="10" id="L8t-kb-N0B"/>
                             <constraint firstItem="Pis-RG-Nrk" firstAttribute="leading" secondItem="yOy-2G-m74" secondAttribute="leading" id="Lsm-Gp-6zu"/>
                             <constraint firstAttribute="bottom" secondItem="yOy-2G-m74" secondAttribute="bottom" constant="39" id="QGz-5O-msm"/>
                             <constraint firstAttribute="bottom" secondItem="9rZ-Mr-rMj" secondAttribute="bottom" constant="10" id="VKk-He-fQ8"/>
                             <constraint firstItem="hRz-6E-7bW" firstAttribute="trailing" secondItem="yOy-2G-m74" secondAttribute="trailing" id="cC7-KE-FCS"/>
+                            <constraint firstItem="9rZ-Mr-rMj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Tsf-1t-LzH" secondAttribute="leading" constant="20" symbolic="YES" id="gff-Ln-X6C"/>
                             <constraint firstAttribute="trailing" secondItem="yOy-2G-m74" secondAttribute="trailing" constant="20" id="jcy-hn-tfV"/>
                             <constraint firstItem="Pis-RG-Nrk" firstAttribute="top" secondItem="9rZ-Mr-rMj" secondAttribute="top" id="lnw-Ma-giv"/>
                             <constraint firstItem="hRz-6E-7bW" firstAttribute="leading" secondItem="9rZ-Mr-rMj" secondAttribute="trailing" constant="12" id="m7f-Nw-zUJ"/>
