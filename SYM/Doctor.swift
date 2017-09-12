@@ -22,46 +22,55 @@
 
 import Foundation
 
-
-/*
-protocol Doctor {
-    func fix(_ crash: CrashInfo) -> CrashInfo
-}
-
-class AddressDoctor: Doctor {
-    func fix(_ crash: CrashInfo) -> CrashInfo {
-        for (_, image) in crash.images {
-            if let loadAddress = image.loadAddress {
-                for frame in image.backtrace {
-                    self.fix(frame: frame, loadAddress: loadAddress)
-                }
-            }
-        }
-        
-        return crash
-    }
-    
-    func fix(frame: CrashInfo.Frame, loadAddress: String) {
-        guard frame.address.hexaToDecimal == loadAddress.hexaToDecimal,
-            frame.symbol != nil,
-            frame.symbol!.hasPrefix("+")
+extension Crash.Frame {
+    func fixed(withLoadAddress loadAddress: String) -> Crash.Frame {
+        guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
+            self.symbol != nil,
+            self.symbol!.hasPrefix("+")
             else {
-                return
+                return self
         }
         
-        let list = frame.symbol!.components(separatedBy: " ")
+        let list = self.symbol!.components(separatedBy: " ")
         if list.count < 2 {
-            return
+            return self
         }
         
         guard let offset = Int(list[1]) else {
-            return
+            return self
         }
-        let newAddress = String(frame.address.hexaToDecimal + offset, radix: 16)
-        frame.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
-        frame.symbol = "+ 0"
+        
+        var newFrame = self
+        let newAddress = String(self.address.hexaToDecimal + offset, radix: 16)
+        newFrame.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
+        newFrame.symbol = "+ 0"
+        
+        return newFrame
     }
 }
- 
-*/
- 
+
+extension Crash {
+    func fixed() -> Crash {
+        guard let image = self.binaryImage(),
+              let loadAddress = image.loadAddress
+        else {
+            return self
+        }
+        
+        let lines = self.content.components(separatedBy: "\n")
+        var newLines: [String] = []
+        for line in lines {
+            if var frame = Frame.parse(fromLine: line) {
+                if frame.image == image.name {
+                    frame = frame.fixed(withLoadAddress: loadAddress)
+                }
+                newLines.append(frame.description)
+            } else {
+                newLines.append(line)
+            }
+        }
+        
+        let newContent = newLines.joined(separator: "\n")
+        return Crash.parse(fromContent: newContent) ?? self
+    }
+}

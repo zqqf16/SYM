@@ -47,7 +47,7 @@ class ContentViewController: NSViewController {
     
     func loadData(_ scrollToTop: Bool = true) {
         let content = self.crashContent
-        if let crash = parseCrash(fromContent: content) {
+        if let crash = Crash.parse(fromContent: content) {
             let formatted = crash.pretty()
             self.textView.setAttributeString(attributeString: formatted)
         } else {

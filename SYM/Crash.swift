@@ -68,6 +68,15 @@ class Crash {
             let symbol = self.symbol ?? ""
             return "\(index) \(image) \(address) \(symbol)"
         }
+        
+        static func parse(fromLine line: String) -> Frame? {
+            if let group = LineRE.frame.match(line) {
+                // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
+                return Frame(index: group[0], image: group[1], address: group[2], symbol: group[3])
+            }
+            
+            return nil
+        }
     }
     
     struct Image {
@@ -116,9 +125,7 @@ class Crash {
         var newLines: [String] = []
         
         for line in lines {
-            if let group = LineRE.frame.match(line) {
-                // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
-                var frame = Frame(index: group[0], image: group[1], address: group[2], symbol: group[3])
+            if var frame = Frame.parse(fromLine: line) {
                 if let symbol = symbols[frame.address] {
                     frame.symbol = symbol
                     newLines.append(frame.description)
@@ -212,12 +219,14 @@ class Umeng: Crash {
 }
 
 // MARK: - Crash Detection
-func parseCrash(fromContent content: String) -> Crash? {
-    if content.contains("dSYM UUID") && content.contains("Slide Address") {
-        return Umeng(content: content)
-    } else if content.contains("Incident Identifier") {
-        return Crash(content: content)
+extension Crash {
+    static func parse(fromContent content: String) -> Crash? {
+        if content.contains("dSYM UUID") && content.contains("Slide Address") {
+            return Umeng(content: content)
+        } else if content.contains("Incident Identifier") {
+            return Crash(content: content)
+        }
+        
+        return nil
     }
-    
-    return nil
 }

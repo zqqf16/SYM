@@ -67,7 +67,7 @@ class MainWindowController: NSWindowController {
     
     func findCurrentDsym() {
         guard let content = self.crashContent,
-            let crash = parseCrash(fromContent: content),
+            let crash = Crash.parse(fromContent: content),
             let image = crash.binaryImage(),
             let uuid = image.uuid
             else {
@@ -110,7 +110,7 @@ extension MainWindowController {
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
-        if let content = self.crashContent, let crash = parseCrash(fromContent: content) {
+        if let content = self.crashContent, let crash = Crash.parse(fromContent: content) {
             self.indicator.startAnimation(nil)
             DispatchQueue.global().async {
                 let new = SYM.symbolicate(crash: crash, dsym: self.dsym?.path)
