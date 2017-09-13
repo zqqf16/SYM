@@ -58,7 +58,7 @@ class ParserTests: XCTestCase {
 
     func testAppleParser() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = parseCrash(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)!
         
         XCTAssertEqual(crash.appName, "demo")
         XCTAssertNotNil(crash.toStandard())
@@ -73,7 +73,7 @@ class ParserTests: XCTestCase {
     
     func testUmengParser() {
         let content = self.crashContent(fromFile: "UmengDemo", ofType: "crash")
-        let crash = parseCrash(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)!
         
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNil(crash.toStandard())
@@ -89,13 +89,13 @@ class ParserTests: XCTestCase {
     func testParseringPerformance() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
         self.measure {
-            let _ = parseCrash(fromContent: content)
+            let _ = Crash.parse(fromContent: content)
         }
     }
     
     func testPrettyPerformance() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = parseCrash(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)!
         self.measure {
             let _ = crash.pretty()
         }
