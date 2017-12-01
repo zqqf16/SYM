@@ -23,19 +23,22 @@
 import Foundation
 
 struct SubProcess {
-    static func execute(cmd: String, args: [String]?) -> String? {
+    static func execute(cmd: String, args: [String]?) -> (String?, String?) {
         let pipe = Pipe()
+        let errPipe = Pipe()
         
         let task = Process()
         task.launchPath = cmd
         task.arguments = args
         task.standardOutput = pipe
-        
+        task.standardError = errPipe
         task.launch()
         
         let output = pipe.fileHandleForReading
         let data = output.readDataToEndOfFile()
-        return String(data: data, encoding: String.Encoding.utf8)
+        let error = errPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        return (String(data: data, encoding: String.Encoding.utf8), String(data: error, encoding: String.Encoding.utf8))
     }
 }
 
@@ -45,7 +48,7 @@ extension SubProcess {
         let args = ["--uuid"] + paths
         let re = try! RE("UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ", optoins: [.anchorsMatchLines, .caseInsensitive])
         
-        if let output = self.execute(cmd: cmd, args: args), let uuids = re.findAll(output) {
+        if let output = self.execute(cmd: cmd, args: args).0, let uuids = re.findAll(output) {
             return uuids.map { ($0[0], $0[1]) }
         }
         

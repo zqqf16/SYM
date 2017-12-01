@@ -30,7 +30,7 @@ extension SubProcess {
                      arch: String = "arm64") -> [String]? {
         let cmd = "/usr/bin/atos"
         let args = ["-arch", arch, "-o", dsym, "-l", loadAddress] + addressess
-        if let result = execute(cmd: cmd, args: args) {
+        if let result = execute(cmd: cmd, args: args).0 {
             return result.components(separatedBy: "\n").filter {
                 (content) -> Bool in
                 return content.count > 0
@@ -72,7 +72,8 @@ extension SubProcess {
         assert(cmd != nil)
         
         let args = [path]
-        return execute(cmd: cmd!, args: args)
+        let output = execute(cmd: cmd!, args: args)
+        return output.0 ?? output.1
     }
 }
 
