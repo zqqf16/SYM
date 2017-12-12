@@ -33,6 +33,7 @@
 				<string>ips</string>
 				<string>sym</string>
 				<string>log</string>
+				<string>beta</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>file</string>
