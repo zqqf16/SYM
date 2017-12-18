@@ -40,6 +40,9 @@ struct LineRE {
     // Binary Image: demo
     static let binaryImage = try! RE("Binary Image:\\s*([^\\s]+)")
     
+    // Hardware Model:      iPhone5,2
+    static let hardware = try! RE("Hardware Model:\\s*([^\\s]+)")
+    
     // Frame with specified binary
     static func frame(_ binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> RE? {
         return try? RE("^\\s*(\\d{1,3})\\s+(\(binary))\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", optoins: options)
@@ -89,6 +92,13 @@ class Crash {
     
     var content: String
     var appName: String?
+    
+    var device: String? {
+        if let group = LineRE.hardware.findFirst(self.content) {
+            return group[0]
+        }
+        return nil
+    }
     
     init(content: String) {
         self.content = content

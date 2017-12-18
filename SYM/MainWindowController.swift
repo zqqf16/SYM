@@ -32,6 +32,7 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var symButton: NSButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
     @IBOutlet weak var dsymButton: NSButton!
+    @IBOutlet weak var deviceLabel: NSTextField!
     
     private var dsym: Dsym? {
         didSet {
@@ -70,11 +71,25 @@ class MainWindowController: NSWindowController {
             let crash = Crash.parse(fromContent: content),
             let image = crash.binaryImage(),
             let uuid = image.uuid
-            else {
+        else {
                 return
         }
         
         self.dsym = DsymManager.shared.dsym(withUUID: uuid)
+    }
+    
+    func parseDevice() {
+        guard let content = self.crashContent,
+              let crash = Crash.parse(fromContent: content),
+              let device = crash.device
+        else {
+            self.deviceLabel.stringValue = ""
+            self.deviceLabel.isHidden = true
+            return
+        }
+        
+        self.deviceLabel.stringValue = modelToName(device)
+        self.deviceLabel.isHidden = false
     }
     
     required init?(coder: NSCoder) {
@@ -93,6 +108,7 @@ extension MainWindowController {
     func open(crash: String) {
         self.sendNotification(.openCrashReport)
         self.findCurrentDsym()
+        self.parseDevice()
     }
     
     func autoSymbolicate() {
@@ -107,6 +123,7 @@ extension MainWindowController {
         self.window?.isDocumentEdited = (self.crashContent != newContent)
         self.sendNotification(.crashUpdated)
         self.findCurrentDsym()
+        self.parseDevice()
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {

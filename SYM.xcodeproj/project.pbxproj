@@ -16,6 +16,7 @@
 		51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */ = {isa = PBXBuildFile; fileRef = 51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */; };
 		51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */; };
 		51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A4A11EEFF78500F21AE4 /* Doctor.swift */; };
+		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
@@ -58,6 +59,7 @@
 		51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UmengDemo.crash; sourceTree = "<group>"; };
 		51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		51C9A4A11EEFF78500F21AE4 /* Doctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doctor.swift; sourceTree = "<group>"; };
+		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A31D3FBB7200F3B00C /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 				F45321091D30CCBF00639917 /* SubProcess.swift */,
 				F422C7C21D36A66800066837 /* FileFinder.swift */,
 				F4A679751E213CDD009F93E7 /* Notifications.swift */,
+				51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				F49A8B651D3B28DF00B951AD /* DsymListViewController.swift in Sources */,
 				F422C7C51D36A6A000066837 /* Dsym.swift in Sources */,
 				F4184EE31D32396100E08040 /* CrashOutput.swift in Sources */,
+				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,

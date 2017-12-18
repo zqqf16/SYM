@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13189.4" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13189.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
@@ -531,12 +531,27 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="19F90AF4-8362-47D7-827A-719EA764FE78" label="Device" paletteLabel="Device" id="7hE-g6-gXk">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="60" height="17"/>
+                                    <size key="maxSize" width="144" height="17"/>
+                                    <textField key="view" hidden="YES" horizontalHuggingPriority="251" verticalHuggingPriority="750" id="HhJ-Bi-xUl">
+                                        <rect key="frame" x="0.0" y="14" width="135" height="17"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="right" title="iPad Pro 12.9 cellular" id="D7p-vH-LZl">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="Elg-kw-8wH"/>
                                 <toolbarItem reference="Taf-n1-7Rr"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
+                                <toolbarItem reference="7hE-g6-gXk"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -544,6 +559,7 @@
                         </connections>
                     </window>
                     <connections>
+                        <outlet property="deviceLabel" destination="HhJ-Bi-xUl" id="P89-0x-pLY"/>
                         <outlet property="dsymButton" destination="Odo-Gj-xOa" id="bDZ-Za-dzm"/>
                         <outlet property="indicator" destination="DVd-5H-ljI" id="hyH-GG-1qt"/>
                         <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
