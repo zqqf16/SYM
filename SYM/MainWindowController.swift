@@ -72,7 +72,7 @@ class MainWindowController: NSWindowController {
             let image = crash.binaryImage(),
             let uuid = image.uuid
         else {
-                return
+            return
         }
         
         self.dsym = DsymManager.shared.dsym(withUUID: uuid)
@@ -150,6 +150,14 @@ extension MainWindowController: DsymListViewControllerDelegate {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
         let viewController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "DsymListViewController")) as! DsymListViewController
         viewController.delegate = self
+        
+        if let content = self.crashContent,
+            let crash = Crash.parse(fromContent: content),
+            let image = crash.binaryImage(),
+            let uuid = image.uuid {
+            viewController.uuid = uuid
+        }
+        
         self.window?.contentViewController?.presentViewControllerAsSheet(viewController)
     }
 }

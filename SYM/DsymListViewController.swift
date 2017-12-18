@@ -28,9 +28,10 @@ protocol DsymListViewControllerDelegate: class {
 
 class DsymListViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
-    weak var delegate: DsymListViewControllerDelegate?
-    
     private var dsymList: [Dsym] = []
+
+    weak var delegate: DsymListViewControllerDelegate?
+    var uuid: String?
     
     func loadData() {
         self.dsymList = DsymManager.shared.dsymList
@@ -46,6 +47,20 @@ class DsymListViewController: NSViewController {
         
         self.outlineView.delegate = self
         self.outlineView.dataSource = self
+        self.selectCurrentDsym()
+    }
+    
+    private func selectCurrentDsym() {
+        guard let uuid = self.uuid,
+              let dsym = DsymManager.shared.dsym(withUUID: uuid)
+        else {
+            return
+        }
+        
+        let row = self.outlineView.row(forItem: dsym)
+        if row > -1 {
+            self.outlineView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: true)
+        }
     }
     
     private func setupMenu() {
@@ -94,6 +109,7 @@ class DsymListViewController: NSViewController {
             DispatchQueue.main.async {
                 self.loadData()
                 self.outlineView.reloadData()
+                self.selectCurrentDsym()
             }
         }
     }
