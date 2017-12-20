@@ -45,6 +45,7 @@ class CrashDocument: NSDocument {
     }
 
     override func data(ofType typeName: String) throws -> Data {
+        self.content = self.mainWindowController.currentCrashContent
         guard let content = self.content else {
             throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
         }

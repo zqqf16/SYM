@@ -71,6 +71,10 @@ class MainWindowController: NSWindowController {
         return nil
     }
     
+    var currentCrashContent: String {
+        return self.crashContentViewController.currentCrashContent
+    }
+    
     var crashDocument: CrashDocument? {
         return self.document as? CrashDocument
     }
