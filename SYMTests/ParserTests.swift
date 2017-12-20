@@ -58,11 +58,14 @@ class ParserTests: XCTestCase {
 
     func testAppleParser() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = Crash.parse(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)
         
         XCTAssertEqual(crash.appName, "demo")
         XCTAssertNotNil(crash.toStandard())
         
+        XCTAssertEqual(crash.device, "iPhone9,2")
+        XCTAssertEqual(crash.uuid, "42fd89f730be3ac5a40a4c1a99438dfb".uuidFormat())
+
         let image = crash.binaryImage()!
         XCTAssertEqual(image.arch, "arm64")
         XCTAssertEqual(image.name, "demo")
@@ -73,11 +76,14 @@ class ParserTests: XCTestCase {
     
     func testUmengParser() {
         let content = self.crashContent(fromFile: "UmengDemo", ofType: "crash")
-        let crash = Crash.parse(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)
         
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNil(crash.toStandard())
-        
+        XCTAssertNil(crash.device)
+
+        XCTAssertEqual(crash.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
+
         let image = crash.binaryImage()!
         XCTAssertEqual(image.arch, "arm64")
         XCTAssertEqual(image.name, "DemoApp")
@@ -95,7 +101,7 @@ class ParserTests: XCTestCase {
     
     func testPrettyPerformance() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = Crash.parse(fromContent: content)!
+        let crash = Crash.parse(fromContent: content)
         self.measure {
             let _ = crash.pretty()
         }

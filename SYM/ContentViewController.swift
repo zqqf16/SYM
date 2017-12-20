@@ -22,40 +22,31 @@
 
 import Cocoa
 
+extension NSViewController {
+    func windowController() -> MainWindowController? {
+        return self.view.window?.windowController as? MainWindowController
+    }
+}
+
 class ContentViewController: NSViewController {
     @IBOutlet var textView: NSTextView!
     
+    var crash: Crash?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupTextView()
-        
-        let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .openCrashReport, object: nil)
-        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .crashSymbolicated, object: nil)
-        nc.addObserver(self, selector: #selector(handleOpenCrash), name: .crashUpdated, object: nil)
     }
     
-    @objc func handleOpenCrash(notification: Notification) {
-        if let wc = notification.object as? MainWindowController, wc == self.windowController() {
-            self.loadData(notification.name != .crashUpdated)
-        }
+    func open(crash: Crash) {
+        self.crash = crash
+        let formatted = crash.pretty()
+        self.textView.setAttributeString(attributeString: formatted)
+        self.textView.scrollToBeginningOfDocument(nil)
     }
     
-    var crashContent: String {
-        return self.windowController()?.crashContent ?? ""
-    }
-    
-    func loadData(_ scrollToTop: Bool = true) {
-        let content = self.crashContent
-        if let crash = Crash.parse(fromContent: content) {
-            let formatted = crash.pretty()
-            self.textView.setAttributeString(attributeString: formatted)
-        } else {
-            self.textView.string = content
-        }
-        if scrollToTop {
-            self.textView.scrollToBeginningOfDocument(nil)
-        }
+    var currentCrashContent: String {
+        return self.textView.string
     }
     
     private func setupTextView() {
@@ -63,14 +54,6 @@ class ContentViewController: NSViewController {
         self.textView.textContainerInset = CGSize(width: 10, height: 10)
         self.textView.allowsUndo = true
         self.textView.delegate = self
-    }
-    
-    override func viewWillAppear() {
-        super.viewWillAppear()
-        
-        if self.textView.string.strip().count == 0 {
-            self.loadData()
-        }
     }
 }
 
@@ -84,13 +67,15 @@ extension ContentViewController: CrashTextViewDelegate {
         return menu
     }
     
-    func didChangeCrashContent() {
+    func didPasteCrashContent() {
+        /*
         let newContent = textView.string
         if newContent.count > 0 {
             DispatchQueue.main.async {
-                self.windowController()?.updateCrash(newContent)
+                //self.document()?.updateCrash(withContent: newContent)
             }
         }
+        */
     }
     
     @objc func symbolicate(_ sender: AnyObject?) {

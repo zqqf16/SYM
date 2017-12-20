@@ -23,14 +23,15 @@
 import Cocoa
 
 protocol CrashTextViewDelegate: NSTextViewDelegate {
-    func didChangeCrashContent()
+    func didPasteCrashContent()
 }
 
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
-        self.textStorage?.beginEditing()
+        //self.undoManager?.removeAllActions()
+        //self.textStorage?.beginEditing()
         self.textStorage?.setAttributedString(attributeString)
-        self.textStorage?.endEditing()
+        //self.textStorage?.endEditing()
     }
 }
 
@@ -50,12 +51,13 @@ class TextView: NSTextView {
         }
         return super.performDragOperation(sender)
     }
-    
-    override func didChangeText() {
-        super.didChangeText()
+    /*
+    override func paste(_ sender: Any?) {
+        super.paste(sender)
         
         if let delegate = self.delegate as? CrashTextViewDelegate {
-            delegate.didChangeCrashContent()
+            //delegate.didPasteCrashContent()
         }
     }
+    */
 }

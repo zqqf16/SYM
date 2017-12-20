@@ -40,6 +40,15 @@ struct LineRE {
     // Binary Image: demo
     static let binaryImage = try! RE("Binary Image:\\s*([^\\s]+)")
     
+    // dSYM UUID: 45AF800D-B56A-39D8-AB1C-AD0F3208EC50
+    static let dsymUUID = try! RE("dSYM UUID:\\s*([^\\s]+)")
+    
+    // Slide Address: 0x0000000100000000
+    static let slideAddress = try! RE("Slide Address:\\s*([^\\s]+)")
+    
+    // CPU Type: arm64
+    static let cpuType = try! RE("CPU Type:\\s*([^\\s]+)")
+    
     // Hardware Model:      iPhone5,2
     static let hardware = try! RE("Hardware Model:\\s*([^\\s]+)")
     
@@ -91,7 +100,10 @@ class Crash {
     }
     
     var content: String
-    var appName: String?
+    
+    var appName: String? {
+        return LineRE.process.findFirst(self.content)?[0]
+    }
     
     var device: String? {
         if let group = LineRE.hardware.findFirst(self.content) {
@@ -100,9 +112,34 @@ class Crash {
         return nil
     }
     
+    var uuid: String? {
+        if let match = self.imageInfo {
+            return match[3].uuidFormat()
+        }
+        return nil
+    }
+    
+    var keyFrames: [Frame]? {
+        guard let appName = self.appName,
+            let keyFrameRe = LineRE.frame(appName),
+            let frames = keyFrameRe.findAll(self.content) else {
+                return nil
+        }
+        
+        return frames.flatMap { Frame(index: $0[0], image: $0[1], address: $0[2], symbol: $0[3]) }
+    }
+    
+    private var imageInfo: [String]? {
+        guard let appName = self.appName,
+            let imageRE = LineRE.image(appName, options:[]),
+            let imageMatch = imageRE.findFirst(self.content) else {
+                return nil
+        }
+        return imageMatch
+    }
+    
     init(content: String) {
         self.content = content
-        self.appName = LineRE.process.findFirst(self.content)?[0]
     }
     
     func toStandard() -> String? {
@@ -110,24 +147,15 @@ class Crash {
     }
     
     func binaryImage() -> Image? {
-        guard let appName = LineRE.process.findFirst(self.content)?[0],
-            let keyFrameRe = LineRE.frame(appName),
-            let imageRE = LineRE.image(appName, options: []),
-            let imageMatch = imageRE.findFirst(self.content)
-            else {
-                return nil
+        guard let imageMatch = self.imageInfo else {
+            return nil
         }
         
-        var image = Image(name: imageMatch[1],
-                          uuid: imageMatch[3].uuidFormat(),
-                          arch: imageMatch[2],
-                          loadAddress: imageMatch[0],
-                          frames: nil)
-        if let frames = keyFrameRe.findAll(self.content) {
-            image.frames = frames.flatMap { Frame(index: $0[0], image: $0[1], address: $0[2], symbol: $0[3]) }
-        }
-        
-        return image
+        return Image(name: imageMatch[1],
+                     uuid: imageMatch[3].uuidFormat(),
+                     arch: imageMatch[2],
+                     loadAddress: imageMatch[0],
+                     frames: self.keyFrames)
     }
     
     func backfill(symbols: [String: String]) -> String {
@@ -160,83 +188,49 @@ class Umeng: Crash {
         case other
     }
     
+    override var appName: String? {
+        return LineRE.binaryImage.findFirst(self.content)?[0]
+    }
+    
+    override var uuid: String? {
+        return LineRE.dsymUUID.findFirst(self.content)?[0]
+    }
+    
+    var slideAddress: String? {
+        return LineRE.slideAddress.findFirst(self.content)?[0]
+    }
+    
+    var arch: String? {
+        return LineRE.cpuType.findFirst(self.content)?[0]
+    }
+    
     override init(content: String) {
         super.init(content: content)
-        self.appName = LineRE.binaryImage.findFirst(self.content)?[0]
     }
     
     override func toStandard() -> String? {
         return nil
     }
     
-    func parse(line: String) -> LineType {
-        let k2v: [String: ((String)->LineType)] = [
-            "CPU Type": { .arch($0) },
-            "Binary Image": { .appName($0) },
-            "Slide Address": { .loadAddress($0) },
-            "dSYM UUID": { .uuid($0) },
-            ]
-        
-        if let (k, v) = line.separate(by: ":") {
-            if let wrapper = k2v[k] {
-                return wrapper(v)
-            }
-        }
-        
-        if let group = LineRE.frame.match(line) {
-            // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
-            return .frame(Frame(index: group[0], image: group[1], address: group[2], symbol: group[3]))
-        }
-        
-        return .other
-    }
-    
     override func binaryImage() -> Image? {
-        var arch: String?
-        var appName: String?
-        var loadAddress: String?
-        var uuid: String?
-        var frames: [Frame] = []
-        
-        let lines = content.components(separatedBy: "\n")
-        for line in lines {
-            let t = self.parse(line: line)
-            switch t {
-            case .appName(let name):
-                appName = name
-            case .arch(let value):
-                arch = value
-            case .frame(let frame):
-                frames.append(frame)
-            case .loadAddress(let value):
-                loadAddress = value
-            case .uuid(let value):
-                uuid = value
-            default:
-                break
-            }
-        }
-        
-        if appName == nil {
+        guard let appName = self.appName else {
             return nil
         }
         
-        var image = Image(name: appName!, uuid: uuid, arch: arch, loadAddress: loadAddress, frames: nil)
-        image.frames = frames.filter { $0.image == appName }
-        
-        return image
+        return Image(name: appName,
+                     uuid: self.uuid,
+                     arch: self.arch,
+                     loadAddress: self.slideAddress,
+                     frames: self.keyFrames)
     }
 }
 
 // MARK: - Crash Detection
 extension Crash {
-    static func parse(fromContent content: String) -> Crash? {
+    static func parse(fromContent content: String) -> Crash {
         if content.contains("dSYM UUID") && content.contains("Slide Address") {
             return Umeng(content: content)
-        } else if content.contains("Incident Identifier") {
-            return Crash(content: content)
         }
-        
-        return nil
+        return Crash(content: content)
     }
 }

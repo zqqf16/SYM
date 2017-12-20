@@ -30,14 +30,14 @@ struct CrashFileType {
 class CrashDocument: NSDocument {
     var content: String?
     
+    var mainWindowController: MainWindowController {
+        return self.windowControllers[0] as! MainWindowController
+    }
+    
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
         let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Main Window Controller")) as! NSWindowController
         self.addWindowController(windowController)
-    }
-    
-    var mainWindowController: MainWindowController {
-        return self.windowControllers[0] as! MainWindowController
     }
     
     override func windowControllerDidLoadNib(_ aController: NSWindowController) {
@@ -58,13 +58,14 @@ class CrashDocument: NSDocument {
         } else if typeName == CrashFileType.plist {
             try self.readPlist(from: data)
         }
+
         DispatchQueue.main.async {
-            self.mainWindowController.open(crash: self.content ?? "")
+            self.mainWindowController.didOpenCrash()
         }
     }
     
     private func readCrash(from data: Data) throws {
-        self.content = String(data: data, encoding: String.Encoding.utf8)
+        self.content = String(data: data, encoding: .utf8)
     }
     
     private func readPlist(from data: Data) throws {

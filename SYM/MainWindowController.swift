@@ -22,9 +22,9 @@
 
 import Cocoa
 
-extension NSImage.Name {
-    static let alert = NSImage.Name(rawValue: "alert")
-    static let symbol = NSImage.Name(rawValue: "symbol")
+extension NSImage {
+    static let alert: NSImage = #imageLiteral(resourceName: "alert")
+    static let symbol: NSImage = #imageLiteral(resourceName: "symbol")
 }
 
 class MainWindowController: NSWindowController {
@@ -39,17 +39,40 @@ class MainWindowController: NSWindowController {
             DispatchQueue.main.async {
                 if self.dsym == nil {
                     self.dsymButton.title = "Select a dSYM file"
-                    self.dsymButton.image = NSImage(named: .alert)
+                    self.dsymButton.image = .alert
                 } else {
                     self.dsymButton.title = self.dsym!.name
-                    self.dsymButton.image = NSImage(named: .symbol)
+                    self.dsymButton.image = .symbol
                 }
             }
         }
     }
     
-    var crashContent: String? {
-        return (self.document as? CrashDocument)?.content
+    private var device: String? {
+        didSet {
+            DispatchQueue.main.async {
+                if let device = self.device {
+                    self.deviceLabel.stringValue = modelToName(device)
+                    self.deviceLabel.isHidden = false
+                } else {
+                    self.deviceLabel.stringValue = ""
+                    self.deviceLabel.isHidden = true
+                }
+            }
+        }
+    }
+    
+    var crash: Crash?
+    
+    var crashContentViewController: ContentViewController! {
+        if let vc = self.contentViewController as? ContentViewController {
+            return vc
+        }
+        return nil
+    }
+    
+    var crashDocument: CrashDocument? {
+        return self.document as? CrashDocument
     }
     
     override func windowDidLoad() {
@@ -58,38 +81,6 @@ class MainWindowController: NSWindowController {
         self.dsym = nil;
         DsymManager.shared.updateDsymList(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
-    }
-    
-    @objc func dsymListDidUpdate(notification: Notification) {
-        if self.dsym == nil {
-            self.findCurrentDsym()
-        }
-    }
-    
-    func findCurrentDsym() {
-        guard let content = self.crashContent,
-            let crash = Crash.parse(fromContent: content),
-            let image = crash.binaryImage(),
-            let uuid = image.uuid
-        else {
-            return
-        }
-        
-        self.dsym = DsymManager.shared.dsym(withUUID: uuid)
-    }
-    
-    func parseDevice() {
-        guard let content = self.crashContent,
-              let crash = Crash.parse(fromContent: content),
-              let device = crash.device
-        else {
-            self.deviceLabel.stringValue = ""
-            self.deviceLabel.isHidden = true
-            return
-        }
-        
-        self.deviceLabel.stringValue = modelToName(device)
-        self.deviceLabel.isHidden = false
     }
     
     required init?(coder: NSCoder) {
@@ -105,43 +96,65 @@ class MainWindowController: NSWindowController {
 
 // MARK: - Crash operation
 extension MainWindowController {
-    func open(crash: String) {
-        self.sendNotification(.openCrashReport)
+    func didOpenCrash() {
+        guard let crashContent = self.crashDocument?.content else {
+            return
+        }
+        
+        self.crash = Crash.parse(fromContent: crashContent)
+        self.crashContentViewController.open(crash: self.crash!)
+        
+        self.device = self.crash!.device
         self.findCurrentDsym()
-        self.parseDevice()
     }
     
+    func didUpdateCrash(withContent content: String) {
+        self.crashDocument!.content = content
+        self.didOpenCrash()
+    }
+}
+
+// MARK: - Symbolicate
+extension MainWindowController {
     func autoSymbolicate() {
         if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
             self.symbolicate(nil)
         }
     }
     
-    func updateCrash(_ newContent: String) {
-        let document = self.document as! CrashDocument
-        document.content = newContent
-        self.window?.isDocumentEdited = (self.crashContent != newContent)
-        self.sendNotification(.crashUpdated)
-        self.findCurrentDsym()
-        self.parseDevice()
-    }
-    
     @IBAction func symbolicate(_ sender: AnyObject?) {
-        if let content = self.crashContent, let crash = Crash.parse(fromContent: content) {
-            self.indicator.startAnimation(nil)
-            DispatchQueue.global().async {
-                let new = SYM.symbolicate(crash: crash, dsym: self.dsym?.path)
-                DispatchQueue.main.async { [weak self] in
-                    self?.indicator.stopAnimation(nil)
-                    self?.updateCrash(new)
-                    self?.sendNotification(.crashSymbolicated)
-                }
+        let content = self.crashContentViewController.currentCrashContent
+        if content.strip().isEmpty {
+            return
+        }
+        
+        let crash = Crash.parse(fromContent: content)
+        
+        self.indicator.startAnimation(nil)
+        DispatchQueue.global().async {
+            let newContent = SYM.symbolicate(crash: crash, dsym: self.dsym?.path)
+            DispatchQueue.main.async { [weak self] in
+                self?.indicator.stopAnimation(nil)
+                self?.didUpdateCrash(withContent: newContent)
             }
         }
     }
 }
 
+// MARK: - dSYM
 extension MainWindowController: DsymListViewControllerDelegate {
+    @objc func dsymListDidUpdate(notification: Notification) {
+        if self.dsym == nil {
+            self.findCurrentDsym()
+        }
+    }
+    
+    func findCurrentDsym() {
+        if let uuid = self.crash?.uuid {
+            self.dsym = DsymManager.shared.dsym(withUUID: uuid)
+        }
+    }
+
     func didSelectDsym(_ dsym: Dsym) {
         self.dsym = dsym
     }
@@ -151,31 +164,10 @@ extension MainWindowController: DsymListViewControllerDelegate {
         let viewController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "DsymListViewController")) as! DsymListViewController
         viewController.delegate = self
         
-        if let content = self.crashContent,
-            let crash = Crash.parse(fromContent: content),
-            let image = crash.binaryImage(),
-            let uuid = image.uuid {
+        if let uuid = self.crash?.uuid {
             viewController.uuid = uuid
         }
         
         self.window?.contentViewController?.presentViewControllerAsSheet(viewController)
-    }
-}
-
-// MARK: - NSViewController extensions
-extension NSViewController {
-    func document() -> CrashDocument? {
-        if let windowController = self.view.window?.windowController {
-            return windowController.document as? CrashDocument
-        }
-        return nil
-    }
-    
-    func window() -> BaseWindow? {
-        return self.view.window as? BaseWindow
-    }
-    
-    func windowController() -> MainWindowController? {
-        return self.view.window?.windowController as? MainWindowController
     }
 }

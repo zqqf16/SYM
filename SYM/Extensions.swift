@@ -25,19 +25,20 @@ import Cocoa
 
 // MARK: - String
 extension String {
-    var drop0xPrefix:          String { return hasPrefix("0x") ? String(characters.dropFirst(2)) : self }
-    var drop0bPrefix:          String { return hasPrefix("0b") ? String(characters.dropFirst(2)) : self }
-    var hexaToDecimal:            Int { return Int(drop0xPrefix, radix: 16) ?? 0 }
-    var hexaToBinaryString:    String { return String(hexaToDecimal, radix: 2) }
-    var decimalToHexaString:   String { return String(Int(self) ?? 0, radix: 16) }
-    var decimalToBinaryString: String { return String(Int(self) ?? 0, radix: 2) }
-    var binaryToDecimal:          Int { return Int(drop0bPrefix, radix: 2) ?? 0 }
-    var binaryToHexaString:    String { return String(binaryToDecimal, radix: 16) }
-
+    var hexaToDecimal: Int {
+        var hex = self
+        if hex.hasPrefix("0x") {
+            let startIndex = self.index(self.startIndex, offsetBy: 2)
+            hex = String(self[startIndex...])
+        }
+        
+        return Int(hex, radix:16) ?? 0
+    }
+    
     subscript (r: Range<Int>) -> String {
         get {
-            let startIndex = self.characters.index(self.startIndex, offsetBy: r.lowerBound)
-            let endIndex = self.characters.index(self.startIndex, offsetBy: r.upperBound)
+            let startIndex = self.index(self.startIndex, offsetBy: r.lowerBound)
+            let endIndex = self.index(self.startIndex, offsetBy: r.upperBound)
             
             return String(self[startIndex..<endIndex])
         }
@@ -71,7 +72,7 @@ extension String {
     }
 
     func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = self.characters.count
+        let newLength = self.count
         if newLength < toLength {
             return String(repeatElement(character, count: toLength - newLength)) + self
         } else {
@@ -86,7 +87,8 @@ extension String {
 
     func uuidFormat() -> String {
         var uuid = ""
-        for (index, char) in self.characters.enumerated() {
+        
+        for (index, char) in self.enumerated() {
             if [8, 12, 16, 20].contains(index) {
                 uuid.append("-" as Character)
             }
@@ -104,7 +106,7 @@ extension String {
         
         let name = list[0].strip()
         let value = list[1].strip()
-        if value.characters.count == 0 {
+        if value.count == 0 {
             return nil
         }
         
@@ -118,7 +120,7 @@ extension String {
         }
         
         let value = list[1].strip()
-        if value.characters.count == 0 {
+        if value.count == 0 {
             return nil
         }
         

@@ -71,6 +71,6 @@ extension Crash {
         }
         
         let newContent = newLines.joined(separator: "\n")
-        return Crash.parse(fromContent: newContent) ?? self
+        return Crash.parse(fromContent: newContent)
     }
 }
