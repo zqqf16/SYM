@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
         //DsymManager.sharedInstance.findAllDsyms()
+    }
+    
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        let _ = DocumentController()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

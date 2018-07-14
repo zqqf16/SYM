@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,46 +27,49 @@ struct CrashFileType {
     static let plist = "com.apple.property-list"
 }
 
+extension Notification.Name {
+    static let crashInfoUpdated = Notification.Name("sym.crashInfoUpdated")
+    static let crashSymbolicated = Notification.Name("sym.crashSymbolicated")
+    static let crashDidOpen = Notification.Name("sym.crashDidOpen")
+}
+
 class CrashDocument: NSDocument {
-    var content: String?
+    let notificationCenter = NotificationCenter()
     
-    var mainWindowController: MainWindowController {
-        return self.windowControllers[0] as! MainWindowController
+    let textStorage =  NSTextStorage()
+    var crashInfo: CrashInfo? {
+        didSet {
+            self.notificationCenter.post(name: .crashInfoUpdated, object: crashInfo)
+        }
+    }
+    
+    override init() {
+        super.init()
+        self.textStorage.delegate = self
     }
     
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let windowController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "Main Window Controller")) as! NSWindowController
+        let windowController = storyboard.instantiateController(withIdentifier: "Main Window Controller") as! NSWindowController
         self.addWindowController(windowController)
-    }
-    
-    override func windowControllerDidLoadNib(_ aController: NSWindowController) {
-        super.windowControllerDidLoadNib(aController)
     }
 
     override func data(ofType typeName: String) throws -> Data {
-        self.content = self.mainWindowController.currentCrashContent
-        guard let content = self.content else {
-            throw NSError(domain: NSOSStatusErrorDomain, code: unimpErr, userInfo: nil)
-        }
-
-        return content.data(using: String.Encoding.utf8)!
+        return self.textStorage.string.data(using: String.Encoding.utf8)!
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
-        if typeName == CrashFileType.crash {
-            try self.readCrash(from: data)
-        } else if typeName == CrashFileType.plist {
+        if typeName == CrashFileType.plist {
             try self.readPlist(from: data)
-        }
-
-        DispatchQueue.main.async {
-            self.mainWindowController.didOpenCrash()
+        } else {
+            try self.readCrash(from: data)
         }
     }
     
     private func readCrash(from data: Data) throws {
-        self.content = String(data: data, encoding: .utf8)
+        let content = String(data: data, encoding: .utf8) ?? ""
+        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+        self.notificationCenter.post(name: .crashDidOpen, object: nil)
     }
     
     private func readPlist(from data: Data) throws {
@@ -89,5 +92,32 @@ class CrashDocument: NSDocument {
     
     override class var autosavesDrafts: Bool {
         return false
+    }
+}
+
+extension CrashDocument: NSTextStorageDelegate {
+    func parseCrashInfo() {
+        self.crashInfo = CrashInfo.parse(self.textStorage.string)
+    }
+    
+    func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
+        self.parseCrashInfo()
+    }
+}
+
+// MARK: Symbolicate
+extension CrashDocument {
+    func symbolicate(withDsymPath dsym: String?) {
+        guard let crash = self.crashInfo else {
+            return
+        }
+        
+        DispatchQueue.global().async {
+            let content = crash.symbolicate(dsym: dsym)
+            DispatchQueue.main.async {
+                self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+                self.notificationCenter.post(name: .crashSymbolicated, object: self)
+            }
+        }
     }
 }

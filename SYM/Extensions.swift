@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,8 +86,11 @@ extension String {
     }
 
     func uuidFormat() -> String {
+        if self.contains("-") {
+            return self.uppercased()
+        }
+
         var uuid = ""
-        
         for (index, char) in self.enumerated() {
             if [8, 12, 16, 20].contains(index) {
                 uuid.append("-" as Character)
@@ -134,6 +137,15 @@ extension String {
         }
         
         return (list[0].strip(), list[1].strip())
+    }
+    
+    var nsRange: NSRange {
+        return NSRange(self.startIndex..<self.endIndex, in: self)
+    }
+    
+    func substring(with nsrange: NSRange) -> String? {
+        guard let range = Range(nsrange, in: self) else { return nil }
+        return String(self[range])
     }
 }
 

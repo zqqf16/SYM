@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,6 @@
 
 import Cocoa
 
-protocol CrashTextViewDelegate: NSTextViewDelegate {
-    func didPasteCrashContent()
-}
-
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
         //self.undoManager?.removeAllActions()
@@ -37,7 +33,7 @@ extension NSTextView {
 
 class TextView: NSTextView {
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let pboard = sender.draggingPasteboard()
+        let pboard = sender.draggingPasteboard
         let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
         if let paths = pboard.propertyList(forType: filenameType) as? [String] {
             for path in paths {
@@ -51,13 +47,4 @@ class TextView: NSTextView {
         }
         return super.performDragOperation(sender)
     }
-    /*
-    override func paste(_ sender: Any?) {
-        super.paste(sender)
-        
-        if let delegate = self.delegate as? CrashTextViewDelegate {
-            //delegate.didPasteCrashContent()
-        }
-    }
-    */
 }

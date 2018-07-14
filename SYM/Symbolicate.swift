@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,11 +40,11 @@ extension SubProcess {
         return nil
     }
     
-    static func atos(_ image: Crash.Image, dsym: String? = nil) -> [String: String]? {
+    static func atos(_ image: CrashInfo.BinaryImage, dsym: String? = nil) -> [String: String]? {
         guard let loadAddress = image.loadAddress,
               let dsym = dsym,
               let arch = image.arch,
-              let frames = image.frames
+              let frames = image.backtrace
         else {
             return nil
         }
@@ -73,21 +73,6 @@ extension SubProcess {
         
         let args = [path]
         let output = execute(cmd: cmd!, args: args)
-        return output.0 ?? output.1
+        return output.0
     }
-}
-
-// MARK: - Symbolicate
-func symbolicate(crash: Crash, dsym: String? = nil) -> String {
-    if let content = crash.toStandard() {
-        return SubProcess.symbolicatecrash(crash: content) ?? content
-    }
-    
-    // Fix addresses
-    let newCrash = crash.fixed()
-    if let image = newCrash.binaryImage(), let result = SubProcess.atos(image, dsym: dsym) {
-        return newCrash.backfill(symbols: result)
-    }
-
-    return newCrash.content
 }

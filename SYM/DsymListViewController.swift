@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,31 @@
 
 import Cocoa
 
+class DsymTableCellView: NSTableCellView {
+    @IBOutlet weak var path: NSTextField!
+    @IBOutlet weak var uuids: NSTextField?
+    
+    func config(_ dsym: DsymFile) {
+        self.textField?.stringValue = dsym.name
+        self.path.stringValue = dsym.path
+        self.uuids?.stringValue = dsym.uuids.joined(separator: " - ")
+        self.toolTip = dsym.path
+    }
+}
+
 protocol DsymListViewControllerDelegate: class {
-    func didSelectDsym(_ dsym: Dsym) -> Void
+    func didSelectDsym(_ dsym: DsymFile) -> Void
 }
 
 class DsymListViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
-    private var dsymList: [Dsym] = []
+    private var dsymList: [DsymFile] = []
 
     weak var delegate: DsymListViewControllerDelegate?
     var uuid: String?
     
     func loadData() {
-        self.dsymList = DsymManager.shared.dsymList
+        self.dsymList = DsymFileManager.shared.dsymFiles
         self.dsymList.sort { (a, b) -> Bool in
             return (a.name < b.name)
         }
@@ -48,11 +60,25 @@ class DsymListViewController: NSViewController {
         self.outlineView.delegate = self
         self.outlineView.dataSource = self
         self.selectCurrentDsym()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func dsymListDidUpdate(notification: Notification) {
+        DispatchQueue.main.async {
+            self.loadData()
+            self.outlineView.reloadData()
+            self.selectCurrentDsym()
+        }
     }
     
     private func selectCurrentDsym() {
         guard let uuid = self.uuid,
-              let dsym = DsymManager.shared.dsym(withUUID: uuid)
+              let dsym = DsymFileManager.shared.dsymFile(withUUID: uuid)
         else {
             return
         }
@@ -72,12 +98,12 @@ class DsymListViewController: NSViewController {
         self.outlineView.menu = menu
     }
     
-    private func selectedItem() -> Dsym? {
+    private func selectedItem() -> DsymFile? {
         let selectedRow = self.outlineView.selectedRow;
         if selectedRow == NSNotFound {
             return nil
         }
-        if let selectedItem = self.outlineView.item(atRow: selectedRow) as? Dsym {
+        if let selectedItem = self.outlineView.item(atRow: selectedRow) as? DsymFile {
             return selectedItem
         };
         
@@ -90,8 +116,8 @@ class DsymListViewController: NSViewController {
             return
         }
         
-        if let dsym = self.outlineView.item(atRow: row) as? Dsym {
-            let fileURL = URL(fileURLWithPath: dsym.displayPath)
+        if let dsym = self.outlineView.item(atRow: row) as? DsymFile {
+            let fileURL = URL(fileURLWithPath: dsym.path)
             NSWorkspace.shared.activateFileViewerSelecting([fileURL])
         }
     }
@@ -105,36 +131,23 @@ class DsymListViewController: NSViewController {
     }
     
     @IBAction func reload(_ sender: AnyObject?) {
-        DsymManager.shared.updateDsymList { (result) in
-            DispatchQueue.main.async {
-                self.loadData()
-                self.outlineView.reloadData()
-                self.selectCurrentDsym()
-            }
-        }
+        DsymFileManager.shared.reload()
     }
 }
 
 extension NSUserInterfaceItemIdentifier {
-    static let dsymNameColumn = NSUserInterfaceItemIdentifier("Name")
-    static let dsymPathColumn = NSUserInterfaceItemIdentifier("Path")
-    static let dsymCell = NSUserInterfaceItemIdentifier("Cell")
+    static let dsymCell = NSUserInterfaceItemIdentifier("DsymCell")
 }
 
 extension DsymListViewController: NSOutlineViewDelegate {
     func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        return !(item is XCArchive)
+        return !(item is XCArchiveFile)
     }
     
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        var view: NSTableCellView?
-        view = outlineView.makeView(withIdentifier: .dsymCell, owner: self) as? NSTableCellView
-        let textField = view!.textField!
-        
-        if let dsym = item as? Dsym {
-            textField.stringValue = dsym.name
-            textField.sizeToFit()
-            view?.toolTip = dsym.displayPath
+        let view = outlineView.makeView(withIdentifier: .dsymCell, owner: self) as? DsymTableCellView
+        if let dsym = item as? DsymFile {
+            view?.config(dsym)
         }
         
         return view
@@ -143,7 +156,7 @@ extension DsymListViewController: NSOutlineViewDelegate {
 
 extension DsymListViewController: NSOutlineViewDataSource {
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-        if let xcarchive = item as? XCArchive {
+        if let xcarchive = item as? XCArchiveFile {
             return xcarchive.dsyms.count
         }
         
@@ -151,7 +164,7 @@ extension DsymListViewController: NSOutlineViewDataSource {
     }
     
     func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-        if let xcarchive = item as? XCArchive {
+        if let xcarchive = item as? XCArchiveFile {
             return xcarchive.dsyms[index]
         }
         
@@ -159,7 +172,7 @@ extension DsymListViewController: NSOutlineViewDataSource {
     }
     
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        if let _ = item as? XCArchive {
+        if let _ = item as? XCArchiveFile {
             return true
         }
         

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,59 +52,27 @@ class ParserTests: XCTestCase {
             asaewwqs
         """
 
-        let uuid = LineRE.uuid.findAll(content)
+        let uuid = RE.uuid.findAll(content)
         XCTAssertEqual(uuid?.count, 4)
     }
 
     func testAppleParser() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = Crash.parse(fromContent: content)
+        let crash = CrashInfo.parse(content)
         
         XCTAssertEqual(crash.appName, "demo")
-        XCTAssertNotNil(crash.toStandard())
         
         XCTAssertEqual(crash.device, "iPhone9,2")
         XCTAssertEqual(crash.uuid, "42fd89f730be3ac5a40a4c1a99438dfb".uuidFormat())
-
-        let image = crash.binaryImage()!
-        XCTAssertEqual(image.arch, "arm64")
-        XCTAssertEqual(image.name, "demo")
-        XCTAssertEqual(image.uuid, "42fd89f730be3ac5a40a4c1a99438dfb".uuidFormat())
-        XCTAssertEqual(image.loadAddress, "0x100070000")
-        XCTAssertEqual(image.frames?.count, 18)
     }
     
     func testUmengParser() {
         let content = self.crashContent(fromFile: "UmengDemo", ofType: "crash")
-        let crash = Crash.parse(fromContent: content)
+        let crash = CrashInfo.parse(content)
         
         XCTAssertEqual(crash.appName, "DemoApp")
-        XCTAssertNil(crash.toStandard())
         XCTAssertNil(crash.device)
 
         XCTAssertEqual(crash.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
-
-        let image = crash.binaryImage()!
-        XCTAssertEqual(image.arch, "arm64")
-        XCTAssertEqual(image.name, "DemoApp")
-        XCTAssertEqual(image.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
-        XCTAssertEqual(image.loadAddress, "0x0000000100000000")
-        XCTAssertEqual(image.frames?.count, 2)
     }
-    
-    func testParseringPerformance() {
-        let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        self.measure {
-            let _ = Crash.parse(fromContent: content)
-        }
-    }
-    
-    func testPrettyPerformance() {
-        let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = Crash.parse(fromContent: content)
-        self.measure {
-            let _ = crash.pretty()
-        }
-    }
-
 }

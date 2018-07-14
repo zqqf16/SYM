@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,14 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var dsymButton: NSButton!
     @IBOutlet weak var deviceLabel: NSTextField!
     
-    private var dsym: Dsym? {
+    private var dsymFile: DsymFile? {
         didSet {
             DispatchQueue.main.async {
-                if self.dsym == nil {
+                if self.dsymFile == nil {
                     self.dsymButton.title = "Select a dSYM file"
                     self.dsymButton.image = .alert
                 } else {
-                    self.dsymButton.title = self.dsym!.name
+                    self.dsymButton.title = self.dsymFile!.name
                     self.dsymButton.image = .symbol
                 }
             }
@@ -61,9 +61,7 @@ class MainWindowController: NSWindowController {
             }
         }
     }
-    
-    var crash: Crash?
-    
+        
     var crashContentViewController: ContentViewController! {
         if let vc = self.contentViewController as? ContentViewController {
             return vc
@@ -71,19 +69,19 @@ class MainWindowController: NSWindowController {
         return nil
     }
     
-    var currentCrashContent: String {
-        return self.crashContentViewController.currentCrashContent
-    }
-    
     var crashDocument: CrashDocument? {
         return self.document as? CrashDocument
+    }
+    
+    var crashInfo: CrashInfo? {
+        return self.crashDocument?.crashInfo
     }
     
     override func windowDidLoad() {
         super.windowDidLoad()
         
-        self.dsym = nil;
-        DsymManager.shared.updateDsymList(nil)
+        self.dsymFile = nil;
+        DsymFileManager.shared.reload()
         NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
     }
     
@@ -91,30 +89,45 @@ class MainWindowController: NSWindowController {
         super.init(coder:coder)
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     fileprivate func sendNotification(_ name: Notification.Name) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: name, object: self)
         }
     }
-}
-
-// MARK: - Crash operation
-extension MainWindowController {
-    func didOpenCrash() {
-        guard let crashContent = self.crashDocument?.content else {
-            return
+    
+    override var document: AnyObject? {
+        didSet {
+            guard let document = document as? CrashDocument else {
+                return
+            }
+            self.crashContentViewController.document = document
+            document.notificationCenter.addObserver(forName: .crashInfoUpdated, object: nil, queue: nil) { [weak self] (notification) in
+                self?.updateCrashInfo()
+            }
+            document.notificationCenter.addObserver(forName: .crashSymbolicated, object: nil, queue: nil) {  [weak self] (notification) in
+                self?.crashDidSymbolicated()
+            }
+            self.updateCrashInfo()
         }
-        
-        self.crash = Crash.parse(fromContent: crashContent)
-        self.crashContentViewController.open(crash: self.crash!)
-        
-        self.device = self.crash!.device
+    }
+    
+    func updateCrashInfo() {
+        self.device = self.crashInfo?.device
         self.findCurrentDsym()
     }
     
-    func didUpdateCrash(withContent content: String) {
-        self.crashDocument!.content = content
-        self.didOpenCrash()
+    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
+        if let dsymListViewController = segue.destinationController as? DsymListViewController {
+            dsymListViewController.delegate = self
+            if let uuid = self.crashDocument?.crashInfo?.uuid {
+                dsymListViewController.uuid = uuid
+            }
+        }
+        super.prepare(for: segue, sender: sender)
     }
 }
 
@@ -127,51 +140,34 @@ extension MainWindowController {
     }
     
     @IBAction func symbolicate(_ sender: AnyObject?) {
-        let content = self.crashContentViewController.currentCrashContent
+        let content = self.crashDocument?.textStorage.string ?? ""
         if content.strip().isEmpty {
             return
         }
-        
-        let crash = Crash.parse(fromContent: content)
-        
         self.indicator.startAnimation(nil)
-        DispatchQueue.global().async {
-            let newContent = SYM.symbolicate(crash: crash, dsym: self.dsym?.path)
-            DispatchQueue.main.async { [weak self] in
-                self?.indicator.stopAnimation(nil)
-                self?.didUpdateCrash(withContent: newContent)
-            }
-        }
+        self.crashDocument?.symbolicate(withDsymPath: self.dsymFile?.binaryPath)
+    }
+    
+    func crashDidSymbolicated() {
+        self.indicator.stopAnimation(nil)
     }
 }
 
 // MARK: - dSYM
 extension MainWindowController: DsymListViewControllerDelegate {
     @objc func dsymListDidUpdate(notification: Notification) {
-        if self.dsym == nil {
+        if self.dsymFile == nil {
             self.findCurrentDsym()
         }
     }
     
     func findCurrentDsym() {
-        if let uuid = self.crash?.uuid {
-            self.dsym = DsymManager.shared.dsym(withUUID: uuid)
+        if let uuid = self.crashInfo?.uuid {
+            self.dsymFile = DsymFileManager.shared.dsymFile(withUUID: uuid)
         }
     }
 
-    func didSelectDsym(_ dsym: Dsym) {
-        self.dsym = dsym
-    }
-    
-    @IBAction func showDsymList(_ sender: AnyObject?) {
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let viewController = storyboard.instantiateController(withIdentifier: NSStoryboard.SceneIdentifier(rawValue: "DsymListViewController")) as! DsymListViewController
-        viewController.delegate = self
-        
-        if let uuid = self.crash?.uuid {
-            viewController.uuid = uuid
-        }
-        
-        self.window?.contentViewController?.presentViewControllerAsSheet(viewController)
+    func didSelectDsym(_ dsym: DsymFile) {
+        self.dsymFile = dsym
     }
 }

@@ -20,31 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import Cocoa
 
-class FileFinder {
-    var observer: AnyObject?
-    var query = NSMetadataQuery()
-    
-    var isRunning: Bool {
-        return self.query.isGathering
-    }
-    
-    func search(_ condition: String, completion: @escaping ([NSMetadataItem]?)->Void) {
-        query.predicate = NSPredicate(fromMetadataQueryString: condition)
-        
-        self.observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: nil, queue: nil) { (notification) in
-            self.query.stop()
-            if let observer = self.observer {
-                NotificationCenter.default.removeObserver(observer)
-                self.observer = nil
-            }
-            
-            let result = self.query.results as! [NSMetadataItem]
-            completion(result)
+class DocumentController: NSDocumentController {
+    override func openDocument(withContentsOf url: URL, display displayDocument: Bool, completionHandler: @escaping (NSDocument?, Bool, Error?) -> Void) {
+        guard let doc = self.currentDocument as? CrashDocument,
+            doc.fileURL == nil,
+            doc.textStorage.string.count == 0
+        else {
+            super.openDocument(withContentsOf: url, display: displayDocument, completionHandler: completionHandler)
+            return
         }
-        
-        query.start()
+        let type = (try? self.typeForContents(of: url)) ?? url.pathExtension
+        try? doc.read(from: url, ofType: type)
+        doc.fileURL = url
+        if (displayDocument) {
+            doc.showWindows()
+        }
+        completionHandler(doc, true, nil)
     }
 }

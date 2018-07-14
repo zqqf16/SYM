@@ -1,3 +1,6 @@
+// The MIT License (MIT)
+//
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -7,15 +10,15 @@
 // furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software"
+// copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT" IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE"
+// SOFTWARE.
 
 
 import Foundation
@@ -76,9 +79,12 @@ func modelToName(_ model: String) -> String {
         "iPhone9,2" : "iPhone 7plus",
         "iPhone9,3" : "iPhone 7",
         "iPhone9,4" : "iPhone 7 Plus",
+        "iPhone10,1" : "iPhone 8",
+        "iPhone10,2" : "iPhone 8 Plus",
         "iPhone10,3" : "iPhone X",
         "iPhone10,4" : "iPhone 8",
         "iPhone10,5" : "iPhone 8 Plus",
+        "iPhone10,6" : "iPhone X",
     ]
     if let name = modelMap[model] {
         return name

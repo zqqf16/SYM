@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 zqqf16
+// Copyright (c) 2017 - 2018 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 import Foundation
 
-extension Crash.Frame {
-    func fixed(withLoadAddress loadAddress: String) -> Crash.Frame {
+extension CrashInfo.Frame {
+    func fixed(withLoadAddress loadAddress: String) -> CrashInfo.Frame {
         guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
             self.symbol != nil,
             self.symbol!.hasPrefix("+")
@@ -49,28 +49,20 @@ extension Crash.Frame {
     }
 }
 
-extension Crash {
-    func fixed() -> Crash {
-        guard let image = self.binaryImage(),
-              let loadAddress = image.loadAddress
-        else {
+extension CrashInfo.BinaryImage {
+    func fixed() -> CrashInfo.BinaryImage {
+        guard let loadAddress = self.loadAddress, let backtrace = self.backtrace else {
             return self
         }
         
-        let lines = self.content.components(separatedBy: "\n")
-        var newLines: [String] = []
-        for line in lines {
-            if var frame = Frame.parse(fromLine: line) {
-                if frame.image == image.name {
-                    frame = frame.fixed(withLoadAddress: loadAddress)
-                }
-                newLines.append(frame.description)
-            } else {
-                newLines.append(line)
-            }
+        var newBacktrace: [CrashInfo.Frame] = []
+        for frame in backtrace {
+            let newFrame = frame.fixed(withLoadAddress: loadAddress)
+            newBacktrace.append(newFrame)
         }
-        
-        let newContent = newLines.joined(separator: "\n")
-        return Crash.parse(fromContent: newContent)
+
+        var newImage = self
+        newImage.backtrace = newBacktrace
+        return newImage
     }
 }
