@@ -10,9 +10,9 @@ Download the latest version from [here](https://github.com/zqqf16/SYM/releases/l
 
 ## Features
 
-1. Support Umeng and Apple format crash report.
+1. Supports standard crash report, cpu usage report and Umeng format.
 2. Automatically search dSYM files.
-3. Highlight key backtrace frames.
+3. One key symbolicating.
 
 ## Usage
 
@@ -30,9 +30,9 @@ Open or paste in a crash report, click the "Symbolicate" button.
 
 ## 主要功能
 
-1. 自动识别崩溃日志格式，支持 Apple 与友盟格式
+1. 支持标准的崩溃日志、cpu usage 日志以及友盟格式的日志
 2. 自动搜索 dSYM 文件
-3. 高亮关键帧
+3. 一键符号化
 
 ## 使用方法
 
