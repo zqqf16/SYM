@@ -30,21 +30,21 @@ extension NSViewController {
 
 class ContentViewController: NSViewController {
     @IBOutlet var textView: NSTextView!
-
+    private let font: NSFont = NSFont(name: "Menlo", size: 11)!
     var document: CrashDocument? {
         didSet {
             guard let document = document else {
                 return
             }
-            let font = self.textView.font
             self.textView.layoutManager?.replaceTextStorage(document.textStorage)
-            self.textView.font = font
+            self.textView.font = self.font
             self.updateCrashInfo()
             
             document.notificationCenter.addObserver(forName: .crashSymbolicated, object: nil, queue: nil) {  [weak self] (notification) in
                 self?.updateCrashInfo()
             }
             document.notificationCenter.addObserver(forName: .crashDidOpen, object: nil, queue: nil) {  [weak self] (notification) in
+                self?.textView.font = self?.font
                 self?.updateCrashInfo()
             }
         }
@@ -56,7 +56,7 @@ class ContentViewController: NSViewController {
     }
 
     private func setupTextView() {
-        self.textView.font = NSFont(name: "Menlo", size: 11)
+        self.textView.font = self.font
         self.textView.textContainerInset = CGSize(width: 10, height: 10)
         self.textView.allowsUndo = true
         self.textView.delegate = self
