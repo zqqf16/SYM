@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 #
+# This file is "stolen" from Xcode. Copyright (c) 2008-2015 Apple Inc
+#
 # This script parses a crashdump file and attempts to resolve addresses into function names.
 #
 # It finds symbol-rich binaries by:
@@ -18,9 +20,6 @@ use Cwd qw(realpath);
 use List::MoreUtils qw(uniq);
 use File::Basename qw(basename);
 use File::Glob ':glob';
-use File::Find;
-use File::Copy;
-use Env qw(DEVELOPER_DIR);
 use Config;
 no warnings "portable";
 
@@ -39,7 +38,7 @@ sub usage();
 # read and parse command line
 my $opt_help = 0;
 my $opt_verbose = 0;
-our $opt_output = "-";
+my $opt_output = "-";
 my @opt_dsyms = ();
 my $opt_spotlight = 1;
 
@@ -67,7 +66,6 @@ my %entity2char = (
 
 #############################
 
-
 # We will find these tools once we can guess the right SDK
 my $otool = undef;
 my $atos  = undef;
@@ -78,7 +76,7 @@ my $size  = undef;
 #############################
 # run the script
 
-try_batch_symbolicate(@ARGV);
+symbolicate_log(@ARGV);
 
 exit 0;
 
@@ -103,33 +101,6 @@ usage:
     -v | --verbose              Enables additional output
 EOF
 exit 1;
-}
-
-##############
-sub try_batch_symbolicate {
-    my ($file, @extra_search_paths) = @_;
-    if ( -f $file ) {
-        symbolicate_log(@ARGV);
-        return
-    }
-    
-    my @crash_files;
-
-    find ( sub {
-        return unless -f;
-        return unless /\.crash$/;
-        push @crash_files, $File::Find::name
-    }, $file);
-
-    foreach my $crash (@crash_files) {
-        print "➜ $crash\n";
-        our $opt_output = "/tmp/".basename($crash);
-        symbolicate_log($crash, @extra_search_paths);
-        move($opt_output, $crash);
-        print STDERR "✓ $crash\n";
-    }
-    
-    print STDERR "🍻 Done\n";
 }
 
 ##############
@@ -810,12 +781,18 @@ sub parse_backtrace {
         
         for my $line (@lines) {
             if( $line =~ m{
-                ^\d+ \s+     # stack frame number
-                (\S.*?) \s+    # bundle id (1)
-                ((0x\w+) \s+   # address (3)
-                .*) \s* $    # current description, to be replaced (2)
+                ^\d+ \s+                   # stack frame number
+                (\S.*?) \s+                # bundle [1]
+                (                          # description to replace [2]
+                    (0x\w+) \s+            # address [3]
+                    0x\w+ \s+              # library address
+                    (?: \+ \s+ (\d+))?     # offset [4], optional
+                    .*                     # remainder of description
+                )                          # end of capture
+                \s*                        # new line
+                $                          # end of line
             }x ) {
-                my($bundle,$replace,$address) = ($1,$2,$3);
+                my($bundle,$replace,$address,$offset) = ($1,$2,$3,$4);
                 #print STDERR "Parse_bt: $bundle,$replace,$address\n" if ($opt_verbose);
                 
                 # disambiguate within our hash of binaries
@@ -836,6 +813,10 @@ sub parse_backtrace {
                     'raw_address' => $raw_address,
                     'bundle'  => $bundle,
                 };
+                
+                if (defined $offset) {
+                    $frames{$replace}{offset} = $offset
+                }
                 
                 $is_first   = 0;
             }
@@ -1243,9 +1224,11 @@ sub symbolize_frames {
             
             if ( $symbolled_frame !~ /^\d/ ) {
                 # only symbolicate if we fetched something other than an address
-                #re-increment any offset that we had to artifically decrement
-                if($$frame{raw_address} ne $$frame{address}) {
-                    $symbolled_frame =~ s|(.+ \+) (\d+)|$1." ".($2 + 1)|e;
+                
+                my $offset = $$frame{offset};
+                if (defined $offset) {
+                    # add offset from unsymbolicated frame after symbolicated name
+                    $symbolled_frame =~ s|(.+)\(|$1."+ ".$offset." ("|e;
                 }
                 
                 if ($is_spindump_report) {
