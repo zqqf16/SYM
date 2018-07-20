@@ -79,7 +79,8 @@ class MainWindowController: NSWindowController {
     
     override func windowDidLoad() {
         super.windowDidLoad()
-        
+        self.windowFrameAutosaveName = "MainWindow"
+
         self.dsymFile = nil;
         DsymFileManager.shared.reload()
         NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
