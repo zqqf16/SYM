@@ -40,6 +40,8 @@ protocol DsymListViewControllerDelegate: class {
 
 class DsymListViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
+    @IBOutlet weak var uuidLabel: NSTextField!
+
     private var dsymList: [DsymFile] = []
 
     weak var delegate: DsymListViewControllerDelegate?
@@ -62,6 +64,9 @@ class DsymListViewController: NSViewController {
         self.selectCurrentDsym()
         
         NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
+        
+        let uuid = self.uuid ?? "NULL"
+        self.uuidLabel.stringValue = "UUID: \(uuid)"
     }
     
     deinit {
