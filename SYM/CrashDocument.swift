@@ -43,6 +43,10 @@ class CrashDocument: NSDocument {
         }
     }
     
+    var isReplaceable: Bool {
+        return self.fileURL == nil && self.textStorage.string.count == 0
+    }
+    
     override init() {
         super.init()
         self.textStorage.delegate = self

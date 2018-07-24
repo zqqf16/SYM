@@ -24,13 +24,17 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    override init() {
+        super.init()
+        let _ = DocumentController()
+    }
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
         //DsymManager.sharedInstance.findAllDsyms()
     }
     
     func applicationWillFinishLaunching(_ notification: Notification) {
-        let _ = DocumentController()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

@@ -24,9 +24,8 @@ import Cocoa
 
 class DocumentController: NSDocumentController {
     override func openDocument(withContentsOf url: URL, display displayDocument: Bool, completionHandler: @escaping (NSDocument?, Bool, Error?) -> Void) {
-        guard let doc = self.currentDocument as? CrashDocument,
-            doc.fileURL == nil,
-            doc.textStorage.string.count == 0
+        guard let doc = self.documents.first as? CrashDocument,
+            doc.isReplaceable
         else {
             super.openDocument(withContentsOf: url, display: displayDocument, completionHandler: completionHandler)
             return
