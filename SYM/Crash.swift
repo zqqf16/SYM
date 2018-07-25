@@ -30,7 +30,9 @@ class CrashInfo {
     var bundleID: String?
     var arch: String = "arm64"
     var uuid: String?
-
+    var osVersion: String?
+    var appVersion: String?
+    
     struct Frame {
         var raw: String
         var index: String
@@ -69,7 +71,9 @@ class CrashInfo {
         self.appName = RE.process.findFirst(self.raw)?[0]
         self.device = RE.hardware.findFirst(self.raw)?[0]
         self.bundleID = RE.identifier.findFirst(self.raw)?[0]
-        
+        self.osVersion = RE.osVersion.findFirst(self.raw)?[0]
+        self.appVersion = RE.version.findFirst(self.raw)?[0]
+
         if let binary = self.appName,
             let imageRE = RE.image(binary, options:[]),
             let imageMatch = imageRE.findFirst(self.raw) {
@@ -103,6 +107,8 @@ class CPUUsageLog: CrashInfo {
         self.appName = RE.powerstats.findFirst(self.raw)?[0]
         self.device = RE.hardware.findFirst(self.raw)?[0]
         self.arch = RE.architecture.findFirst(self.raw)?[0] ?? "arm64"
+        self.osVersion = RE.osVersion.findFirst(self.raw)?[0]
+        self.appVersion = RE.version.findFirst(self.raw)?[0]
         if let path = RE.path.findFirst(self.raw)?[0],
             let imageRE = RE.image(withPath: path),
             let imageMatch = imageRE.findFirst(self.raw) {

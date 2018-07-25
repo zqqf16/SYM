@@ -549,7 +549,6 @@
                                 <toolbarItem reference="Elg-kw-8wH"/>
                                 <toolbarItem reference="Taf-n1-7Rr"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
-                                <toolbarItem reference="7hE-g6-gXk"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -576,41 +575,78 @@
                         <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" horizontalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="jHL-X2-9JA">
+                            <splitView dividerStyle="thin" translatesAutoresizingMaskIntoConstraints="NO" id="FcS-aB-D82">
                                 <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
-                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="Hso-iy-ZHL">
-                                    <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <textView importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" selectionGranularity="paragraph" findStyle="bar" incrementalSearchingEnabled="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="RPb-Ml-heM" customClass="TextView" customModule="SYM" customModuleProvider="target">
-                                            <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
+                                <subviews>
+                                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" horizontalScrollElasticity="none" id="jHL-X2-9JA">
+                                        <rect key="frame" x="0.0" y="0.0" width="800" height="582"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="Hso-iy-ZHL">
+                                            <rect key="frame" x="0.0" y="0.0" width="800" height="582"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="800" height="600"/>
-                                            <size key="maxSize" width="10000" height="10000000"/>
-                                            <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                        </textView>
-                                    </subviews>
-                                </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="P9G-ch-LWU">
-                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Sd6-Bi-L8d">
-                                    <rect key="frame" x="465" y="0.0" width="15" height="230"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </scroller>
-                            </scrollView>
+                                            <subviews>
+                                                <textView importsGraphics="NO" richText="NO" horizontallyResizable="YES" verticallyResizable="YES" selectionGranularity="paragraph" findStyle="bar" incrementalSearchingEnabled="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="RPb-Ml-heM" customClass="TextView" customModule="SYM" customModuleProvider="target">
+                                                    <rect key="frame" x="0.0" y="0.0" width="800" height="582"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    <size key="minSize" width="800" height="581"/>
+                                                    <size key="maxSize" width="10000" height="10000000"/>
+                                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                </textView>
+                                            </subviews>
+                                        </clipView>
+                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="P9G-ch-LWU">
+                                            <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="Sd6-Bi-L8d">
+                                            <rect key="frame" x="784" y="0.0" width="16" height="477"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </scroller>
+                                    </scrollView>
+                                    <customView id="Yh1-TF-zzd">
+                                        <rect key="frame" x="0.0" y="583" width="800" height="17"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <subviews>
+                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QhV-nK-34r">
+                                                <rect key="frame" x="8" y="0.0" width="784" height="17"/>
+                                                <textFieldCell key="cell" lineBreakMode="clipping" allowsUndo="NO" alignment="left" title="iPhone 8 Plus - iOS 11.4.1 - v0.4.5" usesSingleLineMode="YES" id="UG5-2y-TCM">
+                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="QhV-nK-34r" firstAttribute="leading" secondItem="Yh1-TF-zzd" secondAttribute="leading" constant="10" id="1Fb-NE-Ogn"/>
+                                            <constraint firstAttribute="trailing" secondItem="QhV-nK-34r" secondAttribute="trailing" constant="10" id="54a-5L-Foo"/>
+                                            <constraint firstAttribute="bottom" secondItem="QhV-nK-34r" secondAttribute="bottom" id="5af-1e-AC0"/>
+                                            <constraint firstAttribute="height" constant="17" id="UZ8-MR-FZw"/>
+                                            <constraint firstItem="QhV-nK-34r" firstAttribute="top" secondItem="Yh1-TF-zzd" secondAttribute="top" id="uRO-A2-kfG"/>
+                                        </constraints>
+                                    </customView>
+                                </subviews>
+                                <holdingPriorities>
+                                    <real value="490"/>
+                                    <real value="250"/>
+                                </holdingPriorities>
+                                <connections>
+                                    <outlet property="delegate" destination="5WI-tf-yEY" id="rXe-tI-vev"/>
+                                </connections>
+                            </splitView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="jHL-X2-9JA" firstAttribute="top" secondItem="HPQ-v7-rda" secondAttribute="top" id="8jP-Aj-pKY"/>
-                            <constraint firstAttribute="trailing" secondItem="jHL-X2-9JA" secondAttribute="trailing" id="IBU-eY-tjb"/>
-                            <constraint firstAttribute="bottom" secondItem="jHL-X2-9JA" secondAttribute="bottom" id="oTL-sL-hu0"/>
-                            <constraint firstItem="jHL-X2-9JA" firstAttribute="leading" secondItem="HPQ-v7-rda" secondAttribute="leading" id="xXy-u8-PAQ"/>
+                            <constraint firstAttribute="trailing" secondItem="FcS-aB-D82" secondAttribute="trailing" id="807-pb-GiR"/>
+                            <constraint firstItem="FcS-aB-D82" firstAttribute="top" secondItem="HPQ-v7-rda" secondAttribute="top" id="XRY-QJ-eaf"/>
+                            <constraint firstItem="FcS-aB-D82" firstAttribute="leading" secondItem="HPQ-v7-rda" secondAttribute="leading" id="bP9-oQ-L6C"/>
+                            <constraint firstAttribute="bottom" secondItem="FcS-aB-D82" secondAttribute="bottom" id="cSr-Qr-Gfv"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomBar" destination="Yh1-TF-zzd" id="Zs9-Gr-baT"/>
+                        <outlet property="infoLabel" destination="QhV-nK-34r" id="swJ-96-odP"/>
+                        <outlet property="splitView" destination="FcS-aB-D82" id="M35-di-u6F"/>
                         <outlet property="textView" destination="RPb-Ml-heM" id="ByU-BQ-22u"/>
                     </connections>
                 </viewController>

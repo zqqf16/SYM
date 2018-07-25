@@ -30,7 +30,12 @@ extension NSViewController {
 
 class ContentViewController: NSViewController {
     @IBOutlet var textView: NSTextView!
+    @IBOutlet var infoLabel: NSTextField!
+    @IBOutlet var splitView: NSSplitView!
+    @IBOutlet var bottomBar: NSView!
+
     private let font: NSFont = NSFont(name: "Menlo", size: 11)!
+
     var document: CrashDocument? {
         didSet {
             guard let document = document else {
@@ -53,6 +58,12 @@ class ContentViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupTextView()
+        self.toggleBottomBar(false)
+    }
+    
+    private func toggleBottomBar(_ show: Bool) {
+        self.bottomBar.isHidden = !show
+        self.splitView.adjustSubviews()
     }
 
     private func setupTextView() {
@@ -66,14 +77,35 @@ class ContentViewController: NSViewController {
         self.updateCrashInfo()
     }
     
+    private func infoString(fromCrash crash: CrashInfo) -> String {
+        var info = "🏷 " + modelToName(crash.device ?? "Unknow device")
+        if let osVersion = crash.osVersion {
+            info += "- \(osVersion)"
+        }
+        
+        if let appVersion = crash.appVersion {
+            info += "- App \(appVersion)"
+        }
+        
+        return info
+    }
+    
     func updateCrashInfo() {
         guard let document = self.document, let ranges = document.crashInfo?.executableBinaryBacktraceRanges() else {
             return
         }
+        
         let textStorage = document.textStorage
         textStorage.beginEditing()
         textStorage.processHighlighting(ranges)
         textStorage.endEditing()
+        
+        if let crashInfo = document.crashInfo {
+            self.infoLabel.stringValue = self.infoString(fromCrash: crashInfo)
+            self.toggleBottomBar(true)
+        } else {
+            self.toggleBottomBar(false)
+        }
     }
 }
 
@@ -89,6 +121,12 @@ extension ContentViewController: NSTextViewDelegate {
     
     @objc func symbolicate(_ sender: AnyObject?) {
         self.windowController()?.symbolicate(sender)
+    }
+}
+
+extension ContentViewController: NSSplitViewDelegate {
+    func splitView(_ splitView: NSSplitView, effectiveRect proposedEffectiveRect: NSRect, forDrawnRect drawnRect: NSRect, ofDividerAt dividerIndex: Int) -> NSRect {
+        return NSZeroRect
     }
 }
 

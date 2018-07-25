@@ -117,7 +117,7 @@ class MainWindowController: NSWindowController {
     }
     
     func updateCrashInfo() {
-        self.device = self.crashInfo?.device
+        //self.device = self.crashInfo?.device
         self.findCurrentDsym()
     }
     

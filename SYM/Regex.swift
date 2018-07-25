@@ -107,6 +107,12 @@ extension RE {
     // Architecture:    arm64
     static let architecture = try! RE("^Architecture:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     
+    // OS Version:          iPhone OS 11.4 (15F79)
+    static let osVersion = try! RE("^OS Version:\\s*(.*)", options: .anchorsMatchLines)
+
+    // Version:             521 (5.7.8)
+    static let version = try! RE("^Version:\\s*(.*)", options: .anchorsMatchLines)
+    
     // Path: /private/var/containers/Bundle/Application/xxx
     static let path = try! RE("^Path:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     
