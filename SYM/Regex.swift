@@ -39,9 +39,7 @@ struct RE {
     }
     
     func findAll(_ input: String, options: NSRegularExpression.MatchingOptions = []) -> [[String]]? {
-        let matches = regex.matches(in: input,
-                                    options: options,
-                                    range: input.nsRange)
+        let matches = regex.matches(in: input, options: options, range: input.nsRange)
         if matches.count == 0 {
             return nil
         }
@@ -66,7 +64,7 @@ struct RE {
 // MARK: Apple
 extension RE {
     // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
-    static let frame = try! RE("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)")
+    static let frame = try! RE("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: .anchorsMatchLines)
     
     // 0x19a8d8000 - 0x19a8f4fff libsystem_m.dylib arm64  <ee3277089d2b310c81263e5fbcbb3138> /usr/lib/system/libsystem_m.dylib
     static let image = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")

@@ -23,6 +23,15 @@
 import Foundation
 import Cocoa
 
+// MARK: - NSRange
+extension NSRange {
+    init(range:Range <Int>) {
+        self.init()
+        self.location = range.startIndex
+        self.length = range.endIndex - range.startIndex
+    }
+}
+
 // MARK: - String
 extension String {
     var hexaToDecimal: Int {
@@ -35,12 +44,10 @@ extension String {
         return Int(hex, radix:16) ?? 0
     }
     
-    subscript (r: Range<Int>) -> String {
+    subscript (r: Range<Int>) -> String? {
         get {
-            let startIndex = self.index(self.startIndex, offsetBy: r.lowerBound)
-            let endIndex = self.index(self.startIndex, offsetBy: r.upperBound)
-            
-            return String(self[startIndex..<endIndex])
+            let nsRange = NSRange(r)
+            return self.substring(with: nsRange)
         }
     }
 
@@ -54,17 +61,18 @@ extension String {
         let number = result.numberOfRanges
         if number == 1 {
             if let range = Range(result.range(at:0)) {
-                return [self[range]]
-            } else {
-                return []
+                if let subString = self[range] {
+                    return [subString]
+                }
             }
+            return []
         }
         
         var groups = [String]()
         
         for index in 1..<number {
             if let range = Range(result.range(at: index)) {
-                groups.append(self[range])
+                groups.append(self[range] ?? "")
             }
         }
         
@@ -76,7 +84,7 @@ extension String {
         if newLength < toLength {
             return String(repeatElement(character, count: toLength - newLength)) + self
         } else {
-            return self[0..<newLength-toLength]
+            return self[0..<newLength-toLength]!
             //return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
         }
     }
@@ -137,6 +145,10 @@ extension String {
         }
         
         return (list[0].strip(), list[1].strip())
+    }
+    
+    func rangeFromNSRange(nsRange : NSRange) -> Range<String.Index>? {
+        return Range(nsRange, in: self)
     }
     
     var nsRange: NSRange {

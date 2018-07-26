@@ -33,7 +33,16 @@ class ContentViewController: NSViewController {
     @IBOutlet var infoLabel: NSTextField!
     @IBOutlet var splitView: NSSplitView!
     @IBOutlet var bottomBar: NSView!
-
+    @IBOutlet var binaryButton: NSPopUpButton!
+    
+    private let lastSelectedBinaryKey = "lastSelectedBinaryName"
+    
+    var selectedBinaryName: String? {
+        didSet {
+            UserDefaults.standard.setValue(selectedBinaryName, forKey: self.lastSelectedBinaryKey)
+        }
+    }
+    
     private let font: NSFont = NSFont(name: "Menlo", size: 11)!
 
     var document: CrashDocument? {
@@ -91,20 +100,53 @@ class ContentViewController: NSViewController {
     }
     
     func updateCrashInfo() {
-        guard let document = self.document, let ranges = document.crashInfo?.executableBinaryBacktraceRanges() else {
+        guard let document = self.document else {
             return
         }
         
-        let textStorage = document.textStorage
-        textStorage.beginEditing()
-        textStorage.processHighlighting(ranges)
-        textStorage.endEditing()
+        let crashInfo = document.crashInfo
+        if self.selectedBinaryName == nil {
+            self.selectedBinaryName = crashInfo?.appName ??             (UserDefaults.standard.value(forKey: self.lastSelectedBinaryKey) as? String)
+        }
         
-        if let crashInfo = document.crashInfo {
-            self.infoLabel.stringValue = self.infoString(fromCrash: crashInfo)
-            self.toggleBottomBar(true)
-        } else {
+        self.updateHighlighting(crashInfo)
+        self.updateSummary(crashInfo)
+        self.updateBinaryButton(crashInfo)
+    }
+    
+    private func updateHighlighting(_ crashInfo: CrashInfo?) {
+        if let textStorage = self.textView.textStorage,
+            let binary = self.selectedBinaryName,
+            let ranges = crashInfo?.backgraceRanges(withBinary: binary) {
+            textStorage.beginEditing()
+            textStorage.processHighlighting(ranges)
+            textStorage.endEditing()
+        }
+    }
+    
+    private func updateSummary(_ crashInfo: CrashInfo?) {
+        guard let info = crashInfo else {
             self.toggleBottomBar(false)
+            return
+        }
+        self.infoLabel.stringValue = self.infoString(fromCrash: info)
+        self.toggleBottomBar(true)
+    }
+    
+    private func updateBinaryButton(_ crashInfo: CrashInfo?) {
+        guard let info = crashInfo else {
+            self.binaryButton.isHidden = true
+            return
+        }
+        
+        if let binaries = info.allBinaryImages() {
+            self.binaryButton.isHidden = false
+            self.binaryButton.addItems(withTitles: binaries.sorted())
+            if let binary = self.selectedBinaryName {
+                self.binaryButton.selectItem(withTitle: binary)
+            } else {
+                self.binaryButton.selectItem(withTitle: "")
+            }
         }
     }
 }
@@ -130,9 +172,22 @@ extension ContentViewController: NSSplitViewDelegate {
     }
 }
 
+extension ContentViewController {
+    @IBAction func didSelectBinary(_ sender: AnyObject?) {
+        self.selectedBinaryName = self.binaryButton.titleOfSelectedItem
+        self.updateHighlighting(self.document?.crashInfo)
+    }
+}
+
 // Mark: Highlight
 extension NSTextStorage {
     func processHighlighting(_ ranges:[NSRange]) {
+        let defaultAttrs: [NSAttributedString.Key: AnyObject] = [
+            .foregroundColor: NSColor.textColor,
+            .font: self.font!
+        ]
+        self.setAttributes(defaultAttrs, range: self.string.nsRange)
+        
         let attrs: [NSAttributedString.Key: AnyObject] = [
             .foregroundColor: NSColor(red:1.00, green:0.23, blue:0.18, alpha:1.0),
             .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!

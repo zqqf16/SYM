@@ -82,15 +82,32 @@ class CrashInfo {
         }
     }
     
-    func executableBinaryBacktraceRanges() -> [NSRange] {
-        var backtraceRanges:[NSRange] = []
-        if let binary = self.appName,
-            let frameRE = RE.frame(binary),
+    func backgraceRanges(withBinary binary: String) -> [NSRange] {
+        var result:[NSRange] = []
+        if let frameRE = RE.frame(binary),
             let frames = frameRE.findAllRanges(self.raw) {
-            backtraceRanges = frames
+            result = frames
         }
-
-        return backtraceRanges
+        return result
+    }
+    
+    func executableBinaryBacktraceRanges() -> [NSRange] {
+        guard let appName = self.appName else {
+            return [NSRange]()
+        }
+        return self.backgraceRanges(withBinary: appName)
+    }
+    
+    func allBinaryImages() -> [String]? {
+        guard let frames = RE.frame.findAll(self.raw) else {
+            return nil
+        }
+        var images: Set<String> = []
+        for frame in frames {
+            images.insert(frame[1])
+        }
+        
+        return Array(images)
     }
     
     func symbolicate(dsym: String? = nil) -> String {
