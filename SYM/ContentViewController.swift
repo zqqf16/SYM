@@ -80,11 +80,11 @@ class ContentViewController: NSViewController {
     private func infoString(fromCrash crash: CrashInfo) -> String {
         var info = "🏷 " + modelToName(crash.device ?? "Unknow device")
         if let osVersion = crash.osVersion {
-            info += "- \(osVersion)"
+            info += " - \(osVersion)"
         }
         
         if let appVersion = crash.appVersion {
-            info += "- App \(appVersion)"
+            info += " - \(appVersion)"
         }
         
         return info

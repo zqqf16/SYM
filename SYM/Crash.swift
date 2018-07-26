@@ -129,6 +129,25 @@ class CPUUsageLog: CrashInfo {
     }
 }
 
+class FabricCrash: CrashInfo {
+    override func parseCrashInfo() {
+        let regexDevice = try! RE("^# Device:\\s*(.+)", options: .anchorsMatchLines)
+        let regexAppVersion = try! RE("^# Version:\\s*(.+)", options: .anchorsMatchLines)
+        let regexPlatform = try! RE("^# Platform:\\s*(.+)", options: .anchorsMatchLines)
+        let regexOSVersion = try! RE("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
+        let regexBundleID = try! RE("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
+        
+        self.device = regexDevice.findFirst(self.raw)?[0]
+        self.osVersion = regexOSVersion.findFirst(self.raw)?[0]
+        self.appVersion = regexAppVersion.findFirst(self.raw)?[0]
+        self.bundleID = regexBundleID.findFirst(self.raw)?[0]
+        if let osVersion = self.osVersion, let platform = regexPlatform.findFirst(self.raw)?[0] {
+            self.osVersion = "\(platform) \(osVersion)"
+        }
+        // TODO: appName
+    }
+}
+
 class UmengCrash: CrashInfo {
     override func parseCrashInfo() {
         self.appName = RE.binaryImage.findFirst(self.raw)?[0]
@@ -191,6 +210,8 @@ extension CrashInfo {
             return UmengCrash(content)
         } else if content.contains("Wakeups limit") && content.contains("Limit duration:") {
             return CPUUsageLog(content)
+        } else if content.contains("# Crashlytics - plaintext stacktrace") {
+            return FabricCrash(content)
         }
         return CrashInfo(content)
     }
