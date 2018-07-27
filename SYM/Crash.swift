@@ -134,34 +134,37 @@ class CPUUsageLog: CrashInfo {
         }
     }
     
-    override func executableBinaryBacktraceRanges() -> [NSRange] {
-        var backtraceRanges:[NSRange] = []
-        if let binary = self.appName,
-            let frameRE = RE.cpuUsageFrame(binary),
-            let frames = frameRE.findAllRanges(self.raw) {
-            backtraceRanges = frames
+    override func allBinaryImages() -> [String]? {
+        guard let frames = RE.cpuUsageFrame.findAll(self.raw) else {
+            return nil
+        }
+        var images: Set<String> = []
+        for frame in frames {
+            images.insert(frame[0])
         }
         
-        return backtraceRanges
+        return Array(images)
+    }
+    
+    override func backgraceRanges(withBinary binary: String) -> [NSRange] {
+        var result:[NSRange] = []
+        if let frameRE = RE.cpuUsageFrame(binary),
+            let frames = frameRE.findAllRanges(self.raw) {
+            result = frames
+        }
+        return result
     }
 }
 
 class FabricCrash: CrashInfo {
     override func parseCrashInfo() {
-        let regexDevice = try! RE("^# Device:\\s*(.+)", options: .anchorsMatchLines)
-        let regexAppVersion = try! RE("^# Version:\\s*(.+)", options: .anchorsMatchLines)
-        let regexPlatform = try! RE("^# Platform:\\s*(.+)", options: .anchorsMatchLines)
-        let regexOSVersion = try! RE("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
-        let regexBundleID = try! RE("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
-        
-        self.device = regexDevice.findFirst(self.raw)?[0]
-        self.osVersion = regexOSVersion.findFirst(self.raw)?[0]
-        self.appVersion = regexAppVersion.findFirst(self.raw)?[0]
-        self.bundleID = regexBundleID.findFirst(self.raw)?[0]
-        if let osVersion = self.osVersion, let platform = regexPlatform.findFirst(self.raw)?[0] {
+        self.device = RE.hashDevice.findFirst(self.raw)?[0]
+        self.osVersion = RE.hashOSVersion.findFirst(self.raw)?[0]
+        self.appVersion = RE.hashAppVersion.findFirst(self.raw)?[0]
+        self.bundleID = RE.hashBundleID.findFirst(self.raw)?[0]
+        if let osVersion = self.osVersion, let platform = RE.hashPlatform.findFirst(self.raw)?[0] {
             self.osVersion = "\(platform) \(osVersion)"
         }
-        // TODO: appName
     }
 }
 

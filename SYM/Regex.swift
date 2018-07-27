@@ -119,6 +119,11 @@ extension RE {
         return try? RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-.*<(.*)>\\s+\(path)", options: options)
     }
     
+    // 2   -[NSRunLoop run] + 87 (Foundation + 512424) [0x182f721a8]
+    // 2   -[TheClass function:] (xxx.m:1476 in binary + 12591292) [0x101b720bc]
+    // 2   ??? (AGXMetalA11 + 553492) [0x1aaa7f214]
+    static let cpuUsageFrame = try! RE("^.*[\\( ](.*) \\+ \\d+\\) \\[(0[xX][A-Fa-f0-9]+)\\].*", options: .anchorsMatchLines)
+    
     static func cpuUsageFrame(_ binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> RE? {
         //4  function_name (file.name:90 in binary + 869436) [0x1050a843c]
         //2   ??? (binary + 41878904) [0x1032d0578]
@@ -139,4 +144,13 @@ extension RE {
     
     // CPU Type: arm64
     static let cpuType = try! RE("CPU Type:\\s*([^\\s]+)")
+}
+
+// MARK: Fabric
+extension RE {
+    static let hashDevice = try! RE("^# Device:\\s*(.+)", options: .anchorsMatchLines)
+    static let hashAppVersion = try! RE("^# Version:\\s*(.+)", options: .anchorsMatchLines)
+    static let hashPlatform = try! RE("^# Platform:\\s*(.+)", options: .anchorsMatchLines)
+    static let hashOSVersion = try! RE("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
+    static let hashBundleID = try! RE("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
 }

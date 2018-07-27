@@ -87,13 +87,18 @@ class ContentViewController: NSViewController {
     }
     
     private func infoString(fromCrash crash: CrashInfo) -> String {
-        var info = "🏷 " + modelToName(crash.device ?? "Unknow device")
+        var info = ""
+        var divider = ""
+        if let device = crash.device {
+            info += "🏷 " + modelToName(device)
+            divider = " - "
+        }
         if let osVersion = crash.osVersion {
-            info += " - \(osVersion)"
+            info += "\(divider)\(osVersion)"
         }
         
         if let appVersion = crash.appVersion {
-            info += " - \(appVersion)"
+            info += "\(divider)\(appVersion)"
         }
         
         return info
@@ -105,26 +110,24 @@ class ContentViewController: NSViewController {
         }
         
         let crashInfo = document.crashInfo
-        if self.selectedBinaryName == nil {
-            self.selectedBinaryName = crashInfo?.appName ??             (UserDefaults.standard.value(forKey: self.lastSelectedBinaryKey) as? String)
-        }
+        let binary = self.selectedBinaryName ?? crashInfo?.appName ?? (UserDefaults.standard.value(forKey: self.lastSelectedBinaryKey) as? String)
         
-        self.updateHighlighting(crashInfo)
-        self.updateSummary(crashInfo)
-        self.updateBinaryButton(crashInfo)
+        self.updateHighlighting(crashInfo, binary: binary)
+        self.updateSummary(crashInfo, binary: binary)
+        self.updateBinaryButton(crashInfo, binary: binary)
     }
     
-    private func updateHighlighting(_ crashInfo: CrashInfo?) {
+    private func updateHighlighting(_ crashInfo: CrashInfo?, binary: String?) {
         if let textStorage = self.textView.textStorage,
-            let binary = self.selectedBinaryName,
-            let ranges = crashInfo?.backgraceRanges(withBinary: binary) {
+            let binaryName = binary,
+            let ranges = crashInfo?.backgraceRanges(withBinary: binaryName) {
             textStorage.beginEditing()
             textStorage.processHighlighting(ranges)
             textStorage.endEditing()
         }
     }
     
-    private func updateSummary(_ crashInfo: CrashInfo?) {
+    private func updateSummary(_ crashInfo: CrashInfo?, binary: String?) {
         guard let info = crashInfo else {
             self.toggleBottomBar(false)
             return
@@ -133,7 +136,7 @@ class ContentViewController: NSViewController {
         self.toggleBottomBar(true)
     }
     
-    private func updateBinaryButton(_ crashInfo: CrashInfo?) {
+    private func updateBinaryButton(_ crashInfo: CrashInfo?, binary: String?) {
         guard let info = crashInfo else {
             self.binaryButton.isHidden = true
             return
@@ -142,11 +145,7 @@ class ContentViewController: NSViewController {
         if let binaries = info.allBinaryImages() {
             self.binaryButton.isHidden = false
             self.binaryButton.addItems(withTitles: binaries.sorted())
-            if let binary = self.selectedBinaryName {
-                self.binaryButton.selectItem(withTitle: binary)
-            } else {
-                self.binaryButton.selectItem(withTitle: "")
-            }
+            self.binaryButton.selectItem(withTitle: binary ?? "")
         }
     }
 }
@@ -175,17 +174,19 @@ extension ContentViewController: NSSplitViewDelegate {
 extension ContentViewController {
     @IBAction func didSelectBinary(_ sender: AnyObject?) {
         self.selectedBinaryName = self.binaryButton.titleOfSelectedItem
-        self.updateHighlighting(self.document?.crashInfo)
+        self.updateHighlighting(self.document?.crashInfo, binary: self.selectedBinaryName)
     }
 }
 
 // Mark: Highlight
 extension NSTextStorage {
     func processHighlighting(_ ranges:[NSRange]) {
-        let defaultAttrs: [NSAttributedString.Key: AnyObject] = [
+        var defaultAttrs: [NSAttributedString.Key: AnyObject] = [
             .foregroundColor: NSColor.textColor,
-            .font: self.font!
         ]
+        if let font = self.font {
+            defaultAttrs[.font] = font
+        }
         self.setAttributes(defaultAttrs, range: self.string.nsRange)
         
         let attrs: [NSAttributedString.Key: AnyObject] = [
