@@ -120,6 +120,7 @@ extension CrashDocument {
             let content = crash.symbolicate(dsym: dsym)
             DispatchQueue.main.async {
                 self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+                self.undoManager?.removeAllActions()
                 self.notificationCenter.post(name: .crashSymbolicated, object: self)
             }
         }

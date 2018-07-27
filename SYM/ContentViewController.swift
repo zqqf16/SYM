@@ -29,7 +29,7 @@ extension NSViewController {
 }
 
 class ContentViewController: NSViewController {
-    @IBOutlet var textView: NSTextView!
+    @IBOutlet var textView: TextView!
     @IBOutlet var infoLabel: NSTextField!
     @IBOutlet var splitView: NSSplitView!
     @IBOutlet var bottomBar: NSView!
