@@ -158,7 +158,7 @@ extension MainWindowController: DsymFileMonitorDelegate {
         openPanel.canChooseDirectories = false
         openPanel.canCreateDirectories = false
         openPanel.canChooseFiles = true
-        openPanel.begin { [weak openPanel] (result) in
+        openPanel.beginSheetModal(for: self.window!) { [weak openPanel] (result) in
             if result == .OK {
                 if let url = openPanel?.url {
                     self.parseSelectResult(url)

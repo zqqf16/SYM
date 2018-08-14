@@ -49,26 +49,6 @@ class DsymFile: Hashable {
     }
 }
 
-class XCArchiveFile: DsymFile {
-    let dsyms: [DsymFile]
-    
-    init(name: String, path: String, dsyms: [DsymFile]) {
-        self.dsyms = dsyms
-        let uuids: [String] = dsyms.flatMap { return $0.uuids }
-        super.init(name: name, path: name, binaryPath: "", uuids: uuids)
-    }
-    
-    func dsymFile(_ uuid: String) -> DsymFile? {
-        for dsym in self.dsyms {
-            if dsym.uuids.contains(uuid) {
-                return dsym
-            }
-        }
-        
-        return nil
-    }
-}
-
 protocol DsymFileMonitorDelegate: class {
     func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile:DsymFile) -> Void
 }
@@ -130,7 +110,10 @@ class DsymFileMonitor {
     // MARK: Result
     @objc func handleResult(_ notification: NSNotification) {
         // query
-        guard let results = self.query.results as? [NSMetadataItem] else {
+        guard let query = notification.object as? NSMetadataQuery,
+            query == self.query,
+            let results = self.query.results as? [NSMetadataItem]
+        else {
             return
         }
         
