@@ -69,95 +69,157 @@ class XCArchiveFile: DsymFile {
     }
 }
 
-class DsymFileManager {
-    static let shared = DsymFileManager()
+protocol DsymFileMonitorDelegate: class {
+    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile:DsymFile) -> Void
+}
 
-    private var finder = FileFinder()
-    var dsymFiles: [DsymFile] = [] {
-        didSet {
-            NotificationCenter.default.post(name: .dsymListUpdated, object: nil)
+class DsymFileMonitor {
+    private let operationQueue = DispatchQueue(label: "dsym.finder")
+    private let query = NSMetadataQuery()
+    
+    var uuid: String?
+    var bundleID: String?
+    
+    weak var delegate: DsymFileMonitorDelegate?
+    
+    init() {
+        let nc = NotificationCenter.default
+        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidFinishGathering, object: nil)
+        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidUpdate, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    func update(uuid: String?, bundleID: String?) {
+        let restart = self.uuid != uuid || self.bundleID != bundleID
+        self.uuid = uuid
+        self.bundleID = bundleID
+        if (restart) {
+            self.stop()
+            self.start()
         }
     }
     
-    func dsymFile(withUUID uuid: String) -> DsymFile? {
-        for dsym in self.dsymFiles {
-            if dsym.uuids.contains(uuid) {
-                if let archive = dsym as? XCArchiveFile {
-                    return archive.dsymFile(uuid)
-                }
-                return dsym
+    func start() {
+        var condition: String = ""
+        if let uuid = self.uuid {
+            condition = "com_apple_xcode_dsym_uuids = \(uuid)"
+        }
+        
+        if let bundleID = self.bundleID {
+            if condition.count > 0 {
+                condition += " || "
             }
+            condition += "kMDItemCFBundleIdentifier = \(bundleID)"
         }
-        return nil
-    }
-    
-    func reload() {
-        if self.finder.isRunning {
+        
+        if condition.count == 0 {
             return
         }
         
-        let condition = "com_apple_xcode_dsym_uuids = *"
-        self.finder.search(condition) { [weak self] (results) in
-            guard results != nil else {
-                self?.dsymFiles = []
-                return
+        self.query.predicate = NSPredicate(fromMetadataQueryString: condition)
+        self.query.start()
+    }
+    
+    func stop() {
+        self.query.stop()
+    }
+    
+    // MARK: Result
+    @objc func handleResult(_ notification: NSNotification) {
+        // query
+        guard let results = self.query.results as? [NSMetadataItem] else {
+            return
+        }
+        
+        var appItems = [NSMetadataItem]()
+        
+        for item in results {
+            let type = item.value(forKey: NSMetadataItemContentTypeKey) as! String
+            if type == "com.apple.xcode.dsym" {
+                // dsym
+                if let dsym = self.parseDsymFile(item) {
+                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
+                    return
+                }
+            } else if type == "com.apple.xcode.archive" {
+                // xcarchive
+                if let dsym = self.parseXcarchiveFile(item) {
+                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
+                    return
+                }
+            } else if type == "com.apple.application-bundle" {
+                // app
+                appItems.append(item)
             }
-            var files = [DsymFile]()
-            for item in results! {
-                if let dsym = self?.parse(uuidSearchResult: item) {
-                    if let archive = dsym as? XCArchiveFile {
-                        files.append(contentsOf: archive.dsyms)
-                    } else {
-                        files.append(dsym)
-                    }
+        }
+        
+        self.operationQueue.async {
+            for app in appItems {
+                if let dsym = self.parseAppBundle(app) {
+                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
+                    return
                 }
             }
-            self?.dsymFiles = files
         }
     }
     
-    private func parse(uuidSearchResult result: NSMetadataItem) -> DsymFile? {
-        // `mdls xxx.xcarchive`
-        let name = result.value(forKey: NSMetadataItemFSNameKey) as! String
-        let path = result.value(forKey: NSMetadataItemPathKey) as! String
-        let type = result.value(forKey: NSMetadataItemContentTypeKey) as! String
-        
-        let dsymPaths = result.value(forKey: "com_apple_xcode_dsym_paths") as! [String]
-        let dsymUUIDs = result.value(forKey: "com_apple_xcode_dsym_uuids") as! [String]
-        
-        if type == "com.apple.xcode.dsym" {
-            let realPath = "\(path)/\(dsymPaths[0])"
-            return DsymFile(name: name, path: path, binaryPath: realPath, uuids: dsymUUIDs)
+    func parseDsymFile(_ item: NSMetadataItem) -> DsymFile? {
+        guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
+            let path = item.value(forKey: NSMetadataItemPathKey) as? String,
+            let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
+            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String]
+            else {
+                return nil
         }
         
-        if dsymPaths.count != dsymUUIDs.count {
+        let realPath = "\(path)/\(dsymPaths[0])"
+        return DsymFile(name: name, path: path, binaryPath: realPath, uuids: dsymUUIDs)
+    }
+    
+    func parseXcarchiveFile(_ item: NSMetadataItem) -> DsymFile? {
+        guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
+            let path = item.value(forKey: NSMetadataItemPathKey) as? String,
+            let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
+            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
+            let uuid = self.uuid,
+            let index = dsymUUIDs.firstIndex(of: uuid)
+        else {
+                return nil
+        }
+        
+        // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
+        let dsymPath = dsymPaths[index]
+        var displayPath = path
+        let realPath = "\(path)/\(dsymPath)"
+        let pathComponents = dsymPath.components(separatedBy: "/")
+        if pathComponents.count > 2 {
+            displayPath += "/\(pathComponents[0])/\(pathComponents[1])"
+        } else {
+            displayPath = realPath
+        }
+        
+        return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: [uuid])
+    }
+    
+    func parseAppBundle(_ item: NSMetadataItem) -> DsymFile? {
+        guard let uuid = self.uuid,
+            let path = item.value(forKey: NSMetadataItemPathKey) as? String,
+            let bundle = Bundle(path: path),
+            let exePath = bundle.executablePath,
+            let uuids = SubProcess.dwarfdump([exePath])
+        else {
             return nil
         }
-        
-        // xcarchive
-        var pathGroup: [String: [String]] = [:]
-        for (index, subPath) in dsymPaths.enumerated() {
-            var uuids = pathGroup[subPath] ?? []
-            uuids.append(dsymUUIDs[index])
-            pathGroup[subPath] = uuids
-        }
-        
-        let dsyms = pathGroup.map { (tuple: (path: String, uuids: [String])) -> DsymFile in
-            // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
-            var name = tuple.path
-            var displayPath = path
-            let realPath = "\(path)/\(tuple.path)"
-            let pathComponents = tuple.path.components(separatedBy: "/")
-            if pathComponents.count > 2 {
-                name = pathComponents[1]
-                displayPath += "/\(pathComponents[0])/\(pathComponents[1])"
-            } else {
-                displayPath = realPath
+        let name = item.value(forKey: NSMetadataItemFSNameKey) as? String ?? exePath
+        for u in uuids {
+            if u.0 == uuid {
+                return DsymFile(name: name, path: exePath, binaryPath: exePath, uuids: [uuid])
             }
-            
-            return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: tuple.uuids)
         }
         
-        return XCArchiveFile(name: name, path: path, dsyms: dsyms)
+        return nil
     }
 }

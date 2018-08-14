@@ -27,10 +27,8 @@
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
 		F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B68F21E227B8100128D8D /* MainWindowController.swift */; };
 		F49030FF20F769ED00249832 /* DocumentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49030FE20F769ED00249832 /* DocumentController.swift */; };
-		F49A8B651D3B28DF00B951AD /* DsymListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49A8B641D3B28DF00B951AD /* DsymListViewController.swift */; };
 		F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */; };
 		F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F49BD1F51D2FF46300024AAE /* Main.storyboard */; };
-		F49F48C820F8925B00624672 /* Dsym.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F49F48C720F8925B00624672 /* Dsym.storyboard */; };
 		F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A679731E21319D009F93E7 /* BundleDocument.swift */; };
 		F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */; };
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
@@ -70,12 +68,10 @@
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
 		F45B68F21E227B8100128D8D /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
 		F49030FE20F769ED00249832 /* DocumentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentController.swift; sourceTree = "<group>"; };
-		F49A8B641D3B28DF00B951AD /* DsymListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DsymListViewController.swift; sourceTree = "<group>"; };
 		F49BD1EC1D2FF46300024AAE /* SYM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SYM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F49BD1F61D2FF46300024AAE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F49BD1F81D2FF46300024AAE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F49F48C720F8925B00624672 /* Dsym.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Dsym.storyboard; sourceTree = "<group>"; };
 		F4A679731E21319D009F93E7 /* BundleDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BundleDocument.swift; sourceTree = "<group>"; };
 		F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Symbolicate.swift; sourceTree = "<group>"; };
 		F4CD14621D39D323006BAB2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -162,12 +158,10 @@
 			isa = PBXGroup;
 			children = (
 				F49BD1F51D2FF46300024AAE /* Main.storyboard */,
-				F49F48C720F8925B00624672 /* Dsym.storyboard */,
 				F40543691D321E37009B2923 /* Window.swift */,
 				F45B68F21E227B8100128D8D /* MainWindowController.swift */,
 				51BF9C491D66AB8800379BFC /* TextView.swift */,
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
-				F49A8B641D3B28DF00B951AD /* DsymListViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 			);
 			name = UI;
@@ -312,7 +306,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F49F48C820F8925B00624672 /* Dsym.storyboard in Resources */,
 				F4CD14651D39D5B7006BAB2B /* file.icns in Resources */,
 				F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
@@ -341,7 +334,6 @@
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
-				F49A8B651D3B28DF00B951AD /* DsymListViewController.swift in Sources */,
 				F422C7C51D36A6A000066837 /* Dsym.swift in Sources */,
 				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,

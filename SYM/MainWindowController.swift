@@ -34,16 +34,19 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var dsymButton: NSButton!
     @IBOutlet weak var deviceLabel: NSTextField!
     
+    private var monitor = DsymFileMonitor()
+    
     private var dsymFile: DsymFile? {
         didSet {
             DispatchQueue.main.async {
                 if self.dsymFile == nil {
-                    self.dsymButton.title = "Select a dSYM file"
+                    self.dsymButton.title = "dSYM file not found"
                     self.dsymButton.image = .alert
                 } else {
                     self.dsymButton.title = self.dsymFile!.name
                     self.dsymButton.image = .symbol
                 }
+                self.dsymButton.setNeedsDisplay()
             }
         }
     }
@@ -80,18 +83,16 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
-
-        self.dsymFile = nil;
-        DsymFileManager.shared.reload()
-        NotificationCenter.default.addObserver(self, selector: #selector(dsymListDidUpdate), name: .dsymListUpdated, object: nil)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder:coder)
+        self.monitor.delegate = self
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        self.monitor.stop()
     }
     
     fileprivate func sendNotification(_ name: Notification.Name) {
@@ -102,6 +103,7 @@ class MainWindowController: NSWindowController {
     
     override var document: AnyObject? {
         didSet {
+            self.dsymFile = nil;
             guard let document = document as? CrashDocument else {
                 return
             }
@@ -119,16 +121,6 @@ class MainWindowController: NSWindowController {
     func updateCrashInfo() {
         //self.device = self.crashInfo?.device
         self.findCurrentDsym()
-    }
-    
-    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        if let dsymListViewController = segue.destinationController as? DsymListViewController {
-            dsymListViewController.delegate = self
-            if let uuid = self.crashDocument?.crashInfo?.uuid {
-                dsymListViewController.uuid = uuid
-            }
-        }
-        super.prepare(for: segue, sender: sender)
     }
 }
 
@@ -155,20 +147,34 @@ extension MainWindowController {
 }
 
 // MARK: - dSYM
-extension MainWindowController: DsymListViewControllerDelegate {
-    @objc func dsymListDidUpdate(notification: Notification) {
-        if self.dsymFile == nil {
-            self.findCurrentDsym()
+extension MainWindowController: DsymFileMonitorDelegate {
+    func findCurrentDsym() {
+        self.monitor.update(uuid: self.crashInfo?.uuid, bundleID: self.crashInfo?.bundleID)
+    }
+    
+    @IBAction func locateDsym(_ sender: AnyObject?) {
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.begin { [weak openPanel] (result) in
+            if result == .OK {
+                if let url = openPanel?.url {
+                    self.parseSelectResult(url)
+                }
+            }
         }
     }
     
-    func findCurrentDsym() {
-        if let uuid = self.crashInfo?.uuid {
-            self.dsymFile = DsymFileManager.shared.dsymFile(withUUID: uuid)
-        }
+    func parseSelectResult(_ url: URL) {
+        let path = url.path
+        let name = url.lastPathComponent
+        let uuid = self.crashInfo?.uuid ?? ""
+        self.dsymFile = DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])
     }
 
-    func didSelectDsym(_ dsym: DsymFile) {
-        self.dsymFile = dsym
+    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile: DsymFile) {
+        self.dsymFile = dsymFile
     }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14269.14" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14269.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.13.2"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -525,7 +525,7 @@
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
                                         <connections>
-                                            <segue destination="8U3-Iz-SoF" kind="sheet" identifier="gotoDsymList" id="B4Q-Ea-Rnv"/>
+                                            <action selector="locateDsym:" target="akE-CK-Bh4" id="Z5M-aY-l6N"/>
                                         </connections>
                                     </button>
                                 </toolbarItem>
@@ -773,14 +773,6 @@
                 <customObject id="BQJ-8w-mFZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1897" y="-15"/>
-        </scene>
-        <!--Dsym-->
-        <scene sceneID="0du-Tj-hMS">
-            <objects>
-                <controllerPlaceholder storyboardName="Dsym" id="8U3-Iz-SoF" sceneMemberID="viewController"/>
-                <customObject id="hXV-fd-jx2" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-598" y="-346"/>
         </scene>
     </scenes>
     <resources>
