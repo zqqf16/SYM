@@ -20,6 +20,8 @@
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
+		F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */ = {isa = PBXBuildFile; fileRef = F40B9DBC2123E32D000DF7C6 /* models.txt */; };
+		F40B9DBF2123E32D000DF7C6 /* models.py in Resources */ = {isa = PBXBuildFile; fileRef = F40B9DBD2123E32D000DF7C6 /* models.py */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
 		F422C7C51D36A6A000066837 /* Dsym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C41D36A6A000066837 /* Dsym.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
@@ -61,6 +63,8 @@
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A31D3FBB7200F3B00C /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
+		F40B9DBC2123E32D000DF7C6 /* models.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = models.txt; sourceTree = "<group>"; };
+		F40B9DBD2123E32D000DF7C6 /* models.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = models.py; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
 		F422C7C41D36A6A000066837 /* Dsym.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dsym.swift; sourceTree = "<group>"; };
 		F45320FA1D30A33C00639917 /* Crash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crash.swift; sourceTree = "<group>"; };
@@ -134,6 +138,15 @@
 			path = SYMTests;
 			sourceTree = "<group>";
 		};
+		F40B9DBB2123E31A000DF7C6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F40B9DBD2123E32D000DF7C6 /* models.py */,
+				F40B9DBC2123E32D000DF7C6 /* models.txt */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		F43C129D1D39CEE0004952B4 /* images */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,6 +202,7 @@
 		F49BD1EE1D2FF46300024AAE /* SYM */ = {
 			isa = PBXGroup;
 			children = (
+				F40B9DBB2123E31A000DF7C6 /* Models */,
 				51B5D2981D52166000B979C8 /* Tools */,
 				F45321061D30CC5F00639917 /* Utils */,
 				51B8D7031D4F60EB00F2C24C /* Document */,
@@ -308,6 +322,8 @@
 			files = (
 				F4CD14651D39D5B7006BAB2B /* file.icns in Resources */,
 				F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */,
+				F40B9DBF2123E32D000DF7C6 /* models.py in Resources */,
+				F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
 				519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */,
 			);
