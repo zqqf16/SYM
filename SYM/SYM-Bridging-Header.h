@@ -20,26 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
+#ifndef SYM_Bridging_Header_h
+#define SYM_Bridging_Header_h
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-    override init() {
-        super.init()
-        let _ = DocumentController()
-    }
+#import "SYMDeviceMonitor.h"
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        //DsymManager.sharedInstance.findAllDsyms()
-        SYMDeviceMonitor.shared().start()
-    }
-    
-    func applicationWillFinishLaunching(_ notification: Notification) {
-    }
-
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-}
-
+#endif /* SYM_Bridging_Header_h */

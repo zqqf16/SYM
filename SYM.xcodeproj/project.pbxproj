@@ -34,6 +34,12 @@
 		F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */; };
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
+		F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
+		F4EFE907212530CF00E9EDA9 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
+		F4EFE9082125522F00E9EDA9 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
+		F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */; };
+		F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
+		F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +85,56 @@
 		F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Symbolicate.swift; sourceTree = "<group>"; };
 		F4CD14621D39D323006BAB2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4CD14641D39D5B7006BAB2B /* file.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = file.icns; sourceTree = "<group>"; };
+		F4EFE81421242D9300E9EDA9 /* SYM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SYM-Bridging-Header.h"; sourceTree = "<group>"; };
+		F4EFE816212430A600E9EDA9 /* usbmuxd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usbmuxd.h; sourceTree = "<group>"; };
+		F4EFE817212430A600E9EDA9 /* usbmuxd-proto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "usbmuxd-proto.h"; sourceTree = "<group>"; };
+		F4EFE818212430A600E9EDA9 /* libusbmuxd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libusbmuxd.a; sourceTree = "<group>"; };
+		F4EFE81E2124357800E9EDA9 /* Structure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Structure.h; sourceTree = "<group>"; };
+		F4EFE81F2124357800E9EDA9 /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
+		F4EFE8202124357800E9EDA9 /* Key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Key.h; sourceTree = "<group>"; };
+		F4EFE8212124357800E9EDA9 /* Date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
+		F4EFE8222124357800E9EDA9 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
+		F4EFE8232124357800E9EDA9 /* Real.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Real.h; sourceTree = "<group>"; };
+		F4EFE8242124357800E9EDA9 /* Boolean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Boolean.h; sourceTree = "<group>"; };
+		F4EFE8252124357800E9EDA9 /* Dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Dictionary.h; sourceTree = "<group>"; };
+		F4EFE8262124357800E9EDA9 /* plist++.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "plist++.h"; sourceTree = "<group>"; };
+		F4EFE8272124357800E9EDA9 /* Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Array.h; sourceTree = "<group>"; };
+		F4EFE8282124357800E9EDA9 /* libplist.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplist.a; sourceTree = "<group>"; };
+		F4EFE8292124357800E9EDA9 /* Integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Integer.h; sourceTree = "<group>"; };
+		F4EFE82A2124357800E9EDA9 /* plist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plist.h; sourceTree = "<group>"; };
+		F4EFE82B2124357800E9EDA9 /* Uid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Uid.h; sourceTree = "<group>"; };
+		F4EFE82C2124357800E9EDA9 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
+		F4EFE82E2124361400E9EDA9 /* libboringssl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libboringssl.tbd; path = usr/lib/libboringssl.tbd; sourceTree = SDKROOT; };
+		F4EFE8E82125305100E9EDA9 /* afc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = afc.h; sourceTree = "<group>"; };
+		F4EFE8E92125305100E9EDA9 /* webinspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webinspector.h; sourceTree = "<group>"; };
+		F4EFE8EA2125305100E9EDA9 /* asprintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asprintf.h; sourceTree = "<group>"; };
+		F4EFE8EB2125305100E9EDA9 /* installation_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = installation_proxy.h; sourceTree = "<group>"; };
+		F4EFE8EC2125305100E9EDA9 /* misagent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misagent.h; sourceTree = "<group>"; };
+		F4EFE8ED2125305100E9EDA9 /* mobilebackup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobilebackup.h; sourceTree = "<group>"; };
+		F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimobiledevice.a; sourceTree = "<group>"; };
+		F4EFE8EF2125305200E9EDA9 /* heartbeat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heartbeat.h; sourceTree = "<group>"; };
+		F4EFE8F02125305200E9EDA9 /* house_arrest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = house_arrest.h; sourceTree = "<group>"; };
+		F4EFE8F12125305200E9EDA9 /* mobilebackup2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobilebackup2.h; sourceTree = "<group>"; };
+		F4EFE8F22125305200E9EDA9 /* mobileactivation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobileactivation.h; sourceTree = "<group>"; };
+		F4EFE8F32125305200E9EDA9 /* debugserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debugserver.h; sourceTree = "<group>"; };
+		F4EFE8F42125305200E9EDA9 /* lockdown.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lockdown.h; sourceTree = "<group>"; };
+		F4EFE8F52125305200E9EDA9 /* restore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = restore.h; sourceTree = "<group>"; };
+		F4EFE8F62125305200E9EDA9 /* mobile_image_mounter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobile_image_mounter.h; sourceTree = "<group>"; };
+		F4EFE8F72125305200E9EDA9 /* diagnostics_relay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = diagnostics_relay.h; sourceTree = "<group>"; };
+		F4EFE8F82125305200E9EDA9 /* screenshotr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = screenshotr.h; sourceTree = "<group>"; };
+		F4EFE8F92125305200E9EDA9 /* syslog_relay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syslog_relay.h; sourceTree = "<group>"; };
+		F4EFE8FA2125305200E9EDA9 /* file_relay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file_relay.h; sourceTree = "<group>"; };
+		F4EFE8FB2125305200E9EDA9 /* property_list_service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = property_list_service.h; sourceTree = "<group>"; };
+		F4EFE8FC2125305300E9EDA9 /* libimobiledevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libimobiledevice.h; sourceTree = "<group>"; };
+		F4EFE8FD2125305300E9EDA9 /* mobilesync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobilesync.h; sourceTree = "<group>"; };
+		F4EFE8FE2125305300E9EDA9 /* sbservices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbservices.h; sourceTree = "<group>"; };
+		F4EFE8FF2125305300E9EDA9 /* notification_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = notification_proxy.h; sourceTree = "<group>"; };
+		F4EFE9002125305300E9EDA9 /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
+		F4EFE9012125305300E9EDA9 /* endianness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianness.h; sourceTree = "<group>"; };
+		F4EFE904212530CF00E9EDA9 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
+		F4EFE905212530CF00E9EDA9 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SYMDeviceMonitor.h; sourceTree = "<group>"; };
+		F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SYMDeviceMonitor.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +150,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4EFE9082125522F00E9EDA9 /* libssl.a in Frameworks */,
+				F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */,
+				F4EFE907212530CF00E9EDA9 /* libcrypto.a in Frameworks */,
+				F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */,
+				F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +164,7 @@
 		514B4F691E30AC9000171990 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F4EFE82E2124361400E9EDA9 /* libboringssl.tbd */,
 				514B4F6A1E30AC9100171990 /* Foundation.framework */,
 			);
 			name = Frameworks;
@@ -201,6 +263,7 @@
 		F49BD1EE1D2FF46300024AAE /* SYM */ = {
 			isa = PBXGroup;
 			children = (
+				F4EFE7DE21242C0900E9EDA9 /* Device */,
 				F40B9DBB2123E31A000DF7C6 /* Models */,
 				51B5D2981D52166000B979C8 /* Tools */,
 				F45321061D30CC5F00639917 /* Utils */,
@@ -208,6 +271,7 @@
 				F4CD14661D39DD95006BAB2B /* Crash */,
 				F45321071D30CC6E00639917 /* UI */,
 				F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */,
+				F4EFE81421242D9300E9EDA9 /* SYM-Bridging-Header.h */,
 				F49BD1F81D2FF46300024AAE /* Info.plist */,
 				F4CD14621D39D323006BAB2B /* Assets.xcassets */,
 				F43C129D1D39CEE0004952B4 /* images */,
@@ -224,6 +288,93 @@
 				F422C7C41D36A6A000066837 /* Dsym.swift */,
 			);
 			name = Crash;
+			sourceTree = "<group>";
+		};
+		F4EFE7DE21242C0900E9EDA9 /* Device */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE903212530BA00E9EDA9 /* openssl */,
+				F4EFE81D2124357800E9EDA9 /* plist */,
+				F4EFE815212430A600E9EDA9 /* usbmuxd */,
+				F4EFE7FC21242CAA00E9EDA9 /* libimobiledevice */,
+				F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */,
+				F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */,
+			);
+			path = Device;
+			sourceTree = "<group>";
+		};
+		F4EFE7FC21242CAA00E9EDA9 /* libimobiledevice */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */,
+				F4EFE8E82125305100E9EDA9 /* afc.h */,
+				F4EFE8EA2125305100E9EDA9 /* asprintf.h */,
+				F4EFE8F32125305200E9EDA9 /* debugserver.h */,
+				F4EFE8F72125305200E9EDA9 /* diagnostics_relay.h */,
+				F4EFE9012125305300E9EDA9 /* endianness.h */,
+				F4EFE8FA2125305200E9EDA9 /* file_relay.h */,
+				F4EFE8EF2125305200E9EDA9 /* heartbeat.h */,
+				F4EFE8F02125305200E9EDA9 /* house_arrest.h */,
+				F4EFE8EB2125305100E9EDA9 /* installation_proxy.h */,
+				F4EFE8FC2125305300E9EDA9 /* libimobiledevice.h */,
+				F4EFE8F42125305200E9EDA9 /* lockdown.h */,
+				F4EFE8EC2125305100E9EDA9 /* misagent.h */,
+				F4EFE8F62125305200E9EDA9 /* mobile_image_mounter.h */,
+				F4EFE8F22125305200E9EDA9 /* mobileactivation.h */,
+				F4EFE8ED2125305100E9EDA9 /* mobilebackup.h */,
+				F4EFE8F12125305200E9EDA9 /* mobilebackup2.h */,
+				F4EFE8FD2125305300E9EDA9 /* mobilesync.h */,
+				F4EFE8FF2125305300E9EDA9 /* notification_proxy.h */,
+				F4EFE8FB2125305200E9EDA9 /* property_list_service.h */,
+				F4EFE8F52125305200E9EDA9 /* restore.h */,
+				F4EFE8FE2125305300E9EDA9 /* sbservices.h */,
+				F4EFE8F82125305200E9EDA9 /* screenshotr.h */,
+				F4EFE9002125305300E9EDA9 /* service.h */,
+				F4EFE8F92125305200E9EDA9 /* syslog_relay.h */,
+				F4EFE8E92125305100E9EDA9 /* webinspector.h */,
+			);
+			path = libimobiledevice;
+			sourceTree = "<group>";
+		};
+		F4EFE815212430A600E9EDA9 /* usbmuxd */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE816212430A600E9EDA9 /* usbmuxd.h */,
+				F4EFE817212430A600E9EDA9 /* usbmuxd-proto.h */,
+				F4EFE818212430A600E9EDA9 /* libusbmuxd.a */,
+			);
+			path = usbmuxd;
+			sourceTree = "<group>";
+		};
+		F4EFE81D2124357800E9EDA9 /* plist */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE81E2124357800E9EDA9 /* Structure.h */,
+				F4EFE81F2124357800E9EDA9 /* Data.h */,
+				F4EFE8202124357800E9EDA9 /* Key.h */,
+				F4EFE8212124357800E9EDA9 /* Date.h */,
+				F4EFE8222124357800E9EDA9 /* Node.h */,
+				F4EFE8232124357800E9EDA9 /* Real.h */,
+				F4EFE8242124357800E9EDA9 /* Boolean.h */,
+				F4EFE8252124357800E9EDA9 /* Dictionary.h */,
+				F4EFE8262124357800E9EDA9 /* plist++.h */,
+				F4EFE8272124357800E9EDA9 /* Array.h */,
+				F4EFE8282124357800E9EDA9 /* libplist.a */,
+				F4EFE8292124357800E9EDA9 /* Integer.h */,
+				F4EFE82A2124357800E9EDA9 /* plist.h */,
+				F4EFE82B2124357800E9EDA9 /* Uid.h */,
+				F4EFE82C2124357800E9EDA9 /* String.h */,
+			);
+			path = plist;
+			sourceTree = "<group>";
+		};
+		F4EFE903212530BA00E9EDA9 /* openssl */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE905212530CF00E9EDA9 /* libcrypto.a */,
+				F4EFE904212530CF00E9EDA9 /* libssl.a */,
+			);
+			path = openssl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -355,6 +506,7 @@
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
+				F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
@@ -527,14 +679,30 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SYM/Device",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
 				INFOPLIST_FILE = SYM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+					"$(PROJECT_DIR)/SYM/Device/libusbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/libplist",
+					"$(PROJECT_DIR)/SYM/Device/openssl",
+					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/plist",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/SYM/SYM-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -548,15 +716,31 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/SYM/Device",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
 				INFOPLIST_FILE = SYM/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+					"$(PROJECT_DIR)/SYM/Device/libusbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/libplist",
+					"$(PROJECT_DIR)/SYM/Device/openssl",
+					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/plist",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/SYM/SYM-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.2;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
