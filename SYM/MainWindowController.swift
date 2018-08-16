@@ -32,7 +32,7 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var symButton: NSButton!
     @IBOutlet weak var indicator: NSProgressIndicator!
     @IBOutlet weak var dsymButton: NSButton!
-    @IBOutlet weak var deviceLabel: NSTextField!
+    @IBOutlet weak var deviceButton: NSButton!
     
     private var monitor = DsymFileMonitor()
     
@@ -47,20 +47,6 @@ class MainWindowController: NSWindowController {
                     self.dsymButton.image = .symbol
                 }
                 self.dsymButton.setNeedsDisplay()
-            }
-        }
-    }
-    
-    private var device: String? {
-        didSet {
-            DispatchQueue.main.async {
-                if let device = self.device {
-                    self.deviceLabel.stringValue = modelToName(device)
-                    self.deviceLabel.isHidden = false
-                } else {
-                    self.deviceLabel.stringValue = ""
-                    self.deviceLabel.isHidden = true
-                }
             }
         }
     }
@@ -83,6 +69,9 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
+        self.deviceButton.isHidden = !SYMDeviceMonitor.shared().deviceConnected;
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.SYMDeviceMonitor, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -93,11 +82,8 @@ class MainWindowController: NSWindowController {
     deinit {
         NotificationCenter.default.removeObserver(self)
         self.monitor.stop()
-    }
-    
-    fileprivate func sendNotification(_ name: Notification.Name) {
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: name, object: self)
+        if let document = self.crashDocument {
+            document.notificationCenter.removeObserver(self)
         }
     }
     
@@ -108,19 +94,18 @@ class MainWindowController: NSWindowController {
                 return
             }
             self.crashContentViewController.document = document
-            document.notificationCenter.addObserver(forName: .crashInfoUpdated, object: nil, queue: nil) { [weak self] (notification) in
-                self?.updateCrashInfo()
-            }
-            document.notificationCenter.addObserver(forName: .crashSymbolicated, object: nil, queue: nil) {  [weak self] (notification) in
-                self?.crashDidSymbolicated()
-            }
-            self.updateCrashInfo()
+            document.notificationCenter.addObserver(self, selector: #selector(updateCrashInfo(_:)), name: .crashInfoUpdated, object: nil)
+            document.notificationCenter.addObserver(self, selector: #selector(crashDidSymbolicated(_:)), name: .crashSymbolicated, object: nil)
+            self.updateCrashInfo(nil)
         }
     }
     
-    func updateCrashInfo() {
-        //self.device = self.crashInfo?.device
+    @objc func updateCrashInfo(_ notification: Notification?) {
         self.findCurrentDsym()
+    }
+    
+    @objc func updateDeviceButton(_ notification: Notification) {
+        self.deviceButton.isHidden = !SYMDeviceMonitor.shared().deviceConnected;
     }
 }
 
@@ -141,7 +126,7 @@ extension MainWindowController {
         self.crashDocument?.symbolicate(withDsymPath: self.dsymFile?.binaryPath)
     }
     
-    func crashDidSymbolicated() {
+    @objc func crashDidSymbolicated(_ notification: Notification) {
         self.indicator.stopAnimation(nil)
     }
 }
