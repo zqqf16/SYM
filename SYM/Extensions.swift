@@ -217,4 +217,37 @@ extension FileManager {
         let uuid = ProcessInfo.processInfo.globallyUniqueString
         return (NSTemporaryDirectory() as NSString).appendingPathComponent(uuid)
     }
+    
+    func createDirectory(_ path: String) -> Bool {
+        var isDir : ObjCBool = false
+        if self.fileExists(atPath: path, isDirectory: &isDir) {
+            return true
+        }
+        
+        do {
+            try self.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            return false
+        }
+        
+        return true
+    }
+    
+    func localCrashDirectory(_ udid: String) -> String {
+        guard let directory = self.appSupportDirectory() else {
+            return self.temporaryPath()
+        }
+        
+        var path = (directory as NSString).appendingPathComponent("crashes")
+        if !self.createDirectory(path) {
+            return self.temporaryPath()
+        }
+        
+        path = (path as NSString).appendingPathComponent(udid)
+        if !self.createDirectory(path) {
+            return self.temporaryPath()
+        }
+        
+        return path
+    }
 }

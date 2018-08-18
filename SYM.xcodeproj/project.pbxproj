@@ -40,6 +40,9 @@
 		F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */; };
 		F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
+		F4EFE9122126B2DB00E9EDA9 /* CrashImporter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4EFE9112126B2DB00E9EDA9 /* CrashImporter.storyboard */; };
+		F4EFE9182126C0FB00E9EDA9 /* SYMDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */; };
+		F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,6 +138,10 @@
 		F4EFE905212530CF00E9EDA9 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SYMDeviceMonitor.h; sourceTree = "<group>"; };
 		F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SYMDeviceMonitor.m; sourceTree = "<group>"; };
+		F4EFE9112126B2DB00E9EDA9 /* CrashImporter.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = CrashImporter.storyboard; sourceTree = "<group>"; };
+		F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SYMDevice.h; sourceTree = "<group>"; };
+		F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SYMDevice.m; sourceTree = "<group>"; };
+		F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashImporterViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,11 +239,13 @@
 			isa = PBXGroup;
 			children = (
 				F49BD1F51D2FF46300024AAE /* Main.storyboard */,
+				F4EFE9112126B2DB00E9EDA9 /* CrashImporter.storyboard */,
 				F40543691D321E37009B2923 /* Window.swift */,
 				F45B68F21E227B8100128D8D /* MainWindowController.swift */,
 				51BF9C491D66AB8800379BFC /* TextView.swift */,
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
+				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -299,6 +308,8 @@
 				F4EFE7FC21242CAA00E9EDA9 /* libimobiledevice */,
 				F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */,
 				F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */,
+				F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */,
+				F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */,
 			);
 			path = Device;
 			sourceTree = "<group>";
@@ -474,6 +485,7 @@
 				F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */,
 				F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
+				F4EFE9122126B2DB00E9EDA9 /* CrashImporter.storyboard in Resources */,
 				519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -495,6 +507,7 @@
 			files = (
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
+				F4EFE9182126C0FB00E9EDA9 /* SYMDevice.m in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
@@ -506,6 +519,7 @@
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
+				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
 				F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,

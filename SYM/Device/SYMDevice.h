@@ -20,10 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef SYM_Bridging_Header_h
-#define SYM_Bridging_Header_h
+#import <Foundation/Foundation.h>
 
-#import "SYMDeviceMonitor.h"
-#import "SYMDevice.h"
+NS_ASSUME_NONNULL_BEGIN
 
-#endif /* SYM_Bridging_Header_h */
+
+@interface SYMDeviceFile : NSObject
+
+@property (nonatomic, strong) NSString *path;
+@property (nonatomic, assign) BOOL isDirectory;
+@property (nonatomic, strong) NSDate *date;
+
+@property (nonatomic, strong, readonly) NSString *name;
+
+@end
+
+
+@interface SYMDevice : NSObject
+
+- (instancetype)initWithDeviceID:(nullable NSString *)udid;
+
+- (nullable NSString *)deviceName;
+- (nullable NSString *)deviceID;
+- (nullable NSArray<SYMDeviceFile *> *)crashList;
+- (nullable NSString *)readFile:(SYMDeviceFile *)file;
+
+@end
+
+
+NS_ASSUME_NONNULL_END

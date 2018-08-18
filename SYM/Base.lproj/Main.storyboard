@@ -513,6 +513,9 @@
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <segue destination="BZX-tn-6tC" kind="show" id="o44-9z-7zV"/>
+                                        </connections>
                                     </button>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="6607E1B6-AD95-4E9E-A78A-8F61E2062A59" label="Symbolicate Progress" paletteLabel="Symbolicate Progress" tag="-1" id="Elg-kw-8wH">
@@ -565,6 +568,14 @@
                 <customObject id="wBG-Uk-v7d" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1107" y="-322"/>
+        </scene>
+        <!--CrashImporter-->
+        <scene sceneID="Vc3-3e-2HU">
+            <objects>
+                <controllerPlaceholder storyboardName="CrashImporter" id="BZX-tn-6tC" sceneMemberID="viewController"/>
+                <customObject id="7Rm-lf-inn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-685" y="-450"/>
         </scene>
         <!--Content View Controller-->
         <scene sceneID="bhh-am-SLo">
