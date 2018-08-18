@@ -60,7 +60,7 @@ extension SubProcess {
         return nil
     }
     
-    static func symbolicatecrash(crash: String) -> String? {
+    static func symbolicatecrash(crash: String, dsym: String?) -> String? {
         let path = FileManager.default.temporaryPath()
         do {
             try crash.write(toFile: path, atomically: true, encoding: String.Encoding.utf8)
@@ -71,7 +71,10 @@ extension SubProcess {
         let cmd = Bundle.main.path(forResource: "symbolicatecrash", ofType: nil)
         assert(cmd != nil)
         
-        let args = [path]
+        var args = [path]
+        if let dsymPath = dsym {
+            args.append(contentsOf: ["-d", dsymPath])
+        }
         let output = execute(cmd: cmd!, args: args)
         return output.0
     }

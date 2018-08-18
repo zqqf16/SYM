@@ -111,7 +111,7 @@ class CrashInfo {
     }
     
     func symbolicate(dsym: String? = nil) -> String {
-        if let content = SubProcess.symbolicatecrash(crash: self.raw), content.count > 0 {
+        if let content = SubProcess.symbolicatecrash(crash: self.raw, dsym: dsym), content.count > 0 {
             return content
         }
         
