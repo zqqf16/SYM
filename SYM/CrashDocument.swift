@@ -61,6 +61,11 @@ class CrashDocument: NSDocument {
     override func data(ofType typeName: String) throws -> Data {
         return self.textStorage.string.data(using: String.Encoding.utf8)!
     }
+    
+    func update(_ content: String) {
+        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+        self.notificationCenter.post(name: .crashDidOpen, object: nil)
+    }
 
     override func read(from data: Data, ofType typeName: String) throws {
         if typeName == CrashFileType.plist {

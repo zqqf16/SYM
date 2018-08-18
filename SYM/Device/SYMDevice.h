@@ -20,26 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
+#import <Foundation/Foundation.h>
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-    override init() {
-        super.init()
-        let _ = DocumentController()
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        //DsymManager.sharedInstance.findAllDsyms()
-        SYMDeviceMonitor.shared().start()
-    }
-    
-    func applicationWillFinishLaunching(_ notification: Notification) {
-    }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-}
+@interface SYMDeviceFile : NSObject
 
+@property (nonatomic, strong) NSString *path;
+@property (nonatomic, assign) BOOL isDirectory;
+@property (nonatomic, strong) NSDate *date;
+
+@property (nonatomic, strong, readonly) NSString *name;
+
+@end
+
+
+@interface SYMDevice : NSObject
+
+- (instancetype)initWithDeviceID:(nullable NSString *)udid;
+
+- (nullable NSString *)deviceName;
+- (nullable NSString *)deviceID;
+- (nullable NSArray<SYMDeviceFile *> *)crashList;
+- (nullable NSString *)readFile:(SYMDeviceFile *)file;
+
+@end
+
+
+NS_ASSUME_NONNULL_END

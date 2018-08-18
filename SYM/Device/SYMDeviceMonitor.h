@@ -20,26 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
+#import <Foundation/Foundation.h>
 
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-    override init() {
-        super.init()
-        let _ = DocumentController()
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
-        //DsymManager.sharedInstance.findAllDsyms()
-        SYMDeviceMonitor.shared().start()
-    }
-    
-    func applicationWillFinishLaunching(_ notification: Notification) {
-    }
+extern NSString * const SYMDeviceMonitorNotification;
 
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-}
+@interface SYMDeviceMonitor : NSObject
+@property (nonatomic, assign) BOOL deviceConnected;
 
++ (instancetype)sharedMonitor;
+- (void)start;
+@end
+
+NS_ASSUME_NONNULL_END
