@@ -79,7 +79,7 @@ int usbmuxd_subscribe(usbmuxd_event_cb_t callback, void *user_data);
  *
  * @return only 0 for now.
  */
-int usbmuxd_unsubscribe();
+int usbmuxd_unsubscribe(void);
 
 /**
  * Contacts usbmuxd and retrieves a list of connected devices.

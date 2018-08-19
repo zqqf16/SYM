@@ -21,6 +21,8 @@
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
 		F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */ = {isa = PBXBuildFile; fileRef = F40B9DBC2123E32D000DF7C6 /* models.txt */; };
+		F41CD76221291AA300F7CEFB /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
+		F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
 		F422C7C51D36A6A000066837 /* Dsym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C41D36A6A000066837 /* Dsym.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
@@ -35,8 +37,6 @@
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 		F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
-		F4EFE907212530CF00E9EDA9 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
-		F4EFE9082125522F00E9EDA9 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
 		F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */; };
 		F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
@@ -157,9 +157,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F4EFE9082125522F00E9EDA9 /* libssl.a in Frameworks */,
+				F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */,
+				F41CD76221291AA300F7CEFB /* libcrypto.a in Frameworks */,
 				F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */,
-				F4EFE907212530CF00E9EDA9 /* libcrypto.a in Frameworks */,
 				F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */,
 				F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */,
 			);
@@ -703,8 +703,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
-					"$(PROJECT_DIR)/SYM/Device/libusbmuxd",
-					"$(PROJECT_DIR)/SYM/Device/libplist",
 					"$(PROJECT_DIR)/SYM/Device/openssl",
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
@@ -740,8 +738,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
-					"$(PROJECT_DIR)/SYM/Device/libusbmuxd",
-					"$(PROJECT_DIR)/SYM/Device/libplist",
 					"$(PROJECT_DIR)/SYM/Device/openssl",
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
