@@ -113,7 +113,9 @@ class MainWindowController: NSWindowController {
 extension MainWindowController {
     func autoSymbolicate() {
         if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
-            self.symbolicate(nil)
+            DispatchQueue.main.async {
+                self.symbolicate(nil)
+            }
         }
     }
     
@@ -160,6 +162,10 @@ extension MainWindowController: DsymFileMonitorDelegate {
     }
 
     func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile: DsymFile) {
+        let firstTime = (self.dsymFile == nil)
         self.dsymFile = dsymFile
+        if firstTime {
+            self.autoSymbolicate()
+        }
     }
 }
