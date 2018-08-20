@@ -24,7 +24,7 @@ import Cocoa
 
 extension SYMDeviceFile {
     var isCrash: Bool {
-        return self.isDirectory && self.name.contains(".ips")
+        return !self.isDirectory && self.name.contains(".ips")
     }
     
     var localFileName: String {
@@ -78,7 +78,7 @@ class CrashImporterViewController: NSViewController {
             let list = self.device?.crashList() ?? []
             
             DispatchQueue.main.async {
-                self.fileList = list.filter { !$0.isCrash }.sorted(by: { (file1, file2) -> Bool in
+                self.fileList = list.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
                     return file1.date > file2.date
                 })
                 self.tableView.reloadData()
