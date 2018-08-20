@@ -160,19 +160,19 @@
 
     uint32_t bytes_read = 0;
     uint32_t bytes_total = 0;
-    unsigned char data[0x1000] = {0};
+    unsigned char data[0x10000] = {0};
     NSMutableData *result = [NSMutableData data];
     
-    afc_error = afc_file_read(_afc, handle, (char*)data, 0x1000, &bytes_read);
+    afc_error = afc_file_read(_afc, handle, (char*)data, 0x10000, &bytes_read);
     while(afc_error == AFC_E_SUCCESS && bytes_read > 0) {
         [result appendBytes:data length:bytes_read];
         bytes_total += bytes_read;
         memset(data, 0, sizeof(data));
-        afc_error = afc_file_read(_afc, handle, (char*)data, 0x1000, &bytes_read);
+        afc_error = afc_file_read(_afc, handle, (char*)data, 0x10000, &bytes_read);
     }
     afc_file_close(_afc, handle);
-
-    return [NSString stringWithUTF8String:result.bytes];
+    
+    return [NSString stringWithUTF8String:result.bytes] ?: [[NSString alloc] initWithData:result encoding:NSASCIIStringEncoding];
 }
 
 #pragma mark - Internal
