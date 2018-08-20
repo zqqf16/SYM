@@ -22,6 +22,16 @@
 
 import Cocoa
 
+extension NSPasteboard.PasteboardType {
+    static let backwardsCompatibleFileURL: NSPasteboard.PasteboardType = {
+        if #available(OSX 10.13, *) {
+            return NSPasteboard.PasteboardType.fileURL
+        } else {
+            return NSPasteboard.PasteboardType(kUTTypeFileURL as String)
+        }
+    } ()
+}
+
 extension SYMDeviceFile {
     var isCrash: Bool {
         return !self.isDirectory && self.name.contains(".ips")
@@ -49,6 +59,11 @@ extension SYMDevice {
     }
 }
 
+class DeviceFileProvider: NSFilePromiseProvider {
+    var device: SYMDevice?
+    var file: SYMDeviceFile?
+}
+
 class CrashImporterViewController: NSViewController {
     
     private var device: SYMDevice?
@@ -65,6 +80,9 @@ class CrashImporterViewController: NSViewController {
         let descriptorDate = NSSortDescriptor(keyPath: \SYMDeviceFile.date, ascending: true)
         self.tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
         self.tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
+        
+        self.tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
+        self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
     
     @objc func deviceConnected(_ notification:Notification?) {
@@ -140,5 +158,43 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
         self.fileList = (self.fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [SYMDeviceFile]
         self.tableView.reloadData()
+    }
+
+    func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+        let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
+        provider.device = self.device
+        provider.file = self.fileList[row]
+        return provider
+    }
+}
+
+extension CrashImporterViewController: NSFilePromiseProviderDelegate {
+    func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
+        guard let privider = filePromiseProvider as? DeviceFileProvider else {
+            return ""
+        }
+        return privider.file?.localFileName ?? ""
+    }
+    
+    func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
+        guard let privider = filePromiseProvider as? DeviceFileProvider,
+            let device = privider.device,
+            let file = privider.file,
+            let content = device.read(file)
+            else {
+                completionHandler(FileError.createFailed)
+                return
+        }
+        
+        do {
+            try content.write(to: url, atomically: true, encoding: .utf8)
+        } catch {
+            
+        }
+        completionHandler(nil)
+    }
+    
+    func operationQueue(for filePromiseProvider: NSFilePromiseProvider) -> OperationQueue {
+        return OperationQueue()
     }
 }

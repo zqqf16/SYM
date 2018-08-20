@@ -707,6 +707,7 @@
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -742,6 +743,7 @@
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
