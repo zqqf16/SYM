@@ -176,6 +176,14 @@ extension ContentViewController {
         self.selectedBinaryName = self.binaryButton.titleOfSelectedItem
         self.updateHighlighting(self.document?.crashInfo, binary: self.selectedBinaryName)
     }
+    
+    @IBAction func scrollToTarget(_ sender: AnyObject?) {
+        guard let crashInfo = self.document?.crashInfo, let range = crashInfo.crashedThreadRange() else {
+            return
+        }
+        
+        self.textView.scrollRangeToVisible(range)
+    }
 }
 
 // Mark: Highlight

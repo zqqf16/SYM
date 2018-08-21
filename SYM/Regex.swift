@@ -95,6 +95,9 @@ extension RE {
     
     // UUID: E5B0A378-6816-3D90-86FD-2AEF15894A85
     static let uuid = try! RE("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{8}", options: [.anchorsMatchLines, .caseInsensitive])
+    
+    // Thread 55 Crashed:
+    static let threadCrashed = try! RE("Thread \\d+ Crashed:.*^\\s*$", options: [.dotMatchesLineSeparators, .anchorsMatchLines])
 }
 
 // MARK: CPU Usage

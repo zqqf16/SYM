@@ -518,6 +518,21 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Crashed" paletteLabel="Crashed" toolTip="Symbolicate" image="Reticle" id="SZU-E2-ttI">
+                                    <size key="minSize" width="32" height="25"/>
+                                    <size key="maxSize" width="36" height="28"/>
+                                    <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
+                                        <rect key="frame" x="8" y="14" width="36" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Reticle" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <connections>
+                                        <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="3RP-uU-rKN"/>
+                                    </connections>
+                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="6607E1B6-AD95-4E9E-A78A-8F61E2062A59" label="Symbolicate Progress" paletteLabel="Symbolicate Progress" tag="-1" id="Elg-kw-8wH">
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="16" height="16"/>
@@ -549,6 +564,7 @@
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="Elg-kw-8wH"/>
                                 <toolbarItem reference="Taf-n1-7Rr"/>
+                                <toolbarItem reference="SZU-E2-ttI"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
                                 <toolbarItem reference="4T4-1f-Y26"/>
                             </defaultToolbarItems>
@@ -788,6 +804,7 @@
     <resources>
         <image name="Device" width="16" height="16"/>
         <image name="Play" width="20" height="16"/>
+        <image name="Reticle" width="20" height="16"/>
         <image name="file" width="512" height="512"/>
         <image name="symbol" width="19" height="19"/>
     </resources>
