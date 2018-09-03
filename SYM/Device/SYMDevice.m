@@ -141,7 +141,18 @@
         return nil;
     }
     
-    return [self listDirectoryWithAFC:_afc directory:@"."];
+    NSMutableArray *results = [[self listDirectoryWithAFC:_afc directory:@"."] mutableCopy];
+    NSArray *retired = nil;
+    for (SYMDeviceFile *file in results) {
+        if (file.isDirectory && [file.path isEqualToString:@"./Retired"]) {
+            retired = [self listDirectoryWithAFC:_afc directory:@"./Retired"];
+        }
+    }
+    if (retired) {
+        [results addObjectsFromArray:retired];
+    }
+    
+    return [results copy];
 }
 
 - (NSString *)readFile:(SYMDeviceFile *)file

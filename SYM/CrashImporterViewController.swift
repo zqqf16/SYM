@@ -34,12 +34,22 @@ extension NSPasteboard.PasteboardType {
 
 extension SYMDeviceFile {
     var isCrash: Bool {
-        return !self.isDirectory && self.name.contains(".ips")
+        return !self.isDirectory && (self.name.contains(".ips") || self.name.contains(".crash"))
     }
     
     var localFileName: String {
         let name = self.name.components(separatedBy: ".ips")[0]
         return "\(name).crash"
+    }
+    
+    var displayName: String {
+        var components = self.name.components(separatedBy: ".")
+        if components.last == "synced" {
+            components.removeLast()
+            return components.joined(separator: ".")
+        }
+        
+        return self.name
     }
 }
 
@@ -145,7 +155,7 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
         let file = self.fileList[row]
         if tableColumn == tableView.tableColumns[0] {
             cell = tableView.makeView(withIdentifier: .cellProcess, owner: nil) as? NSTableCellView
-            cell?.textField?.stringValue = file.name
+            cell?.textField?.stringValue = file.displayName
         } else {
             cell = tableView.makeView(withIdentifier: .cellDate, owner: nil) as? NSTableCellView
             let formatter = DateFormatter()
