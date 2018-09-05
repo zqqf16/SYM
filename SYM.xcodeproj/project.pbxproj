@@ -206,6 +206,14 @@
 			path = SYMTests;
 			sourceTree = "<group>";
 		};
+		F4095A32213F81520050D903 /* dSYM */ = {
+			isa = PBXGroup;
+			children = (
+				F422C7C41D36A6A000066837 /* Dsym.swift */,
+			);
+			path = dSYM;
+			sourceTree = "<group>";
+		};
 		F40B9DBB2123E31A000DF7C6 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -277,6 +285,7 @@
 				51B5D2981D52166000B979C8 /* Tools */,
 				F45321061D30CC5F00639917 /* Utils */,
 				51B8D7031D4F60EB00F2C24C /* Document */,
+				F4095A32213F81520050D903 /* dSYM */,
 				F4CD14661D39DD95006BAB2B /* Crash */,
 				F45321071D30CC6E00639917 /* UI */,
 				F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */,
@@ -294,7 +303,6 @@
 				F45320FA1D30A33C00639917 /* Crash.swift */,
 				51C9A4A11EEFF78500F21AE4 /* Doctor.swift */,
 				F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */,
-				F422C7C41D36A6A000066837 /* Dsym.swift */,
 			);
 			name = Crash;
 			sourceTree = "<group>";

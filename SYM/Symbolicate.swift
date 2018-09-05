@@ -30,13 +30,15 @@ extension SubProcess {
                      arch: String = "arm64") -> [String]? {
         let cmd = "/usr/bin/atos"
         let args = ["-arch", arch, "-o", dsym, "-l", loadAddress] + addressess
-        if let result = execute(cmd: cmd, args: args).0 {
+        let process = SubProcess(cmd: cmd, args: args)
+        process.run()
+        let result = process.output
+        if result.count > 0 {
             return result.components(separatedBy: "\n").filter {
                 (content) -> Bool in
                 return content.count > 0
             }
         }
-        
         return nil
     }
     
@@ -69,13 +71,16 @@ extension SubProcess {
         }
         
         let cmd = Bundle.main.path(forResource: "symbolicatecrash", ofType: nil)
-        assert(cmd != nil)
+        if cmd == nil {
+            return nil
+        }
         
         var args = [path]
         if let dsymPath = dsym {
             args.append(contentsOf: ["-d", dsymPath])
         }
-        let output = execute(cmd: cmd!, args: args)
-        return output.0
+        let process = SubProcess(cmd: cmd!, args: args)
+        process.run()
+        return process.output
     }
 }

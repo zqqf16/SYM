@@ -22,23 +22,68 @@
 
 import Foundation
 
-struct SubProcess {
-    static func execute(cmd: String, args: [String]?) -> (String?, String?) {
-        let pipe = Pipe()
-        let errPipe = Pipe()
+class SubProcess {
+    var output: String = ""
+    var error: String = ""
+    
+    var cmd: String
+    var args: [String]?
+    var env: [String: String]?
+
+    var outputHandler: ((String)->Void)?
+
+    private var task: Process?
+    
+    init(cmd: String, args: [String]?, env: [String: String]? = nil) {
+        self.cmd = cmd
+        self.args = args
+        self.env = env
+    }
+    
+    @discardableResult
+    func run() -> Bool {
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        outputPipe.fileHandleForReading.readabilityHandler = {handle in
+            guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
+                return
+            }
+            self.output += string
+            if self.outputHandler != nil {
+                self.outputHandler!(string)
+            }
+        }
+        errorPipe.fileHandleForReading.readabilityHandler = {handle in
+            guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
+                    return
+            }
+            self.error += string
+        }
         
         let task = Process()
-        task.launchPath = cmd
-        task.arguments = args
-        task.standardOutput = pipe
-        task.standardError = errPipe
+        task.launchPath = self.cmd
+        task.arguments = self.args
+        if let customEnv = self.env {
+            var env = task.environment ?? [:]
+            customEnv.forEach { (k, v) in env[k] = v }
+            task.environment = env
+        }
+        
+        task.standardOutput = outputPipe
+        task.standardError = errorPipe
+        
+        self.task = task
         task.launch()
+        task.waitUntilExit()
         
-        let output = pipe.fileHandleForReading
-        let data = output.readDataToEndOfFile()
-        let error = errPipe.fileHandleForReading.readDataToEndOfFile()
-        
-        return (String(data: data, encoding: String.Encoding.utf8), String(data: error, encoding: String.Encoding.utf8))
+        outputPipe.fileHandleForReading.readabilityHandler = nil
+        errorPipe.fileHandleForReading.readabilityHandler = nil
+
+        return (task.terminationStatus == 0)
+    }
+    
+    func terminate() {
+        self.task?.terminate()
     }
 }
 
@@ -48,7 +93,10 @@ extension SubProcess {
         let args = ["--uuid"] + paths
         let re = try! RE("UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ", options: [.anchorsMatchLines, .caseInsensitive])
         
-        if let output = self.execute(cmd: cmd, args: args).0, let uuids = re.findAll(output) {
+        let process = SubProcess(cmd: cmd, args: args)
+        process.run()
+        let output = process.output
+        if let uuids = re.findAll(output) {
             return uuids.map { ($0[0], $0[1]) }
         }
         
