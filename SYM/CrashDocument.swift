@@ -126,6 +126,7 @@ extension CrashDocument {
             DispatchQueue.main.async {
                 self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
                 self.undoManager?.removeAllActions()
+                self.updateChangeCount(.changeDone)
                 self.notificationCenter.post(name: .crashSymbolicated, object: self)
             }
         }
