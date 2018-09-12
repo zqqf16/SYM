@@ -110,7 +110,9 @@ extension CrashDocument: NSTextStorageDelegate {
     }
     
     func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
-        self.parseCrashInfo()
+        if editedMask.contains(.editedCharacters) {
+            self.parseCrashInfo()
+        }
     }
 }
 

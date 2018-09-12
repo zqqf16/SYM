@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.13.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -74,6 +74,14 @@
                 <userDefaultsController representsSharedInstance="YES" id="zBm-ol-1gm"/>
             </objects>
             <point key="canvasLocation" x="-997" y="-948"/>
+        </scene>
+        <!--ScriptImporter-->
+        <scene sceneID="cbl-uN-zq5">
+            <objects>
+                <controllerPlaceholder storyboardName="ScriptImporter" id="4tc-s8-qhv" sceneMemberID="viewController"/>
+                <customObject id="cBG-ig-4Cc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-660" y="-497"/>
         </scene>
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
@@ -422,6 +430,13 @@
                                                 <action selector="symbolicate:" target="Ady-hI-5gd" id="s2u-gg-Qbe"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="0nN-eT-ILP"/>
+                                        <menuItem title="Download Script" id="hbk-Ek-cz1">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <segue destination="4tc-s8-qhv" kind="show" id="VZq-N8-3LJ"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -518,54 +533,108 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Crashed" paletteLabel="Crashed" toolTip="Symbolicate" image="Reticle" id="SZU-E2-ttI">
+                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Symbolicate" image="Reticle" id="SZU-E2-ttI">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
-                                        <rect key="frame" x="8" y="14" width="36" height="28"/>
+                                        <rect key="frame" x="1" y="14" width="36" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Reticle" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <connections>
+                                            <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="vhL-6a-p4l"/>
+                                        </connections>
                                     </button>
-                                    <connections>
-                                        <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="3RP-uU-rKN"/>
-                                    </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="6607E1B6-AD95-4E9E-A78A-8F61E2062A59" label="Symbolicate Progress" paletteLabel="Symbolicate Progress" tag="-1" id="Elg-kw-8wH">
-                                    <nil key="toolTip"/>
-                                    <size key="minSize" width="16" height="16"/>
-                                    <size key="maxSize" width="16" height="16"/>
-                                    <progressIndicator key="view" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="DVd-5H-ljI">
-                                        <rect key="frame" x="53" y="14" width="16" height="16"/>
+                                <toolbarItem implicitItemIdentifier="F8A96EE7-0DFB-4561-8D9A-1FAA2158E0E0" label="Download" paletteLabel="Download" toolTip="Symbolicate" image="Cloud" id="rh6-Nt-hIy">
+                                    <size key="minSize" width="32" height="25"/>
+                                    <size key="maxSize" width="36" height="28"/>
+                                    <button key="view" verticalHuggingPriority="750" id="0Uu-G4-QHQ" customClass="DownloadButton" customModule="SYM" customModuleProvider="target">
+                                        <rect key="frame" x="12" y="14" width="36" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    </progressIndicator>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
-                                <toolbarItem implicitItemIdentifier="E32EBD4B-C676-4238-B1F1-45063BE90B0D" label="dSYM" paletteLabel="dSYM" image="symbol" id="Taf-n1-7Rr">
-                                    <nil key="toolTip"/>
-                                    <size key="minSize" width="138" height="28"/>
-                                    <size key="maxSize" width="269" height="32"/>
-                                    <button key="view" verticalHuggingPriority="750" id="Odo-Gj-xOa">
-                                        <rect key="frame" x="0.0" y="14" width="200" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="symbol" imagePosition="left" alignment="left" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="stb-Wn-3vU">
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Cloud" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="uCv-qu-pUt">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <connections>
-                                            <action selector="locateDsym:" target="akE-CK-Bh4" id="Z5M-aY-l6N"/>
-                                        </connections>
                                     </button>
+                                    <connections>
+                                        <segue destination="o1z-o0-KTK" kind="popover" popoverAnchorView="rh6-Nt-hIy" popoverBehavior="t" preferredEdge="maxY" id="1GG-bx-MSW"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
+                                <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" id="wHv-dg-CLj">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="100" height="22"/>
+                                    <size key="maxSize" width="480" height="22"/>
+                                    <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="StatusBar" customModule="SYM" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="14" width="320" height="22"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" bezelStyle="round" id="N1P-ok-3bD" customClass="StatusBarCell" customModule="SYM" customModuleProvider="target">
+                                            <font key="font" metaFont="systemLight" size="12"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="8AA3EEF4-4EAF-472F-AE5D-F3B189A7277A" label="dSYM" paletteLabel="dSYM" image="alert" id="x2M-ly-xLG">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="36" height="28"/>
+                                    <size key="maxSize" width="200" height="28"/>
+                                    <popUpButton key="view" verticalHuggingPriority="750" id="iaa-hN-kZp">
+                                        <rect key="frame" x="0.0" y="14" width="200" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <popUpButtonCell key="cell" type="roundTextured" title="dSYM file not found" bezelStyle="texturedRounded" image="alert" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" id="1nB-M4-fq1">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" autoenablesItems="NO" id="uu2-q5-bEn">
+                                                <items>
+                                                    <menuItem title="dSYM file not found" image="alert" hidden="YES" id="Dlc-9A-Ldz">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem title="Choose" id="zR3-sH-tLI">
+                                                        <connections>
+                                                            <action selector="chooseDsymFile:" target="akE-CK-Bh4" id="nTj-Ip-fFi"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem title="Show in Finder" enabled="NO" id="64e-AO-Xx2" userLabel="Show in Finder">
+                                                        <connections>
+                                                            <action selector="showInFinder:" target="akE-CK-Bh4" id="8Za-yo-oct"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="f2X-Mh-3Y6"/>
+                                                    <menuItem title="Download" tag="1" enabled="NO" id="MKW-Iv-70M">
+                                                        <connections>
+                                                            <action selector="downloadDsym:" target="akE-CK-Bh4" id="zrv-Jc-KHh"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                                <connections>
+                                                    <outlet property="delegate" destination="akE-CK-Bh4" id="NNX-Il-TaB"/>
+                                                </connections>
+                                            </menu>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="didClickDsymButton:" target="akE-CK-Bh4" id="hut-h3-Vuf"/>
+                                        </connections>
+                                    </popUpButton>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="C5AD0D29-9AF0-4059-9039-100C6BAE05ED" label="Indicator" paletteLabel="Indicator" tag="-1" sizingBehavior="auto" id="56F-jO-Bdr">
+                                    <nil key="toolTip"/>
+                                    <progressIndicator key="view" hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="zP5-Pn-E5C">
+                                        <rect key="frame" x="19" y="14" width="16" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </progressIndicator>
                                 </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="jOx-ar-DOP"/>
-                                <toolbarItem reference="Elg-kw-8wH"/>
-                                <toolbarItem reference="Taf-n1-7Rr"/>
+                                <toolbarItem reference="56F-jO-Bdr"/>
+                                <toolbarItem reference="x2M-ly-xLG"/>
                                 <toolbarItem reference="SZU-E2-ttI"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
+                                <toolbarItem reference="rh6-Nt-hIy"/>
                                 <toolbarItem reference="4T4-1f-Y26"/>
                             </defaultToolbarItems>
                         </toolbar>
@@ -574,9 +643,15 @@
                         </connections>
                     </window>
                     <connections>
-                        <outlet property="deviceButton" destination="5Nz-F0-1ts" id="Lly-0Q-5yh"/>
-                        <outlet property="dsymButton" destination="Odo-Gj-xOa" id="bDZ-Za-dzm"/>
-                        <outlet property="indicator" destination="DVd-5H-ljI" id="hyH-GG-1qt"/>
+                        <outlet property="deviceItem" destination="4T4-1f-Y26" id="TaU-FR-WmN"/>
+                        <outlet property="downloadButton" destination="0Uu-G4-QHQ" id="zXq-SZ-d3E"/>
+                        <outlet property="dsymButton" destination="iaa-hN-kZp" id="AUj-qt-5U6"/>
+                        <outlet property="dsymMenu" destination="uu2-q5-bEn" id="TYf-3G-VTK"/>
+                        <outlet property="dsymMenuItemDownload" destination="MKW-Iv-70M" id="pS9-28-VcJ"/>
+                        <outlet property="dsymMenuItemName" destination="Dlc-9A-Ldz" id="EpT-uv-NxJ"/>
+                        <outlet property="dsymMenuItemReveal" destination="64e-AO-Xx2" id="jRZ-kn-lmK"/>
+                        <outlet property="indicator" destination="zP5-Pn-E5C" id="z4w-VT-HaL"/>
+                        <outlet property="statusBar" destination="UYX-wf-f6l" id="bFC-Eh-UiL"/>
                         <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
                         <segue destination="5WI-tf-yEY" kind="relationship" relationship="window.shadowedContentViewController" id="Lwr-gD-c6J"/>
                     </connections>
@@ -591,7 +666,120 @@
                 <controllerPlaceholder storyboardName="CrashImporter" id="BZX-tn-6tC" sceneMemberID="viewController"/>
                 <customObject id="7Rm-lf-inn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-685" y="-450"/>
+            <point key="canvasLocation" x="-532" y="-355"/>
+        </scene>
+        <!--Download Task List View Controller-->
+        <scene sceneID="W9O-v4-3dZ">
+            <objects>
+                <viewController id="o1z-o0-KTK" customClass="DownloadTaskListViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" appearanceType="aqua" id="emI-dl-iHb">
+                        <rect key="frame" x="0.0" y="0.0" width="317" height="357"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" horizontalLineScroll="24" horizontalPageScroll="10" verticalLineScroll="24" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s4k-Pa-fdP">
+                                <rect key="frame" x="0.0" y="0.0" width="317" height="317"/>
+                                <clipView key="contentView" id="g5E-ga-Ih4">
+                                    <rect key="frame" x="0.0" y="0.0" width="317" height="317"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="22" rowSizeStyle="automatic" viewBased="YES" id="2C8-m7-dzr">
+                                            <rect key="frame" x="0.0" y="0.0" width="317" height="317"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <size key="intercellSpacing" width="3" height="2"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <tableViewGridLines key="gridStyleMask" vertical="YES"/>
+                                            <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                            <tableColumns>
+                                                <tableColumn editable="NO" width="314" minWidth="40" maxWidth="1000" id="3j8-go-4Qr">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                                        <font key="font" metaFont="smallSystem"/>
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="ih1-uG-FPy">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                                    <prototypeCellViews>
+                                                        <tableCellView identifier="cell" id="kxt-hr-TE0" customClass="DownloadTaskListCell" customModule="SYM" customModuleProvider="target">
+                                                            <rect key="frame" x="1" y="1" width="314" height="22"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="pOy-8a-v6c">
+                                                                    <rect key="frame" x="288" y="3" width="16" height="16"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="16" id="5lc-2c-0ZH"/>
+                                                                        <constraint firstAttribute="width" constant="16" id="HWP-jk-cN0"/>
+                                                                    </constraints>
+                                                                </progressIndicator>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AHE-rZ-v47">
+                                                                    <rect key="frame" x="10" y="2" width="276" height="17"/>
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" drawsBackground="YES" id="LYp-LE-GWd">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                            <constraints>
+                                                                <constraint firstItem="pOy-8a-v6c" firstAttribute="leading" secondItem="AHE-rZ-v47" secondAttribute="trailing" constant="2" id="Edz-Q6-DDd"/>
+                                                                <constraint firstAttribute="trailing" secondItem="pOy-8a-v6c" secondAttribute="trailing" constant="10" id="JH8-cp-kve"/>
+                                                                <constraint firstItem="pOy-8a-v6c" firstAttribute="centerY" secondItem="kxt-hr-TE0" secondAttribute="centerY" id="LIk-ef-qG4"/>
+                                                                <constraint firstItem="AHE-rZ-v47" firstAttribute="centerY" secondItem="kxt-hr-TE0" secondAttribute="centerY" id="TTo-gR-Qus"/>
+                                                                <constraint firstItem="AHE-rZ-v47" firstAttribute="leading" secondItem="kxt-hr-TE0" secondAttribute="leading" constant="10" id="wgr-FE-KrY"/>
+                                                            </constraints>
+                                                            <connections>
+                                                                <outlet property="indicator" destination="pOy-8a-v6c" id="ZZv-5k-x5A"/>
+                                                                <outlet property="nameField" destination="AHE-rZ-v47" id="XWK-ZI-zf3"/>
+                                                                <outlet property="textField" destination="AHE-rZ-v47" id="znG-Eg-GS7"/>
+                                                            </connections>
+                                                        </tableCellView>
+                                                    </prototypeCellViews>
+                                                </tableColumn>
+                                            </tableColumns>
+                                            <connections>
+                                                <outlet property="dataSource" destination="o1z-o0-KTK" id="reC-i0-Cpd"/>
+                                                <outlet property="delegate" destination="o1z-o0-KTK" id="zIS-ct-CCT"/>
+                                            </connections>
+                                        </tableView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Qxe-rx-3jp">
+                                    <rect key="frame" x="-100" y="-100" width="317" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="WVe-eK-J19">
+                                    <rect key="frame" x="-100" y="-100" width="16" height="337"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wxX-lA-da6">
+                                <rect key="frame" x="118" y="329" width="82" height="18"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Downloads" id="2gF-48-bkm">
+                                    <font key="font" metaFont="systemMedium" size="14"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="wxX-lA-da6" firstAttribute="top" secondItem="emI-dl-iHb" secondAttribute="top" constant="10" id="Gmt-fO-aeN"/>
+                            <constraint firstItem="s4k-Pa-fdP" firstAttribute="top" secondItem="emI-dl-iHb" secondAttribute="top" constant="40" id="PHi-pA-O2o"/>
+                            <constraint firstItem="s4k-Pa-fdP" firstAttribute="leading" secondItem="emI-dl-iHb" secondAttribute="leading" id="Pfr-e4-vEX"/>
+                            <constraint firstAttribute="bottom" secondItem="s4k-Pa-fdP" secondAttribute="bottom" id="XyM-de-XRw"/>
+                            <constraint firstAttribute="trailing" secondItem="s4k-Pa-fdP" secondAttribute="trailing" id="jd6-RJ-sVX"/>
+                            <constraint firstItem="wxX-lA-da6" firstAttribute="centerX" secondItem="emI-dl-iHb" secondAttribute="centerX" id="mnx-nc-Ad2"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="2C8-m7-dzr" id="wD2-x6-STj"/>
+                    </connections>
+                </viewController>
+                <customObject id="NX9-Qy-hGK" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-273.5" y="-142.5"/>
         </scene>
         <!--Content View Controller-->
         <scene sceneID="bhh-am-SLo">
@@ -723,7 +911,7 @@
                 </windowController>
                 <customObject id="39M-B1-sai" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1897" y="-362"/>
+            <point key="canvasLocation" x="-1893" y="-332"/>
         </scene>
         <!--About View Controller-->
         <scene sceneID="BzY-xK-xDH">
@@ -798,14 +986,15 @@
                 </viewController>
                 <customObject id="BQJ-8w-mFZ" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1897" y="-15"/>
+            <point key="canvasLocation" x="-1893" y="15"/>
         </scene>
     </scenes>
     <resources>
+        <image name="Cloud" width="20" height="16"/>
         <image name="Device" width="16" height="16"/>
         <image name="Play" width="20" height="16"/>
         <image name="Reticle" width="20" height="16"/>
+        <image name="alert" width="19" height="19"/>
         <image name="file" width="512" height="512"/>
-        <image name="symbol" width="19" height="19"/>
     </resources>
 </document>

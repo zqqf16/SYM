@@ -30,6 +30,8 @@ class SubProcess {
     var args: [String]?
     var env: [String: String]?
 
+    var exitCode: Int
+    
     var outputHandler: ((String)->Void)?
 
     private var task: Process?
@@ -38,6 +40,7 @@ class SubProcess {
         self.cmd = cmd
         self.args = args
         self.env = env
+        self.exitCode = 0
     }
     
     @discardableResult
@@ -53,7 +56,7 @@ class SubProcess {
                 self.outputHandler!(string)
             }
         }
-        errorPipe.fileHandleForReading.readabilityHandler = {handle in
+        errorPipe.fileHandleForReading.readabilityHandler = { handle in
             guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
                     return
             }
@@ -71,6 +74,9 @@ class SubProcess {
         
         task.standardOutput = outputPipe
         task.standardError = errorPipe
+        task.terminationHandler = { process in
+            
+        }
         
         self.task = task
         task.launch()
@@ -78,8 +84,9 @@ class SubProcess {
         
         outputPipe.fileHandleForReading.readabilityHandler = nil
         errorPipe.fileHandleForReading.readabilityHandler = nil
-
-        return (task.terminationStatus == 0)
+        
+        self.exitCode = Int(task.terminationStatus)
+        return (exitCode == 0)
     }
     
     func terminate() {

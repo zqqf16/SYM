@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="pg5-Ea-0Pu">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.automator.AutomatorPalette" version="14313.18"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="SFa-QX-0Ni">
+            <objects>
+                <windowController showSeguePresentationStyle="single" id="pg5-Ea-0Pu" sceneMemberID="viewController">
+                    <window key="window" title="Download Script" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="sYg-iB-nfe">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+                        <connections>
+                            <outlet property="delegate" destination="pg5-Ea-0Pu" id="SlI-9O-19h"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="RTF-vs-keQ" kind="relationship" relationship="window.shadowedContentViewController" id="ZgF-My-fYc"/>
+                    </connections>
+                </windowController>
+                <customObject id="gXl-Ut-sEc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-304" y="117"/>
+        </scene>
+        <!--Download Script View Controller-->
+        <scene sceneID="ncn-hX-xql">
+            <objects>
+                <viewController id="RTF-vs-keQ" customClass="DownloadScriptViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="raX-eF-gPB">
+                        <rect key="frame" x="0.0" y="0.0" width="560" height="358"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dao-ct-74o">
+                                <rect key="frame" x="20" y="51" width="520" height="272"/>
+                                <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="XZo-4n-4JN">
+                                    <rect key="frame" x="0.0" y="0.0" width="520" height="272"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="Rgn-Gp-xB5">
+                                            <rect key="frame" x="0.0" y="0.0" width="520" height="272"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <size key="minSize" width="520" height="272"/>
+                                            <size key="maxSize" width="520" height="10000000"/>
+                                            <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="8GB-rZ-ayS">
+                                    <rect key="frame" x="504" y="0.0" width="16" height="272"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GFY-ea-939">
+                                <rect key="frame" x="18" y="331" width="524" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Edit dSYM download script" id="njm-2x-I9i">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3G3-r4-xZa">
+                                <rect key="frame" x="476" y="3" width="70" height="32"/>
+                                <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="f7k-pH-pVK">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="didClickDoneButton:" target="RTF-vs-keQ" id="KhN-bf-zaJ"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QwZ-LJ-pmX">
+                                <rect key="frame" x="394" y="3" width="82" height="32"/>
+                                <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Muz-PD-cFf">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="close:" target="RTF-vs-keQ" id="uUs-rX-zw8"/>
+                                </connections>
+                            </button>
+                            <amPathPopUpButton verticalHuggingPriority="750" imageHugsTitle="YES" canChooseDirectories="YES" canChooseNewPaths="YES" canChooseExistingPaths="YES" showStandardPaths="YES" showPathComponents="YES" placeholder="" translatesAutoresizingMaskIntoConstraints="NO" id="EoW-3U-Rsk">
+                                <rect key="frame" x="138" y="17" width="132" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="U3O-Yq-3DC"/>
+                                </constraints>
+                                <amVariablePopUpButtonCell key="cell" type="push" title="Desktop" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1001" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="mgx-un-Moo">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <menu key="menu" title="OtherViews" id="GAT-VH-nSW"/>
+                                </amVariablePopUpButtonCell>
+                                <connections>
+                                    <binding destination="nSq-dY-Ajp" name="path" keyPath="values.dsymDownloadFolder" id="bhr-YV-cDp"/>
+                                </connections>
+                            </amPathPopUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="17t-M3-kpz">
+                                <rect key="frame" x="18" y="22" width="114" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Downloads folder:" id="xn9-0q-5Hy">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="17t-M3-kpz" firstAttribute="centerY" secondItem="EoW-3U-Rsk" secondAttribute="centerY" id="4dC-QI-jhU"/>
+                            <constraint firstItem="dao-ct-74o" firstAttribute="top" secondItem="GFY-ea-939" secondAttribute="bottom" constant="8" id="A6f-Zu-d5K"/>
+                            <constraint firstAttribute="bottom" secondItem="EoW-3U-Rsk" secondAttribute="bottom" constant="20" id="IzV-x3-s8y"/>
+                            <constraint firstItem="GFY-ea-939" firstAttribute="leading" secondItem="raX-eF-gPB" secondAttribute="leading" constant="20" id="KqD-hh-vkM"/>
+                            <constraint firstItem="3G3-r4-xZa" firstAttribute="leading" secondItem="QwZ-LJ-pmX" secondAttribute="trailing" constant="12" id="Rr8-FG-HQr"/>
+                            <constraint firstItem="QwZ-LJ-pmX" firstAttribute="centerY" secondItem="3G3-r4-xZa" secondAttribute="centerY" id="Yro-2G-he6"/>
+                            <constraint firstItem="EoW-3U-Rsk" firstAttribute="top" secondItem="dao-ct-74o" secondAttribute="bottom" constant="10" id="Zo0-C1-wdW"/>
+                            <constraint firstAttribute="trailing" secondItem="dao-ct-74o" secondAttribute="trailing" constant="20" id="a0H-ke-zpU"/>
+                            <constraint firstAttribute="bottom" secondItem="3G3-r4-xZa" secondAttribute="bottom" constant="10" id="bLZ-WL-cA6"/>
+                            <constraint firstAttribute="trailing" secondItem="3G3-r4-xZa" secondAttribute="trailing" constant="20" id="gk4-mt-8xl"/>
+                            <constraint firstItem="17t-M3-kpz" firstAttribute="leading" secondItem="Rgn-Gp-xB5" secondAttribute="leading" id="iIi-Hj-qGG"/>
+                            <constraint firstItem="dao-ct-74o" firstAttribute="leading" secondItem="raX-eF-gPB" secondAttribute="leading" constant="20" id="j8d-AD-Zkq"/>
+                            <constraint firstAttribute="trailing" secondItem="GFY-ea-939" secondAttribute="trailing" constant="20" id="qqM-3w-ArV"/>
+                            <constraint firstItem="EoW-3U-Rsk" firstAttribute="leading" secondItem="17t-M3-kpz" secondAttribute="trailing" constant="10" id="sVE-kR-xar"/>
+                            <constraint firstItem="GFY-ea-939" firstAttribute="top" secondItem="raX-eF-gPB" secondAttribute="top" constant="10" id="sjF-EM-MDC"/>
+                            <constraint firstItem="3G3-r4-xZa" firstAttribute="leading" secondItem="QwZ-LJ-pmX" secondAttribute="trailing" constant="12" id="xwE-Qm-bf1"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textView" destination="Rgn-Gp-xB5" id="YuP-fe-wCd"/>
+                    </connections>
+                </viewController>
+                <customObject id="g3r-P8-gKE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController representsSharedInstance="YES" id="nSq-dY-Ajp"/>
+            </objects>
+            <point key="canvasLocation" x="437" y="111"/>
+        </scene>
+    </scenes>
+</document>

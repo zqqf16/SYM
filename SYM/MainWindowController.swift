@@ -30,27 +30,55 @@ extension NSImage {
 class MainWindowController: NSWindowController {
     // Toolbar buttons
     @IBOutlet weak var symButton: NSButton!
+    //@IBOutlet weak var deviceButton: NSButton!
+    //@IBOutlet weak var statusBar: StatusBar!
+    @IBOutlet weak var downloadButton: DownloadButton!
+    @IBOutlet weak var dsymButton: NSPopUpButton!
+    @IBOutlet weak var deviceItem: NSToolbarItem!
+    
     @IBOutlet weak var indicator: NSProgressIndicator!
-    @IBOutlet weak var dsymButton: NSButton!
-    @IBOutlet weak var deviceButton: NSButton!
+
+    @IBOutlet weak var dsymMenu: NSMenu!
+    @IBOutlet weak var dsymMenuItemName: NSMenuItem!
+    @IBOutlet weak var dsymMenuItemReveal: NSMenuItem!
+    @IBOutlet weak var dsymMenuItemDownload: NSMenuItem!
     
-    private var monitor = DsymFileMonitor()
     
-    private var dsymFile: DsymFile? {
+    var isSymbolicating: Bool = false {
         didSet {
             DispatchQueue.main.async {
-                if self.dsymFile == nil {
-                    self.dsymButton.title = "dSYM file not found"
-                    self.dsymButton.image = .alert
+                if (self.isSymbolicating) {
+                    self.indicator.startAnimation(nil)
+                    self.indicator.isHidden = false
                 } else {
-                    self.dsymButton.title = self.dsymFile!.name
-                    self.dsymButton.image = .symbol
+                    self.indicator.stopAnimation(nil)
+                    self.indicator.isHidden = true
                 }
-                self.dsymButton.setNeedsDisplay()
             }
         }
     }
-        
+    
+    // Dsym
+    private var monitor = DsymFileMonitor()
+    private var downloader = DsymDownloader()
+
+    private var dsymFile: DsymFile? {
+        didSet {
+            DispatchQueue.main.async {
+                if self.dsymFile != nil {
+                    self.dsymMenuItemName.image = .symbol
+                    self.dsymButton.title = self.dsymFile!.name
+                    self.dsymMenuItemReveal.isEnabled = true
+                } else {
+                    self.dsymMenuItemName.image = .alert
+                    self.dsymButton.title = "dSYM file not found"
+                    self.dsymMenuItemReveal.isEnabled = false
+                }
+            }
+        }
+    }
+
+    // Crash
     var crashContentViewController: ContentViewController! {
         if let vc = self.contentViewController as? ContentViewController {
             return vc
@@ -69,8 +97,8 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
-        self.deviceButton.isHidden = !SYMDeviceMonitor.shared().deviceConnected;
-        
+        self.deviceItem.isEnabled = SYMDeviceMonitor.shared().deviceConnected
+
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.SYMDeviceMonitor, object: nil)
     }
     
@@ -100,17 +128,21 @@ class MainWindowController: NSWindowController {
         }
     }
     
+    // MARK: Notifications
     @objc func updateCrashInfo(_ notification: Notification?) {
-        self.findCurrentDsym()
+        self.dsymFile = nil
+        self.monitor.update(uuid: self.crashInfo?.uuid, bundleID: self.crashInfo?.bundleID)
     }
     
     @objc func updateDeviceButton(_ notification: Notification) {
-        self.deviceButton.isHidden = !SYMDeviceMonitor.shared().deviceConnected;
+        self.deviceItem.isEnabled = SYMDeviceMonitor.shared().deviceConnected
     }
-}
+    
+    @objc func crashDidSymbolicated(_ notification: Notification) {
+        self.isSymbolicating = false
+    }
 
-// MARK: - Symbolicate
-extension MainWindowController {
+    // MARK: - Symbolicate
     func autoSymbolicate() {
         if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
             DispatchQueue.main.async {
@@ -119,53 +151,76 @@ extension MainWindowController {
         }
     }
     
+    // MARK: IBActions
     @IBAction func symbolicate(_ sender: AnyObject?) {
         let content = self.crashDocument?.textStorage.string ?? ""
         if content.strip().isEmpty {
             return
         }
-        self.indicator.startAnimation(nil)
+        
+        self.isSymbolicating = true
         self.crashDocument?.symbolicate(withDsymPath: self.dsymFile?.binaryPath)
     }
     
-    @objc func crashDidSymbolicated(_ notification: Notification) {
-        self.indicator.stopAnimation(nil)
-    }
-}
-
-// MARK: - dSYM
-extension MainWindowController: DsymFileMonitorDelegate {
-    func findCurrentDsym() {
-        self.monitor.update(uuid: self.crashInfo?.uuid, bundleID: self.crashInfo?.bundleID)
-    }
-    
-    @IBAction func locateDsym(_ sender: AnyObject?) {
+    @IBAction func chooseDsymFile(_ sender: Any) {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = false
         openPanel.canCreateDirectories = false
         openPanel.canChooseFiles = true
         openPanel.beginSheetModal(for: self.window!) { [weak openPanel] (result) in
-            if result == .OK {
-                if let url = openPanel?.url {
-                    self.parseSelectResult(url)
-                }
+            guard result == .OK, let url = openPanel?.url else {
+                return
             }
+            
+            let path = url.path
+            let name = url.lastPathComponent
+            let uuid = self.crashInfo?.uuid ?? ""
+            self.dsymFile = DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])
         }
     }
     
-    func parseSelectResult(_ url: URL) {
-        let path = url.path
-        let name = url.lastPathComponent
-        let uuid = self.crashInfo?.uuid ?? ""
-        self.dsymFile = DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])
+    @IBAction func showInFinder(_ sender: Any) {
+        guard let path = self.dsymFile?.path else {
+            return
+        }
+        
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.activateFileViewerSelecting([url])
     }
+    
+    @IBAction func downloadDsym(_ sender: Any) {
+        guard let doc = self.crashDocument, let crashInfo = doc.crashInfo else {
+            return
+        }
+        
+        DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
+    }
+}
 
+// MARK: - DsymFileMonitorDelegate
+extension MainWindowController: DsymFileMonitorDelegate {
     func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile: DsymFile) {
         let firstTime = (self.dsymFile == nil)
         self.dsymFile = dsymFile
         if firstTime {
             self.autoSymbolicate()
         }
+    }
+}
+
+// MARK: - NSMenuDelegate
+extension MainWindowController: NSMenuDelegate {
+    func menuWillOpen(_ menu: NSMenu) {
+        if menu == self.dsymMenu {
+            self.dsymMenuItemDownload.isEnabled = self.crashInfo != nil && DsymDownloader.shared.canDownload()
+            self.dsymMenuItemReveal.isEnabled = self.dsymFile != nil
+        }
+    }
+}
+
+extension MainWindowController: NSToolbarItemValidation {
+    func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
+        return item.isEnabled
     }
 }

@@ -57,6 +57,8 @@ class DsymFileMonitor {
     private let operationQueue = DispatchQueue(label: "dsym.finder")
     private let query = NSMetadataQuery()
     
+    var cache: DsymFile?
+
     var uuid: String?
     var bundleID: String?
     
@@ -79,6 +81,10 @@ class DsymFileMonitor {
         if (restart) {
             self.stop()
             self.start()
+        } else {
+            if self.cache != nil {
+                self.delegate?.dsymFileMonitor(self, didFindDsymFile: self.cache!)
+            }
         }
     }
     
@@ -98,7 +104,7 @@ class DsymFileMonitor {
         if condition.count == 0 {
             return
         }
-        
+        self.cache = nil
         self.query.predicate = NSPredicate(fromMetadataQueryString: condition)
         self.query.start()
     }
@@ -124,12 +130,14 @@ class DsymFileMonitor {
             if type == "com.apple.xcode.dsym" {
                 // dsym
                 if let dsym = self.parseDsymFile(item) {
+                    self.cache = dsym
                     self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
                     return
                 }
             } else if type == "com.apple.xcode.archive" {
                 // xcarchive
                 if let dsym = self.parseXcarchiveFile(item) {
+                    self.cache = dsym
                     self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
                     return
                 }
@@ -142,6 +150,7 @@ class DsymFileMonitor {
         self.operationQueue.async {
             for app in appItems {
                 if let dsym = self.parseAppBundle(app) {
+                    self.cache = dsym
                     self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
                     return
                 }
