@@ -168,7 +168,7 @@ class DsymFileMonitor {
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
             let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
             let uuid = self.uuid,
-            let index = dsymUUIDs.firstIndex(of: uuid)
+            let index = dsymUUIDs.index(of: uuid)
         else {
                 return nil
         }

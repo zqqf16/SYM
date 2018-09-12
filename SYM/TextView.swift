@@ -35,7 +35,7 @@ class TextView: NSTextView {
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard
         let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
-        if let paths = pboard.propertyList(forType: filenameType) as? [String] {
+        if let paths = pboard().propertyList(forType: filenameType) as? [String] {
             for path in paths {
                 let fileURL = URL(fileURLWithPath: path)
                 NSDocumentController.shared.openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in

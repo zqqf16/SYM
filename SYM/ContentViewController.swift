@@ -189,7 +189,7 @@ extension ContentViewController {
 // Mark: Highlight
 extension NSTextStorage {
     func processHighlighting(_ ranges:[NSRange]) {
-        var defaultAttrs: [NSAttributedString.Key: AnyObject] = [
+        var defaultAttrs: [NSAttributedStringKey: AnyObject] = [
             .foregroundColor: NSColor.textColor,
         ]
         if let font = self.font {
@@ -197,7 +197,7 @@ extension NSTextStorage {
         }
         self.setAttributes(defaultAttrs, range: self.string.nsRange)
         
-        let attrs: [NSAttributedString.Key: AnyObject] = [
+        let attrs: [NSAttributedStringKey: AnyObject] = [
             .foregroundColor: NSColor(red:1.00, green:0.23, blue:0.18, alpha:1.0),
             .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
         ]

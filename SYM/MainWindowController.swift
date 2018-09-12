@@ -68,7 +68,7 @@ class MainWindowController: NSWindowController {
     
     override func windowDidLoad() {
         super.windowDidLoad()
-        self.windowFrameAutosaveName = "MainWindow"
+        self.windowFrameAutosaveName = NSWindow.FrameAutosaveName(rawValue: "MainWindow")
         self.deviceButton.isHidden = !SYMDeviceMonitor.shared().deviceConnected;
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.SYMDeviceMonitor, object: nil)
