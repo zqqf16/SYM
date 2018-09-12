@@ -83,7 +83,7 @@ class CrashInfo {
     }
     
     func crashedThreadRange() -> NSRange? {
-        return RE.threadCrashed.findAllRanges(self.raw)?.first
+        return RE.threadCrashed.findFirstRange(self.raw)
     }
     
     func backgraceRanges(withBinary binary: String) -> [NSRange] {

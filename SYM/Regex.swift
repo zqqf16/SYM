@@ -59,6 +59,16 @@ struct RE {
         
         return matches.map { $0.range }
     }
+    
+    func findFirstRange(_ input: String, options: NSRegularExpression.MatchingOptions = []) -> NSRange? {
+        let nsRange = input.nsRange
+        let range = regex.rangeOfFirstMatch(in: input, options: options, range: nsRange)
+        if range.location >= nsRange.location + nsRange.length {
+            return nil
+        }
+        
+        return range
+    }
 }
 
 // MARK: Apple
@@ -97,7 +107,7 @@ extension RE {
     static let uuid = try! RE("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{8}", options: [.anchorsMatchLines, .caseInsensitive])
     
     // Thread 55 Crashed:
-    static let threadCrashed = try! RE("^Thread \\d+ Crashed:.*^\\s*$", options: [.dotMatchesLineSeparators, .anchorsMatchLines])
+    static let threadCrashed = try! RE("(?:^Thread \\d+.*\n)*^Thread \\d+ Crashed:\\s*\n(?:^\\s*\\d{1,3}.*\n)+", options: .anchorsMatchLines)
 }
 
 // MARK: CPU Usage
