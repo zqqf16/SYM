@@ -10,9 +10,11 @@ Download the latest version from [here](https://github.com/zqqf16/SYM/releases/l
 
 ## Features
 
-1. Supports standard crash report, cpu usage report and Umeng format.
-2. Automatically search dSYM files.
-3. One key symbolicating.
+1. Supports Apple/Umeng/Fabric formats report.
+2. Automatically parsing informations from crash report, and finding dSYM files.
+3. Supports import crash report from iOS device directly.
+4. Supports finding symbols from debugging app.
+5. Supports dSYM download script.
 
 ## Usage
 
@@ -30,9 +32,11 @@ Open or paste in a crash report, click the "Symbolicate" button.
 
 ## 主要功能
 
-1. 支持标准的崩溃日志、cpu usage 日志以及友盟格式的日志
-2. 自动搜索 dSYM 文件
-3. 一键符号化
+1. 支持标准的崩溃日志、cpu usage 日志、Fabric 以及友盟格式的日志
+2. 自动解析崩溃日志信息，自动查找匹配 dSYM 文件
+3. 支持从 iOS 设备中直接导入崩溃日志
+4. 支持从 debug app 中查找符号
+5. 支持 dSYM 文件下载脚本
 
 ## 使用方法
 
