@@ -615,9 +615,6 @@
                                                 </connections>
                                             </menu>
                                         </popUpButtonCell>
-                                        <connections>
-                                            <action selector="didClickDsymButton:" target="akE-CK-Bh4" id="hut-h3-Vuf"/>
-                                        </connections>
                                     </popUpButton>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="C5AD0D29-9AF0-4059-9039-100C6BAE05ED" label="Indicator" paletteLabel="Indicator" tag="-1" sizingBehavior="auto" id="56F-jO-Bdr">
