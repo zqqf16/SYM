@@ -518,7 +518,7 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Symbolicate" image="Device" id="4T4-1f-Y26">
+                                <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Import crash report from device" image="Device" id="4T4-1f-Y26">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="5Nz-F0-1ts">
@@ -533,7 +533,7 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Symbolicate" image="Reticle" id="SZU-E2-ttI">
+                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Scroll to crashed thread" image="Reticle" id="SZU-E2-ttI">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
@@ -548,7 +548,7 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="F8A96EE7-0DFB-4561-8D9A-1FAA2158E0E0" label="Download" paletteLabel="Download" toolTip="Symbolicate" image="Cloud" id="rh6-Nt-hIy">
+                                <toolbarItem implicitItemIdentifier="F8A96EE7-0DFB-4561-8D9A-1FAA2158E0E0" label="Download" paletteLabel="Download" toolTip="dSYM download list" image="Cloud" id="rh6-Nt-hIy">
                                     <size key="minSize" width="32" height="25"/>
                                     <size key="maxSize" width="36" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="0Uu-G4-QHQ" customClass="DownloadButton" customModule="SYM" customModuleProvider="target">
@@ -564,8 +564,7 @@
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
-                                <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" id="wHv-dg-CLj">
-                                    <nil key="toolTip"/>
+                                <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" id="wHv-dg-CLj">
                                     <size key="minSize" width="100" height="22"/>
                                     <size key="maxSize" width="480" height="22"/>
                                     <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="StatusBar" customModule="SYM" customModuleProvider="target">
@@ -578,8 +577,7 @@
                                         </textFieldCell>
                                     </textField>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="8AA3EEF4-4EAF-472F-AE5D-F3B189A7277A" label="dSYM" paletteLabel="dSYM" image="alert" id="x2M-ly-xLG">
-                                    <nil key="toolTip"/>
+                                <toolbarItem implicitItemIdentifier="8AA3EEF4-4EAF-472F-AE5D-F3B189A7277A" label="dSYM" paletteLabel="dSYM" toolTip="Choose or download dSYM file" image="alert" id="x2M-ly-xLG">
                                     <size key="minSize" width="36" height="28"/>
                                     <size key="maxSize" width="200" height="28"/>
                                     <popUpButton key="view" verticalHuggingPriority="750" id="iaa-hN-kZp">
@@ -618,7 +616,6 @@
                                     </popUpButton>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="C5AD0D29-9AF0-4059-9039-100C6BAE05ED" label="Indicator" paletteLabel="Indicator" tag="-1" sizingBehavior="auto" id="56F-jO-Bdr">
-                                    <nil key="toolTip"/>
                                     <progressIndicator key="view" hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="zP5-Pn-E5C">
                                         <rect key="frame" x="19" y="14" width="16" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
