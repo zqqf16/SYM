@@ -39,13 +39,13 @@ def main(url):
 
     results = []
 
-ipad = re.compile(r'rowspan.*(iPad[\w \(\)-.]*)')
-results += parse_models(ipad, text)
+    ipad = re.compile(r'rowspan.*(iPad[\w \(\)-.]*)')
+    results += parse_models(ipad, text)
 
-iPhone = re.compile(r'rowspan.*(iPhone[\w \(\)-.]*)')
-results += parse_models(iPhone, text)
+    iPhone = re.compile(r'rowspan.*(iPhone[\w \(\)-.]*)')
+    results += parse_models(iPhone, text)
 
-output(results)
+    output(results)
 
 if __name__ == '__main__':
     main('https://www.theiphonewiki.com/w/index.php?title=Models&action=edit')
