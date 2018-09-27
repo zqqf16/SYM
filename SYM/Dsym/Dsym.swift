@@ -32,16 +32,18 @@ class DsymFile: Hashable {
     let path: String
     let uuids: [String]
     let binaryPath: String
+    let isApp: Bool
 
     var hashValue: Int {
         return self.path.hashValue
     }
     
-    init(name: String, path: String, binaryPath: String, uuids: [String]) {
+    init(name: String, path: String, binaryPath: String, uuids: [String], isApp: Bool = false) {
         self.name = name
         self.path = path
         self.binaryPath = binaryPath
         self.uuids = uuids
+        self.isApp = isApp
     }
     
     static func == (lhs: DsymFile, rhs: DsymFile) -> Bool {
@@ -163,8 +165,8 @@ class DsymFileMonitor {
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
             let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String]
-            else {
-                return nil
+        else {
+            return nil
         }
         
         let realPath = "\(path)/\(dsymPaths[0])"
@@ -179,7 +181,7 @@ class DsymFileMonitor {
             let uuid = self.uuid,
             let index = dsymUUIDs.firstIndex(of: uuid)
         else {
-                return nil
+            return nil
         }
         
         // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
@@ -193,7 +195,7 @@ class DsymFileMonitor {
             displayPath = realPath
         }
         
-        return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: [uuid])
+        return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
     func parseAppBundle(_ item: NSMetadataItem) -> DsymFile? {
@@ -201,14 +203,16 @@ class DsymFileMonitor {
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let bundle = Bundle(path: path),
             let exePath = bundle.executablePath,
-            let uuids = SubProcess.dwarfdump([exePath])
+            let uuidMap = SubProcess.dwarfdump([exePath])
         else {
             return nil
         }
         let name = item.value(forKey: NSMetadataItemFSNameKey) as? String ?? exePath
+        
+        let uuids = uuidMap.map { $0.0 }
         for u in uuids {
-            if u.0 == uuid {
-                return DsymFile(name: name, path: exePath, binaryPath: exePath, uuids: [uuid])
+            if u == uuid {
+                return DsymFile(name: name, path: exePath, binaryPath: exePath, uuids: uuids, isApp: true)
             }
         }
         

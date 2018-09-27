@@ -27,6 +27,7 @@
 		F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
 		F422C7C51D36A6A000066837 /* Dsym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C41D36A6A000066837 /* Dsym.swift */; };
+		F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
@@ -85,6 +86,7 @@
 		F40B9DBD2123E32D000DF7C6 /* models.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = models.py; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
 		F422C7C41D36A6A000066837 /* Dsym.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dsym.swift; sourceTree = "<group>"; };
+		F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymInfoViewController.swift; sourceTree = "<group>"; };
 		F45320FA1D30A33C00639917 /* Crash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crash.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
@@ -278,6 +280,7 @@
 				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
 				F49E2D44214BA5E3001A6A88 /* DownloadScriptViewController.swift */,
 				F4B9025321538B5000B1DC0A /* DownloadTaskListViewController.swift */,
+				F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -570,6 +573,7 @@
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
+				F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */,
 				F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */,
 				F48D8C9121492079009E2DA6 /* StatusBar.swift in Sources */,
 				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,

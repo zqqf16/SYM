@@ -181,12 +181,15 @@ class MainWindowController: NSWindowController {
     }
     
     @IBAction func showInFinder(_ sender: Any) {
-        guard let path = self.dsymFile?.path else {
+        guard let dsymFile = self.dsymFile else {
             return
         }
         
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.activateFileViewerSelecting([url])
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
+        let vc = storyboard.instantiateController(withIdentifier: "DsymInfoViewController") as! DsymInfoViewController
+        vc.dsymFile = dsymFile
+        
+        self.contentViewController?.presentAsSheet(vc)
     }
     
     @IBAction func downloadDsym(_ sender: Any) {
