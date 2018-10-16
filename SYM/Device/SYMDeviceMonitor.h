@@ -28,6 +28,7 @@ extern NSString * const SYMDeviceMonitorNotification;
 
 @interface SYMDeviceMonitor : NSObject
 @property (nonatomic, assign) BOOL deviceConnected;
+@property (nonatomic, strong) NSArray<NSString *> *connectedDevices;
 
 + (instancetype)sharedMonitor;
 - (void)start;

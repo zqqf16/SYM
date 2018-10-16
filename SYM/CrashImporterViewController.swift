@@ -76,10 +76,13 @@ class DeviceFileProvider: NSFilePromiseProvider {
 
 class CrashImporterViewController: NSViewController {
     
-    private var device: SYMDevice?
+    private var devices: [SYMDevice] = []
+    private var currentDevice: SYMDevice?
     private var fileList: [SYMDeviceFile] = []
 
     @IBOutlet var tableView: NSTableView!
+    @IBOutlet weak var deviceButton: NSPopUpButton!
+    @IBOutlet weak var openButton: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,40 +99,61 @@ class CrashImporterViewController: NSViewController {
     }
     
     @objc func deviceConnected(_ notification:Notification?) {
-        DispatchQueue.global().async {
-            if SYMDeviceMonitor.shared().deviceConnected {
-                self.device = SYMDevice(deviceID: nil)
-            } else {
-                self.device = nil;
+        let deviceList = SYMDeviceMonitor.shared().connectedDevices
+        self.devices.removeAll()
+        deviceList.forEach { (deviceID) in
+            self.devices.append(SYMDevice(deviceID: deviceID))
+        }
+        
+        self.deviceButton.removeAllItems()
+        var unamed = 0
+        self.devices.forEach({ (device) in
+            var title = device.deviceName()
+            if title == nil {
+                title = "Unnamed device \(unamed)"
+                unamed += 1
             }
+            self.deviceButton.addItem(withTitle: title!)
             
-            let list = self.device?.crashList() ?? []
-            
+        })
+        
+        if self.currentDevice != nil {
+            if let index = self.devices.firstIndex(of: self.currentDevice!) {
+                self.deviceButton.selectItem(at: index)
+                return
+            }
+        }
+        
+        self.select(device: self.devices.first)
+    }
+    
+    func select(device: SYMDevice?) {
+        self.currentDevice = device
+        DispatchQueue.global().async {
+            let crashList = device?.crashList() ?? []
             DispatchQueue.main.async {
-                self.fileList = list.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
+                self.fileList = crashList.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
                     return file1.date > file2.date
                 })
                 self.tableView.reloadData()
             }
         }
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
     
-    @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
-        let row = self.tableView.clickedRow
-        if row < 0 || row > self.fileList.count - 1 {
+    func openCrash(atIndex index: Int) {
+        if index < 0 || index > self.fileList.count - 1 {
             return
         }
-        
-        let file = self.fileList[row]
+        let file = self.fileList[index]
         DispatchQueue.global().async {
-            guard let udid = self.device?.deviceID(),
-                let path = self.device?.copyFile(file, to: FileManager.default.localCrashDirectory(udid))
-            else {
-                return
+            guard let udid = self.currentDevice?.deviceID(),
+                let path = self.currentDevice?.copyFile(file, to: FileManager.default.localCrashDirectory(udid))
+                else {
+                    return
             }
             DispatchQueue.main.async {
                 DocumentController.shared.openDocument(withContentsOf: URL(fileURLWithPath: path), display: true, completionHandler: { (document, success, error) in
@@ -137,6 +161,25 @@ class CrashImporterViewController: NSViewController {
                 })
             }
         }
+    }
+    
+    @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
+        let row = self.tableView.clickedRow
+        self.openCrash(atIndex: row)
+    }
+
+    @IBAction func openCrash(_ sender: NSButton) {
+        let row = self.tableView.selectedRow
+        self.openCrash(atIndex: row)
+    }
+    
+    @IBAction func changeDevice(_ sender: NSPopUpButton) {
+        let index = self.deviceButton.indexOfSelectedItem
+        if index < 0 || index > self.devices.count - 1 {
+            return
+        }
+        
+        self.select(device: self.devices[index])
     }
 }
 
@@ -172,9 +215,13 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
-        provider.device = self.device
+        provider.device = self.currentDevice
         provider.file = self.fileList[row]
         return provider
+    }
+    
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        self.openButton.isEnabled = self.tableView.selectedRow >= 0
     }
 }
 

@@ -64,8 +64,17 @@ static void usbmux_event_cb(const usbmuxd_event_t *event, void *user_data)
         int num = 0;
         char **devices = NULL;
         idevice_get_device_list(&devices, &num);
-        idevice_device_list_free(devices);
+        
+        NSMutableArray *deviceList = [NSMutableArray array];
+        if (num > 0) {
+            for (int i = 0; i < num; i++) {
+                NSString *udid = [NSString stringWithFormat:@"%s", devices[i]];
+                [deviceList addObject:udid];
+            }
+        }
         self.deviceConnected = (num > 0);
+        self.connectedDevices = [deviceList copy];
+        idevice_device_list_free(devices);
     });
 }
 
