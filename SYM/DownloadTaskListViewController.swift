@@ -31,7 +31,12 @@ class DownloadTaskListCell: NSTableCellView {
             if let task = self.task {
                 let name = task.crashInfo.appVersion ?? task.crashInfo.appName ?? "Utitled task"
                 if task.isRunning {
-                    self.nameField.stringValue = "🏃‍♂️ \(name)"
+                    let progress = task.progress.percentage
+                    if (progress > 0) {
+                        self.nameField.stringValue = "🏃‍♂️ \(name) \(progress)%"
+                    } else {
+                        self.nameField.stringValue = "🏃‍♂️ \(name)"
+                    }
                     self.indicator.startAnimation(nil)
                     self.indicator.isHidden = false
                 } else {

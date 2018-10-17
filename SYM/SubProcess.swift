@@ -33,6 +33,7 @@ class SubProcess {
     var exitCode: Int
     
     var outputHandler: ((String)->Void)?
+    var errorHandler: ((String)->Void)?
 
     private var task: Process?
     
@@ -52,8 +53,8 @@ class SubProcess {
                 return
             }
             self.output += string
-            if self.outputHandler != nil {
-                self.outputHandler!(string)
+            if let outputHandler = self.outputHandler {
+                outputHandler(string)
             }
         }
         errorPipe.fileHandleForReading.readabilityHandler = { handle in
@@ -61,6 +62,9 @@ class SubProcess {
                     return
             }
             self.error += string
+            if let errorHandler = self.errorHandler {
+                errorHandler(string)
+            }
         }
         
         let task = Process()

@@ -27,13 +27,69 @@ extension Notification.Name {
     static let dsymDownloadStatusChanged = Notification.Name("sym.dsymDownloadStatusChanged")
 }
 
+class DsymDownloadProgress: CustomStringConvertible {
+    var percentage: Int = 0
+    var totalSize: String = "0"
+    var downloadedSize: String = "0"
+    var timeLeft: String = "Unknow"
+    var speed: String = "0"
+    
+    var description: String {
+        return "\(percentage)% \(downloadedSize)/\(totalSize) \(timeLeft) \(speed)/s"
+    }
+    
+    func update(fromConsoleOutput output: String) {
+        /*
+         curl
+         % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+         Dload  Upload   Total   Spent    Left  Speed
+         10  286M   10 30.2M    0     0   830k      0  0:05:53  0:00:37  0:05:16 1660k
+         */
+        let title = "% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current"
+        guard let range = output.range(of: title) else {
+            return
+        }
+        
+        let content = output[range.upperBound...]
+        let lines = content.components(separatedBy: "\r")
+        let count = lines.count
+        if count < 3 {
+            return;
+        }
+        
+        var items: [String] = []
+        for index in (count-2..<count).reversed() {
+            let lastLine = lines[index]
+            items = lastLine.components(separatedBy: " ").filter({ (string) -> Bool in
+                string != ""
+            })
+            if items.count >= 12 {
+                break
+            }
+        }
+        
+        if items.count != 12 || !items[10].contains(":") {
+            return
+        }
+        
+        self.percentage = Int(items[0]) ?? 0
+        self.totalSize = items[1]
+        self.downloadedSize = items[3]
+        self.timeLeft = items[10]
+        self.speed = items[11]
+        
+        print(self)
+    }
+}
+
 class DsymDownloadTask {
     var crashInfo: CrashInfo
     
     var isRunning: Bool = false
     var statusCode: Int = 0
     var message: String?
-    
+    var progress: DsymDownloadProgress = DsymDownloadProgress()
+
     private var process: SubProcess!
     private var fileURL: URL?
     private var scriptURL: URL
@@ -66,6 +122,11 @@ class DsymDownloadTask {
         let dir = Config.dsymDownloadDirectory()
         let env = self.crashInfoToEnv(crashInfo)
         self.process = SubProcess(cmd: self.scriptURL.path, args: [crashPath, dir], env: env)
+        self.process.errorHandler = { [weak self] (_) in
+            if let this = self {
+                this.progress.update(fromConsoleOutput: this.process.error)
+            }
+        }
         self.isRunning = true
         self.process.run()
         
