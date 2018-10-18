@@ -43,7 +43,6 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var dsymMenuItemReveal: NSMenuItem!
     @IBOutlet weak var dsymMenuItemDownload: NSMenuItem!
     
-    
     var isSymbolicating: Bool = false {
         didSet {
             DispatchQueue.main.async {

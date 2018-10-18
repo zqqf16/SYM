@@ -77,8 +77,7 @@ class DsymDownloadProgress: CustomStringConvertible {
         self.downloadedSize = items[3]
         self.timeLeft = items[10]
         self.speed = items[11]
-        
-        print(self)
+        //print(self)
     }
 }
 

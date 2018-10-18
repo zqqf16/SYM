@@ -125,20 +125,18 @@
 
 - (NSArray *)crashList
 {
-    if (self.afc) {
-        return [self listDirectoryWithAFC:self.afc directory:@"."];
-    }
-    
-    _service = [self createCrashService];
-    if (!_service) {
-        return nil;
-    }
-    
-    _afc = [self createAFCWithService:_service];
     if (!_afc) {
-        lockdownd_service_descriptor_free(_service);
-        _service = NULL;
-        return nil;
+        _service = [self createCrashService];
+        if (!_service) {
+            return nil;
+        }
+        
+        _afc = [self createAFCWithService:_service];
+        if (!_afc) {
+            lockdownd_service_descriptor_free(_service);
+            _service = NULL;
+            return nil;
+        }
     }
     
     NSMutableArray *results = [[self listDirectoryWithAFC:_afc directory:@"."] mutableCopy];
@@ -303,7 +301,6 @@
         /* assemble absolute source filename */
         strcpy(((char*)source_filename) + device_directory_length, list[k]);
         file.path = [NSString stringWithUTF8String:source_filename];
-
         /* get file information */
         afc_get_file_info(afc, source_filename, &fileinfo);
         if (!fileinfo) {

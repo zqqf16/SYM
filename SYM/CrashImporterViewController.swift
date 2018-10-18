@@ -22,16 +22,6 @@
 
 import Cocoa
 
-extension NSPasteboard.PasteboardType {
-    static let backwardsCompatibleFileURL: NSPasteboard.PasteboardType = {
-        if #available(OSX 10.13, *) {
-            return NSPasteboard.PasteboardType.fileURL
-        } else {
-            return NSPasteboard.PasteboardType(kUTTypeFileURL as String)
-        }
-    } ()
-}
-
 extension SYMDeviceFile {
     var isCrash: Bool {
         return !self.isDirectory && (self.name.contains(".ips") || self.name.contains(".crash"))
