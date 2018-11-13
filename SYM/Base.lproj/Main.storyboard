@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -666,7 +666,7 @@
         <scene sceneID="W9O-v4-3dZ">
             <objects>
                 <viewController id="o1z-o0-KTK" customClass="DownloadTaskListViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" appearanceType="aqua" id="emI-dl-iHb">
+                    <view key="view" id="emI-dl-iHb">
                         <rect key="frame" x="0.0" y="0.0" width="317" height="357"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -709,7 +709,7 @@
                                                                     </constraints>
                                                                 </progressIndicator>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AHE-rZ-v47">
-                                                                    <rect key="frame" x="10" y="2" width="276" height="17"/>
+                                                                    <rect key="frame" x="10" y="3" width="276" height="17"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" drawsBackground="YES" id="LYp-LE-GWd">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -834,7 +834,7 @@ DQ
                                 </connections>
                             </button>
                             <button hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OdP-6V-9jz">
-                                <rect key="frame" x="75" y="138" width="18" height="19"/>
+                                <rect key="frame" x="75" y="140" width="14" height="14"/>
                                 <buttonCell key="cell" type="roundRect" bezelStyle="roundedRect" image="NSFollowLinkFreestandingTemplate" imagePosition="only" alignment="left" imageScaling="proportionallyDown" inset="2" id="yR3-QF-hwa">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="cellTitle"/>
