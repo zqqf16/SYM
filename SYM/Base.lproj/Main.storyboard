@@ -6,75 +6,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Window Controller-->
-        <scene sceneID="cDg-40-55L">
-            <objects>
-                <windowController id="SbN-gS-vg0" sceneMemberID="viewController">
-                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Ckz-0k-KtD">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="163" y="199" width="480" height="270"/>
-                        <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-                        <connections>
-                            <outlet property="delegate" destination="SbN-gS-vg0" id="fQF-Ra-dyj"/>
-                        </connections>
-                    </window>
-                    <connections>
-                        <segue destination="MhP-uL-K4P" kind="relationship" relationship="window.shadowedContentViewController" id="PRi-ce-dQq"/>
-                    </connections>
-                </windowController>
-                <customObject id="84z-8G-glB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1517" y="-942"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="XOZ-O2-C6a">
-            <objects>
-                <viewController id="MhP-uL-K4P" sceneMemberID="viewController">
-                    <view key="view" id="w35-WK-YZg">
-                        <rect key="frame" x="0.0" y="0.0" width="351" height="71"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <stackView distribution="fill" orientation="horizontal" alignment="bottom" spacing="14" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" fixedFrame="YES" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5e6-Nz-RYb">
-                                <rect key="frame" x="86" y="34" width="179" height="17"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mrj-R3-86V">
-                                        <rect key="frame" x="-2" y="0.0" width="44" height="17"/>
-                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Crash:" id="Vf1-BP-273">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="XbJ-yo-rWu">
-                                        <rect key="frame" x="52" y="-2" width="129" height="18"/>
-                                        <buttonCell key="cell" type="check" title="Auto Symbolicate" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="qJm-jg-Vrt">
-                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <binding destination="zBm-ol-1gm" name="value" keyPath="values.autoSymbolicate" id="KSU-fR-XZf"/>
-                                        </connections>
-                                    </button>
-                                </subviews>
-                                <visibilityPriorities>
-                                    <integer value="1000"/>
-                                    <integer value="1000"/>
-                                </visibilityPriorities>
-                                <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
-                                    <real value="3.4028234663852886e+38"/>
-                                </customSpacing>
-                            </stackView>
-                        </subviews>
-                    </view>
-                </viewController>
-                <customObject id="HTc-U4-PeV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-                <userDefaultsController representsSharedInstance="YES" id="zBm-ol-1gm"/>
-            </objects>
-            <point key="canvasLocation" x="-997" y="-948"/>
-        </scene>
         <!--ScriptImporter-->
         <scene sceneID="cbl-uN-zq5">
             <objects>
@@ -101,11 +32,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
-                                            <connections>
-                                                <segue destination="SbN-gS-vg0" kind="show" id="M1V-jv-M0U"/>
-                                            </connections>
-                                        </menuItem>
+                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW"/>
                                         <menuItem isSeparatorItem="YES" id="wFC-TO-SCJ"/>
                                         <menuItem title="Services" id="NMo-om-nkz">
                                             <modifierMask key="keyEquivalentModifierMask"/>
@@ -740,11 +667,11 @@
                                         </tableView>
                                     </subviews>
                                 </clipView>
-                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="Qxe-rx-3jp">
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="Qxe-rx-3jp">
                                     <rect key="frame" x="-100" y="-100" width="317" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
-                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="WVe-eK-J19">
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="WVe-eK-J19">
                                     <rect key="frame" x="-100" y="-100" width="16" height="337"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
@@ -916,11 +843,11 @@ DQ
                                                 </textView>
                                             </subviews>
                                         </clipView>
-                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="P9G-ch-LWU">
+                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="P9G-ch-LWU">
                                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>
-                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="Sd6-Bi-L8d">
+                                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="Sd6-Bi-L8d">
                                             <rect key="frame" x="784" y="0.0" width="16" height="477"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </scroller>

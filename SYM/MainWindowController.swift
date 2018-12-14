@@ -140,15 +140,6 @@ class MainWindowController: NSWindowController {
     @objc func crashDidSymbolicated(_ notification: Notification) {
         self.isSymbolicating = false
     }
-
-    // MARK: - Symbolicate
-    func autoSymbolicate() {
-        if NSUserDefaultsController.shared.defaults.bool(forKey: "autoSymbolicate") {
-            DispatchQueue.main.async {
-                self.symbolicate(nil)
-            }
-        }
-    }
     
     // MARK: IBActions
     @IBAction func symbolicate(_ sender: AnyObject?) {
@@ -203,11 +194,7 @@ class MainWindowController: NSWindowController {
 // MARK: - DsymFileMonitorDelegate
 extension MainWindowController: DsymFileMonitorDelegate {
     func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile: DsymFile) {
-        let firstTime = (self.dsymFile == nil)
         self.dsymFile = dsymFile
-        if firstTime {
-            self.autoSymbolicate()
-        }
     }
 }
 
