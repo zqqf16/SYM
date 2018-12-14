@@ -27,7 +27,7 @@ class AboutWindow: BaseWindow {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
         self.titlebarAppearsTransparent = true
         self.titleVisibility = .visible
-        self.backgroundColor = NSColor.white
+        //self.backgroundColor = NSColor.white
         //self.center()
     }
 }
