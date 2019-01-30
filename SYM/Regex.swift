@@ -127,11 +127,14 @@ extension RE {
     // Path: /private/var/containers/Bundle/Application/xxx
     static let path = try! RE("^Path:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     
-    // 0x100874000 -   ???  com.kwai.gifshow.beta 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/com_kwai_gif.app/com_kwai_gif
+    // 0x100874000 -   ???  com.yourapp 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/com_kwai_gif.app/com_kwai_gif
     static func image(withPath path: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> RE? {
         return try? RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-.*<(.*)>\\s+\(path)", options: options)
     }
     
+    // 0x18876d000 -        0x188790fff  libsystem_malloc.dylib  <6E321806-C54E-31DB-B4A8-9DEC04A5CA2C>  /usr/lib/system/libsystem_malloc.dylib
+    static let cpuUsageImage = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+[^\\s]+\\s+([^\\s]+)\\s*\\s*<(.*)> (.*)")
+
     // 2   -[NSRunLoop run] + 87 (Foundation + 512424) [0x182f721a8]
     // 2   -[TheClass function:] (xxx.m:1476 in binary + 12591292) [0x101b720bc]
     // 2   ??? (AGXMetalA11 + 553492) [0x1aaa7f214]

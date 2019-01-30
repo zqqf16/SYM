@@ -66,8 +66,8 @@ class Binary {
         guard let path = self.path else {
             return false
         }
-        return path.hasPrefix("/var/containers/Bundle/Application")
-            || path.hasPrefix("/private/var/containers/Bundle/Application")
+        
+        return path.contains("/var/containers/Bundle/Application")
     }
     
     var isValid: Bool {
@@ -99,6 +99,7 @@ class CrashInfo {
     init(_ raw: String) {
         self.raw = raw
         self.parseCrashInfo()
+        self.parseEmbededBinaries()
     }
     
     func parseOneLineInfo(_ re: RE) -> String? {
@@ -118,7 +119,9 @@ class CrashInfo {
             self.uuid = imageMatch[3].uuidFormat()
             self.arch = imageMatch[2]
         }
-        
+    }
+    
+    func parseEmbededBinaries() {
         if let groups = RE.image.findAll(self.raw) {
             var embededBinaries: [Binary] = []
             for group in groups {
@@ -190,6 +193,26 @@ class CPUUsageLog: CrashInfo {
             let imageMatch = imageRE.findFirst(self.raw) {
             //self.bundleID = imageMatch[1]
             self.uuid = imageMatch[1].uuidFormat()
+        }
+    }
+    
+    override func parseEmbededBinaries() {
+        if let groups = RE.cpuUsageImage.findAll(self.raw) {
+            var embededBinaries: [Binary] = []
+            for group in groups {
+                let binary = Binary(name: group[1],
+                                    uuid: group[2].uuidFormat(),
+                                    arch: nil,
+                                    loadAddress: group[0],
+                                    path: group[3])
+                if !binary.inApp {
+                    continue
+                }
+                
+                binary.executable = binary.name == self.appName
+                embededBinaries.append(binary)
+            }
+            self.embededBinaries = embededBinaries;
         }
     }
 
@@ -280,7 +303,7 @@ extension CrashInfo {
     static func parse(_ content: String) -> CrashInfo {
         if content.contains("dSYM UUID") && content.contains("Slide Address") {
             return UmengCrash(content)
-        } else if content.contains("Wakeups limit") && content.contains("Limit duration:") {
+        } else if (content.contains("Wakeups limit") || content.contains("CPU limit")) && content.contains("Limit duration:") {
             return CPUUsageLog(content)
         } else if content.contains("# Crashlytics - plaintext stacktrace") {
             return FabricCrash(content)
