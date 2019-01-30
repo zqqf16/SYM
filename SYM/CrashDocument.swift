@@ -118,13 +118,13 @@ extension CrashDocument: NSTextStorageDelegate {
 
 // MARK: Symbolicate
 extension CrashDocument {
-    func symbolicate(withDsymPath dsym: String?) {
+    func symbolicate(withDsymPaths dsyms: [String]?) {
         guard let crash = self.crashInfo else {
             return
         }
         
         DispatchQueue.global().async {
-            let content = crash.symbolicate(dsym: dsym)
+            let content = crash.symbolicate(dsyms: dsyms)
             DispatchQueue.main.async {
                 self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
                 self.undoManager?.removeAllActions()

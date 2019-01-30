@@ -61,12 +61,12 @@ class MainWindowController: NSWindowController {
     private var monitor = DsymFileMonitor()
     private var downloader = DsymDownloader()
 
-    private var dsymFile: DsymFile? {
+    private var dsymFiles: [DsymFile]? {
         didSet {
             DispatchQueue.main.async {
-                if self.dsymFile != nil {
+                if let dsymFile = self.dsymFiles?.first {
                     self.dsymMenuItemName.image = .symbol
-                    self.dsymButton.title = self.dsymFile!.name
+                    self.dsymButton.title = dsymFile.name
                     self.dsymMenuItemReveal.isEnabled = true
                 } else {
                     self.dsymMenuItemName.image = .alert
@@ -116,7 +116,7 @@ class MainWindowController: NSWindowController {
     
     override var document: AnyObject? {
         didSet {
-            self.dsymFile = nil;
+            self.dsymFiles = nil;
             guard let document = document as? CrashDocument else {
                 return
             }
@@ -129,8 +129,8 @@ class MainWindowController: NSWindowController {
     
     // MARK: Notifications
     @objc func updateCrashInfo(_ notification: Notification?) {
-        self.dsymFile = nil
-        self.monitor.update(uuid: self.crashInfo?.uuid, bundleID: self.crashInfo?.bundleID)
+        self.dsymFiles = nil
+        self.monitor.update(bundleID: self.crashInfo?.bundleID, binaries: self.crashInfo?.embededBinaries)
     }
     
     @objc func updateDeviceButton(_ notification: Notification) {
@@ -149,7 +149,7 @@ class MainWindowController: NSWindowController {
         }
         
         self.isSymbolicating = true
-        self.crashDocument?.symbolicate(withDsymPath: self.dsymFile?.binaryPath)
+        self.crashDocument?.symbolicate(withDsymPaths: self.dsymFiles?.compactMap( {$0.binaryPath} ))
     }
     
     @IBAction func chooseDsymFile(_ sender: Any) {
@@ -166,12 +166,12 @@ class MainWindowController: NSWindowController {
             let path = url.path
             let name = url.lastPathComponent
             let uuid = self.crashInfo?.uuid ?? ""
-            self.dsymFile = DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])
+            self.dsymFiles = [DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])]
         }
     }
     
     @IBAction func showInFinder(_ sender: Any) {
-        guard let dsymFile = self.dsymFile else {
+        guard let dsymFile = self.dsymFiles?.first else {
             return
         }
         
@@ -193,8 +193,8 @@ class MainWindowController: NSWindowController {
 
 // MARK: - DsymFileMonitorDelegate
 extension MainWindowController: DsymFileMonitorDelegate {
-    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile: DsymFile) {
-        self.dsymFile = dsymFile
+    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFiles dsymFiles:[DsymFile]?) {
+        self.dsymFiles = dsymFiles
     }
 }
 
@@ -203,7 +203,7 @@ extension MainWindowController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         if menu == self.dsymMenu {
             self.dsymMenuItemDownload.isEnabled = self.crashInfo != nil && DsymDownloader.shared.canDownload()
-            self.dsymMenuItemReveal.isEnabled = self.dsymFile != nil
+            self.dsymMenuItemReveal.isEnabled = self.dsymFiles != nil
         }
     }
 }

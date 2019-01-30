@@ -857,36 +857,19 @@ DQ
                                         <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QhV-nK-34r">
-                                                <rect key="frame" x="130" y="0.0" width="662" height="17"/>
+                                                <rect key="frame" x="8" y="0.0" width="784" height="17"/>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" alignment="left" title="iPhone 8 Plus - iOS 11.4.1 - v0.4.5" id="UG5-2y-TCM">
                                                     <font key="font" metaFont="cellTitle"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <popUpButton translatesAutoresizingMaskIntoConstraints="NO" id="Mj2-Id-TUl">
-                                                <rect key="frame" x="0.0" y="0.0" width="120" height="17"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="120" id="nY5-wI-hYd"/>
-                                                </constraints>
-                                                <popUpButtonCell key="cell" type="roundRect" bezelStyle="roundedRect" alignment="center" lineBreakMode="truncatingTail" imageScaling="proportionallyUpOrDown" inset="2" id="7rQ-OZ-qhg">
-                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                    <font key="font" metaFont="cellTitle"/>
-                                                    <menu key="menu" id="d8j-Bd-xhj"/>
-                                                </popUpButtonCell>
-                                                <connections>
-                                                    <action selector="didSelectBinary:" target="5WI-tf-yEY" id="Uxd-K5-KLh"/>
-                                                </connections>
-                                            </popUpButton>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstItem="QhV-nK-34r" firstAttribute="leading" secondItem="Mj2-Id-TUl" secondAttribute="trailing" constant="12" id="1Fb-NE-Ogn"/>
-                                            <constraint firstItem="Mj2-Id-TUl" firstAttribute="leading" secondItem="Yh1-TF-zzd" secondAttribute="leading" id="3vc-py-nQX"/>
                                             <constraint firstAttribute="trailing" secondItem="QhV-nK-34r" secondAttribute="trailing" constant="10" id="54a-5L-Foo"/>
                                             <constraint firstAttribute="bottom" secondItem="QhV-nK-34r" secondAttribute="bottom" id="5af-1e-AC0"/>
-                                            <constraint firstAttribute="bottom" secondItem="Mj2-Id-TUl" secondAttribute="bottom" id="CZB-b1-wve"/>
+                                            <constraint firstItem="QhV-nK-34r" firstAttribute="leading" secondItem="Yh1-TF-zzd" secondAttribute="leading" constant="10" id="9KN-2K-RXN"/>
                                             <constraint firstAttribute="height" constant="17" id="UZ8-MR-FZw"/>
-                                            <constraint firstItem="Mj2-Id-TUl" firstAttribute="top" secondItem="Yh1-TF-zzd" secondAttribute="top" id="k5R-Q6-Mki"/>
                                             <constraint firstItem="QhV-nK-34r" firstAttribute="top" secondItem="Yh1-TF-zzd" secondAttribute="top" id="uRO-A2-kfG"/>
                                         </constraints>
                                     </customView>
@@ -908,7 +891,6 @@ DQ
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="binaryButton" destination="Mj2-Id-TUl" id="E6n-Hg-8Kr"/>
                         <outlet property="bottomBar" destination="Yh1-TF-zzd" id="Zs9-Gr-baT"/>
                         <outlet property="infoLabel" destination="QhV-nK-34r" id="swJ-96-odP"/>
                         <outlet property="splitView" destination="FcS-aB-D82" id="M35-di-u6F"/>

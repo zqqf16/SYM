@@ -77,7 +77,7 @@ extension RE {
     static let frame = try! RE("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: .anchorsMatchLines)
     
     // 0x19a8d8000 - 0x19a8f4fff libsystem_m.dylib arm64  <ee3277089d2b310c81263e5fbcbb3138> /usr/lib/system/libsystem_m.dylib
-    static let image = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)>")
+    static let image = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)> (.*)")
     
     // Thread 0:
     // Thread 0 Crashed:
@@ -92,7 +92,7 @@ extension RE {
     
     // Hardware Model:      iPhone5,2
     static let hardware = try! RE("Hardware Model:\\s*([^\\s]+)", options: .caseInsensitive)
-
+    
     // Frame with specified binary
     static func frame(_ binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> RE? {
         return try? RE("^\\s*(\\d{1,3})\\s+(\(binary))\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: options)

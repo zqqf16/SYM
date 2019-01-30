@@ -22,8 +22,8 @@
 
 import Foundation
 
-extension CrashInfo.Frame {
-    func fixed(withLoadAddress loadAddress: String) -> CrashInfo.Frame {
+extension Frame {
+    func fixed(withLoadAddress loadAddress: String) -> Frame {
         guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
             self.symbol != nil,
             self.symbol!.hasPrefix("+")
@@ -49,20 +49,18 @@ extension CrashInfo.Frame {
     }
 }
 
-extension CrashInfo.BinaryImage {
-    func fixed() -> CrashInfo.BinaryImage {
+extension Binary {
+    func fix() {
         guard let loadAddress = self.loadAddress, let backtrace = self.backtrace else {
-            return self
+            return
         }
         
-        var newBacktrace: [CrashInfo.Frame] = []
+        var newBacktrace: [Frame] = []
         for frame in backtrace {
             let newFrame = frame.fixed(withLoadAddress: loadAddress)
             newBacktrace.append(newFrame)
         }
 
-        var newImage = self
-        newImage.backtrace = newBacktrace
-        return newImage
+        self.backtrace = newBacktrace
     }
 }

@@ -42,7 +42,7 @@ extension SubProcess {
         return nil
     }
     
-    static func atos(_ image: CrashInfo.BinaryImage, dsym: String? = nil) -> [String: String]? {
+    static func atos(_ image: Binary, dsym: String? = nil) -> [String: String]? {
         guard let loadAddress = image.loadAddress,
               let dsym = dsym,
               let arch = image.arch,
@@ -62,7 +62,7 @@ extension SubProcess {
         return nil
     }
     
-    static func symbolicatecrash(crash: String, dsym: String?) -> String? {
+    static func symbolicatecrash(crash: String, dsyms: [String]?) -> String? {
         let path = FileManager.default.temporaryPath()
         do {
             try crash.write(toFile: path, atomically: true, encoding: String.Encoding.utf8)
@@ -76,9 +76,9 @@ extension SubProcess {
         }
         
         var args = [path]
-        if let dsymPath = dsym {
+        dsyms?.forEach({ (dsymPath) in
             args.append(contentsOf: ["-d", dsymPath])
-        }
+        })
         let process = SubProcess(cmd: cmd!, args: args)
         process.run()
         return process.output

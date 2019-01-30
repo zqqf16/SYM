@@ -52,16 +52,15 @@ class DsymFile: Hashable {
 }
 
 protocol DsymFileMonitorDelegate: class {
-    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFile dsymFile:DsymFile) -> Void
+    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFiles dsymFiles:[DsymFile]?) -> Void
 }
 
 class DsymFileMonitor {
     private let operationQueue = DispatchQueue(label: "dsym.finder")
     private let query = NSMetadataQuery()
     
-    var cache: DsymFile?
-
-    var uuid: String?
+    var uuids: [String]?
+    var binaries: [Binary]?
     var bundleID: String?
     
     weak var delegate: DsymFileMonitorDelegate?
@@ -76,37 +75,38 @@ class DsymFileMonitor {
         NotificationCenter.default.removeObserver(self)
     }
     
-    func update(uuid: String?, bundleID: String?) {
-        let restart = self.uuid != uuid || self.bundleID != bundleID
-        self.uuid = uuid
+    func update(bundleID: String?, binaries:[Binary]?) {
+        self.binaries = binaries
         self.bundleID = bundleID
-        if (restart) {
-            self.stop()
-            self.start()
-        } else {
-            if self.cache != nil {
-                self.delegate?.dsymFileMonitor(self, didFindDsymFile: self.cache!)
-            }
-        }
+        self.uuids = binaries?.compactMap({ (binary) -> String? in
+            return binary.uuid
+        })
+        self.stop()
+        self.start()
     }
     
     func start() {
         var condition: String = ""
-        if let uuid = self.uuid {
-            condition = "com_apple_xcode_dsym_uuids = \(uuid)"
-        }
+        var isFirst = true
+        self.uuids?.forEach({ (uuid) in
+            if !isFirst {
+                condition += " || "
+            }
+            condition += "com_apple_xcode_dsym_uuids = \(uuid)"
+            isFirst = false
+        })
         
         if let bundleID = self.bundleID {
-            if condition.count > 0 {
+            if !isFirst {
                 condition += " || "
             }
             condition += "kMDItemCFBundleIdentifier = \(bundleID)"
+            isFirst = false
         }
         
         if condition.count == 0 {
             return
         }
-        self.cache = nil
         self.query.predicate = NSPredicate(fromMetadataQueryString: condition)
         self.query.start()
     }
@@ -122,26 +122,24 @@ class DsymFileMonitor {
             query == self.query,
             let results = self.query.results as? [NSMetadataItem]
         else {
+            self.delegate?.dsymFileMonitor(self, didFindDsymFiles: nil)
             return
         }
         
         var appItems = [NSMetadataItem]()
-        
+        var dsyms = [DsymFile]()
+
         for item in results {
             let type = item.value(forKey: NSMetadataItemContentTypeKey) as! String
             if type == "com.apple.xcode.dsym" {
                 // dsym
                 if let dsym = self.parseDsymFile(item) {
-                    self.cache = dsym
-                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
-                    return
+                    dsyms.append(dsym)
                 }
             } else if type == "com.apple.xcode.archive" {
                 // xcarchive
                 if let dsym = self.parseXcarchiveFile(item) {
-                    self.cache = dsym
-                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
-                    return
+                    dsyms.append(dsym)
                 }
             } else if type == "com.apple.application-bundle" {
                 // app
@@ -149,11 +147,16 @@ class DsymFileMonitor {
             }
         }
         
+        if dsyms.count > 0 {
+            // found dsyms
+            self.delegate?.dsymFileMonitor(self, didFindDsymFiles: dsyms)
+            return
+        }
+        
         self.operationQueue.async {
             for app in appItems {
-                if let dsym = self.parseAppBundle(app) {
-                    self.cache = dsym
-                    self.delegate?.dsymFileMonitor(self, didFindDsymFile: dsym)
+                if let dsyms = self.parseAppBundle(app) {
+                    self.delegate?.dsymFileMonitor(self, didFindDsymFiles: dsyms)
                     return
                 }
             }
@@ -178,9 +181,19 @@ class DsymFileMonitor {
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
             let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
-            let uuid = self.uuid,
-            let index = dsymUUIDs.firstIndex(of: uuid)
+            let uuids = self.uuids
         else {
+            return nil
+        }
+        
+        var index: Int = -1
+        for (i, u) in dsymUUIDs.enumerated() {
+            if uuids.contains(u) {
+                index = i
+                break
+            }
+        }
+        if index < 0 {
             return nil
         }
         
@@ -198,24 +211,43 @@ class DsymFileMonitor {
         return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
-    func parseAppBundle(_ item: NSMetadataItem) -> DsymFile? {
-        guard let uuid = self.uuid,
+    func parseAppBundle(_ item: NSMetadataItem) -> [DsymFile]? {
+        guard let binaries = self.binaries,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
-            let bundle = Bundle(path: path),
-            let exePath = bundle.executablePath,
-            let uuidMap = SubProcess.dwarfdump([exePath])
-        else {
+            let bundle = Bundle(path: path) else {
             return nil
         }
-        let name = item.value(forKey: NSMetadataItemFSNameKey) as? String ?? exePath
-        
+        let name = item.value(forKey: NSMetadataItemFSNameKey) as? String
+        var dsyms: [DsymFile] = [DsymFile]()
+
+        if let exe = binaries.filter({ $0.executable }).first, let dsym = self.parseBinary(exe, bundle: bundle, name: name) {
+            dsyms.append(dsym)
+            for framework in binaries.filter({ !$0.executable }) {
+                if let d = self.parseBinary(framework, bundle: bundle, name: name) {
+                    dsyms.append(d)
+                }
+            }
+            
+            return dsyms
+        }
+
+        return nil
+    }
+    
+    func parseBinary(_ binary: Binary, bundle: Bundle, name: String?) -> DsymFile? {
+        guard let path = binary.relativePath,
+            let absPath = bundle.path(forResource: path, ofType: nil),
+            let uuidMap = SubProcess.dwarfdump([absPath]) else {
+            return nil
+        }
+        let dsymName = name ?? path
         let uuids = uuidMap.map { $0.0 }
         for u in uuids {
-            if u == uuid {
-                return DsymFile(name: name, path: exePath, binaryPath: exePath, uuids: uuids, isApp: true)
+            if u == binary.uuid {
+                return DsymFile(name: dsymName, path: absPath, binaryPath: absPath, uuids: uuids, isApp: true)
             }
         }
         
-        return nil
+        return nil;
     }
 }

@@ -33,15 +33,6 @@ class ContentViewController: NSViewController {
     @IBOutlet var infoLabel: NSTextField!
     @IBOutlet var splitView: NSSplitView!
     @IBOutlet var bottomBar: NSView!
-    @IBOutlet var binaryButton: NSPopUpButton!
-    
-    private let lastSelectedBinaryKey = "lastSelectedBinaryName"
-    
-    var selectedBinaryName: String? {
-        didSet {
-            UserDefaults.standard.setValue(selectedBinaryName, forKey: self.lastSelectedBinaryKey)
-        }
-    }
     
     private let font: NSFont = NSFont(name: "Menlo", size: 11)!
 
@@ -110,43 +101,26 @@ class ContentViewController: NSViewController {
         }
         
         let crashInfo = document.crashInfo
-        let binary = self.selectedBinaryName ?? crashInfo?.appName ?? (UserDefaults.standard.value(forKey: self.lastSelectedBinaryKey) as? String)
-        
-        self.updateHighlighting(crashInfo, binary: binary)
-        self.updateSummary(crashInfo, binary: binary)
-        self.updateBinaryButton(crashInfo, binary: binary)
+        self.updateHighlighting(crashInfo)
+        self.updateSummary(crashInfo)
     }
     
-    private func updateHighlighting(_ crashInfo: CrashInfo?, binary: String?) {
+    private func updateHighlighting(_ crashInfo: CrashInfo?) {
         if let textStorage = self.textView.textStorage,
-            let binaryName = binary,
-            let ranges = crashInfo?.backgraceRanges(withBinary: binaryName) {
+            let ranges = crashInfo?.appBacktraceRanges() {
             textStorage.beginEditing()
             textStorage.processHighlighting(ranges)
             textStorage.endEditing()
         }
     }
     
-    private func updateSummary(_ crashInfo: CrashInfo?, binary: String?) {
+    private func updateSummary(_ crashInfo: CrashInfo?) {
         guard let info = crashInfo else {
             self.toggleBottomBar(false)
             return
         }
         self.infoLabel.stringValue = self.infoString(fromCrash: info)
         self.toggleBottomBar(true)
-    }
-    
-    private func updateBinaryButton(_ crashInfo: CrashInfo?, binary: String?) {
-        guard let info = crashInfo else {
-            self.binaryButton.isHidden = true
-            return
-        }
-        
-        if let binaries = info.allBinaryImages() {
-            self.binaryButton.isHidden = false
-            self.binaryButton.addItems(withTitles: binaries.sorted())
-            self.binaryButton.selectItem(withTitle: binary ?? "")
-        }
     }
 }
 
@@ -172,11 +146,6 @@ extension ContentViewController: NSSplitViewDelegate {
 }
 
 extension ContentViewController {
-    @IBAction func didSelectBinary(_ sender: AnyObject?) {
-        self.selectedBinaryName = self.binaryButton.titleOfSelectedItem
-        self.updateHighlighting(self.document?.crashInfo, binary: self.selectedBinaryName)
-    }
-    
     @IBAction func scrollToTarget(_ sender: AnyObject?) {
         guard let crashInfo = self.document?.crashInfo, let range = crashInfo.crashedThreadRange() else {
             return

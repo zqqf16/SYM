@@ -22,6 +22,68 @@
 
 import Foundation
 
+struct Frame {
+    var raw: String
+    var index: String
+    var image: String
+    var address: String
+    var symbol: String?
+    
+    var description: String {
+        let index = self.index.extendToLength(2)
+        let image = self.image.extendToLength(26)
+        let address = self.address.extendToLength(18)
+        let symbol = self.symbol ?? ""
+        return "\(index) \(image) \(address) \(symbol)"
+    }
+}
+
+class Binary {
+    var name: String
+    var uuid: String?
+    var arch: String? = "arm64"
+    var loadAddress: String?
+    var path: String?
+    var executable: Bool = false
+    var backtrace: [Frame]? = nil
+    
+    var relativePath: String? {
+        guard let path = self.path else {
+            return nil
+        }
+
+        var components: [String] = []
+        for dir in path.components(separatedBy: "/").reversed() {
+            if dir.hasSuffix(".app") {
+                break
+            }
+            components.append(dir)
+        }
+        return components.reversed().joined(separator: "/")
+    }
+    
+    var inApp: Bool {
+        guard let path = self.path else {
+            return false
+        }
+        return path.hasPrefix("/var/containers/Bundle/Application")
+            || path.hasPrefix("/private/var/containers/Bundle/Application")
+    }
+    
+    var isValid: Bool {
+        return self.uuid != nil && self.loadAddress != nil
+    }
+    
+    init(name: String, uuid: String?, arch: String?, loadAddress: String?, path: String?) {
+        self.name = name
+        self.uuid = uuid
+        self.arch = arch ?? "arm64"
+        self.loadAddress = loadAddress
+        self.path = path
+    }
+}
+
+
 class CrashInfo {
     let raw: String
     
@@ -32,56 +94,50 @@ class CrashInfo {
     var uuid: String?
     var osVersion: String?
     var appVersion: String?
-    
-    struct Frame {
-        var raw: String
-        var index: String
-        var image: String
-        var address: String
-        var symbol: String?
-        
-        var description: String {
-            let index = self.index.extendToLength(2)
-            let image = self.image.extendToLength(26)
-            let address = self.address.extendToLength(18)
-            let symbol = self.symbol ?? ""
-            return "\(index) \(image) \(address) \(symbol)"
-        }
-    }
-    
-    struct BinaryImage {
-        var name: String
-        var uuid: String?
-        var arch: String? = "arm64"
-        var loadAddress: String?
-        var backtrace: [Frame]?
-        
-        func isValid() -> Bool {
-            return self.uuid != nil && self.loadAddress != nil
-                && self.backtrace != nil && self.backtrace!.count > 0
-        }
-    }
+    var embededBinaries: [Binary]?
     
     init(_ raw: String) {
         self.raw = raw
         self.parseCrashInfo()
     }
     
+    func parseOneLineInfo(_ re: RE) -> String? {
+        return re.findFirst(self.raw)?[0]
+    }
+    
     func parseCrashInfo() {
-        self.appName = RE.process.findFirst(self.raw)?[0]
-        self.device = RE.hardware.findFirst(self.raw)?[0]
-        self.bundleID = RE.identifier.findFirst(self.raw)?[0]
-        self.osVersion = RE.osVersion.findFirst(self.raw)?[0]
-        self.appVersion = RE.version.findFirst(self.raw)?[0]
-
+        self.appName = self.parseOneLineInfo(.process)
+        self.device = self.parseOneLineInfo(.hardware)
+        self.bundleID = self.parseOneLineInfo(.identifier)
+        self.osVersion = self.parseOneLineInfo(.osVersion)
+        self.appVersion = self.parseOneLineInfo(.version)
+        
         if let binary = self.appName,
             let imageRE = RE.image(binary, options:[]),
             let imageMatch = imageRE.findFirst(self.raw) {
             self.uuid = imageMatch[3].uuidFormat()
             self.arch = imageMatch[2]
         }
+        
+        if let groups = RE.image.findAll(self.raw) {
+            var embededBinaries: [Binary] = []
+            for group in groups {
+                let binary = Binary(name: group[1],
+                                    uuid: group[3].uuidFormat(),
+                                    arch: group[2],
+                                    loadAddress: group[0],
+                                    path: group[4])
+                if !binary.inApp {
+                    continue
+                }
+                
+                binary.executable = binary.name == self.appName
+                embededBinaries.append(binary)
+            }
+            self.embededBinaries = embededBinaries;
+        }
     }
-    
+
     func crashedThreadRange() -> NSRange? {
         return RE.threadCrashed.findFirstRange(self.raw)
     }
@@ -95,27 +151,26 @@ class CrashInfo {
         return result
     }
     
-    func executableBinaryBacktraceRanges() -> [NSRange] {
-        guard let appName = self.appName else {
-            return [NSRange]()
-        }
-        return self.backgraceRanges(withBinary: appName)
-    }
-    
-    func allBinaryImages() -> [String]? {
-        guard let frames = RE.frame.findAll(self.raw) else {
-            return nil
-        }
-        var images: Set<String> = []
-        for frame in frames {
-            images.insert(frame[1])
+    func appBacktraceRanges() -> [NSRange] {
+        var binaryNames: [String] = []
+        if let embededBinaries = self.embededBinaries {
+            embededBinaries.forEach { (binary) in
+                binaryNames.append(binary.name)
+            }
+        } else if let appName = self.appName {
+            binaryNames.append(appName)
         }
         
-        return Array(images)
+        var ranges: [NSRange] = []
+        binaryNames.forEach { (name) in
+            ranges.append(contentsOf: self.backgraceRanges(withBinary: name))
+        }
+        
+        return ranges;
     }
     
-    func symbolicate(dsym: String? = nil) -> String {
-        if let content = SubProcess.symbolicatecrash(crash: self.raw, dsym: dsym), content.count > 0 {
+    func symbolicate(dsyms: [String]? = nil) -> String {
+        if let content = SubProcess.symbolicatecrash(crash: self.raw, dsyms: dsyms), content.count > 0 {
             return content
         }
         
@@ -125,31 +180,19 @@ class CrashInfo {
 
 class CPUUsageLog: CrashInfo {
     override func parseCrashInfo() {
-        self.appName = RE.powerstats.findFirst(self.raw)?[0]
-        self.device = RE.hardware.findFirst(self.raw)?[0]
-        self.arch = RE.architecture.findFirst(self.raw)?[0] ?? "arm64"
-        self.osVersion = RE.osVersion.findFirst(self.raw)?[0]
-        self.appVersion = RE.version.findFirst(self.raw)?[0]
-        if let path = RE.path.findFirst(self.raw)?[0],
+        self.appName = self.parseOneLineInfo(.powerstats)
+        self.device = self.parseOneLineInfo(.hardware)
+        self.arch = self.parseOneLineInfo(.architecture) ?? "arm64"
+        self.osVersion = self.parseOneLineInfo(.osVersion)
+        self.appVersion = self.parseOneLineInfo(.version)
+        if let path = self.parseOneLineInfo(.path),
             let imageRE = RE.image(withPath: path),
             let imageMatch = imageRE.findFirst(self.raw) {
             //self.bundleID = imageMatch[1]
             self.uuid = imageMatch[1].uuidFormat()
         }
     }
-    
-    override func allBinaryImages() -> [String]? {
-        guard let frames = RE.cpuUsageFrame.findAll(self.raw) else {
-            return nil
-        }
-        var images: Set<String> = []
-        for frame in frames {
-            images.insert(frame[0])
-        }
-        
-        return Array(images)
-    }
-    
+
     override func backgraceRanges(withBinary binary: String) -> [NSRange] {
         var result:[NSRange] = []
         if let frameRE = RE.cpuUsageFrame(binary),
@@ -162,11 +205,11 @@ class CPUUsageLog: CrashInfo {
 
 class FabricCrash: CrashInfo {
     override func parseCrashInfo() {
-        self.device = RE.hashDevice.findFirst(self.raw)?[0]
-        self.osVersion = RE.hashOSVersion.findFirst(self.raw)?[0]
-        self.appVersion = RE.hashAppVersion.findFirst(self.raw)?[0]
-        self.bundleID = RE.hashBundleID.findFirst(self.raw)?[0]
-        if let osVersion = self.osVersion, let platform = RE.hashPlatform.findFirst(self.raw)?[0] {
+        self.device = self.parseOneLineInfo(.hashDevice)
+        self.osVersion = self.parseOneLineInfo(.hashOSVersion)
+        self.appVersion = self.parseOneLineInfo(.hashAppVersion)
+        self.bundleID = self.parseOneLineInfo(.hashBundleID)
+        if let osVersion = self.osVersion, let platform = self.parseOneLineInfo(.hashPlatform) {
             self.osVersion = "\(platform) \(osVersion)"
         }
     }
@@ -174,18 +217,18 @@ class FabricCrash: CrashInfo {
 
 class UmengCrash: CrashInfo {
     override func parseCrashInfo() {
-        self.appName = RE.binaryImage.findFirst(self.raw)?[0]
-        self.uuid = RE.dsymUUID.findFirst(self.raw)?[0]
-        self.arch = RE.cpuType.findFirst(self.raw)?[0] ?? "arm64"
+        self.appName = self.parseOneLineInfo(.binaryImage)
+        self.uuid = self.parseOneLineInfo(.dsymUUID)
+        self.arch = self.parseOneLineInfo(.cpuType) ?? "arm64"
     }
-    
-    func executableBinaryImage() -> BinaryImage? {
+
+    func executableBinaryImage() -> Binary? {
         guard let appName = self.appName else {
                 return nil
         }
 
-        let loadAddress = RE.slideAddress.findFirst(self.raw)?[0]
-        let ranges = self.executableBinaryBacktraceRanges()
+        let loadAddress = self.parseOneLineInfo(.slideAddress)
+        let ranges = self.appBacktraceRanges()
         let backtrace = ranges.map { (range) -> Frame in
             let line = self.raw.substring(with: range)!
             let group = RE.frame.match(line)!
@@ -197,26 +240,31 @@ class UmengCrash: CrashInfo {
                          symbol: group[3])
         }
 
-        return BinaryImage(name: appName,
-                           uuid: self.uuid,
-                           arch: self.arch,
-                           loadAddress: loadAddress,
-                           backtrace: backtrace)
-        
+        let binary = Binary(name: appName,
+                            uuid: self.uuid,
+                            arch: self.arch,
+                            loadAddress: loadAddress,
+                            path: "")
+        binary.backtrace = backtrace
+        return binary
     }
     
-    override func symbolicate(dsym: String? = nil) -> String {
-        guard let image = self.executableBinaryImage(), image.isValid() else {
+    override func symbolicate(dsyms: [String]? = nil) -> String {
+        guard let image = self.executableBinaryImage(), image.isValid else {
             return self.raw
         }
         
-        let fixedImage = image.fixed()
-        guard let result = SubProcess.atos(fixedImage, dsym: dsym) else {
+        image.fix()
+        var dsymPath = ""
+        if let dsymPaths = dsyms {
+            dsymPath = dsymPaths[0]
+        }
+        guard let result = SubProcess.atos(image, dsym: dsymPath) else {
             return self.raw
         }
         
         var newContent = self.raw
-        for frame in fixedImage.backtrace! {
+        for frame in image.backtrace! {
             if let symbol = result[frame.address] {
                 var newFrame = frame
                 newFrame.symbol = symbol
