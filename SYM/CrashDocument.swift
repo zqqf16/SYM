@@ -86,7 +86,7 @@ class CrashDocument: NSDocument {
             return
         }
         
-        guard let content = plist?["description"] as? String,
+        guard let content = plist["description"] as? String,
             let data = content.data(using: .utf8)
             else {
                 return

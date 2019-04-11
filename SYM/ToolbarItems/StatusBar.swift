@@ -79,20 +79,20 @@ class StatusBar: NSTextField {
         self.addSubview(self.image)
         
         self.addConstraints([
-            NSLayoutConstraint(item: self.image, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 4),
-            NSLayoutConstraint(item: self.image, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.image, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -4),
-            NSLayoutConstraint(item: self.image, attribute: .width, relatedBy: .equal, toItem: self.image, attribute: .height, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.image!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 4),
+            NSLayoutConstraint(item: self.image!, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.image!, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -4),
+            NSLayoutConstraint(item: self.image!, attribute: .width, relatedBy: .equal, toItem: self.image, attribute: .height, multiplier: 1.0, constant: 0),
             
-            NSLayoutConstraint(item: self.indicator, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -8),
-            NSLayoutConstraint(item: self.indicator, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.indicator, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -8),
-            NSLayoutConstraint(item: self.indicator, attribute: .width, relatedBy: .equal, toItem: self.indicator, attribute: .height, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.indicator!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -8),
+            NSLayoutConstraint(item: self.indicator!, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.indicator!, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -8),
+            NSLayoutConstraint(item: self.indicator!, attribute: .width, relatedBy: .equal, toItem: self.indicator, attribute: .height, multiplier: 1.0, constant: 0),
             
-            NSLayoutConstraint(item: self.button, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -4),
-            NSLayoutConstraint(item: self.button, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
-            NSLayoutConstraint(item: self.button, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -8),
-            NSLayoutConstraint(item: self.button, attribute: .width, relatedBy: .greaterThanOrEqual, toItem: nil, attribute: .width, multiplier: 1.0, constant: 32),
+            NSLayoutConstraint(item: self.button!, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1.0, constant: -4),
+            NSLayoutConstraint(item: self.button!, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1.0, constant: 0),
+            NSLayoutConstraint(item: self.button!, attribute: .height, relatedBy: .equal, toItem: self, attribute: .height, multiplier: 1.0, constant: -8),
+            NSLayoutConstraint(item: self.button!, attribute: .width, relatedBy: .greaterThanOrEqual, toItem: nil, attribute: .width, multiplier: 1.0, constant: 32),
         ])
     }
     

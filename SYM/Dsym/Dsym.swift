@@ -34,8 +34,8 @@ class DsymFile: Hashable {
     let binaryPath: String
     let isApp: Bool
 
-    var hashValue: Int {
-        return self.path.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(path)
     }
     
     init(name: String, path: String, binaryPath: String, uuids: [String], isApp: Bool = false) {

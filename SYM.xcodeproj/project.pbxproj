@@ -477,12 +477,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = zqqf16;
 				TargetAttributes = {
 					51BF9C4E1D6C7A1C00379BFC = {
 						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 						TestTargetID = F49BD1EB1D2FF46300024AAE;
 					};
 					F49BD1EB1D2FF46300024AAE = {
@@ -494,7 +494,7 @@
 			};
 			buildConfigurationList = F49BD1E71D2FF46300024AAE /* Build configuration list for PBXProject "SYM" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -613,8 +613,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
 			};
@@ -631,8 +630,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
 			};
@@ -770,7 +768,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/SYM/SYM-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				VALID_ARCHS = x86_64;
 			};
@@ -807,7 +805,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/SYM/SYM-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				VALID_ARCHS = x86_64;
 			};
