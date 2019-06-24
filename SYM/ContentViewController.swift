@@ -34,15 +34,15 @@ class ContentViewController: NSViewController {
     @IBOutlet var splitView: NSSplitView!
     @IBOutlet var bottomBar: NSView!
     
-    private let font: NSFont = NSFont(name: "Menlo", size: 11)!
-
+    private var font: NSFont = Config.editorFont
+    
     var document: CrashDocument? {
         didSet {
             guard let document = document else {
                 return
             }
+
             self.textView.layoutManager?.replaceTextStorage(document.textStorage)
-            self.textView.font = self.font
             self.updateCrashInfo()
             
             document.notificationCenter.addObserver(forName: .crashSymbolicated, object: nil, queue: nil) {  [weak self] (notification) in
@@ -59,6 +59,7 @@ class ContentViewController: NSViewController {
         super.viewDidLoad()
         self.setupTextView()
         self.toggleBottomBar(false)
+        NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configFontChanged, object: nil)
     }
     
     private func toggleBottomBar(_ show: Bool) {
@@ -71,6 +72,11 @@ class ContentViewController: NSViewController {
         self.textView.textContainerInset = CGSize(width: 10, height: 10)
         self.textView.allowsUndo = true
         self.textView.delegate = self
+        
+        //self.textView.isHorizontallyResizable = true
+        self.textView.textContainer?.widthTracksTextView = false
+        self.textView.textContainer?.containerSize = NSMakeSize(CGFloat(Float.greatestFiniteMagnitude), CGFloat(Float.greatestFiniteMagnitude))
+        //self.textView.textContainer?.containerSize = self.textView.maxSize
     }
     
     func textDidChange(_ notification: Notification) {
@@ -108,7 +114,9 @@ class ContentViewController: NSViewController {
     private func updateHighlighting(_ crashInfo: CrashInfo?) {
         if let textStorage = self.textView.textStorage,
             let ranges = crashInfo?.appBacktraceRanges() {
+            self.textView.font = self.font
             textStorage.beginEditing()
+            textStorage.font = self.font
             textStorage.processHighlighting(ranges)
             textStorage.endEditing()
         }
@@ -121,6 +129,11 @@ class ContentViewController: NSViewController {
         }
         self.infoLabel.stringValue = self.infoString(fromCrash: info)
         self.toggleBottomBar(true)
+    }
+    
+    @objc func configFontDidChanged(_ notification: Notification) {
+        self.font = Config.editorFont
+        self.updateCrashInfo()
     }
 }
 
@@ -153,23 +166,41 @@ extension ContentViewController {
         
         self.textView.scrollRangeToVisible(range)
     }
+    
+    @IBAction func zoomIn(_ sender: AnyObject?) {
+        let size = min(self.font.pointSize + 1, 20.0)
+        self.font = NSFont(name: self.font.fontName, size: size)!
+        self.updateCrashInfo()
+    }
+    
+    @IBAction func zoomOut(_ sender: AnyObject?) {
+        let size = max(self.font.pointSize - 1, 10.0)
+        self.font = NSFont(name: self.font.fontName, size: size)!
+        self.updateCrashInfo()
+    }
 }
 
 // Mark: Highlight
 extension NSTextStorage {
     func processHighlighting(_ ranges:[NSRange]) {
+        let style: NSMutableParagraphStyle = NSMutableParagraphStyle()
+        style.lineBreakMode = .byCharWrapping
         var defaultAttrs: [NSAttributedString.Key: AnyObject] = [
             .foregroundColor: NSColor.textColor,
+            .paragraphStyle: style,
         ]
+        
         if let font = self.font {
             defaultAttrs[.font] = font
         }
         self.setAttributes(defaultAttrs, range: self.string.nsRange)
         
-        let attrs: [NSAttributedString.Key: AnyObject] = [
-            .foregroundColor: NSColor(red:1.00, green:0.23, blue:0.18, alpha:1.0),
-            .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
-        ]
+        var attrs = defaultAttrs
+        attrs[.foregroundColor] = NSColor(red:1.00, green:0.23, blue:0.18, alpha:1.0)
+        if let font = self.font, let familyName = font.familyName {
+            //.font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
+            attrs[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)
+        }
         for range in ranges {
             self.setAttributes(attrs, range: range)
         }

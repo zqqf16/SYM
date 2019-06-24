@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Nkr-tf-Q6G">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Preferences-->
+        <scene sceneID="TbT-lp-ooM">
+            <objects>
+                <viewController title="Preferences" id="Nkr-tf-Q6G" customClass="PreferencesViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="BvU-Pt-BKJ">
+                        <rect key="frame" x="0.0" y="0.0" width="455" height="61"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ahQ-mM-3pU">
+                                <rect key="frame" x="148" y="22" width="32" height="17"/>
+                                <textFieldCell key="cell" lineBreakMode="clipping" title="Font" id="kdj-Uv-OvW">
+                                    <font key="font" usesAppearanceFont="YES"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LOF-a0-KIl">
+                                <rect key="frame" x="192" y="13" width="109" height="32"/>
+                                <buttonCell key="cell" type="push" title="Melon 12" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5GB-NP-L58">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="showFontPanel:" target="Nkr-tf-Q6G" id="FFX-jz-9bw"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="LOF-a0-KIl" secondAttribute="trailing" constant="160" id="5tm-rw-bdt"/>
+                            <constraint firstItem="ahQ-mM-3pU" firstAttribute="leading" secondItem="BvU-Pt-BKJ" secondAttribute="leading" constant="150" id="QZm-mG-8Xw"/>
+                            <constraint firstItem="LOF-a0-KIl" firstAttribute="leading" secondItem="ahQ-mM-3pU" secondAttribute="trailing" constant="20" id="SOM-SS-Z8h"/>
+                            <constraint firstItem="LOF-a0-KIl" firstAttribute="centerY" secondItem="ahQ-mM-3pU" secondAttribute="centerY" id="deP-xy-Qlh"/>
+                            <constraint firstItem="ahQ-mM-3pU" firstAttribute="top" secondItem="BvU-Pt-BKJ" secondAttribute="top" constant="22" id="sBB-fM-cgo"/>
+                            <constraint firstAttribute="bottom" secondItem="ahQ-mM-3pU" secondAttribute="bottom" constant="22" id="uZ8-0p-eek"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="fontNameButton" destination="LOF-a0-KIl" id="8BA-2t-K33"/>
+                    </connections>
+                </viewController>
+                <customObject id="i6T-Sq-Uca" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <userDefaultsController representsSharedInstance="YES" id="nPv-kQ-OXc"/>
+            </objects>
+            <point key="canvasLocation" x="138.5" y="11.5"/>
+        </scene>
+    </scenes>
+</document>

@@ -20,28 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+import Cocoa
+
+extension String {
+    static let downloadScriptURLKey = "symDownloadScriptURL"
+    static let downloadFolderKey = "dsymDownloadFolder"
+    static let editorFontNameKey = "editorFontName"
+    static let editorFontSizeKey = "editorFontSize"
+}
+
+extension Notification.Name {
+    static let configFontChanged = Notification.Name("sym.config.fontChanged")
+}
 
 struct Config {
     static func downloadScriptURL() -> URL {
-        let key = "symDownloadScriptURL"
-        if let stored = UserDefaults.standard.url(forKey: key) {
+        if let stored = UserDefaults.standard.url(forKey: .downloadScriptURLKey) {
             return stored
         }
         
         var path = FileManager.default.appSupportDirectory() ?? NSTemporaryDirectory()
         path = (path as NSString).appendingPathComponent("download.sh")
         let url = URL(fileURLWithPath: path)
-        UserDefaults.standard.set(url, forKey: key)
+        UserDefaults.standard.set(url, forKey: .downloadScriptURLKey)
         return url
     }
     
     static func dsymDownloadDirectory() -> String {
-        let key = "dsymDownloadFolder"
-        if let stored = UserDefaults.standard.string(forKey: key) {
+        if let stored = UserDefaults.standard.string(forKey: .downloadFolderKey) {
             if stored.hasPrefix("~/") {
                 let newPath = "\(NSHomeDirectory())/\(stored.dropFirst(2))"
-                UserDefaults.standard.set(newPath, forKey: key)
+                UserDefaults.standard.set(newPath, forKey: .downloadFolderKey)
                 return newPath
             }
             
@@ -49,7 +58,32 @@ struct Config {
         }
         let urls = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
         let path = urls.first?.path ?? NSHomeDirectory()
-        UserDefaults.standard.set(path, forKey: key)
+        UserDefaults.standard.set(path, forKey: .downloadFolderKey)
         return path
+    }
+    
+    static var editorFont: NSFont {
+        get {
+            var fontSize: CGFloat = NSFont.systemFontSize
+            
+            let size = UserDefaults.standard.integer(forKey: .editorFontSizeKey)
+            if size > 0 {
+                fontSize = CGFloat(size)
+            }
+            
+            var font: NSFont?
+            if let name = UserDefaults.standard.string(forKey: .editorFontNameKey) {
+                font = NSFont(name: name, size: fontSize)
+            }
+            
+            return font ?? NSFont.userFixedPitchFont(ofSize: fontSize) ?? NSFont.systemFont(ofSize: fontSize)
+        }
+        set(newFont) {
+            let name = newFont.fontName
+            let size = Int(newFont.pointSize)
+            UserDefaults.standard.set(name, forKey: .editorFontNameKey)
+            UserDefaults.standard.set(size, forKey: .editorFontSizeKey)
+            NotificationCenter.default.post(name: .configFontChanged, object: newFont)
+        }
     }
 }
