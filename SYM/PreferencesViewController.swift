@@ -25,14 +25,38 @@ import Cocoa
 class PreferencesViewController: NSViewController {
 
     @IBOutlet weak var fontNameButton: NSButton!
-    
+    @IBOutlet weak var colorButton: NSPopUpButton!
+    @IBOutlet weak var colorMenu: NSMenu!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do view setup here.
+        
+        // Font
         let font = Config.editorFont
         self.fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
         
         NotificationCenter.default.addObserver(self, selector: #selector(fontDidChanged(_:)), name: .configFontChanged, object: nil)
+        
+        // Color
+        self.setupColors()
+    }
+    
+    private func setupColors() {
+        self.colorMenu.removeAllItems()
+        let currentColor = Config.highlightColor
+        for colorCode in Config.highlightColors {
+            guard let color = NSColor(hexString: colorCode) else {
+                continue
+            }
+            let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+            menuItem.image = NSImage(color: color, size: NSSize(width: 20, height: 10))
+            menuItem.toolTip = colorCode
+            self.colorMenu.addItem(menuItem)
+            
+            if colorCode == currentColor {
+                self.colorButton.select(menuItem)
+            }
+        }
     }
     
     @IBAction func showFontPanel(_ sender: AnyObject?) {
@@ -47,6 +71,14 @@ class PreferencesViewController: NSViewController {
     @objc func fontDidChanged(_ notification: Notification?) {
         let font = Config.editorFont
         self.fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
+    }
+    
+    @IBAction func colorDidChanged(_ sender: NSPopUpButton) {
+        guard let selectedItem = sender.selectedItem, let index = sender.menu?.index(of: selectedItem) else {
+            return
+        }
+        
+        Config.highlightColor = Config.highlightColors[index]
     }
 }
 

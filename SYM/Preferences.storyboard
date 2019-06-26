@@ -1,55 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Nkr-tf-Q6G">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="2jI-LC-2et">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Window Controller-->
+        <scene sceneID="ei4-ff-6Lq">
+            <objects>
+                <windowController showSeguePresentationStyle="single" id="2jI-LC-2et" sceneMemberID="viewController">
+                    <window key="window" title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="2Gb-l7-GlD">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="245" y="301" width="480" height="150"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <connections>
+                            <outlet property="delegate" destination="2jI-LC-2et" id="H0f-Qh-8xu"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="Nkr-tf-Q6G" kind="relationship" relationship="window.shadowedContentViewController" id="B7b-40-pnv"/>
+                    </connections>
+                </windowController>
+                <customObject id="LUZ-ZO-Gtq" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-186" y="-176"/>
+        </scene>
         <!--Preferences-->
         <scene sceneID="TbT-lp-ooM">
             <objects>
                 <viewController title="Preferences" id="Nkr-tf-Q6G" customClass="PreferencesViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="BvU-Pt-BKJ">
-                        <rect key="frame" x="0.0" y="0.0" width="455" height="61"/>
+                        <rect key="frame" x="0.0" y="0.0" width="460" height="120"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ahQ-mM-3pU">
-                                <rect key="frame" x="148" y="22" width="32" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" title="Font" id="kdj-Uv-OvW">
-                                    <font key="font" usesAppearanceFont="YES"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LOF-a0-KIl">
-                                <rect key="frame" x="192" y="13" width="109" height="32"/>
-                                <buttonCell key="cell" type="push" title="Melon 12" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5GB-NP-L58">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                    <connections>
-                                        <action selector="showFontPanel:" target="Nkr-tf-Q6G" id="FFX-jz-9bw"/>
-                                    </connections>
-                                </buttonCell>
-                            </button>
+                            <gridView xPlacement="trailing" yPlacement="center" rowAlignment="none" rowSpacing="12" columnSpacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="KIH-yc-4fr">
+                                <rect key="frame" x="133" y="33" width="194" height="54"/>
+                                <rows>
+                                    <gridRow id="3ad-xq-pko"/>
+                                    <gridRow id="tOh-Wt-FyV"/>
+                                </rows>
+                                <columns>
+                                    <gridColumn id="p0B-Bc-eHr"/>
+                                    <gridColumn xPlacement="leading" id="dXc-3q-cRR"/>
+                                </columns>
+                                <gridCells>
+                                    <gridCell row="3ad-xq-pko" column="p0B-Bc-eHr" id="Opr-W9-nBX">
+                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ahQ-mM-3pU">
+                                            <rect key="frame" x="62" y="35" width="35" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Font:" id="kdj-Uv-OvW">
+                                                <font key="font" usesAppearanceFont="YES"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                    <gridCell row="3ad-xq-pko" column="dXc-3q-cRR" id="kb9-8H-noq">
+                                        <button key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="LOF-a0-KIl">
+                                            <rect key="frame" x="105" y="26" width="95" height="32"/>
+                                            <buttonCell key="cell" type="push" title="Melon 12" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5GB-NP-L58">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                                <connections>
+                                                    <action selector="showFontPanel:" target="Nkr-tf-Q6G" id="FFX-jz-9bw"/>
+                                                </connections>
+                                            </buttonCell>
+                                        </button>
+                                    </gridCell>
+                                    <gridCell row="tOh-Wt-FyV" column="p0B-Bc-eHr" id="7Na-lm-jrD">
+                                        <textField key="contentView" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sbw-2O-twS">
+                                            <rect key="frame" x="-2" y="2" width="99" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Highlight Color:" id="tp4-jg-KBC">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </gridCell>
+                                    <gridCell row="tOh-Wt-FyV" column="dXc-3q-cRR" id="Fun-WH-XrQ">
+                                        <popUpButton key="contentView" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qCE-sD-blg">
+                                            <rect key="frame" x="109" y="-3" width="69" height="25"/>
+                                            <popUpButtonCell key="cell" type="push" title="color" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="awr-5C-eO7" id="Ygf-wL-Xy9">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" id="Jb3-Q9-KeH">
+                                                    <items>
+                                                        <menuItem title="color" state="on" id="awr-5C-eO7"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="colorDidChanged:" target="Nkr-tf-Q6G" id="KLR-WU-Kqy"/>
+                                            </connections>
+                                        </popUpButton>
+                                    </gridCell>
+                                </gridCells>
+                            </gridView>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="LOF-a0-KIl" secondAttribute="trailing" constant="160" id="5tm-rw-bdt"/>
-                            <constraint firstItem="ahQ-mM-3pU" firstAttribute="leading" secondItem="BvU-Pt-BKJ" secondAttribute="leading" constant="150" id="QZm-mG-8Xw"/>
-                            <constraint firstItem="LOF-a0-KIl" firstAttribute="leading" secondItem="ahQ-mM-3pU" secondAttribute="trailing" constant="20" id="SOM-SS-Z8h"/>
-                            <constraint firstItem="LOF-a0-KIl" firstAttribute="centerY" secondItem="ahQ-mM-3pU" secondAttribute="centerY" id="deP-xy-Qlh"/>
-                            <constraint firstItem="ahQ-mM-3pU" firstAttribute="top" secondItem="BvU-Pt-BKJ" secondAttribute="top" constant="22" id="sBB-fM-cgo"/>
-                            <constraint firstAttribute="bottom" secondItem="ahQ-mM-3pU" secondAttribute="bottom" constant="22" id="uZ8-0p-eek"/>
+                            <constraint firstItem="KIH-yc-4fr" firstAttribute="centerX" secondItem="BvU-Pt-BKJ" secondAttribute="centerX" id="T5W-iw-3W3"/>
+                            <constraint firstItem="KIH-yc-4fr" firstAttribute="centerY" secondItem="BvU-Pt-BKJ" secondAttribute="centerY" id="mIj-lm-bdD"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="colorButton" destination="qCE-sD-blg" id="C4Y-JL-4j8"/>
+                        <outlet property="colorMenu" destination="Jb3-Q9-KeH" id="H0N-C2-Zc3"/>
                         <outlet property="fontNameButton" destination="LOF-a0-KIl" id="8BA-2t-K33"/>
                     </connections>
                 </viewController>
                 <customObject id="i6T-Sq-Uca" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController representsSharedInstance="YES" id="nPv-kQ-OXc"/>
             </objects>
-            <point key="canvasLocation" x="138.5" y="11.5"/>
+            <point key="canvasLocation" x="-186" y="132"/>
         </scene>
     </scenes>
 </document>

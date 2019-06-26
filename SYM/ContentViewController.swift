@@ -60,6 +60,7 @@ class ContentViewController: NSViewController {
         self.setupTextView()
         self.toggleBottomBar(false)
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configFontChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
     }
     
     private func toggleBottomBar(_ show: Bool) {
@@ -196,7 +197,7 @@ extension NSTextStorage {
         self.setAttributes(defaultAttrs, range: self.string.nsRange)
         
         var attrs = defaultAttrs
-        attrs[.foregroundColor] = NSColor(red:1.00, green:0.23, blue:0.18, alpha:1.0)
+        attrs[.foregroundColor] = NSColor(hexString: Config.highlightColor)!
         if let font = self.font, let familyName = font.familyName {
             //.font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
             attrs[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)

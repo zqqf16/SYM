@@ -38,7 +38,7 @@ class DsymInfoViewController: NSViewController {
         // Do view setup here.
         
         self.view.wantsLayer = true
-        self.view.layer?.backgroundColor = NSColor.white.cgColor
+        //self.view.layer?.backgroundColor = NSColor.white.cgColor
         
         if let dsym = self.dsymFile {
             self.pathLabel.stringValue = dsym.path

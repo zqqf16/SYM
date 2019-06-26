@@ -27,10 +27,12 @@ extension String {
     static let downloadFolderKey = "dsymDownloadFolder"
     static let editorFontNameKey = "editorFontName"
     static let editorFontSizeKey = "editorFontSize"
+    static let editorHighlightColorKey = "editorHighlightColorKey"
 }
 
 extension Notification.Name {
     static let configFontChanged = Notification.Name("sym.config.fontChanged")
+    static let configColorChanged = Notification.Name("sym.config.colorChanged")
 }
 
 struct Config {
@@ -84,6 +86,38 @@ struct Config {
             UserDefaults.standard.set(name, forKey: .editorFontNameKey)
             UserDefaults.standard.set(size, forKey: .editorFontSizeKey)
             NotificationCenter.default.post(name: .configFontChanged, object: newFont)
+        }
+    }
+    
+    static let highlightColors: [String] = [
+        "#F44336",
+        "#E91E63",
+        "#9C27B0",
+        "#673AB7",
+        "#3F51B5",
+        "#2196F3",
+        "#03A9F4",
+        "#00BCD4",
+        "#009688",
+        "#4CAF50",
+        "#8BC34A",
+        "#CDDC39",
+        "#FFEB3B",
+        "#FFC107",
+        "#FF9800",
+        "#FF5722",
+        "#795548",
+        "#9E9E9E",
+        "#607D8B",
+    ]
+    
+    static var highlightColor: String {
+        get {
+            return UserDefaults.standard.string(forKey: .editorHighlightColorKey) ?? self.highlightColors[0]
+        }
+        set(newColor) {
+            UserDefaults.standard.set(newColor, forKey: .editorHighlightColorKey)
+            NotificationCenter.default.post(name: .configColorChanged, object: newColor)
         }
     }
 }

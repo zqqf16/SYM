@@ -19,6 +19,8 @@
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
 		B5F3577C22C0866400111FF3 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3577B22C0866400111FF3 /* Preferences.storyboard */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
+		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
+		B5F3578922C3121200111FF3 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578822C3121200111FF3 /* Image.swift */; };
 		F400154821539E8500267818 /* Automator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F400154721539E8500267818 /* Automator.framework */; };
 		F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F402D2D1214A90BF00B75B40 /* DownloadButton.swift */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
@@ -81,6 +83,8 @@
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		B5F3577B22C0866400111FF3 /* Preferences.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Preferences.storyboard; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
+		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		B5F3578822C3121200111FF3 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		F400154721539E8500267818 /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
 		F402D2D1214A90BF00B75B40 /* DownloadButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadButton.swift; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
@@ -264,6 +268,8 @@
 				F45321091D30CCBF00639917 /* SubProcess.swift */,
 				F422C7C21D36A66800066837 /* FileFinder.swift */,
 				51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */,
+				B5F3578622C30B7C00111FF3 /* Color.swift */,
+				B5F3578822C3121200111FF3 /* Image.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -559,6 +565,7 @@
 			files = (
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				F4B9025421538B5000B1DC0A /* DownloadTaskListViewController.swift in Sources */,
+				B5F3578922C3121200111FF3 /* Image.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
 				F4EFE9182126C0FB00E9EDA9 /* SYMDevice.m in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
@@ -580,6 +587,7 @@
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
+				B5F3578722C30B7C00111FF3 /* Color.swift in Sources */,
 				F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */,
 				B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */,
 				F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */,
