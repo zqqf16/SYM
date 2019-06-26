@@ -36,8 +36,14 @@ class DownloadScriptViewController: NSViewController {
     }
     
     @IBAction func didClickDoneButton(_ sender: Any) {
+        var script = self.textView.string
+        if script.lengthOfBytes(using: .utf8) > 0 {
+            if !script.hasPrefix("#!") {
+                script = "#!/bin/bash\n" + script
+            }
+        }
         do {
-            try self.textView.string.write(to: Config.downloadScriptURL(), atomically: true, encoding: .utf8)
+            try script.write(to: Config.downloadScriptURL(), atomically: true, encoding: .utf8)
         } catch {
             // TODO: error handling
         }
