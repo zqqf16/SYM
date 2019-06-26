@@ -49,7 +49,6 @@ class ContentViewController: NSViewController {
                 self?.updateCrashInfo()
             }
             document.notificationCenter.addObserver(forName: .crashDidOpen, object: nil, queue: nil) {  [weak self] (notification) in
-                self?.textView.font = self?.font
                 self?.updateCrashInfo()
             }
         }
@@ -78,6 +77,8 @@ class ContentViewController: NSViewController {
         self.textView.textContainer?.widthTracksTextView = false
         self.textView.textContainer?.containerSize = NSMakeSize(CGFloat(Float.greatestFiniteMagnitude), CGFloat(Float.greatestFiniteMagnitude))
         //self.textView.textContainer?.containerSize = self.textView.maxSize
+        
+        self.textView.layoutManager?.allowsNonContiguousLayout = false
     }
     
     func textDidChange(_ notification: Notification) {
