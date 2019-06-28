@@ -1,0 +1,18 @@
+
+/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "GAT-VH-nSW"; */
+"GAT-VH-nSW.title" = "OtherViews";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "Muz-PD-cFf"; */
+"Muz-PD-cFf.title" = "取消";
+
+/* Class = "NSButtonCell"; title = "Save"; ObjectID = "f7k-pH-pVK"; */
+"f7k-pH-pVK.title" = "保存";
+
+/* Class = "NSTextFieldCell"; title = "Edit dSYM download script"; ObjectID = "njm-2x-I9i"; */
+"njm-2x-I9i.title" = "编辑 dSYM 下载脚本";
+
+/* Class = "NSWindow"; title = "Download Script"; ObjectID = "sYg-iB-nfe"; */
+"sYg-iB-nfe.title" = "下载脚本";
+
+/* Class = "NSTextFieldCell"; title = "Downloads folder:"; ObjectID = "xn9-0q-5Hy"; */
+"xn9-0q-5Hy.title" = "下载目录:";
