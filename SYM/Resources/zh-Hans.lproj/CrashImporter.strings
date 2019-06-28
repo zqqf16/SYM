@@ -1,0 +1,30 @@
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "Gq3-za-3vy"; */
+"Gq3-za-3vy.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "Open"; ObjectID = "Kd0-Wz-la2"; */
+"Kd0-Wz-la2.title" = "打开";
+
+/* Class = "NSTableColumn"; headerCell.title = "Date"; ObjectID = "UoP-0P-jha"; */
+"UoP-0P-jha.headerCell.title" = "日期";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "esl-wg-sbV"; */
+"esl-wg-sbV.headerCell.title" = "名称";
+
+/* Class = "NSMenuItem"; title = "Device name"; ObjectID = "fhM-S9-Qe8"; */
+"fhM-S9-Qe8.title" = "设备名";
+
+/* Class = "NSTextFieldCell"; title = "Device:"; ObjectID = "gVC-01-kVX"; */
+"gVC-01-kVX.title" = "设备：";
+
+/* Class = "NSWindow"; title = "Crash Importer"; ObjectID = "ikU-qi-rnc"; */
+"ikU-qi-rnc.title" = "Crash Importer";
+
+/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "m2O-aS-qky"; */
+"m2O-aS-qky.title" = "Table View Cell";
+
+/* Class = "NSTextFieldCell"; title = "Table View Cell"; ObjectID = "wIB-W8-nvj"; */
+"wIB-W8-nvj.title" = "Table View Cell";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "xG1-qz-rKj"; */
+"xG1-qz-rKj.title" = "Text Cell";

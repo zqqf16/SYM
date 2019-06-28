@@ -1,0 +1,18 @@
+
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "2Gb-l7-GlD"; */
+"2Gb-l7-GlD.title" = "偏好设置";
+
+/* Class = "NSButtonCell"; title = "Melon 12"; ObjectID = "5GB-NP-L58"; */
+"5GB-NP-L58.title" = "Melon 12";
+
+/* Class = "NSViewController"; title = "Preferences"; ObjectID = "Nkr-tf-Q6G"; */
+"Nkr-tf-Q6G.title" = "偏好设置";
+
+/* Class = "NSMenuItem"; title = "color"; ObjectID = "awr-5C-eO7"; */
+"awr-5C-eO7.title" = "颜色";
+
+/* Class = "NSTextFieldCell"; title = "Font:"; ObjectID = "kdj-Uv-OvW"; */
+"kdj-Uv-OvW.title" = "字体：";
+
+/* Class = "NSTextFieldCell"; title = "Highlight Color:"; ObjectID = "tp4-jg-KBC"; */
+"tp4-jg-KBC.title" = "高亮颜色：";

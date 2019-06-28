@@ -70,7 +70,7 @@ class MainWindowController: NSWindowController {
                     self.dsymMenuItemReveal.isEnabled = true
                 } else {
                     self.dsymMenuItemName.image = .alert
-                    self.dsymButton.title = "dSYM file not found"
+                    self.dsymButton.title = NSLocalizedString("dsym_file_not_found", comment: "")
                     self.dsymMenuItemReveal.isEnabled = false
                 }
             }
