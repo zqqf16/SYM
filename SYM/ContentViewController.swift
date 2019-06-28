@@ -73,11 +73,14 @@ class ContentViewController: NSViewController {
         self.textView.allowsUndo = true
         self.textView.delegate = self
         
+        self.textView.lnv_setUpLineNumberView()
+        
+        /* horizontally scrolling
         //self.textView.isHorizontallyResizable = true
         self.textView.textContainer?.widthTracksTextView = false
         self.textView.textContainer?.containerSize = NSMakeSize(CGFloat(Float.greatestFiniteMagnitude), CGFloat(Float.greatestFiniteMagnitude))
         //self.textView.textContainer?.containerSize = self.textView.maxSize
-        
+         */
         self.textView.layoutManager?.allowsNonContiguousLayout = false
     }
     

@@ -38,6 +38,7 @@
 		B5F3579822C5CAD400111FF3 /* ScriptImporter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579A22C5CAD400111FF3 /* ScriptImporter.storyboard */; };
 		B5F3579D22C5CB1000111FF3 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */; };
 		B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B5F357B322C5E90C00111FF3 /* Localizable.strings */; };
+		B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */; };
 		F400154821539E8500267818 /* Automator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F400154721539E8500267818 /* Automator.framework */; };
 		F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F402D2D1214A90BF00B75B40 /* DownloadButton.swift */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
@@ -108,6 +109,7 @@
 		B5F357A122C5CB1600111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Preferences.strings"; sourceTree = "<group>"; };
 		B5F357B422C5E90C00111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B5F357B622C5E92000111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineNumberRulerView.swift; sourceTree = "<group>"; };
 		F400154721539E8500267818 /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
 		F402D2D1214A90BF00B75B40 /* DownloadButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadButton.swift; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 				51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */,
 				B5F3578622C30B7C00111FF3 /* Color.swift */,
 				B5F3578822C3121200111FF3 /* Image.swift */,
+				B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -633,6 +636,7 @@
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
 				F422C7C51D36A6A000066837 /* Dsym.swift in Sources */,
+				B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */,
 				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,
