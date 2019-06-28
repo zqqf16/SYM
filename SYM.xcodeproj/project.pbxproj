@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		B5F357B722C5FDD900111FF3 /* UpdateModel */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = B5F357BA22C5FDDA00111FF3 /* Build configuration list for PBXAggregateTarget "UpdateModel" */;
+			buildPhases = (
+				B5F357BB22C5FDE300111FF3 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = UpdateModel;
+			productName = Model;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */ = {isa = PBXBuildFile; fileRef = 510777781EFBA4C30055E8BD /* AppleDemo.ips */; };
 		514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 514B4F6A1E30AC9100171990 /* Foundation.framework */; };
@@ -504,6 +518,7 @@
 		F49BD1E41D2FF46300024AAE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = zqqf16;
@@ -512,6 +527,11 @@
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1020;
 						TestTargetID = F49BD1EB1D2FF46300024AAE;
+					};
+					B5F357B722C5FDD900111FF3 = {
+						CreatedOnToolsVersion = 10.2.1;
+						DevelopmentTeam = BPL95996PK;
+						ProvisioningStyle = Automatic;
 					};
 					F49BD1EB1D2FF46300024AAE = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -537,6 +557,7 @@
 			targets = (
 				F49BD1EB1D2FF46300024AAE /* SYM */,
 				51BF9C4E1D6C7A1C00379BFC /* SYMTests */,
+				B5F357B722C5FDD900111FF3 /* UpdateModel */,
 			);
 		};
 /* End PBXProject section */
@@ -568,6 +589,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B5F357BB22C5FDE300111FF3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 \"$PROJECT_DIR\"/SYM/Models/models.py > \"$PROJECT_DIR\"/SYM/Models/models.txt\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		51BF9C4B1D6C7A1C00379BFC /* Sources */ = {
@@ -705,6 +746,24 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		B5F357B822C5FDDA00111FF3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BPL95996PK;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B5F357B922C5FDDA00111FF3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BPL95996PK;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -893,6 +952,15 @@
 			buildConfigurations = (
 				51BF9C561D6C7A1C00379BFC /* Debug */,
 				51BF9C571D6C7A1C00379BFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B5F357BA22C5FDDA00111FF3 /* Build configuration list for PBXAggregateTarget "UpdateModel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5F357B822C5FDDA00111FF3 /* Debug */,
+				B5F357B922C5FDDA00111FF3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

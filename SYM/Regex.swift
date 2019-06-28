@@ -127,7 +127,7 @@ extension RE {
     // Path: /private/var/containers/Bundle/Application/xxx
     static let path = try! RE("^Path:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     
-    // 0x100874000 -   ???  com.yourapp 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/com_kwai_gif.app/com_kwai_gif
+    // 0x100874000 -   ???  com.yourapp 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/demo.app/demo
     static func image(withPath path: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> RE? {
         return try? RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-.*<(.*)>\\s+\(path)", options: options)
     }
