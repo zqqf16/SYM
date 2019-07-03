@@ -69,7 +69,7 @@ class ContentViewController: NSViewController {
 
     private func setupTextView() {
         self.textView.font = self.font
-        self.textView.textContainerInset = CGSize(width: 10, height: 10)
+        self.textView.textContainerInset = CGSize(width: 0, height: 4)
         self.textView.allowsUndo = true
         self.textView.delegate = self
         
