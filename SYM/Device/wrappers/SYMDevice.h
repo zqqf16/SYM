@@ -38,12 +38,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SYMDevice : NSObject
 
+@property (nonatomic, readonly, nullable, strong) NSString *name;
+@property (nonatomic, readonly, nullable, strong) NSString *udid;
+@property (nonatomic, readonly, nullable, strong) NSArray<SYMDeviceFile *> *crashList;
+
 - (instancetype)initWithDeviceID:(nullable NSString *)udid;
 
-- (nullable NSString *)deviceName;
-- (nullable NSString *)deviceID;
-- (nullable NSArray<SYMDeviceFile *> *)crashList;
 - (nullable NSString *)readFile:(SYMDeviceFile *)file;
+
+- (void)startLoggingWithCallback:(void (^)(NSString * _Nonnull))callback;
+- (void)stopLogging;
 
 @end
 

@@ -257,6 +257,17 @@
 			path = SYMTests;
 			sourceTree = "<group>";
 		};
+		B59208CE22CE093400605B16 /* wrappers */ = {
+			isa = PBXGroup;
+			children = (
+				F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */,
+				F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */,
+				F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */,
+				F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */,
+			);
+			path = wrappers;
+			sourceTree = "<group>";
+		};
 		B5F357A222C5E54A00111FF3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -395,10 +406,7 @@
 				F4EFE81D2124357800E9EDA9 /* plist */,
 				F4EFE815212430A600E9EDA9 /* usbmuxd */,
 				F4EFE7FC21242CAA00E9EDA9 /* libimobiledevice */,
-				F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */,
-				F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */,
-				F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */,
-				F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */,
+				B59208CE22CE093400605B16 /* wrappers */,
 			);
 			path = Device;
 			sourceTree = "<group>";

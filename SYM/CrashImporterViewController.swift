@@ -98,7 +98,7 @@ class CrashImporterViewController: NSViewController {
         self.deviceButton.removeAllItems()
         var unamed = 0
         self.devices.forEach({ (device) in
-            var title = device.deviceName()
+            var title = device.name
             if title == nil {
                 title = "Unnamed device \(unamed)"
                 unamed += 1
@@ -120,7 +120,7 @@ class CrashImporterViewController: NSViewController {
     func select(device: SYMDevice?) {
         self.currentDevice = device
         DispatchQueue.global().async {
-            let crashList = device?.crashList() ?? []
+            let crashList = device?.crashList ?? []
             DispatchQueue.main.async {
                 self.fileList = crashList.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
                     return file1.date > file2.date
@@ -140,7 +140,7 @@ class CrashImporterViewController: NSViewController {
         }
         let file = self.fileList[index]
         DispatchQueue.global().async {
-            guard let udid = self.currentDevice?.deviceID(),
+            guard let udid = self.currentDevice?.udid,
                 let path = self.currentDevice?.copyFile(file, to: FileManager.default.localCrashDirectory(udid))
                 else {
                     return
