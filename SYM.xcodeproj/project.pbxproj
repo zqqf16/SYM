@@ -47,6 +47,8 @@
 		B53E2F9A22D49491003BC45C /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
 		B53E2F9B22D49496003BC45C /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
+		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
+		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
 		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
 		B5F3578922C3121200111FF3 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578822C3121200111FF3 /* Image.swift */; };
@@ -137,6 +139,8 @@
 		B53E2F8B22D48E28003BC45C /* icp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = icp; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53E2F8D22D48E28003BC45C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
+		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
+		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		B5F3578822C3121200111FF3 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
@@ -329,6 +333,8 @@
 				B53E2F7F22D477A3003BC45C /* MDAfcClient.m */,
 				B53E2F8422D48383003BC45C /* MDHouseArrest.h */,
 				B53E2F8522D48383003BC45C /* MDHouseArrest.m */,
+				B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */,
+				B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */,
 				B53E2F7822D4710C003BC45C /* MDUtil.h */,
 				B53E2F7922D4710C003BC45C /* MDUtil.m */,
 			);
@@ -726,6 +732,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */,
 				B53E2F9422D49471003BC45C /* MDDeviceFile.m in Sources */,
 				B53E2F8E22D48E28003BC45C /* main.swift in Sources */,
 				B53E2F9722D49479003BC45C /* MDUtil.m in Sources */,
@@ -762,6 +769,7 @@
 				F49E2D45214BA5E3001A6A88 /* DownloadScriptViewController.swift in Sources */,
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
+				B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */,
 				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
 				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,

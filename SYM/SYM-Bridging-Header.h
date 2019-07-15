@@ -26,5 +26,6 @@
 #import "MDDeviceMonitor.h"
 #import "MDLockdown.h"
 #import "MDAfcClient.h"
+#import "MDInstProxy.h"
 
 #endif /* SYM_Bridging_Header_h */

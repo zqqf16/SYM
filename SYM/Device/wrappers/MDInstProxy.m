@@ -1,13 +1,72 @@
+// The MIT License (MIT)
 //
-//  MDInstProxy.m
-//  SYM
+// Copyright (c) 2017 - 2019 zqqf16
 //
-//  Created by 张全全 on 2019/7/15.
-//  Copyright © 2019 zqqf16. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 
 #import "MDInstProxy.h"
+#import "MDLockdown.h"
+#import "MDUtil.h"
+#import <libimobiledevice/installation_proxy.h>
+
+@interface MDInstProxy ()
+@property (nonatomic, strong) MDLockdown *lockdown;
+@property (nonatomic, strong) MDLockdownService *service;
+@property (nonatomic, assign) instproxy_client_t instproxy;
+@end
 
 @implementation MDInstProxy
+
+- (instancetype)initWithLockdown:(nullable MDLockdown *)lockdown {
+    if (self = [super init]) {
+        _lockdown = lockdown ?: [[MDLockdown alloc] initWithUDID:nil];
+        _service = [lockdown startServiceWithIdentifier:@(INSTPROXY_SERVICE_NAME)];
+        instproxy_error_t err = instproxy_client_new(_lockdown.device, _service.service, &_instproxy);
+        if (err != INSTPROXY_E_SUCCESS) {
+            NSLog(@"ERROR: Could not start service instrpoxy: %d.", err);
+        }
+    }
+    return self;
+}
+
+- (void)dealloc {
+    if (_instproxy) {
+        instproxy_client_free(_instproxy);
+    }
+}
+
+- (NSArray *)listApps {
+    plist_t result = NULL;
+    plist_t filter = plist_new_dict();
+    plist_dict_set_item(filter, "ApplicationType", plist_new_string("User"));
+    instproxy_error_t err = instproxy_browse(_instproxy, filter, &result);
+    plist_free(filter);
+
+    if (err != INSTPROXY_E_SUCCESS) {
+        NSLog(@"ERROR: Failed to browse apps.");
+        return @[];
+    }
+
+    NSArray *list = plist_to_nsobject(result);
+    plist_free(result);
+    return list;
+}
 
 @end
