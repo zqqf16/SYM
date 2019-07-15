@@ -20,31 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
+#import <Foundation/Foundation.h>
 
-extension NSTextView {
-    func setAttributeString(attributeString: NSAttributedString) {
-        //self.undoManager?.removeAllActions()
-        //self.textStorage?.beginEditing()
-        self.textStorage?.setAttributedString(attributeString)
-        //self.textStorage?.endEditing()
-    }
-}
+NS_ASSUME_NONNULL_BEGIN
 
-class TextView: NSTextView {
-    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let pboard = sender.draggingPasteboard
-        let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
-        if let paths = pboard.propertyList(forType: filenameType) as? [String] {
-            for path in paths {
-                let fileURL = URL(fileURLWithPath: path)
-                NSDocumentController.shared.openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
-                    // Do nothing
-                })
-            }
-            
-            return true
-        }
-        return super.performDragOperation(sender)
-    }
-}
+@interface MDDeviceFile : NSObject
+@property (nonatomic, strong) NSString *path;
+@property (nonatomic, assign) BOOL isDirectory;
+@property (nonatomic, strong) NSDate *date;
+@property (nonatomic, strong, readonly) NSString *name;
+@end
+
+NS_ASSUME_NONNULL_END

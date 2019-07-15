@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#import <Foundation/Foundation.h>
+#import "MDDeviceFile.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation MDDeviceFile
 
-extern NSString * const SYMDeviceMonitorNotification;
+- (NSString *)name {
+    return [self.path lastPathComponent];
+}
 
-@interface SYMDeviceMonitor : NSObject
-@property (nonatomic, assign) BOOL deviceConnected;
-@property (nonatomic, strong) NSArray<NSString *> *connectedDevices;
+- (NSString *)description {
+    return self.path;
+}
 
-+ (instancetype)sharedMonitor;
-- (void)start;
 @end
-
-NS_ASSUME_NONNULL_END

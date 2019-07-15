@@ -31,6 +31,22 @@
 		51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */; };
 		51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A4A11EEFF78500F21AE4 /* Doctor.swift */; };
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
+		B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
+		B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
+		B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
+		B53E2F8322D47E46003BC45C /* MDDeviceFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8222D47E46003BC45C /* MDDeviceFile.m */; };
+		B53E2F8622D48383003BC45C /* MDHouseArrest.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8522D48383003BC45C /* MDHouseArrest.m */; };
+		B53E2F8E22D48E28003BC45C /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8D22D48E28003BC45C /* main.swift */; };
+		B53E2F9322D4946E003BC45C /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
+		B53E2F9422D49471003BC45C /* MDDeviceFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8222D47E46003BC45C /* MDDeviceFile.m */; };
+		B53E2F9522D49473003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
+		B53E2F9622D49476003BC45C /* MDHouseArrest.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8522D48383003BC45C /* MDHouseArrest.m */; };
+		B53E2F9722D49479003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
+		B53E2F9822D49489003BC45C /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
+		B53E2F9922D4948C003BC45C /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
+		B53E2F9A22D49491003BC45C /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
+		B53E2F9B22D49496003BC45C /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
+		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
 		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
 		B5F3578922C3121200111FF3 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578822C3121200111FF3 /* Image.swift */; };
@@ -67,10 +83,9 @@
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 		F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
-		F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */; };
+		F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
 		F4EFE90C212580C700E9EDA9 /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
-		F4EFE9182126C0FB00E9EDA9 /* SYMDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */; };
 		F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -83,6 +98,18 @@
 			remoteInfo = SYM;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B53E2F8922D48E28003BC45C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		510777781EFBA4C30055E8BD /* AppleDemo.ips */ = {isa = PBXFileReference; lastKnownFileType = text; path = AppleDemo.ips; sourceTree = "<group>"; };
@@ -97,6 +124,19 @@
 		51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		51C9A4A11EEFF78500F21AE4 /* Doctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doctor.swift; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
+		B53E2F7522D44838003BC45C /* MDLockdown.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDLockdown.h; sourceTree = "<group>"; };
+		B53E2F7622D44838003BC45C /* MDLockdown.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDLockdown.m; sourceTree = "<group>"; };
+		B53E2F7822D4710C003BC45C /* MDUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDUtil.h; sourceTree = "<group>"; };
+		B53E2F7922D4710C003BC45C /* MDUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDUtil.m; sourceTree = "<group>"; };
+		B53E2F7E22D477A3003BC45C /* MDAfcClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDAfcClient.h; sourceTree = "<group>"; };
+		B53E2F7F22D477A3003BC45C /* MDAfcClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDAfcClient.m; sourceTree = "<group>"; };
+		B53E2F8122D47E46003BC45C /* MDDeviceFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDDeviceFile.h; sourceTree = "<group>"; };
+		B53E2F8222D47E46003BC45C /* MDDeviceFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDDeviceFile.m; sourceTree = "<group>"; };
+		B53E2F8422D48383003BC45C /* MDHouseArrest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDHouseArrest.h; sourceTree = "<group>"; };
+		B53E2F8522D48383003BC45C /* MDHouseArrest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDHouseArrest.m; sourceTree = "<group>"; };
+		B53E2F8B22D48E28003BC45C /* icp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = icp; sourceTree = BUILT_PRODUCTS_DIR; };
+		B53E2F8D22D48E28003BC45C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		B5F3578822C3121200111FF3 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
@@ -186,10 +226,8 @@
 		F4EFE9012125305300E9EDA9 /* endianness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianness.h; sourceTree = "<group>"; };
 		F4EFE904212530CF00E9EDA9 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		F4EFE905212530CF00E9EDA9 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SYMDeviceMonitor.h; sourceTree = "<group>"; };
-		F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SYMDeviceMonitor.m; sourceTree = "<group>"; };
-		F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SYMDevice.h; sourceTree = "<group>"; };
-		F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SYMDevice.m; sourceTree = "<group>"; };
+		F4EFE9092125583700E9EDA9 /* MDDeviceMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDDeviceMonitor.h; sourceTree = "<group>"; };
+		F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDDeviceMonitor.m; sourceTree = "<group>"; };
 		F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashImporterViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -199,6 +237,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B53E2F8822D48E28003BC45C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B53E2F9922D4948C003BC45C /* libcrypto.a in Frameworks */,
+				B53E2F9822D49489003BC45C /* libssl.a in Frameworks */,
+				B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */,
+				B53E2F9B22D49496003BC45C /* libusbmuxd.a in Frameworks */,
+				B53E2F9A22D49491003BC45C /* libplist.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,13 +307,30 @@
 			path = SYMTests;
 			sourceTree = "<group>";
 		};
+		B53E2F8C22D48E28003BC45C /* icp */ = {
+			isa = PBXGroup;
+			children = (
+				B53E2F8D22D48E28003BC45C /* main.swift */,
+				B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */,
+			);
+			path = icp;
+			sourceTree = "<group>";
+		};
 		B59208CE22CE093400605B16 /* wrappers */ = {
 			isa = PBXGroup;
 			children = (
-				F4EFE9092125583700E9EDA9 /* SYMDeviceMonitor.h */,
-				F4EFE90A2125583700E9EDA9 /* SYMDeviceMonitor.m */,
-				F4EFE9162126C0FB00E9EDA9 /* SYMDevice.h */,
-				F4EFE9172126C0FB00E9EDA9 /* SYMDevice.m */,
+				F4EFE9092125583700E9EDA9 /* MDDeviceMonitor.h */,
+				F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */,
+				B53E2F7522D44838003BC45C /* MDLockdown.h */,
+				B53E2F7622D44838003BC45C /* MDLockdown.m */,
+				B53E2F8122D47E46003BC45C /* MDDeviceFile.h */,
+				B53E2F8222D47E46003BC45C /* MDDeviceFile.m */,
+				B53E2F7E22D477A3003BC45C /* MDAfcClient.h */,
+				B53E2F7F22D477A3003BC45C /* MDAfcClient.m */,
+				B53E2F8422D48383003BC45C /* MDHouseArrest.h */,
+				B53E2F8522D48383003BC45C /* MDHouseArrest.m */,
+				B53E2F7822D4710C003BC45C /* MDUtil.h */,
+				B53E2F7922D4710C003BC45C /* MDUtil.m */,
 			);
 			path = wrappers;
 			sourceTree = "<group>";
@@ -355,6 +422,7 @@
 			children = (
 				F49BD1EE1D2FF46300024AAE /* SYM */,
 				51BF9C501D6C7A1C00379BFC /* SYMTests */,
+				B53E2F8C22D48E28003BC45C /* icp */,
 				F49BD1ED1D2FF46300024AAE /* Products */,
 				514B4F691E30AC9000171990 /* Frameworks */,
 			);
@@ -365,6 +433,7 @@
 			children = (
 				F49BD1EC1D2FF46300024AAE /* SYM.app */,
 				51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */,
+				B53E2F8B22D48E28003BC45C /* icp */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -506,6 +575,23 @@
 			productReference = 51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		B53E2F8A22D48E28003BC45C /* icp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B53E2F8F22D48E28003BC45C /* Build configuration list for PBXNativeTarget "icp" */;
+			buildPhases = (
+				B53E2F8722D48E28003BC45C /* Sources */,
+				B53E2F8822D48E28003BC45C /* Frameworks */,
+				B53E2F8922D48E28003BC45C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = icp;
+			productName = icp;
+			productReference = B53E2F8B22D48E28003BC45C /* icp */;
+			productType = "com.apple.product-type.tool";
+		};
 		F49BD1EB1D2FF46300024AAE /* SYM */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F49BD2111D2FF46400024AAE /* Build configuration list for PBXNativeTarget "SYM" */;
@@ -530,7 +616,7 @@
 			isa = PBXProject;
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Latest;
-				LastSwiftUpdateCheck = 0730;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = zqqf16;
 				TargetAttributes = {
@@ -538,6 +624,11 @@
 						CreatedOnToolsVersion = 7.3.1;
 						LastSwiftMigration = 1020;
 						TestTargetID = F49BD1EB1D2FF46300024AAE;
+					};
+					B53E2F8A22D48E28003BC45C = {
+						CreatedOnToolsVersion = 10.2.1;
+						DevelopmentTeam = BPL95996PK;
+						ProvisioningStyle = Automatic;
 					};
 					B5F357B722C5FDD900111FF3 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -569,6 +660,7 @@
 				F49BD1EB1D2FF46300024AAE /* SYM */,
 				51BF9C4E1D6C7A1C00379BFC /* SYMTests */,
 				B5F357B722C5FDD900111FF3 /* UpdateModel */,
+				B53E2F8A22D48E28003BC45C /* icp */,
 			);
 		};
 /* End PBXProject section */
@@ -630,16 +722,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B53E2F8722D48E28003BC45C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B53E2F9422D49471003BC45C /* MDDeviceFile.m in Sources */,
+				B53E2F8E22D48E28003BC45C /* main.swift in Sources */,
+				B53E2F9722D49479003BC45C /* MDUtil.m in Sources */,
+				B53E2F9522D49473003BC45C /* MDAfcClient.m in Sources */,
+				B53E2F9322D4946E003BC45C /* MDLockdown.m in Sources */,
+				B53E2F9622D49476003BC45C /* MDHouseArrest.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F49BD1E81D2FF46300024AAE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B53E2F8622D48383003BC45C /* MDHouseArrest.m in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				F4B9025421538B5000B1DC0A /* DownloadTaskListViewController.swift in Sources */,
 				B5F3578922C3121200111FF3 /* Image.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
-				F4EFE9182126C0FB00E9EDA9 /* SYMDevice.m in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
+				B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */,
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
@@ -651,11 +757,13 @@
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F49E2D47214BA704001A6A88 /* Config.swift in Sources */,
+				B53E2F8322D47E46003BC45C /* MDDeviceFile.m in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F49E2D45214BA5E3001A6A88 /* DownloadScriptViewController.swift in Sources */,
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
-				F4EFE90B2125583700E9EDA9 /* SYMDeviceMonitor.m in Sources */,
+				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
+				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
@@ -663,6 +771,7 @@
 				F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */,
 				B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */,
 				F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */,
+				B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */,
 				F48D8C9121492079009E2DA6 /* StatusBar.swift in Sources */,
 				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,
 				51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */,
@@ -758,6 +867,67 @@
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		B53E2F9022D48E28003BC45C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BPL95996PK;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device/libimobiledevice";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/openssl",
+					"$(PROJECT_DIR)/SYM/Device/plist",
+					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/icp/ICP-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
+			};
+			name = Debug;
+		};
+		B53E2F9122D48E28003BC45C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BPL95996PK;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device/libimobiledevice";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/openssl",
+					"$(PROJECT_DIR)/SYM/Device/plist",
+					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/icp/ICP-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 			};
 			name = Release;
 		};
@@ -964,6 +1134,15 @@
 			buildConfigurations = (
 				51BF9C561D6C7A1C00379BFC /* Debug */,
 				51BF9C571D6C7A1C00379BFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B53E2F8F22D48E28003BC45C /* Build configuration list for PBXNativeTarget "icp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B53E2F9022D48E28003BC45C /* Debug */,
+				B53E2F9122D48E28003BC45C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

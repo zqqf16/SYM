@@ -20,31 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
 
-extension NSTextView {
-    func setAttributeString(attributeString: NSAttributedString) {
-        //self.undoManager?.removeAllActions()
-        //self.textStorage?.beginEditing()
-        self.textStorage?.setAttributedString(attributeString)
-        //self.textStorage?.endEditing()
-    }
-}
+#import <Foundation/Foundation.h>
+#import <libimobiledevice/house_arrest.h>
+#import "MDLockdown.h"
 
-class TextView: NSTextView {
-    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let pboard = sender.draggingPasteboard
-        let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
-        if let paths = pboard.propertyList(forType: filenameType) as? [String] {
-            for path in paths {
-                let fileURL = URL(fileURLWithPath: path)
-                NSDocumentController.shared.openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
-                    // Do nothing
-                })
-            }
-            
-            return true
-        }
-        return super.performDragOperation(sender)
-    }
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@class MDLockdown;
+
+@interface MDHouseArrest : NSObject
+@property (nonatomic, assign, readonly) house_arrest_client_t houseArrest;
+@property (nonatomic, strong) MDLockdownService *service;
+@property (nonatomic, strong) MDLockdown *lockdown;
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithLockdown:(nullable MDLockdown *)lockdown appID:(NSString *)appID NS_DESIGNATED_INITIALIZER;
+
+@end
+
+NS_ASSUME_NONNULL_END

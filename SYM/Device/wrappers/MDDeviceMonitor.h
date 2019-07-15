@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,32 +24,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const MDDeviceMonitorNotification;
 
-@interface SYMDeviceFile : NSObject
+@interface MDDeviceMonitor : NSObject
+@property (nonatomic, assign) BOOL deviceConnected;
+@property (nonatomic, strong) NSArray<NSString *> *connectedDevices;
 
-@property (nonatomic, strong) NSString *path;
-@property (nonatomic, assign) BOOL isDirectory;
-@property (nonatomic, strong) NSDate *date;
-
-@property (nonatomic, strong, readonly) NSString *name;
-
++ (instancetype)sharedMonitor;
+- (void)start;
 @end
-
-
-@interface SYMDevice : NSObject
-
-@property (nonatomic, readonly, nullable, strong) NSString *name;
-@property (nonatomic, readonly, nullable, strong) NSString *udid;
-@property (nonatomic, readonly, nullable, strong) NSArray<SYMDeviceFile *> *crashList;
-
-- (instancetype)initWithDeviceID:(nullable NSString *)udid;
-
-- (nullable NSString *)readFile:(SYMDeviceFile *)file;
-
-- (void)startLoggingWithCallback:(void (^)(NSString * _Nonnull))callback;
-- (void)stopLogging;
-
-@end
-
 
 NS_ASSUME_NONNULL_END

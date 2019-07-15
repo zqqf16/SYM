@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,17 @@
 
 import Cocoa
 
-extension SYMDeviceFile {
+extension MDDeviceFile {
     var isCrash: Bool {
         return !self.isDirectory && (self.name.contains(".ips") || self.name.contains(".crash"))
     }
     
-    var localFileName: String {
+    var localCrashFileName: String {
         let name = self.name.components(separatedBy: ".ips")[0]
         return "\(name).crash"
     }
     
-    var displayName: String {
+    var crashFileDisplayName: String {
         var components = self.name.components(separatedBy: ".")
         if components.last == "synced" {
             components.removeLast()
@@ -43,33 +43,36 @@ extension SYMDeviceFile {
     }
 }
 
-extension SYMDevice {
-    func copyFile(_ file: SYMDeviceFile, to directory: String) -> String? {
-        guard let content = self.read(file) else {
+extension MDAfcClient {
+    func copyCrashFile(_ file: MDDeviceFile, to url: URL) -> String? {
+        guard let content = self.read(file.path) else {
             return nil
         }
         
-        let path = (directory as NSString).appendingPathComponent(file.localFileName)
         do {
-            try content.write(toFile: path, atomically: true, encoding: .utf8)
+            try content.write(to: url, options: .atomic)
         } catch {
             return nil
         }
-        return path
+        return url.path
     }
 }
 
 class DeviceFileProvider: NSFilePromiseProvider {
-    var device: SYMDevice?
-    var file: SYMDeviceFile?
+    var file: MDDeviceFile?
 }
 
 class CrashImporterViewController: NSViewController {
+    private var deviceList: [String] = []
+    private var fileList: [MDDeviceFile] = []
+    private var currentLockdown: MDLockdown?
+    private var afcClient: MDAfcClient? {
+        guard let lockdown = self.currentLockdown else {
+            return nil
+        }
+        return MDAfcClient.crash(with: lockdown)
+    }
     
-    private var devices: [SYMDevice] = []
-    private var currentDevice: SYMDevice?
-    private var fileList: [SYMDeviceFile] = []
-
     @IBOutlet var tableView: NSTableView!
     @IBOutlet weak var deviceButton: NSPopUpButton!
     @IBOutlet weak var openButton: NSButton!
@@ -77,10 +80,10 @@ class CrashImporterViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.deviceConnected(nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(deviceConnected(_:)), name: NSNotification.Name.SYMDeviceMonitor, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(deviceConnected(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
         
-        let descriptorProcess = NSSortDescriptor(keyPath: \SYMDeviceFile.name, ascending: true)
-        let descriptorDate = NSSortDescriptor(keyPath: \SYMDeviceFile.date, ascending: true)
+        let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.name, ascending: true)
+        let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
         self.tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
         self.tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
         
@@ -89,38 +92,35 @@ class CrashImporterViewController: NSViewController {
     }
     
     @objc func deviceConnected(_ notification:Notification?) {
-        let deviceList = SYMDeviceMonitor.shared().connectedDevices
-        self.devices.removeAll()
-        deviceList.forEach { (deviceID) in
-            self.devices.append(SYMDevice(deviceID: deviceID))
-        }
-        
+        self.deviceList = MDDeviceMonitor.shared().connectedDevices
         self.deviceButton.removeAllItems()
+        var lockdownList:[MDLockdown] = []
         var unamed = 0
-        self.devices.forEach({ (device) in
-            var title = device.name
+        self.deviceList.forEach({ (udid) in
+            let lockdown = MDLockdown(udid: udid)
+            lockdownList.append(lockdown)
+            var title = lockdown.deviceName
             if title == nil {
                 title = "Unnamed device \(unamed)"
                 unamed += 1
             }
             self.deviceButton.addItem(withTitle: title!)
-            
         })
         
-        if self.currentDevice != nil {
-            if let index = self.devices.firstIndex(of: self.currentDevice!) {
+        if self.currentLockdown != nil, let udid = self.currentLockdown?.deviceID {
+            if let index = self.deviceList.firstIndex(of: udid) {
                 self.deviceButton.selectItem(at: index)
                 return
             }
+        } else {
+            self.select(lockdown: lockdownList.first)
         }
-        
-        self.select(device: self.devices.first)
     }
     
-    func select(device: SYMDevice?) {
-        self.currentDevice = device
+    func select(lockdown: MDLockdown?) {
+        self.currentLockdown = lockdown
         DispatchQueue.global().async {
-            let crashList = device?.crashList ?? []
+            let crashList = self.afcClient?.crashFiles() ?? []
             DispatchQueue.main.async {
                 self.fileList = crashList.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
                     return file1.date > file2.date
@@ -140,15 +140,18 @@ class CrashImporterViewController: NSViewController {
         }
         let file = self.fileList[index]
         DispatchQueue.global().async {
-            guard let udid = self.currentDevice?.udid,
-                let path = self.currentDevice?.copyFile(file, to: FileManager.default.localCrashDirectory(udid))
-                else {
-                    return
+            guard let udid = self.currentLockdown?.deviceID else {
+                return
             }
-            DispatchQueue.main.async {
-                DocumentController.shared.openDocument(withContentsOf: URL(fileURLWithPath: path), display: true, completionHandler: { (document, success, error) in
-                    //
-                })
+            
+            let path = FileManager.default.localCrashDirectory(udid) + "/\(file.localCrashFileName)"
+            let url = URL(fileURLWithPath: path)
+            if let _ =  self.afcClient?.copyCrashFile(file, to: url) {
+                DispatchQueue.main.async {
+                    DocumentController.shared.openDocument(withContentsOf: url, display: true, completionHandler: { (document, success, error) in
+                        //
+                    })
+                }
             }
         }
     }
@@ -165,11 +168,13 @@ class CrashImporterViewController: NSViewController {
     
     @IBAction func changeDevice(_ sender: NSPopUpButton) {
         let index = self.deviceButton.indexOfSelectedItem
-        if index < 0 || index > self.devices.count - 1 {
+        if index < 0 || index > self.deviceList.count - 1 {
             return
         }
-        
-        self.select(device: self.devices[index])
+        let udid = self.deviceList[index]
+        if udid != self.currentLockdown?.deviceID {
+            self.select(lockdown: MDLockdown(udid: udid))
+        }
     }
 }
 
@@ -188,7 +193,7 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
         let file = self.fileList[row]
         if tableColumn == tableView.tableColumns[0] {
             cell = tableView.makeView(withIdentifier: .cellProcess, owner: nil) as? NSTableCellView
-            cell?.textField?.stringValue = file.displayName
+            cell?.textField?.stringValue = file.crashFileDisplayName
         } else {
             cell = tableView.makeView(withIdentifier: .cellDate, owner: nil) as? NSTableCellView
             let formatter = DateFormatter()
@@ -199,13 +204,12 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
     }
     
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-        self.fileList = (self.fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [SYMDeviceFile]
+        self.fileList = (self.fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
         self.tableView.reloadData()
     }
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
-        provider.device = self.currentDevice
         provider.file = self.fileList[row]
         return provider
     }
@@ -220,24 +224,19 @@ extension CrashImporterViewController: NSFilePromiseProviderDelegate {
         guard let privider = filePromiseProvider as? DeviceFileProvider else {
             return ""
         }
-        return privider.file?.localFileName ?? ""
+        return privider.file?.localCrashFileName ?? ""
     }
     
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
         guard let privider = filePromiseProvider as? DeviceFileProvider,
-            let device = privider.device,
             let file = privider.file,
-            let content = device.read(file)
+            let afcClient = self.afcClient
             else {
                 completionHandler(FileError.createFailed)
                 return
         }
         
-        do {
-            try content.write(to: url, atomically: true, encoding: .utf8)
-        } catch {
-            
-        }
+        let _ = afcClient.copyCrashFile(file, to: url)
         completionHandler(nil)
     }
     

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#import "SYMDeviceMonitor.h"
+#import "MDDeviceMonitor.h"
 #import <libimobiledevice/libimobiledevice.h>
 #import <usbmuxd/usbmuxd-proto.h>
 #import <usbmuxd/usbmuxd.h>
 
-NSString * const SYMDeviceMonitorNotification = @"sym.deviceMonitoring";
+NSString * const MDDeviceMonitorNotification = @"sym.deviceMonitoring";
 
-@interface SYMDeviceMonitor ()
+@interface MDDeviceMonitor ()
 @property (nonatomic, strong) dispatch_queue_t operationQueue;
 
 - (void)updateDeviceStatus;
@@ -41,17 +41,17 @@ static void usbmux_event_cb(const usbmuxd_event_t *event, void *user_data)
         NSLog(@"INFO: Device disconnected");
     }
     
-    [[SYMDeviceMonitor sharedMonitor] updateDeviceStatus];
+    [[MDDeviceMonitor sharedMonitor] updateDeviceStatus];
 }
 
-@implementation SYMDeviceMonitor
+@implementation MDDeviceMonitor
 
 + (instancetype)sharedMonitor
 {
-    static SYMDeviceMonitor *sharedInstance;
+    static MDDeviceMonitor *sharedInstance;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[SYMDeviceMonitor alloc] init];
+        sharedInstance = [[MDDeviceMonitor alloc] init];
         sharedInstance.operationQueue = dispatch_queue_create("sym.device.monitoring", NULL);
     });
     
@@ -82,7 +82,7 @@ static void usbmux_event_cb(const usbmuxd_event_t *event, void *user_data)
 {
     _deviceConnected = deviceConnected;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:SYMDeviceMonitorNotification object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:MDDeviceMonitorNotification object:nil];
     });
 }
 

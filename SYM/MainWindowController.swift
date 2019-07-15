@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,9 +96,9 @@ class MainWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
-        self.deviceItem.isEnabled = SYMDeviceMonitor.shared().deviceConnected
+        self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
 
-        NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.SYMDeviceMonitor, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -134,7 +134,7 @@ class MainWindowController: NSWindowController {
     }
     
     @objc func updateDeviceButton(_ notification: Notification) {
-        self.deviceItem.isEnabled = SYMDeviceMonitor.shared().deviceConnected
+        self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
     }
     
     @objc func crashDidSymbolicated(_ notification: Notification) {

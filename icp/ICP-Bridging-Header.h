@@ -20,31 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Cocoa
+#ifndef ICP_Bridging_Header_h
+#define ICP_Bridging_Header_h
 
-extension NSTextView {
-    func setAttributeString(attributeString: NSAttributedString) {
-        //self.undoManager?.removeAllActions()
-        //self.textStorage?.beginEditing()
-        self.textStorage?.setAttributedString(attributeString)
-        //self.textStorage?.endEditing()
-    }
-}
+#import "MDLockdown.h"
+#import "MDAfcClient.h"
 
-class TextView: NSTextView {
-    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let pboard = sender.draggingPasteboard
-        let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
-        if let paths = pboard.propertyList(forType: filenameType) as? [String] {
-            for path in paths {
-                let fileURL = URL(fileURLWithPath: path)
-                NSDocumentController.shared.openDocument(withContentsOf: fileURL, display: true, completionHandler: { (doc: NSDocument?, success: Bool, error: Error?) in
-                    // Do nothing
-                })
-            }
-            
-            return true
-        }
-        return super.performDragOperation(sender)
-    }
-}
+#endif /* ICP_Bridging_Header_h */

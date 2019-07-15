@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2018 zqqf16
+// Copyright (c) 2017 - 2019 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,8 @@
 #ifndef SYM_Bridging_Header_h
 #define SYM_Bridging_Header_h
 
-#import "SYMDeviceMonitor.h"
-#import "SYMDevice.h"
+#import "MDDeviceMonitor.h"
+#import "MDLockdown.h"
+#import "MDAfcClient.h"
 
 #endif /* SYM_Bridging_Header_h */
