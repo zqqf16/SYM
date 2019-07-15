@@ -8,6 +8,7 @@ DIST_DIR = dist
 DMG_PATH = $(DIST_DIR)/$(NAME).dmg
 
 all: archive export dmg
+install:
 
 clean:
 	xcodebuild -project SYM.xcodeproj -config Release -scheme SYM -archivePath $(ARCHIVE_PATH) clean
@@ -28,3 +29,6 @@ dmg:
 	cp -r $(APP_PATH) $(DMG_DIR)
 	ln -s /Applications $(DMG_DIR)/Applications
 	hdiutil create -fs HFS+ -srcfolder $(DMG_DIR) -format UDZO -volname SYM $(DMG_PATH)
+
+install: archive export
+	cp -r $(APP_PATH) /Applications
