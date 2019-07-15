@@ -62,8 +62,7 @@ class DeviceFileProvider: NSFilePromiseProvider {
     var file: MDDeviceFile?
 }
 
-class CrashImporterViewController: NSViewController {
-    private var deviceList: [String] = []
+class CrashImporterViewController: DeviceBaseViewController {
     private var fileList: [MDDeviceFile] = []
     private var currentLockdown: MDLockdown?
     private var afcClient: MDAfcClient? {
@@ -74,13 +73,11 @@ class CrashImporterViewController: NSViewController {
     }
     
     @IBOutlet var tableView: NSTableView!
-    @IBOutlet weak var deviceButton: NSPopUpButton!
     @IBOutlet weak var openButton: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.deviceConnected(nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(deviceConnected(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
+        self.deviceConnectionChanged()
         
         let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.name, ascending: true)
         let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
@@ -91,29 +88,12 @@ class CrashImporterViewController: NSViewController {
         self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
     
-    @objc func deviceConnected(_ notification:Notification?) {
-        self.deviceList = MDDeviceMonitor.shared().connectedDevices
-        self.deviceButton.removeAllItems()
-        var lockdownList:[MDLockdown] = []
-        var unamed = 0
-        self.deviceList.forEach({ (udid) in
-            let lockdown = MDLockdown(udid: udid)
-            lockdownList.append(lockdown)
-            var title = lockdown.deviceName
-            if title == nil {
-                title = "Unnamed device \(unamed)"
-                unamed += 1
-            }
-            self.deviceButton.addItem(withTitle: title!)
-        })
-        
-        if self.currentLockdown != nil, let udid = self.currentLockdown?.deviceID {
-            if let index = self.deviceList.firstIndex(of: udid) {
-                self.deviceButton.selectItem(at: index)
-                return
-            }
+    override func deviceConnectionChanged() {
+        self.deviceButton.reloadItemsWithDevices(self.deviceList)
+        if let currentUdid = self.currentLockdown?.deviceID, let index = self.deviceList.firstIndex(of: currentUdid) {
+            self.deviceButton.selectItem(at: index)
         } else {
-            self.select(lockdown: lockdownList.first)
+            self.select(lockdown: MDLockdown(udid: self.deviceList.first))
         }
     }
     
@@ -165,13 +145,8 @@ class CrashImporterViewController: NSViewController {
         let row = self.tableView.selectedRow
         self.openCrash(atIndex: row)
     }
-    
-    @IBAction func changeDevice(_ sender: NSPopUpButton) {
-        let index = self.deviceButton.indexOfSelectedItem
-        if index < 0 || index > self.deviceList.count - 1 {
-            return
-        }
-        let udid = self.deviceList[index]
+
+    override func deviceSelectionChanged(_ udid: String?) {
         if udid != self.currentLockdown?.deviceID {
             self.select(lockdown: MDLockdown(udid: udid))
         }

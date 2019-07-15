@@ -24,11 +24,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MDAfcClient;
+
 @interface MDDeviceFile : NSObject
+
 @property (nonatomic, strong) NSString *path;
 @property (nonatomic, assign) BOOL isDirectory;
 @property (nonatomic, strong) NSDate *date;
 @property (nonatomic, strong, readonly) NSString *name;
+@property (nonatomic, readonly, nullable) NSArray<MDDeviceFile *> *children;
+
+- (instancetype)initWithAfcClient:(MDAfcClient *)afcClient;
+
+- (nullable NSData *)read;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -608,10 +608,10 @@
             </objects>
             <point key="canvasLocation" x="-1107" y="-322"/>
         </scene>
-        <!--CrashImporter-->
+        <!--Device-->
         <scene sceneID="Vc3-3e-2HU">
             <objects>
-                <controllerPlaceholder storyboardName="CrashImporter" id="BZX-tn-6tC" sceneMemberID="viewController"/>
+                <controllerPlaceholder storyboardName="Device" id="BZX-tn-6tC" sceneMemberID="viewController"/>
                 <customObject id="7Rm-lf-inn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-661" y="-443"/>

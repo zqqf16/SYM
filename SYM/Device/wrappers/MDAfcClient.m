@@ -30,6 +30,7 @@
 @property (nonatomic, assign) afc_client_t afc;
 @property (nonatomic, strong) MDLockdownService *service;
 @property (nonatomic, strong) MDLockdown *lockdown;
+@property (nonatomic, strong) MDHouseArrest *houseArrest;
 @end
 
 @implementation MDAfcClient
@@ -139,11 +140,14 @@
         char **fileinfo = NULL;
         struct stat stbuf;
         stbuf.st_size = 0;
-        MDDeviceFile *file = [[MDDeviceFile alloc] init];
+        MDDeviceFile *file = [[MDDeviceFile alloc] initWithAfcClient:self];
         
         /* assemble absolute source filename */
         strcpy(((char*)source_filename) + device_directory_length, list[k]);
         file.path = [NSString stringWithUTF8String:source_filename];
+        if ([file.path hasSuffix:@".com.apple.mobile_container_manager.metadata.plist"]) {
+            continue;
+        }
         /* get file information */
         afc_get_file_info(_afc, source_filename, &fileinfo);
         if (!fileinfo) {
@@ -191,7 +195,6 @@
         [fileList addObject:file];
     }
     afc_dictionary_free(list);
-    
     return fileList;
 }
 
@@ -236,7 +239,9 @@
         NSLog(@"Failed to create afc");
     }
     
-    return [[self alloc] initWithLockdown:houseArrest.lockdown afc:afc];
+    MDAfcClient *afcClient = [[self alloc] initWithLockdown:houseArrest.lockdown afc:afc];
+    afcClient.houseArrest = houseArrest;
+    return afcClient;
 }
 
 @end

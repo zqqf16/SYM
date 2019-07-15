@@ -20,9 +20,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
 #import "MDDeviceFile.h"
+#import "MDAfcClient.h"
+
+@interface MDDeviceFile ()
+@property (nonatomic, strong) MDAfcClient *afcClient;
+@end
 
 @implementation MDDeviceFile
+
+@synthesize children = _children;
+
+- (instancetype)initWithAfcClient:(MDAfcClient *)afcClient {
+    if (self = [super init]) {
+        _afcClient = afcClient;
+    }
+    
+    return self;
+}
 
 - (NSString *)name {
     return [self.path lastPathComponent];
@@ -30,6 +46,27 @@
 
 - (NSString *)description {
     return self.path;
+}
+
+- (NSArray *)children {
+    if (!self.isDirectory) {
+        return nil;
+    }
+
+    if (_children) {
+        return _children;
+    }
+    
+    _children = [self.afcClient listDirectory:self.path];
+    return _children;
+}
+
+- (NSData *)read {
+    if (!self.afcClient) {
+        return nil;
+    }
+    
+    return [self.afcClient read:self.path];
 }
 
 @end

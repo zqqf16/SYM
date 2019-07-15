@@ -99,6 +99,7 @@ class MainWindowController: NSWindowController {
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
+        self.startMDLockdownTest()
     }
     
     required init?(coder: NSCoder) {
@@ -211,5 +212,19 @@ extension MainWindowController: NSMenuDelegate {
 extension MainWindowController: NSToolbarItemValidation {
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
         return item.isEnabled
+    }
+    
+    func startMDLockdownTest() {
+       // let lockdown = MDLockdown()
+        //let ha = MDHouseArrest(lockdown: lockdown, appID: "com.ss.iphone.ugc.Aweme")
+        //let afc = MDAfcClient.fileClient(with: ha)
+        //print(afc.listDirectory("/"))
+
+//        let instproxy = MDInstProxy(lockdown: lockdown)
+//        for app in instproxy.listApps() {
+//            if let info = app as? [String: Any] {
+//                print(info["CFBundleIdentifier"])
+//            }
+//        }
     }
 }

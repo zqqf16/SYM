@@ -27,12 +27,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MDLockdown;
 
+@interface MDAppInfo: NSObject
+@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, strong) NSString *name;
+@end
+
 @interface MDInstProxy : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithLockdown:(nullable MDLockdown *)lockdown NS_DESIGNATED_INITIALIZER;
 
-- (NSArray *)listApps;
+- (NSArray<MDAppInfo *> *)listApps;
 
 @end
 

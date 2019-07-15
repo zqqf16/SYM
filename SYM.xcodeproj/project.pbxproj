@@ -47,12 +47,14 @@
 		B53E2F9A22D49491003BC45C /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
 		B53E2F9B22D49496003BC45C /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
+		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
+		B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
 		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
 		B5F3578922C3121200111FF3 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578822C3121200111FF3 /* Image.swift */; };
-		B5F3579322C5C8EF00111FF3 /* CrashImporter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579522C5C8EF00111FF3 /* CrashImporter.storyboard */; };
+		B5F3579322C5C8EF00111FF3 /* Device.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579522C5C8EF00111FF3 /* Device.storyboard */; };
 		B5F3579822C5CAD400111FF3 /* ScriptImporter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579A22C5CAD400111FF3 /* ScriptImporter.storyboard */; };
 		B5F3579D22C5CB1000111FF3 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */; };
 		B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B5F357B322C5E90C00111FF3 /* Localizable.strings */; };
@@ -139,14 +141,16 @@
 		B53E2F8B22D48E28003BC45C /* icp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = icp; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53E2F8D22D48E28003BC45C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
+		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
+		B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBaseViewController.swift; sourceTree = "<group>"; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		B5F3578822C3121200111FF3 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		B5F3579222C5C8C300111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
-		B5F3579622C5C8F600111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/CrashImporter.storyboard; sourceTree = "<group>"; };
-		B5F3579722C5C90A00111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/CrashImporter.strings"; sourceTree = "<group>"; };
+		B5F3579622C5C8F600111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Device.storyboard; sourceTree = "<group>"; };
+		B5F3579722C5C90A00111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Device.strings"; sourceTree = "<group>"; };
 		B5F3579B22C5CADD00111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/ScriptImporter.storyboard; sourceTree = "<group>"; };
 		B5F3579C22C5CAE400111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ScriptImporter.strings"; sourceTree = "<group>"; };
 		B5F3579E22C5CB1000111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Preferences.storyboard; sourceTree = "<group>"; };
@@ -345,7 +349,7 @@
 			isa = PBXGroup;
 			children = (
 				F49BD1F51D2FF46300024AAE /* Main.storyboard */,
-				B5F3579522C5C8EF00111FF3 /* CrashImporter.storyboard */,
+				B5F3579522C5C8EF00111FF3 /* Device.storyboard */,
 				B5F3579A22C5CAD400111FF3 /* ScriptImporter.storyboard */,
 				B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */,
 				B5F357B322C5E90C00111FF3 /* Localizable.strings */,
@@ -406,10 +410,12 @@
 				51BF9C491D66AB8800379BFC /* TextView.swift */,
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
-				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
 				F49E2D44214BA5E3001A6A88 /* DownloadScriptViewController.swift */,
 				F4B9025321538B5000B1DC0A /* DownloadTaskListViewController.swift */,
 				F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */,
+				B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */,
+				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
+				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -690,7 +696,7 @@
 				F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
 				B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */,
-				B5F3579322C5C8EF00111FF3 /* CrashImporter.storyboard in Resources */,
+				B5F3579322C5C8EF00111FF3 /* Device.storyboard in Resources */,
 				B5F3579822C5CAD400111FF3 /* ScriptImporter.storyboard in Resources */,
 				519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */,
 				B5F3579D22C5CB1000111FF3 /* Preferences.storyboard in Resources */,
@@ -770,9 +776,11 @@
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
 				B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */,
+				B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */,
 				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
 				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
+				B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
 				B5F3578722C30B7C00111FF3 /* Color.swift in Sources */,
@@ -797,13 +805,13 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		B5F3579522C5C8EF00111FF3 /* CrashImporter.storyboard */ = {
+		B5F3579522C5C8EF00111FF3 /* Device.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				B5F3579622C5C8F600111FF3 /* Base */,
 				B5F3579722C5C90A00111FF3 /* zh-Hans */,
 			);
-			name = CrashImporter.storyboard;
+			name = Device.storyboard;
 			sourceTree = "<group>";
 		};
 		B5F3579A22C5CAD400111FF3 /* ScriptImporter.storyboard */ = {

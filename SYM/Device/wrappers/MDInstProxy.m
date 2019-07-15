@@ -26,6 +26,9 @@
 #import "MDUtil.h"
 #import <libimobiledevice/installation_proxy.h>
 
+@implementation MDAppInfo
+@end
+
 @interface MDInstProxy ()
 @property (nonatomic, strong) MDLockdown *lockdown;
 @property (nonatomic, strong) MDLockdownService *service;
@@ -66,7 +69,16 @@
 
     NSArray *list = plist_to_nsobject(result);
     plist_free(result);
-    return list;
+    
+    NSMutableArray *apps = [NSMutableArray array];
+    for (NSDictionary *info in list) {
+        MDAppInfo *app = [MDAppInfo new];
+        app.name = info[@"CFBundleDisplayName"];
+        app.identifier = info[@"CFBundleIdentifier"];
+        [apps addObject:app];
+    }
+    
+    return [apps copy];
 }
 
 @end
