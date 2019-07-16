@@ -160,6 +160,7 @@
         for (i = 0; fileinfo[i]; i+=2) {
             if (!strcmp(fileinfo[i], "st_size")) {
                 stbuf.st_size = atoll(fileinfo[i+1]);
+                file.size = stbuf.st_size;
             } else if (!strcmp(fileinfo[i], "st_ifmt")) {
                 if (!strcmp(fileinfo[i+1], "S_IFREG")) {
                     stbuf.st_mode = S_IFREG;

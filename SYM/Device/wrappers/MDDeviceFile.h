@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *path;
 @property (nonatomic, assign) BOOL isDirectory;
 @property (nonatomic, strong) NSDate *date;
+@property (nonatomic, assign) NSUInteger size;
 @property (nonatomic, strong, readonly) NSString *name;
 @property (nonatomic, readonly, nullable) NSArray<MDDeviceFile *> *children;
 

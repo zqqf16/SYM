@@ -25,12 +25,19 @@ import Cocoa
 
 class FileBrowserViewController: DeviceBaseViewController {
 
-    @IBOutlet weak var browser: NSBrowser!
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var exportButton: NSButton!
     @IBOutlet weak var exportIndicator: NSProgressIndicator!
+    @IBOutlet weak var outlineView: NSOutlineView!
     
-    var afcClient: MDAfcClient!
+    var rootDir: MDDeviceFile!
+    var afcClient: MDAfcClient! {
+        didSet {
+            self.rootDir = MDDeviceFile(afcClient: self.afcClient)
+            self.rootDir.path = "."
+            self.rootDir.isDirectory = true
+        }
+    }
     var appList: [MDAppInfo] = []
     
     override func viewDidLoad() {
@@ -48,7 +55,8 @@ class FileBrowserViewController: DeviceBaseViewController {
         let lockdown = MDLockdown()
         let houseArrest = MDHouseArrest(lockdown: lockdown, appID: app.identifier)
         self.afcClient = MDAfcClient.fileClient(with: houseArrest)
-        self.browser.loadColumnZero()
+        //self.browser.loadColumnZero()
+        self.outlineView.reloadData()
     }
     
     override func deviceConnectionChanged() {
@@ -60,11 +68,11 @@ class FileBrowserViewController: DeviceBaseViewController {
     }
     
     @IBAction func exportFile(_ sender: NSButton) {
-        guard let indexPath = self.browser.selectionIndexPath,
-            let file = self.browser.item(at: indexPath) as? MDDeviceFile else {
-                return;
+        let row = self.outlineView.selectedRow
+        guard row >= 0, let file = self.outlineView.item(atRow: row) as? MDDeviceFile else {
+            return;
         }
-
+        
         let savePanel = NSSavePanel()
         savePanel.canCreateDirectories = true
         savePanel.nameFieldStringValue = file.name
@@ -96,52 +104,6 @@ class FileBrowserViewController: DeviceBaseViewController {
     }
 }
 
-extension FileBrowserViewController: NSBrowserDelegate {
-    func rootItem(for browser: NSBrowser) -> Any? {
-        if self.afcClient == nil {
-            return nil
-        }
-        let file = MDDeviceFile(afcClient: self.afcClient)
-        file.path = "."
-        file.isDirectory = true
-        return file
-    }
-    
-    func browser(_ browser: NSBrowser, objectValueForItem item: Any?) -> Any? {
-        guard let file = item as? MDDeviceFile else {
-            return ""
-        }
-        return file.name
-    }
-    
-    func browser(_ browser: NSBrowser, numberOfChildrenOfItem item: Any?) -> Int {
-        guard let file = item as? MDDeviceFile, file.isDirectory else {
-            return 0
-        }
-        return file.children?.count ?? 0
-    }
-    
-    func browser(_ browser: NSBrowser, child index: Int, ofItem item: Any?) -> Any {
-        guard let file = item as? MDDeviceFile, file.isDirectory else {
-            return self.rootItem(for: browser)!
-        }
-        
-        if let fileList = file.children {
-            return fileList[index]
-        } else {
-            return self.rootItem(for: browser)!
-        }
-    }
-    
-    func browser(_ browser: NSBrowser, isLeafItem item: Any?) -> Bool {
-        guard let file = item as? MDDeviceFile else {
-            return true
-        }
-        
-        return !file.isDirectory
-    }
-}
-
 extension NSUserInterfaceItemIdentifier {
     static let appName = NSUserInterfaceItemIdentifier("appName")
 }
@@ -164,5 +126,74 @@ extension FileBrowserViewController: NSTableViewDelegate, NSTableViewDataSource 
             let app = self.appList[row]
             self.loadFiles(app)
         }
+    }
+}
+
+extension UInt {
+    var readableSize: String {
+        if self < 1024 {
+            return "\(self)"
+        }
+        var value = Double(self) / 1024.0
+        let units = ["K", "M", "G", "T"]
+        var index = 0
+        while value > 1024 && index < units.count - 1 {
+            index += 1
+            value /= 1024
+        }
+        
+        return "\(String(format: "%.2f", value))\(units[index])"
+    }
+}
+
+extension FileBrowserViewController: NSOutlineViewDelegate, NSOutlineViewDataSource {
+    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        if let file = item as? MDDeviceFile, file.isDirectory, let children = file.children {
+            return children.count
+        }
+        
+        return self.rootDir?.children?.count ?? 0
+    }
+    
+    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+        if let file = item as? MDDeviceFile, file.isDirectory, let children = file.children {
+            return children[index]
+        }
+        
+        return self.rootDir!.children![index]
+    }
+    
+    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+        if let file = item as? MDDeviceFile, file.isDirectory, let children = file.children {
+            return children.count > 0
+        }
+
+        return false
+    }
+    
+    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+        var view: NSTableCellView?
+        guard let file = item as? MDDeviceFile else {
+            return view
+        }
+        
+        view = outlineView.makeView(withIdentifier: tableColumn!.identifier, owner: nil) as? NSTableCellView
+        if tableColumn == outlineView.tableColumns[0] {
+            view?.textField?.stringValue = file.name
+            if !file.isDirectory {
+                view?.imageView?.image = nil
+            }
+        } else if tableColumn == outlineView.tableColumns[1] {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            view?.textField?.stringValue = formatter.string(from: file.date)
+        } else {
+            view?.textField?.stringValue = "\(file.size.readableSize)"
+        }
+        
+        return view
+    }
+    
+    func outlineViewSelectionDidChange(_ notification: Notification) {
     }
 }
