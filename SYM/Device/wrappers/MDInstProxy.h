@@ -28,8 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 @class MDLockdown;
 
 @interface MDAppInfo: NSObject
-@property (nonatomic, strong) NSString *identifier;
-@property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong, readonly) NSString *identifier;
+@property (nonatomic, strong, readonly) NSString *name;
+@property (nonatomic, strong, readonly) NSString *container;
+@property (nonatomic, assign, readonly) BOOL isDeveloping;
 @end
 
 @interface MDInstProxy : NSObject

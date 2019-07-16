@@ -35,13 +35,12 @@ class FileBrowserViewController: DeviceBaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.loadAppList(self.deviceList.first)
     }
 
     func loadAppList(_ udid: String?) {
         let lockdown = MDLockdown()
         let instproxy = MDInstProxy(lockdown: lockdown)
-        self.appList = instproxy.listApps()
+        self.appList = instproxy.listApps().filter { $0.isDeveloping }
         self.tableView.reloadData()
     }
     
@@ -161,7 +160,7 @@ extension FileBrowserViewController: NSTableViewDelegate, NSTableViewDataSource 
     
     func tableViewSelectionDidChange(_ notification: Notification) {
         let row = self.tableView.selectedRow
-        if row > 0 && row < self.appList.count {
+        if row >= 0 && row < self.appList.count {
             let app = self.appList[row]
             self.loadFiles(app)
         }

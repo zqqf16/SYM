@@ -26,7 +26,36 @@
 #import "MDUtil.h"
 #import <libimobiledevice/installation_proxy.h>
 
+@interface MDAppInfo ()
+@property (nonatomic, strong) NSDictionary *rawInfo;
+@end
+
 @implementation MDAppInfo
+
+- (instancetype)initWithInfo:(NSDictionary *)info {
+    if (self = [super init]) {
+        _rawInfo = info;
+    }
+    return self;
+}
+
+- (NSString *)name {
+    return self.rawInfo[@"CFBundleDisplayName"];
+}
+
+- (NSString *)identifier {
+    return self.rawInfo[@"CFBundleIdentifier"];
+}
+
+- (BOOL)isDeveloping {
+    NSString *signer = self.rawInfo[@"SignerIdentity"];
+    return ![signer hasPrefix:@"Apple"] && [signer containsString:@"Developer"];
+}
+
+- (NSString *)container {
+    return self.rawInfo[@"Container"];
+}
+
 @end
 
 @interface MDInstProxy ()
@@ -72,12 +101,8 @@
     
     NSMutableArray *apps = [NSMutableArray array];
     for (NSDictionary *info in list) {
-        MDAppInfo *app = [MDAppInfo new];
-        app.name = info[@"CFBundleDisplayName"];
-        app.identifier = info[@"CFBundleIdentifier"];
-        [apps addObject:app];
+        [apps addObject:[[MDAppInfo alloc] initWithInfo:info]];
     }
-    
     return [apps copy];
 }
 
