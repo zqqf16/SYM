@@ -42,11 +42,19 @@ class DeviceBaseViewController : NSViewController {
 
     @IBOutlet weak var deviceButton: NSPopUpButton!
     var deviceList: [String] = MDDeviceMonitor.shared().connectedDevices
+    var hasLoadDevices: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self._deviceConnected(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(_deviceConnected(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
+    }
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        if !self.hasLoadDevices {
+            self._deviceConnected(nil)
+            self.hasLoadDevices = true
+        }
     }
     
     @objc func _deviceConnected(_ notification: Notification?) {
