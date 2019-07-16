@@ -414,6 +414,12 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="eew-wu-PHN"/>
+                                        <menuItem title="Devices" keyEquivalent="d" id="kDi-ec-idF">
+                                            <connections>
+                                                <segue destination="BZX-tn-6tC" kind="show" id="Czv-jy-NCk"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="zpn-pn-uVJ"/>
                                         <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
@@ -1057,4 +1063,7 @@ DQ
         <image name="alert" width="19" height="19"/>
         <image name="file" width="512" height="512"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="o44-9z-7zV"/>
+    </inferredMetricsTieBreakers>
 </document>
