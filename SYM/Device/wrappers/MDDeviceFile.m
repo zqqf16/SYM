@@ -69,4 +69,38 @@
     return [self.afcClient read:self.path];
 }
 
+- (void)copy:(NSString *)path {
+    if (!self.isDirectory) {
+        NSData *data = [self read];
+        if (!data) {
+            return;
+        }
+        
+        [data writeToFile:path atomically:YES];
+        return;
+    }
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDirectory;
+    if (![fileManager fileExistsAtPath:path isDirectory:&isDirectory]) {
+        NSError *error;
+        [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error];
+        if (error) {
+            NSLog(@"ERROR: create directory failed: %@", error);
+            return;
+        }
+    } else if (!isDirectory) {
+        NSLog(@"ERROR: create directory failed: %@ existed", path);
+        return;
+    }
+    
+    NSArray *children = self.children;
+    if (children.count == 0) {
+        return;
+    }
+    for (MDDeviceFile *file in self.children) {
+        NSString *filePath = [path stringByAppendingPathComponent:file.name];
+        [file copy:filePath];
+    }
+}
+
 @end

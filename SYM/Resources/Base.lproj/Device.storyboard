@@ -343,6 +343,13 @@
                                     <action selector="exportFile:" target="Ock-S4-Eux" id="DXz-ts-vbq"/>
                                 </connections>
                             </button>
+                            <progressIndicator hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="3Qq-5M-2wY">
+                                <rect key="frame" x="673" y="9" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="16" id="2Gl-8X-gQP"/>
+                                    <constraint firstAttribute="height" constant="16" id="Mh7-RR-oqu"/>
+                                </constraints>
+                            </progressIndicator>
                         </subviews>
                         <constraints>
                             <constraint firstItem="Qvm-hY-CO3" firstAttribute="leading" secondItem="rkZ-Do-nkz" secondAttribute="leading" constant="20" id="0PD-yX-CB2"/>
@@ -356,15 +363,18 @@
                             <constraint firstAttribute="bottom" secondItem="ck5-es-c4C" secondAttribute="bottom" constant="34" id="U1a-7H-HXC"/>
                             <constraint firstItem="ck5-es-c4C" firstAttribute="leading" secondItem="EZM-aq-c0i" secondAttribute="trailing" constant="10" id="fl9-Kf-Ce9"/>
                             <constraint firstItem="EZM-aq-c0i" firstAttribute="leading" secondItem="Qvm-hY-CO3" secondAttribute="leading" id="lDD-yS-MfW"/>
+                            <constraint firstItem="3Qq-5M-2wY" firstAttribute="centerY" secondItem="I2k-2s-5rF" secondAttribute="centerY" id="lI4-e2-k4u"/>
                             <constraint firstItem="ck5-es-c4C" firstAttribute="leading" secondItem="Qvm-hY-CO3" secondAttribute="trailing" constant="10" id="nAC-eb-Q64"/>
                             <constraint firstItem="EZM-aq-c0i" firstAttribute="top" secondItem="Qvm-hY-CO3" secondAttribute="bottom" constant="10" id="qiW-LC-myH"/>
                             <constraint firstItem="I2k-2s-5rF" firstAttribute="top" secondItem="ck5-es-c4C" secondAttribute="bottom" constant="10" id="rtb-UG-T2n"/>
+                            <constraint firstItem="I2k-2s-5rF" firstAttribute="leading" secondItem="3Qq-5M-2wY" secondAttribute="trailing" constant="8" id="uFP-Mk-h1a"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="browser" destination="ck5-es-c4C" id="KeB-tw-zna"/>
                         <outlet property="deviceButton" destination="Qvm-hY-CO3" id="FM3-HW-MEf"/>
                         <outlet property="exportButton" destination="I2k-2s-5rF" id="eQa-EP-RA1"/>
+                        <outlet property="exportIndicator" destination="3Qq-5M-2wY" id="euu-gB-1Yp"/>
                         <outlet property="tableView" destination="HSc-6a-gQ6" id="RIr-Gt-BYT"/>
                     </connections>
                 </viewController>

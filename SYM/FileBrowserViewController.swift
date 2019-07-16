@@ -28,7 +28,8 @@ class FileBrowserViewController: DeviceBaseViewController {
     @IBOutlet weak var browser: NSBrowser!
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var exportButton: NSButton!
-
+    @IBOutlet weak var exportIndicator: NSProgressIndicator!
+    
     var afcClient: MDAfcClient!
     var appList: [MDAppInfo] = []
     
@@ -61,9 +62,7 @@ class FileBrowserViewController: DeviceBaseViewController {
     
     @IBAction func exportFile(_ sender: NSButton) {
         guard let indexPath = self.browser.selectionIndexPath,
-            let file = self.browser.item(at: indexPath) as? MDDeviceFile,
-            !file.isDirectory,
-            let data = file.read() else {
+            let file = self.browser.item(at: indexPath) as? MDDeviceFile else {
                 return;
         }
 
@@ -74,10 +73,26 @@ class FileBrowserViewController: DeviceBaseViewController {
             guard result == .OK, let url = savePanel?.url else {
                 return
             }
-            let dest = URL(fileURLWithPath: file.name, relativeTo: url)
-            do {
-                try data.write(to: dest, options: .atomic)
-            } catch { }
+            var name = savePanel?.nameFieldStringValue ?? ""
+            if name.isEmpty {
+                name = file.name
+            }
+            let dest = URL(fileURLWithPath: name, relativeTo: url)
+            self.doExport(file, url: dest)
+        }
+    }
+    
+    private func doExport(_ file: MDDeviceFile, url: URL) {
+        self.exportIndicator.startAnimation(nil)
+        self.exportIndicator.isHidden = false
+        self.exportButton.isEnabled = false
+        DispatchQueue.global().async {
+            file.copy(url.path)
+            DispatchQueue.main.async {
+                self.exportIndicator.stopAnimation(nil)
+                self.exportIndicator.isHidden = true
+                self.exportButton.isEnabled = true
+            }
         }
     }
 }

@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithAfcClient:(MDAfcClient *)afcClient;
 
 - (nullable NSData *)read;
+- (void)copy:(NSString *)path;
 
 @end
 
