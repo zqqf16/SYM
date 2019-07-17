@@ -181,7 +181,7 @@ extension FileBrowserViewController: NSOutlineViewDelegate, NSOutlineViewDataSou
         if tableColumn == outlineView.tableColumns[0] {
             view?.textField?.stringValue = file.name
             if !file.isDirectory {
-                view?.imageView?.image = nil
+                view?.imageView?.image = NSWorkspace.shared.icon(forFileType: file.extension)
             }
         } else if tableColumn == outlineView.tableColumns[1] {
             let formatter = DateFormatter()

@@ -44,6 +44,10 @@
     return [self.path lastPathComponent];
 }
 
+- (NSString *)extension {
+    return [self.path pathExtension];
+}
+
 - (NSString *)description {
     return self.path;
 }
