@@ -56,7 +56,7 @@ let destURL = URL(fileURLWithPath: "\(arguments[3])/\(components.last!)", relati
 
 let lockdown = MDLockdown(udid: nil)
 let houseArrest = MDHouseArrest(lockdown: lockdown, appID: arguments[1])
-let afc = MDAfcClient.afc(from: houseArrest)
+let afc = MDAfcClient.fileClient(with: houseArrest)
 guard let data = afc.read(srcPath) else {
     print("Cannot read file: \(path)")
     exit(4)
