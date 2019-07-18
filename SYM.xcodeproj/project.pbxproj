@@ -49,6 +49,13 @@
 		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
 		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
 		B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */; };
+		B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
+		B59B326C22E0112800013B67 /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
+		B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8222D47E46003BC45C /* MDDeviceFile.m */; };
+		B59B326E22E0112E00013B67 /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
+		B59B326F22E0113100013B67 /* MDHouseArrest.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8522D48383003BC45C /* MDHouseArrest.m */; };
+		B59B327022E0113300013B67 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
+		B59B327122E0113600013B67 /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
@@ -730,7 +737,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B59B327022E0113300013B67 /* MDInstProxy.m in Sources */,
+				B59B326F22E0113100013B67 /* MDHouseArrest.m in Sources */,
+				B59B327122E0113600013B67 /* MDUtil.m in Sources */,
+				B59B326C22E0112800013B67 /* MDLockdown.m in Sources */,
+				B59B326E22E0112E00013B67 /* MDAfcClient.m in Sources */,
 				51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */,
+				B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */,
+				B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -864,6 +878,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
 			};
@@ -881,6 +897,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
 				VALID_ARCHS = x86_64;
 			};
