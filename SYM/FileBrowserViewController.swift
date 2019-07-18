@@ -180,7 +180,9 @@ extension FileBrowserViewController: NSOutlineViewDelegate, NSOutlineViewDataSou
         view = outlineView.makeView(withIdentifier: tableColumn!.identifier, owner: nil) as? NSTableCellView
         if tableColumn == outlineView.tableColumns[0] {
             view?.textField?.stringValue = file.name
-            if !file.isDirectory {
+            if file.isDirectory {
+                view?.imageView?.image = NSImage(named: NSImage.folderName as NSImage.Name)
+            } else {
                 view?.imageView?.image = NSWorkspace.shared.icon(forFileType: file.extension)
             }
         } else if tableColumn == outlineView.tableColumns[1] {
