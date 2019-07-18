@@ -63,7 +63,7 @@ class DeviceBaseViewController : NSViewController {
         self.deviceConnectionChanged()
     }
     
-    @IBAction func _changeDevice(_ sender: NSPopUpButton) {
+    @IBAction func changeDevice(_ sender: NSPopUpButton) {
         let index = self.deviceButton.indexOfSelectedItem
         if index < 0 || index > self.deviceList.count - 1 {
             return

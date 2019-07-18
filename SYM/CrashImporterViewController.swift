@@ -64,11 +64,10 @@ class DeviceFileProvider: NSFilePromiseProvider {
 
 class CrashImporterViewController: DeviceBaseViewController {
     private var fileList: [MDDeviceFile] = []
-    private var currentLockdown: MDLockdown?
+    private var currentDeviceID: String?
     private var afcClient: MDAfcClient? {
-        guard let lockdown = self.currentLockdown else {
-            return nil
-        }
+        // Always create a new one
+        let lockdown = MDLockdown(udid: self.currentDeviceID)
         return MDAfcClient.crash(with: lockdown)
     }
     
@@ -90,7 +89,7 @@ class CrashImporterViewController: DeviceBaseViewController {
     
     override func deviceConnectionChanged() {
         self.deviceButton.reloadItemsWithDevices(self.deviceList)
-        if let currentUdid = self.currentLockdown?.deviceID, let index = self.deviceList.firstIndex(of: currentUdid) {
+        if let currentUdid = self.currentDeviceID, let index = self.deviceList.firstIndex(of: currentUdid) {
             self.deviceButton.selectItem(at: index)
         } else {
             self.select(lockdown: MDLockdown(udid: self.deviceList.first))
@@ -98,7 +97,7 @@ class CrashImporterViewController: DeviceBaseViewController {
     }
     
     func select(lockdown: MDLockdown?) {
-        self.currentLockdown = lockdown
+        self.currentDeviceID = lockdown?.deviceID
         DispatchQueue.global().async {
             let crashList = self.afcClient?.crashFiles() ?? []
             DispatchQueue.main.async {
@@ -120,7 +119,7 @@ class CrashImporterViewController: DeviceBaseViewController {
         }
         let file = self.fileList[index]
         DispatchQueue.global().async {
-            guard let udid = self.currentLockdown?.deviceID else {
+            guard let udid = self.currentDeviceID else {
                 return
             }
             
@@ -147,7 +146,7 @@ class CrashImporterViewController: DeviceBaseViewController {
     }
 
     override func deviceSelectionChanged(_ udid: String?) {
-        if udid != self.currentLockdown?.deviceID {
+        if udid != self.currentDeviceID {
             self.select(lockdown: MDLockdown(udid: udid))
         }
     }
@@ -171,9 +170,7 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
             cell?.textField?.stringValue = file.crashFileDisplayName
         } else {
             cell = tableView.makeView(withIdentifier: .cellDate, owner: nil) as? NSTableCellView
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            cell?.textField?.stringValue = formatter.string(from: file.date)
+            cell?.textField?.stringValue = file.date.formattedString
         }
         return cell
     }

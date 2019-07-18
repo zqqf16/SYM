@@ -261,3 +261,34 @@ extension NSPasteboard.PasteboardType {
         }
     } ()
 }
+
+extension DateFormatter {
+    static let symDate: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+}
+
+extension Date {
+    var formattedString: String {
+        return DateFormatter.symDate.string(from: self)
+    }
+}
+
+extension UInt {
+    var readableSize: String {
+        if self < 1024 {
+            return "\(self)"
+        }
+        var value = Double(self) / 1024.0
+        let units = ["K", "M", "G", "T"]
+        var index = 0
+        while value > 1024 && index < units.count - 1 {
+            index += 1
+            value /= 1024
+        }
+        
+        return "\(String(format: "%.2f", value))\(units[index])"
+    }
+}

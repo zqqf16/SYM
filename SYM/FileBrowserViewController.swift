@@ -23,12 +23,21 @@
 
 import Cocoa 
 
+extension NSPopUpButton {
+    func reloadItemsWithApps(_ apps: [MDAppInfo]) {
+        self.removeAllItems()
+        apps.forEach({ (app) in
+            self.addItem(withTitle: "\(app.name)(\(app.identifier))")
+        })
+    }
+}
+
 class FileBrowserViewController: DeviceBaseViewController {
 
-    @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var exportButton: NSButton!
     @IBOutlet weak var exportIndicator: NSProgressIndicator!
     @IBOutlet weak var outlineView: NSOutlineView!
+    @IBOutlet weak var appButton: NSPopUpButton!
     
     var rootDir: MDDeviceFile!
     var afcClient: MDAfcClient! {
@@ -45,17 +54,26 @@ class FileBrowserViewController: DeviceBaseViewController {
     }
 
     func loadAppList(_ udid: String?) {
-        let lockdown = MDLockdown()
-        let instproxy = MDInstProxy(lockdown: lockdown)
-        self.appList = instproxy.listApps().filter { $0.isDeveloping }
-        self.tableView.reloadData()
+        DispatchQueue.global().async {
+            let lockdown = MDLockdown()
+            let instproxy = MDInstProxy(lockdown: lockdown)
+            self.appList = instproxy.listApps().filter { $0.isDeveloping }
+            DispatchQueue.main.async {
+                self.appButton.reloadItemsWithApps(self.appList)
+                self.appButton.selectItem(at: 0)
+                self.changeApp(self.appButton)
+            }
+        }
     }
     
-    func loadFiles(_ app: MDAppInfo) {
-        let lockdown = MDLockdown()
-        let houseArrest = MDHouseArrest(lockdown: lockdown, appID: app.identifier)
-        self.afcClient = MDAfcClient.fileClient(with: houseArrest)
-        //self.browser.loadColumnZero()
+    func loadFiles(_ app: MDAppInfo?) {
+        if let appInfo = app {
+            let lockdown = MDLockdown()
+            let houseArrest = MDHouseArrest(lockdown: lockdown, appID: appInfo.identifier)
+            self.afcClient = MDAfcClient.fileClient(with: houseArrest)
+        } else {
+            self.rootDir = nil
+        }
         self.outlineView.reloadData()
     }
     
@@ -67,10 +85,19 @@ class FileBrowserViewController: DeviceBaseViewController {
         self.loadAppList(udid)
     }
     
-    @IBAction func exportFile(_ sender: NSButton) {
+    @IBAction func didClickExportButton(_ sender: NSButton) {
         let row = self.outlineView.selectedRow
-        guard row >= 0, let file = self.outlineView.item(atRow: row) as? MDDeviceFile else {
-            return;
+        self.exportFile(atIndex: row)
+    }
+
+    @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
+        let row = self.outlineView.clickedRow
+        self.exportFile(atIndex: row)
+    }
+
+    private func exportFile(atIndex index: Int) {
+        guard index >= 0, let file = self.outlineView.item(atRow: index) as? MDDeviceFile else {
+            return
         }
         
         let savePanel = NSSavePanel()
@@ -85,11 +112,11 @@ class FileBrowserViewController: DeviceBaseViewController {
                 name = file.name
             }
             let dest = URL(fileURLWithPath: name, relativeTo: url)
-            self.doExport(file, url: dest)
+            self.exportFile(file, toURL: dest)
         }
     }
-    
-    private func doExport(_ file: MDDeviceFile, url: URL) {
+
+    private func exportFile(_ file: MDDeviceFile, toURL url: URL) {
         self.exportIndicator.startAnimation(nil)
         self.exportIndicator.isHidden = false
         self.exportButton.isEnabled = false
@@ -102,47 +129,16 @@ class FileBrowserViewController: DeviceBaseViewController {
             }
         }
     }
-}
-
-extension NSUserInterfaceItemIdentifier {
-    static let appName = NSUserInterfaceItemIdentifier("appName")
-}
-
-extension FileBrowserViewController: NSTableViewDelegate, NSTableViewDataSource {
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return self.appList.count
-    }
     
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let app = self.appList[row]
-        let cell = tableView.makeView(withIdentifier: .appName, owner: nil) as? NSTableCellView
-        cell?.textField?.stringValue = "\(app.name)(\(app.identifier))"
-        return cell
-    }
-    
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        let row = self.tableView.selectedRow
-        if row >= 0 && row < self.appList.count {
-            let app = self.appList[row]
+    @IBAction func changeApp(_ sender: NSPopUpButton) {
+        var app: MDAppInfo?
+        let index = self.appButton.indexOfSelectedItem
+        if index >= 0 && index < self.appList.count {
+            app = self.appList[index]
+        }
+        DispatchQueue.main.async {
             self.loadFiles(app)
         }
-    }
-}
-
-extension UInt {
-    var readableSize: String {
-        if self < 1024 {
-            return "\(self)"
-        }
-        var value = Double(self) / 1024.0
-        let units = ["K", "M", "G", "T"]
-        var index = 0
-        while value > 1024 && index < units.count - 1 {
-            index += 1
-            value /= 1024
-        }
-        
-        return "\(String(format: "%.2f", value))\(units[index])"
     }
 }
 
@@ -186,9 +182,7 @@ extension FileBrowserViewController: NSOutlineViewDelegate, NSOutlineViewDataSou
                 view?.imageView?.image = NSWorkspace.shared.icon(forFileType: file.extension)
             }
         } else if tableColumn == outlineView.tableColumns[1] {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            view?.textField?.stringValue = formatter.string(from: file.date)
+            view?.textField?.stringValue = file.date.formattedString
         } else {
             view?.textField?.stringValue = "\(file.size.readableSize)"
         }
