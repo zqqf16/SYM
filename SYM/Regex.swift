@@ -104,7 +104,7 @@ extension RE {
     }
     
     // UUID: E5B0A378-6816-3D90-86FD-2AEF15894A85
-    static let uuid = try! RE("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{8}", options: [.anchorsMatchLines, .caseInsensitive])
+    static let uuid = try! RE("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", options: [.anchorsMatchLines, .caseInsensitive])
     
     // Thread 55 Crashed:
     static let threadCrashed = try! RE("(?:^Thread \\d+.*\n)*^Thread \\d+ Crashed:\\s*\n(?:^\\s*\\d{1,3}.*\n)+", options: .anchorsMatchLines)
@@ -169,4 +169,10 @@ extension RE {
     static let hashPlatform = try! RE("^# Platform:\\s*(.+)", options: .anchorsMatchLines)
     static let hashOSVersion = try! RE("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
     static let hashBundleID = try! RE("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
+}
+
+// MARK: dwarfdump
+extension RE {
+    //UUID: F9E72B35-ACE9-3B64-8D8C-6A59BE609683 (armv7) /path/to/xxx.dSYM/Contents/Resources/DWARF/xxx
+    static let dwarfdump = try! RE("^UUID: ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}) \\(.*\\) (.*)", options: [.anchorsMatchLines, .caseInsensitive])
 }

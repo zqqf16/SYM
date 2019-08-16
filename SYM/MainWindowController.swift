@@ -60,6 +60,7 @@ class MainWindowController: NSWindowController {
     // Dsym
     private var monitor = DsymFileMonitor()
     private var downloader = DsymDownloader()
+    private var downloadTask: DsymDownloadTask?
 
     private var dsymFiles: [DsymFile]? {
         didSet {
@@ -99,7 +100,7 @@ class MainWindowController: NSWindowController {
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
-        self.startMDLockdownTest()
+        NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -140,6 +141,13 @@ class MainWindowController: NSWindowController {
     
     @objc func crashDidSymbolicated(_ notification: Notification) {
         self.isSymbolicating = false
+    }
+    
+    @objc func dsymDownloadStatusChanged(_ notification: Notification) {
+        if self.dsymFiles == nil, let dsymFiles = self.downloadTask?.dsymFiles {
+            self.dsymFiles = dsymFiles
+            self.downloadTask = nil
+        }
     }
     
     // MARK: IBActions
@@ -188,7 +196,7 @@ class MainWindowController: NSWindowController {
             return
         }
         
-        DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
+        self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
     }
 }
 
@@ -212,19 +220,5 @@ extension MainWindowController: NSMenuDelegate {
 extension MainWindowController: NSToolbarItemValidation {
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
         return item.isEnabled
-    }
-    
-    func startMDLockdownTest() {
-       // let lockdown = MDLockdown()
-        //let ha = MDHouseArrest(lockdown: lockdown, appID: "com.ss.iphone.ugc.Aweme")
-        //let afc = MDAfcClient.fileClient(with: ha)
-        //print(afc.listDirectory("/"))
-
-//        let instproxy = MDInstProxy(lockdown: lockdown)
-//        for app in instproxy.listApps() {
-//            if let info = app as? [String: Any] {
-//                print(info["CFBundleIdentifier"])
-//            }
-//        }
     }
 }

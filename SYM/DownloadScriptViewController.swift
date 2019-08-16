@@ -64,6 +64,7 @@ class DownloadScriptViewController: NSViewController {
 
                                 # Crash informations
                                 #     $1               # original crash file path
+                                #     $2               # download directory
                                 #     ${APP_NAME}      # e.g. im_zorro_sym
                                 #     ${UUID}          # e.g. E5B0A378-6816-3D90-86FD-2AEF15894A85
                                 #     ${BUNDLE_ID}     # e.g. im.zorro.sym
@@ -73,6 +74,13 @@ class DownloadScriptViewController: NSViewController {
                                 #     exit 0           # success
                                 #     exit 1           # crash not supported
                                 #     exit 2           # download failed"
+
+                                # Examples:
+                                #     curl -o $2/${UUID}.zip http://your.server.domain/path/to/${UUID}.zip
+                                #     unzip -o "$2/${UUID}.zip" -d "$2/${UUID}"
+                                #     for f in "$2/${UUID}/*.dSYM"; do dwarfdump --uuid $f ; done
+                                #
+                                
                                 """
         let saved = try? String(contentsOf: Config.downloadScriptURL(), encoding: .utf8)
         if saved != nil && saved!.count > 0 {

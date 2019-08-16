@@ -88,6 +88,7 @@ class DsymDownloadTask {
     var statusCode: Int = 0
     var message: String?
     var progress: DsymDownloadProgress = DsymDownloadProgress()
+    var dsymFiles: [DsymFile]?
 
     private var process: SubProcess!
     private var fileURL: URL?
@@ -129,6 +130,7 @@ class DsymDownloadTask {
         self.isRunning = true
         self.process.run()
         
+        self.parse(output: self.process.output)
         self.statusCode = self.process.exitCode
         self.message = self.process.output
     }
@@ -145,6 +147,39 @@ class DsymDownloadTask {
         env["BUNDLE_ID"] = crashInfo.bundleID ?? ""
         env["APP_VERSION"] = crashInfo.appVersion ?? ""
         return env
+    }
+    
+    private func parse(output: String) {
+        guard let matches = RE.dwarfdump.findAll(output) else {
+            return
+        }
+        
+        var uuids: [String] = [self.crashInfo.uuid ?? ""]
+        if let binaries = self.crashInfo.embededBinaries {
+            uuids = binaries.compactMap { (binary) -> String? in
+                return binary.uuid
+            }
+        }
+        
+        var dsymFiles: [DsymFile] = []
+        for group in matches {
+            let uuid = group[0]
+            if !uuids.contains(uuid) {
+                continue
+            }
+            let path = group[1]
+            var name = ""
+            for component in path.components(separatedBy: "/") {
+                if component.hasSuffix(".dSYM") {
+                    name = component
+                    break
+                }
+            }
+            let file = DsymFile(name: name, path: path, binaryPath: path,
+                                uuids: [uuid], isApp: uuid == self.crashInfo.uuid)
+            dsymFiles.append(file)
+        }
+        self.dsymFiles = dsymFiles
     }
 }
 
