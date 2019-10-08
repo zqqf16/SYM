@@ -1,4 +1,7 @@
-BUILD_VER = $(shell /usr/libexec/PlistBuddy -c Print:CFBundleShortVersionString -c Print:CFBundleVersion SYM/Info.plist  | xargs |  sed 's/ /_/g')
+PROJ = SYM.xcodeproj/project.pbxproj
+MARKETING_VERSION = $(shell cat $(PROJ)|  sed -n 's/.*MARKETING_VERSION = \(.*\);/\1/p' | head -n 1)
+CURRENT_PROJECT_VERSION = $(shell cat $(PROJ)|  sed -n 's/.*CURRENT_PROJECT_VERSION = \(.*\);/\1/p' | head -n 1)
+BUILD_VER = $(MARKETING_VERSION)_$(CURRENT_PROJECT_VERSION)
 NAME = SYM_$(BUILD_VER)
 ARCHIVE_PATH = build/$(NAME).xcarchive
 EXPORT_PATH = build/$(NAME)
