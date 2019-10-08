@@ -205,8 +205,6 @@
 
 + (instancetype)crashClientWithLockdown:(MDLockdown *)lockdown {
     lockdown = lockdown ?: [[MDLockdown alloc] initWithUDID:nil];
-    MDLockdownService *service = [lockdown startServiceWithIdentifier:@"com.apple.crashreportmover"];
-    [service ping];
     return [[self alloc] initWithLockdown:lockdown serviceName:@"com.apple.crashreportcopymobile"];
 }
 

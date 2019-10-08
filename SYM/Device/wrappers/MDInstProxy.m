@@ -49,7 +49,8 @@
 
 - (BOOL)isDeveloping {
     NSString *signer = self.rawInfo[@"SignerIdentity"];
-    return ![signer hasPrefix:@"Apple"] && [signer containsString:@"Developer"];
+    return (![signer hasPrefix:@"Apple"] && [signer containsString:@"Developer"]) // Xcode 10
+            || [signer containsString:@"Apple Development"]; // Xcode 11
 }
 
 - (NSString *)container {

@@ -3,7 +3,8 @@
  * @brief Main include of libplist
  * \internal
  *
- * Copyright (c) 2008 Jonathan Beck All Rights Reserved.
+ * Copyright (c) 2012-2019 Nikias Bassen, All Rights Reserved.
+ * Copyright (c) 2008-2009 Jonathan Beck, All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +29,7 @@ extern "C"
 {
 #endif
 
-#ifdef _MSC_VER
+#if _MSC_VER && _MSC_VER < 1700
     typedef __int8 int8_t;
     typedef __int16 int16_t;
     typedef __int32 int32_t;
@@ -90,7 +91,12 @@ extern "C"
     /**
      * The plist dictionary iterator.
      */
-    typedef void *plist_dict_iter;
+    typedef void* plist_dict_iter;
+
+    /**
+     * The plist array iterator.
+     */
+    typedef void* plist_array_iter;
 
     /**
      * The enumeration of plist node types.
@@ -241,7 +247,7 @@ extern "C"
      * Get the index of an item. item must be a member of a #PLIST_ARRAY node.
      *
      * @param node the node
-     * @return the node index
+     * @return the node index or UINT_MAX if node index can't be determined
      */
     uint32_t plist_array_get_item_index(plist_t node);
 
@@ -281,6 +287,35 @@ extern "C"
      */
     void plist_array_remove_item(plist_t node, uint32_t n);
 
+    /**
+     * Remove a node that is a child node of a #PLIST_ARRAY node.
+     * node will be freed using #plist_free.
+     *
+     * @param node The node to be removed from its #PLIST_ARRAY parent.
+     */
+    void plist_array_item_remove(plist_t node);
+
+    /**
+     * Create an iterator of a #PLIST_ARRAY node.
+     * The allocated iterator should be freed with the standard free function.
+     *
+     * @param node The node of type #PLIST_ARRAY
+     * @param iter Location to store the iterator for the array.
+     */
+    void plist_array_new_iter(plist_t node, plist_array_iter *iter);
+
+    /**
+     * Increment iterator of a #PLIST_ARRAY node.
+     *
+     * @param node The node of type #PLIST_ARRAY.
+     * @param iter Iterator of the array
+     * @param item Location to store the item. The caller must *not* free the
+     *          returned item. Will be set to NULL when no more items are left
+     *          to iterate.
+     */
+    void plist_array_next_item(plist_t node, plist_array_iter iter, plist_t *item);
+
+
     /********************************************
      *                                          *
      *         Dictionary functions             *
@@ -299,27 +334,28 @@ extern "C"
      * Create an iterator of a #PLIST_DICT node.
      * The allocated iterator should be freed with the standard free function.
      *
-     * @param node the node of type #PLIST_DICT
-     * @param iter iterator of the #PLIST_DICT node
+     * @param node The node of type #PLIST_DICT.
+     * @param iter Location to store the iterator for the dictionary.
      */
     void plist_dict_new_iter(plist_t node, plist_dict_iter *iter);
 
     /**
      * Increment iterator of a #PLIST_DICT node.
      *
-     * @param node the node of type #PLIST_DICT
-     * @param iter iterator of the dictionary
-     * @param key a location to store the key, or NULL. The caller is responsible
+     * @param node The node of type #PLIST_DICT
+     * @param iter Iterator of the dictionary
+     * @param key Location to store the key, or NULL. The caller is responsible
      *		for freeing the the returned string.
-     * @param val a location to store the value, or NULL. The caller should *not*
-     *		free the returned value.
+     * @param val Location to store the value, or NULL. The caller must *not*
+     *		free the returned value. Will be set to NULL when no more
+     *		key/value pairs are left to iterate.
      */
     void plist_dict_next_item(plist_t node, plist_dict_iter iter, char **key, plist_t *val);
 
     /**
-     * Get key associated to an item. Item must be member of a dictionary
+     * Get key associated key to an item. Item must be member of a dictionary.
      *
-     * @param node the node
+     * @param node the item
      * @param key a location to store the key. The caller is responsible for freeing the returned string.
      */
     void plist_dict_get_item_key(plist_t node, char **key);
@@ -333,6 +369,14 @@ extern "C"
      *		the returned node.
      */
     plist_t plist_dict_get_item(plist_t node, const char* key);
+
+    /**
+     * Get key node associated to an item. Item must be member of a dictionary.
+     *
+     * @param node the item
+     * @return the key node of the given item, or NULL.
+     */
+    plist_t plist_dict_item_get_key(plist_t node);
 
     /**
      * Set item identified by key in a #PLIST_DICT node.

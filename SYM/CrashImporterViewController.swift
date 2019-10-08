@@ -99,6 +99,11 @@ class CrashImporterViewController: DeviceBaseViewController {
     func select(lockdown: MDLockdown?) {
         self.currentDeviceID = lockdown?.deviceID
         DispatchQueue.global().async {
+            let lockdown = MDLockdown(udid: self.currentDeviceID)
+            if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
+                // trigger moving
+                moveService.ping()
+            }
             let crashList = self.afcClient?.crashFiles() ?? []
             DispatchQueue.main.async {
                 self.fileList = crashList.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in

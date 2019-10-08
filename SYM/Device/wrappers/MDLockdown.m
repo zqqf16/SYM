@@ -23,6 +23,7 @@
 #import "MDLockdown.h"
 
 #import <libimobiledevice/syslog_relay.h>
+#import <libimobiledevice/service.h>
 #import "MDUtil.h"
 
 @interface MDLockdownService ()
@@ -45,33 +46,33 @@
 }
 
 - (void)ping {
-    idevice_connection_t connection = NULL;
-    idevice_error_t device_error = idevice_connect(_lockdown.device, self.service->port, &connection);
-    if(device_error != IDEVICE_E_SUCCESS) {
-        NSLog(@"ERROR: Failed to connect device: %d", device_error);
+    service_client_t serviceClient = NULL;
+    service_error_t err = service_client_new(self.lockdown.device, self.service, &serviceClient);
+    if (err != SERVICE_E_SUCCESS) {
+        NSLog(@"ERROR: Failed to create service client: %d", err);
         return;
     }
-    
+
     /* read "ping" message which indicates the crash logs have been moved to a safe harbor */
     char *ping = malloc(4);
     memset(ping, '\0', 4);
     int attempts = 0;
     while ((strncmp(ping, "ping", 4) != 0) && (attempts < 10)) {
         uint32_t bytes = 0;
-        device_error = idevice_connection_receive_timeout(connection, ping, 4, &bytes, 2000);
-        if ((bytes == 0) && (device_error == IDEVICE_E_SUCCESS)) {
+        err = service_receive_with_timeout(serviceClient, ping, 4, &bytes, 2000);
+        if (err == SERVICE_E_SUCCESS || err == SERVICE_E_TIMEOUT) {
             attempts++;
             continue;
-        } else if (device_error < 0) {
-            NSLog(@"ERROR: Crash logs could not be moved. Connection interrupted.");
+        } else {
+            NSLog(@"ERROR: Connection interrupted (%d).\n", err);
             break;
         }
     }
-    idevice_disconnect(connection);
+    err = service_client_free(serviceClient);
     free(ping);
-    
-    if (device_error != IDEVICE_E_SUCCESS || attempts > 10) {
-        NSLog(@"ERROR: Failed to receive ping message from crash report mover.");
+
+    if (attempts > 10) {
+        NSLog(@"ERROR: Failed to receive ping message from service.");
         return;
     }
 }
