@@ -68,6 +68,7 @@ class Binary {
         }
         
         return path.contains("/var/containers/Bundle/Application")
+            || path.hasPrefix("/var/mobile/Containers/Bundle/Application") // iOS8
     }
     
     var isValid: Bool {
