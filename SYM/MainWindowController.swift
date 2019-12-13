@@ -198,6 +198,12 @@ class MainWindowController: NSWindowController {
         
         self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
     }
+    
+    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
+        if let dsym = segue.destinationController as? DsymWindowController {
+            dsym.binaries = self.crashInfo?.binaryImages ?? []
+        }
+    }
 }
 
 // MARK: - DsymFileMonitorDelegate

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -12,7 +12,7 @@
                 <controllerPlaceholder storyboardName="ScriptImporter" id="4tc-s8-qhv" sceneMemberID="viewController"/>
                 <customObject id="cBG-ig-4Cc" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-660" y="-497"/>
+            <point key="canvasLocation" x="-697" y="-499"/>
         </scene>
         <!--Preferences-->
         <scene sceneID="uXe-DV-R7e">
@@ -20,7 +20,15 @@
                 <controllerPlaceholder storyboardName="Preferences" id="MJf-tg-Gb0" sceneMemberID="viewController"/>
                 <customObject id="07z-wY-QIw" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-458" y="-499"/>
+            <point key="canvasLocation" x="-556" y="-499"/>
+        </scene>
+        <!--Dsym-->
+        <scene sceneID="rVL-p0-0uT">
+            <objects>
+                <controllerPlaceholder storyboardName="Dsym" id="EOT-IE-3Qc" sceneMemberID="viewController"/>
+                <customObject id="7IC-8d-EfO" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-436" y="-499"/>
         </scene>
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
@@ -523,6 +531,21 @@
                                         <segue destination="o1z-o0-KTK" kind="popover" popoverAnchorView="rh6-Nt-hIy" popoverBehavior="t" preferredEdge="maxY" id="1GG-bx-MSW"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="39CAE711-CC86-4C2F-9D7C-2A0ACDD4CD18" label="Dsym" paletteLabel="Dsym" toolTip="dSYM download list" image="symbol" id="ZMq-01-VJi">
+                                    <size key="minSize" width="32" height="25"/>
+                                    <size key="maxSize" width="36" height="28"/>
+                                    <button key="view" verticalHuggingPriority="750" id="GGe-Tb-Qbo" customClass="DownloadButton" customModule="SYM" customModuleProvider="target">
+                                        <rect key="frame" x="1" y="14" width="36" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="symbol" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="vF1-Fr-Scp">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <connections>
+                                        <segue destination="EOT-IE-3Qc" kind="show" identifier="showDsym" id="V7d-C4-kAQ"/>
+                                    </connections>
+                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
                                 <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" id="wHv-dg-CLj">
                                     <size key="minSize" width="100" height="22"/>
@@ -543,9 +566,9 @@
                                     <popUpButton key="view" verticalHuggingPriority="750" id="iaa-hN-kZp">
                                         <rect key="frame" x="0.0" y="14" width="200" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <popUpButtonCell key="cell" type="roundTextured" title="dSYM file not found" bezelStyle="texturedRounded" image="alert" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" id="1nB-M4-fq1">
+                                        <popUpButtonCell key="cell" type="roundTextured" title="dSYM file not found" bezelStyle="texturedRounded" image="alert" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="Dlc-9A-Ldz" id="1nB-M4-fq1">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="menu"/>
+                                            <font key="font" metaFont="system"/>
                                             <menu key="menu" autoenablesItems="NO" id="uu2-q5-bEn">
                                                 <items>
                                                     <menuItem title="dSYM file not found" image="alert" hidden="YES" id="Dlc-9A-Ldz">
@@ -586,6 +609,7 @@
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="56F-jO-Bdr"/>
                                 <toolbarItem reference="x2M-ly-xLG"/>
+                                <toolbarItem reference="ZMq-01-VJi"/>
                                 <toolbarItem reference="SZU-E2-ttI"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
                                 <toolbarItem reference="rh6-Nt-hIy"/>
@@ -620,7 +644,7 @@
                 <controllerPlaceholder storyboardName="Device" id="BZX-tn-6tC" sceneMemberID="viewController"/>
                 <customObject id="7Rm-lf-inn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-661" y="-443"/>
+            <point key="canvasLocation" x="-341" y="-499"/>
         </scene>
         <!--Download Task List View Controller-->
         <scene sceneID="W9O-v4-3dZ">
@@ -638,7 +662,7 @@
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="22" rowSizeStyle="automatic" viewBased="YES" id="2C8-m7-dzr">
                                             <rect key="frame" x="0.0" y="0.0" width="317" height="317"/>
-                                            <autoresizingMask key="autoresizingMask"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <tableViewGridLines key="gridStyleMask" vertical="YES"/>
@@ -646,7 +670,7 @@
                                             <tableColumns>
                                                 <tableColumn editable="NO" width="314" minWidth="40" maxWidth="1000" id="3j8-go-4Qr">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="smallSystem"/>
+                                                        <font key="font" metaFont="message" size="11"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -669,7 +693,7 @@
                                                                     </constraints>
                                                                 </progressIndicator>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AHE-rZ-v47">
-                                                                    <rect key="frame" x="10" y="3" width="276" height="17"/>
+                                                                    <rect key="frame" x="10" y="3" width="276" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" drawsBackground="YES" id="LYp-LE-GWd">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -710,7 +734,7 @@
                                 </scroller>
                             </scrollView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wxX-lA-da6">
-                                <rect key="frame" x="118" y="329" width="82" height="18"/>
+                                <rect key="frame" x="118" y="330" width="82" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Downloads" id="2gF-48-bkm">
                                     <font key="font" metaFont="systemMedium" size="14"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -744,7 +768,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hPp-HR-CZc">
-                                <rect key="frame" x="18" y="163" width="33" height="17"/>
+                                <rect key="frame" x="18" y="164" width="33" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Path" id="YRO-Ht-n6C">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -752,7 +776,7 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0tW-EV-MlM">
-                                <rect key="frame" x="18" y="106" width="44" height="17"/>
+                                <rect key="frame" x="18" y="109" width="44" height="16"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="UUIDs" id="VCD-Y0-e92">
                                     <font key="font" metaFont="systemMedium" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -760,15 +784,15 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lOM-oh-spZ">
-                                <rect key="frame" x="38" y="139" width="35" height="16"/>
+                                <rect key="frame" x="38" y="141" width="35" height="15"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" alignment="left" title="Label" id="TlF-bz-9mE">
-                                    <font key="font" metaFont="cellTitle"/>
+                                    <font key="font" metaFont="controlContent"/>
                                     <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dI9-Z0-Elg">
-                                <rect key="frame" x="38" y="62" width="394" height="36"/>
+                                <rect key="frame" x="38" y="73" width="394" height="28"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" alignment="left" id="5XJ-7h-8b5">
                                     <font key="font" size="12" name="Menlo-Regular"/>
                                     <string key="title">E556F3F3-AA90-34CB-8E57-5214547C1888 (armv7)
@@ -791,10 +815,10 @@ DQ
                                 </connections>
                             </button>
                             <button hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OdP-6V-9jz">
-                                <rect key="frame" x="75" y="140" width="14" height="14"/>
+                                <rect key="frame" x="75" y="142" width="14" height="14"/>
                                 <buttonCell key="cell" type="roundRect" bezelStyle="roundedRect" image="NSFollowLinkFreestandingTemplate" imagePosition="only" alignment="left" imageScaling="proportionallyDown" inset="2" id="yR3-QF-hwa">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="cellTitle"/>
+                                    <font key="font" metaFont="controlContent"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="showInFinder:" target="7n1-wc-6iz" id="ZIm-MX-9rV"/>
@@ -843,7 +867,7 @@ DQ
                 </viewController>
                 <customObject id="ql0-DV-QJ9" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-496" y="-255.5"/>
+            <point key="canvasLocation" x="-315" y="-235"/>
         </scene>
         <!--Content View Controller-->
         <scene sceneID="bhh-am-SLo">
@@ -890,7 +914,7 @@ DQ
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QhV-nK-34r">
                                                 <rect key="frame" x="8" y="0.0" width="784" height="17"/>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" alignment="left" title="iPhone 8 Plus - iOS 11.4.1 - v0.4.5" id="UG5-2y-TCM">
-                                                    <font key="font" metaFont="cellTitle"/>
+                                                    <font key="font" metaFont="controlContent"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -930,7 +954,7 @@ DQ
                 </viewController>
                 <customObject id="Ubv-yr-Mz1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1107" y="299"/>
+            <point key="canvasLocation" x="-1079" y="318"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="os9-PT-O6A">
@@ -976,7 +1000,7 @@ DQ
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="file" id="lc1-8j-bd8"/>
                             </imageView>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I5e-s3-CED">
-                                <rect key="frame" x="137" y="100" width="59" height="36"/>
+                                <rect key="frame" x="137" y="101" width="59" height="35"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Sym" id="vnr-ZA-pHm">
                                     <font key="font" metaFont="systemThin" size="30"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -984,7 +1008,7 @@ DQ
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ier-eo-cQw">
-                                <rect key="frame" x="137" y="83" width="64" height="17"/>
+                                <rect key="frame" x="137" y="85" width="61" height="16"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="1.1.1 (200)" id="zVG-Ln-82I">
                                     <font key="font" metaFont="systemUltraLight" size="13"/>
                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -994,7 +1018,7 @@ DQ
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mLi-CY-HTg">
                                 <rect key="frame" x="137" y="49" width="255" height="14"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Copyright © 2016年 zqqf16. All rights reserved." id="Jsd-cK-7rO">
-                                    <font key="font" metaFont="smallSystem"/>
+                                    <font key="font" metaFont="message" size="11"/>
                                     <color key="textColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -1062,6 +1086,7 @@ DQ
         <image name="Reticle" width="20" height="16"/>
         <image name="alert" width="19" height="19"/>
         <image name="file" width="512" height="512"/>
+        <image name="symbol" width="19" height="19"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="o44-9z-7zV"/>

@@ -95,12 +95,13 @@ class CrashInfo {
     var uuid: String?
     var osVersion: String?
     var appVersion: String?
-    var embededBinaries: [Binary]?
+    var embededBinaries: [Binary] = []
+    var binaryImages: [Binary] = []
     
     init(_ raw: String) {
         self.raw = raw
         self.parseCrashInfo()
-        self.parseEmbededBinaries()
+        self.parseBinaries()
     }
     
     func parseOneLineInfo(_ re: RE) -> String? {
@@ -122,24 +123,22 @@ class CrashInfo {
         }
     }
     
-    func parseEmbededBinaries() {
+    func parseBinaries() {
+        self.binaryImages = []
         if let groups = RE.image.findAll(self.raw) {
-            var embededBinaries: [Binary] = []
             for group in groups {
                 let binary = Binary(name: group[1],
                                     uuid: group[3].uuidFormat(),
                                     arch: group[2],
                                     loadAddress: group[0],
                                     path: group[4])
-                if !binary.inApp {
-                    continue
-                }
-                
+
                 binary.executable = binary.name == self.appName
-                embededBinaries.append(binary)
+                self.binaryImages.append(binary)
             }
-            self.embededBinaries = embededBinaries;
         }
+        
+        self.embededBinaries = self.binaryImages.filter { $0.inApp }
     }
 
     func crashedThreadRange() -> NSRange? {
@@ -157,8 +156,8 @@ class CrashInfo {
     
     func appBacktraceRanges() -> [NSRange] {
         var binaryNames: [String] = []
-        if let embededBinaries = self.embededBinaries {
-            embededBinaries.forEach { (binary) in
+        if self.embededBinaries.count > 0 {
+            self.embededBinaries.forEach { (binary) in
                 binaryNames.append(binary.name)
             }
         } else if let appName = self.appName {
@@ -197,24 +196,22 @@ class CPUUsageLog: CrashInfo {
         }
     }
     
-    override func parseEmbededBinaries() {
+    override func parseBinaries() {
+        self.binaryImages = []
         if let groups = RE.cpuUsageImage.findAll(self.raw) {
-            var embededBinaries: [Binary] = []
             for group in groups {
                 let binary = Binary(name: group[1],
                                     uuid: group[2].uuidFormat(),
                                     arch: nil,
                                     loadAddress: group[0],
                                     path: group[3])
-                if !binary.inApp {
-                    continue
-                }
                 
                 binary.executable = binary.name == self.appName
-                embededBinaries.append(binary)
+                self.binaryImages.append(binary)
             }
-            self.embededBinaries = embededBinaries;
         }
+        
+        self.embededBinaries = self.binaryImages.filter { $0.inApp }
     }
 
     override func backtraceRanges(withBinary binary: String) -> [NSRange] {

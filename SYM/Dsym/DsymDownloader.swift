@@ -155,12 +155,12 @@ class DsymDownloadTask {
         }
         
         var uuids: [String] = [self.crashInfo.uuid ?? ""]
-        if let binaries = self.crashInfo.embededBinaries {
-            uuids = binaries.compactMap { (binary) -> String? in
+        if self.crashInfo.embededBinaries.count > 0 {
+            uuids = self.crashInfo.embededBinaries.compactMap { (binary) -> String? in
                 return binary.uuid
             }
         }
-        
+
         var dsymFiles: [DsymFile] = []
         for group in matches {
             let uuid = group[0]

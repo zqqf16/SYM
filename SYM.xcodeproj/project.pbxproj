@@ -47,6 +47,8 @@
 		B53E2F9A22D49491003BC45C /* libplist.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8282124357800E9EDA9 /* libplist.a */; };
 		B53E2F9B22D49496003BC45C /* libusbmuxd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE818212430A600E9EDA9 /* libusbmuxd.a */; };
 		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
+		B56B9B8923A379CE00049491 /* Dsym.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B56B9B8723A379CE00049491 /* Dsym.storyboard */; };
+		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
 		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
 		B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */; };
 		B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
@@ -148,6 +150,8 @@
 		B53E2F8B22D48E28003BC45C /* icp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = icp; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53E2F8D22D48E28003BC45C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
+		B56B9B8823A379CE00049491 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Dsym.storyboard; sourceTree = "<group>"; };
+		B56B9B8C23A3869100049491 /* DsymViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymViewController.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
 		B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBaseViewController.swift; sourceTree = "<group>"; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
@@ -360,6 +364,7 @@
 				B5F3579A22C5CAD400111FF3 /* ScriptImporter.storyboard */,
 				B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */,
 				B5F357B322C5E90C00111FF3 /* Localizable.strings */,
+				B56B9B8723A379CE00049491 /* Dsym.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -423,6 +428,7 @@
 				B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */,
 				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
 				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
+				B56B9B8C23A3869100049491 /* DsymViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -703,6 +709,7 @@
 				F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
 				B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */,
+				B56B9B8923A379CE00049491 /* Dsym.storyboard in Resources */,
 				B5F3579322C5C8EF00111FF3 /* Device.storyboard in Resources */,
 				B5F3579822C5CAD400111FF3 /* ScriptImporter.storyboard in Resources */,
 				519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */,
@@ -805,6 +812,7 @@
 				F48D8C9121492079009E2DA6 /* StatusBar.swift in Sources */,
 				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,
 				51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */,
+				B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -819,6 +827,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		B56B9B8723A379CE00049491 /* Dsym.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B56B9B8823A379CE00049491 /* Base */,
+			);
+			name = Dsym.storyboard;
+			sourceTree = "<group>";
+		};
 		B5F3579522C5C8EF00111FF3 /* Device.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
