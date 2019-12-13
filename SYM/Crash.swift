@@ -146,7 +146,7 @@ class CrashInfo {
         return RE.threadCrashed.findFirstRange(self.raw)
     }
     
-    func backgraceRanges(withBinary binary: String) -> [NSRange] {
+    func backtraceRanges(withBinary binary: String) -> [NSRange] {
         var result:[NSRange] = []
         if let frameRE = RE.frame(binary),
             let frames = frameRE.findAllRanges(self.raw) {
@@ -167,7 +167,7 @@ class CrashInfo {
         
         var ranges: [NSRange] = []
         binaryNames.forEach { (name) in
-            ranges.append(contentsOf: self.backgraceRanges(withBinary: name))
+            ranges.append(contentsOf: self.backtraceRanges(withBinary: name))
         }
         
         return ranges;
@@ -217,7 +217,7 @@ class CPUUsageLog: CrashInfo {
         }
     }
 
-    override func backgraceRanges(withBinary binary: String) -> [NSRange] {
+    override func backtraceRanges(withBinary binary: String) -> [NSRange] {
         var result:[NSRange] = []
         if let frameRE = RE.cpuUsageFrame(binary),
             let frames = frameRE.findAllRanges(self.raw) {
