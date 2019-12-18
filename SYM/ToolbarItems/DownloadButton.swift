@@ -38,9 +38,10 @@ class DownloadButton: NSButton {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        let frame = CGRect(x: 6, y: self.bounds.height - 7, width: self.bounds.width - 12, height: 2)
+        let frame = CGRect(x: 6, y: self.bounds.height - 10, width: self.bounds.width - 12, height: 4)
         self.progress = NSProgressIndicator(frame: frame)
         self.progress.style = .bar
+        self.progress.isIndeterminate = true
         self.progress.isHidden = true
 
         self.addSubview(self.progress)
@@ -61,7 +62,11 @@ class DownloadButton: NSButton {
     @objc func downloadStatusChanged(_ notification: Notification?) {
         DispatchQueue.main.async {
             let active = DsymDownloader.shared.tasks.values.filter {
-                $0.isRunning
+                if case .running = $0.status {
+                    return true
+                } else {
+                    return false
+                }
             }
             
             if active.count > 0 {

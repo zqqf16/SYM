@@ -67,6 +67,11 @@ class DsymManager {
 
     init() {
         self.monitor.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func update(_ crash: CrashInfo) {
@@ -90,6 +95,18 @@ class DsymManager {
     
     func dsymFile(withUuid uuid: String) -> DsymFile? {
         return self.dsymFiles[uuid]
+    }
+    
+    func assign(_ binary: Binary, dsymFileURL: URL) {
+        let path = dsymFileURL.path
+        let name = dsymFileURL.lastPathComponent
+        let uuid = binary.uuid ?? ""
+        let dsymFile = DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])
+        
+        DispatchQueue.main.async {
+            self.dsymFiles[uuid] = dsymFile
+            self.nc.post(name: .dsymDidUpdate, object: [dsymFile])
+        }
     }
     
     private func createCondition(bundleID: String?, binaries:[Binary]?) -> String? {
@@ -121,16 +138,27 @@ class DsymManager {
         return condition
     }
     
-    private func dsymFileDidUpdate(_ dsymFile: [DsymFile] = []) {
+    private func dsymFileDidUpdate(_ dsymFiles: [DsymFile] = []) {
         DispatchQueue.main.async {
             self.dsymFiles.removeAll()
-            dsymFile.forEach { (dsym) in
+            dsymFiles.forEach { (dsym) in
                 dsym.uuids.forEach { (uuid) in
                     self.dsymFiles[uuid] = dsym
                 }
             }
-            self.nc.post(name: .dsymDidUpdate, object: dsymFile)
+            self.nc.post(name: .dsymDidUpdate, object: dsymFiles)
         }
+    }
+    
+    @objc func dsymDownloadStatusChanged(_ notification: Notification) {
+        guard let task = notification.object as? DsymDownloadTask,
+            task.crashInfo.uuid == self.crash.uuid,
+            self.dsymFiles.count == 0,
+            let dsymFiles = task.dsymFiles else {
+                return
+        }
+        
+        self.dsymFileDidUpdate(dsymFiles)
     }
 }
 

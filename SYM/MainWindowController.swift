@@ -33,7 +33,6 @@ class MainWindowController: NSWindowController {
     //@IBOutlet weak var deviceButton: NSButton!
     //@IBOutlet weak var statusBar: StatusBar!
     @IBOutlet weak var downloadButton: DownloadButton!
-    @IBOutlet weak var dsymButton: NSPopUpButton!
     @IBOutlet weak var deviceItem: NSToolbarItem!
     
     @IBOutlet weak var indicator: NSProgressIndicator!
@@ -42,6 +41,7 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var dsymMenuItemName: NSMenuItem!
     @IBOutlet weak var dsymMenuItemReveal: NSMenuItem!
     @IBOutlet weak var dsymMenuItemDownload: NSMenuItem!
+    @IBOutlet weak var dsymButton: NSButton!
     
     var isSymbolicating: Bool = false {
         didSet {
@@ -82,10 +82,10 @@ class MainWindowController: NSWindowController {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
+        self.dsymButton.image = .alert
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
+        self.dsymManager.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -127,14 +127,12 @@ class MainWindowController: NSWindowController {
         self.isSymbolicating = false
     }
     
-    @objc func dsymDownloadStatusChanged(_ notification: Notification) {
-        // TODO: Downloader
-        /*
-        if self.dsymManager.dsymFiles == nil, let dsymFiles = self.downloadTask?.dsymFiles {
-            self.dsymFiles = dsymFiles
-            self.downloadTask = nil
+    @objc func dsymDidUpdated(_ notification: Notification) {
+        if self.dsymManager.dsymFiles.count > 0 {
+            self.dsymButton.image = .symbol
+        } else {
+            self.dsymButton.image = .alert
         }
-         */
     }
     
     // MARK: IBActions
@@ -150,57 +148,19 @@ class MainWindowController: NSWindowController {
     }
     
     @IBAction func chooseDsymFile(_ sender: Any) {
-        /*
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
-        openPanel.canChooseDirectories = false
-        openPanel.canCreateDirectories = false
-        openPanel.canChooseFiles = true
-        openPanel.beginSheetModal(for: self.window!) { [weak openPanel] (result) in
-            guard result == .OK, let url = openPanel?.url else {
-                return
-            }
-            
-            let path = url.path
-            let name = url.lastPathComponent
-            let uuid = self.crashInfo?.uuid ?? ""
-            self.dsymFiles = [DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])]
-        }
- */
     }
     
     @IBAction func showInFinder(_ sender: Any) {
-        /*
-        guard let dsymFile = self.dsymFiles?.first else {
-            return
-        }
-        
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let vc = storyboard.instantiateController(withIdentifier: "DsymInfoViewController") as! DsymInfoViewController
-        vc.dsymFile = dsymFile
-        
-        self.contentViewController?.presentAsSheet(vc)
- */
     }
     
     @IBAction func downloadDsym(_ sender: Any) {
-        guard let doc = self.crashDocument, let crashInfo = doc.crashInfo else {
-            return
-        }
-        
-        self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
     }
     
     @IBAction func showDsymInfo(_ sender: NSButton) {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
         let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
         vc.dsymManager = self.dsymManager
-        vc.view.layout()
-        let popover = NSPopover()
-        popover.behavior = .transient
-        popover.contentViewController = vc
-        popover.contentSize = vc.view.frame.size
-        popover.show(relativeTo: sender.frame, of: sender, preferredEdge: .maxY)
+        self.contentViewController?.presentAsSheet(vc)
     }
 }
 

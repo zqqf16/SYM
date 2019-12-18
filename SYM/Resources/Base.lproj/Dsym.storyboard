@@ -11,16 +11,16 @@
             <objects>
                 <viewController storyboardIdentifier="DsymViewController" id="dar-vU-IbA" customClass="DsymViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="WDs-ca-ySf">
-                        <rect key="frame" x="0.0" y="0.0" width="560" height="274"/>
+                        <rect key="frame" x="0.0" y="0.0" width="560" height="258"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="44" horizontalPageScroll="10" verticalLineScroll="44" verticalPageScroll="10" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="5k0-EM-kNO">
-                                <rect key="frame" x="10" y="64" width="540" height="200"/>
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="70" horizontalPageScroll="10" verticalLineScroll="70" verticalPageScroll="10" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="5k0-EM-kNO">
+                                <rect key="frame" x="10" y="48" width="540" height="200"/>
                                 <clipView key="contentView" drawsBackground="NO" id="Mtg-U0-3uc">
                                     <rect key="frame" x="0.0" y="0.0" width="540" height="200"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="40" rowSizeStyle="automatic" viewBased="YES" id="SDD-FI-oES">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="66" rowSizeStyle="automatic" viewBased="YES" id="SDD-FI-oES">
                                             <rect key="frame" x="0.0" y="0.0" width="540" height="200"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="2" height="4"/>
@@ -63,14 +63,14 @@
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QIA-HE-lCu">
                                                                     <rect key="frame" x="24" y="23" width="264" height="15"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="E556F3F3-AA90-34CB-8E57-5214547C1888" id="Xi3-QH-IaD">
-                                                                        <font key="font" metaFont="system" size="12"/>
+                                                                        <font key="font" metaFont="label" size="12"/>
                                                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="45z-MR-80i">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="45z-MR-80i">
                                                                     <rect key="frame" x="24" y="6" width="329" height="16"/>
-                                                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" allowsUndo="NO" title="/Users/zorro/Downloads/dSYMS/SYM/0.7.0/sym.dsym" id="Eow-Ck-gSg">
+                                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" allowsUndo="NO" alignment="left" title="/Users/zorro/Downloads/dSYMS/SYM/0.7.0/sym.dsym" usesSingleLineMode="YES" id="Eow-Ck-gSg">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -132,22 +132,57 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="tHh-Gu-jaA">
+                                <rect key="frame" x="488" y="3" width="68" height="32"/>
+                                <buttonCell key="cell" type="push" title="Hide" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ASu-JF-oz9">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="dismissController:" target="dar-vU-IbA" id="Fn5-Vk-8lz"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qd6-P9-i3y">
+                                <rect key="frame" x="391" y="3" width="101" height="32"/>
+                                <buttonCell key="cell" type="push" title="Download" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eay-Je-Z5i">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="didClickDownloadButton:" target="dar-vU-IbA" id="Bhr-ab-CWf"/>
+                                </connections>
+                            </button>
+                            <progressIndicator hidden="YES" wantsLayer="YES" maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Zvv-gF-A8E">
+                                <rect key="frame" x="10" y="11" width="367" height="20"/>
+                            </progressIndicator>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="5k0-EM-kNO" secondAttribute="bottom" constant="64" id="Jgi-5N-5D3"/>
+                            <constraint firstItem="qd6-P9-i3y" firstAttribute="centerY" secondItem="tHh-Gu-jaA" secondAttribute="centerY" id="HgZ-N9-A9m"/>
+                            <constraint firstAttribute="bottom" secondItem="5k0-EM-kNO" secondAttribute="bottom" constant="48" id="Jgi-5N-5D3"/>
+                            <constraint firstItem="Zvv-gF-A8E" firstAttribute="leading" secondItem="WDs-ca-ySf" secondAttribute="leading" constant="10" id="JhZ-9Y-9tz"/>
                             <constraint firstAttribute="trailing" secondItem="5k0-EM-kNO" secondAttribute="trailing" constant="10" id="LG2-SO-ek9"/>
+                            <constraint firstAttribute="trailing" secondItem="tHh-Gu-jaA" secondAttribute="trailing" constant="10" id="LxX-IQ-nfB"/>
+                            <constraint firstItem="qd6-P9-i3y" firstAttribute="leading" secondItem="Zvv-gF-A8E" secondAttribute="trailing" constant="20" id="SQC-7m-Mx3"/>
+                            <constraint firstItem="tHh-Gu-jaA" firstAttribute="leading" secondItem="qd6-P9-i3y" secondAttribute="trailing" constant="8" id="cmu-Y4-9tn"/>
                             <constraint firstItem="5k0-EM-kNO" firstAttribute="top" secondItem="WDs-ca-ySf" secondAttribute="top" constant="10" id="fjY-e3-8TU"/>
+                            <constraint firstItem="Zvv-gF-A8E" firstAttribute="centerY" secondItem="qd6-P9-i3y" secondAttribute="centerY" id="xOU-Tb-G7H"/>
                             <constraint firstItem="5k0-EM-kNO" firstAttribute="leading" secondItem="WDs-ca-ySf" secondAttribute="leading" constant="10" id="z3r-fb-ih7"/>
+                            <constraint firstAttribute="bottom" secondItem="tHh-Gu-jaA" secondAttribute="bottom" constant="10" id="zdq-tL-2Y4"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="downloadButton" destination="qd6-P9-i3y" id="6ur-kX-jJu"/>
+                        <outlet property="progressBar" destination="Zvv-gF-A8E" id="I1b-IA-9aG"/>
                         <outlet property="tableView" destination="SDD-FI-oES" id="gpd-s0-24p"/>
                         <outlet property="tableViewHeight" destination="Jcj-BE-MXx" id="UcT-xX-DWi"/>
                     </connections>
                 </viewController>
                 <customObject id="Fzu-Md-Ov8" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2020" y="361.5"/>
+            <point key="canvasLocation" x="-2020" y="361"/>
         </scene>
     </scenes>
     <resources>

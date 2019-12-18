@@ -22,6 +22,11 @@
 
 import Cocoa
 
+protocol DsymTableCellViewDelegate: class {
+    func didClickSelectButton(_ cell: DsymTableCellView, sender: NSButton)
+    func didClickRevealButton(_ cell: DsymTableCellView, sender: NSButton)
+}
+
 class DsymTableCellView: NSTableCellView {
     @IBOutlet weak var image: NSImageView!
     @IBOutlet weak var title: NSTextField!
@@ -29,69 +34,37 @@ class DsymTableCellView: NSTableCellView {
     @IBOutlet weak var path: NSTextField!
     @IBOutlet weak var actionButton: NSButton!
     
-    var binary: Binary!
-    var dsymManager: DsymManager?
-    var dsym: DsymFile? {
-        if let uuid = self.binary.uuid {
-            return self.dsymManager?.dsymFile(withUuid: uuid)
-        }
-        return nil
-    }
+    weak var delegate: DsymTableCellViewDelegate?
     
-    func updateUI(binary: Binary, dsymManager: DsymManager?) {
-        self.binary = binary
-        self.dsymManager = dsymManager
-
+    var binary: Binary!
+    var dsym: DsymFile?
+    
+    func updateUI() {
         self.title.stringValue = self.binary.name
         self.uuid.stringValue = self.binary.uuid ?? ""
         if let path = self.dsym?.path {
             self.path.stringValue = path
             self.actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
         } else {
-            self.path.stringValue = ""
+            self.path.stringValue = NSLocalizedString("Not found", comment: "Dsym file not found")
             self.actionButton.title = NSLocalizedString("Select", comment: "Select a dSYM file")
         }
     }
     
     @IBAction func didClickActionButton(_ sender: NSButton) {
-        guard let path = self.dsym?.path else {
-            // select
-            self.chooseDsymFile(self)
-            return
+        if self.dsym?.path != nil {
+            self.delegate?.didClickRevealButton(self, sender: sender)
+        } else {
+            self.delegate?.didClickSelectButton(self, sender: sender)
         }
-        let url = URL(fileURLWithPath: path)
-        NSWorkspace.shared.activateFileViewerSelecting([url])
-    }
-    
-    func chooseDsymFile(_ sender: Any) {
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
-        openPanel.canChooseDirectories = false
-        openPanel.canCreateDirectories = false
-        openPanel.canChooseFiles = true
-        
-        openPanel.begin { (result) in
-            //
-        }
-        
-        /*
-        openPanel.beginSheetModal(for: self.window!) { [weak openPanel] (result) in
-            guard result == .OK, let url = openPanel?.url else {
-                return
-            }
-            
-            let path = url.path
-            let name = url.lastPathComponent
-            //let uuid = self.crashInfo?.uuid ?? ""
-            //self.dsymFiles = [DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])]
-        }
- */
     }
 }
 
 class DsymViewController: NSViewController {
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var tableViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var downloadButton: NSButton!
+    @IBOutlet weak var progressBar: NSProgressIndicator!
     
     private var binaries: [Binary] = [] {
         didSet {
@@ -99,10 +72,22 @@ class DsymViewController: NSViewController {
         }
     }
     
+    private var downloadTask: DsymDownloadTask? {
+        willSet {
+            self.downloadTask?.unregister(observer: self)
+        }
+        didSet {
+            self.downloadTask?.register(observer: self)
+        }
+    }
+    
     var dsymManager: DsymManager? {
         didSet {
             self.binaries = self.dsymManager?.binaries ?? []
             self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
+            if let uuid = self.dsymManager?.crash?.uuid {
+                self.downloadTask = DsymDownloader.shared.tasks[uuid]
+            }
         }
     }
 
@@ -115,8 +100,11 @@ class DsymViewController: NSViewController {
         self.updateViewHeight()
     }
     
-    private func updateViewHeight() {
-        self.tableViewHeight.constant = CGFloat(70 * self.binaries.count)
+    private func dsymFile(forBinary binary: Binary) -> DsymFile? {
+        if let uuid = binary.uuid {
+            return self.dsymManager?.dsymFile(withUuid: uuid)
+        }
+        return nil
     }
     
     override func viewDidLayout() {
@@ -126,10 +114,23 @@ class DsymViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateViewHeight()
+        self.updateDownloadStatus()
     }
     
     @objc func dsymDidUpdated(_ notification: Notification?) {
         self.tableView.reloadData()
+    }
+    
+    //MARK: UI
+    private func updateViewHeight() {
+        self.tableViewHeight.constant = min(CGFloat(70 * self.binaries.count), 520.0)
+    }
+    
+    @IBAction func didClickDownloadButton(_ sender: NSButton) {
+        if let crashInfo = self.dsymManager?.crash {
+            self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
+            self.updateDownloadStatus()
+        }
     }
 }
 
@@ -140,11 +141,86 @@ extension DsymViewController: NSTableViewDelegate, NSTableViewDataSource {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "cell"), owner: nil) as? DsymTableCellView
-        cell?.updateUI(binary: self.binaries[row], dsymManager: self.dsymManager!)
+        cell?.delegate = self
+        let binary = self.binaries[row]
+        cell?.binary = binary
+        cell?.dsym = self.dsymFile(forBinary: binary)
+        cell?.updateUI()
         return cell
     }
     
     func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
         return false
+    }
+}
+
+extension DsymViewController: DsymTableCellViewDelegate {
+    func didClickSelectButton(_ cell: DsymTableCellView, sender: NSButton) {
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        
+        openPanel.begin { [weak openPanel] (result) in
+            guard result == .OK, let url = openPanel?.url else {
+                return
+            }
+            self.dsymManager?.assign(cell.binary!, dsymFileURL: url)
+        }
+    }
+
+    func didClickRevealButton(_ cell: DsymTableCellView, sender: NSButton) {
+        if let path = cell.dsym?.path {
+            let url = URL(fileURLWithPath: path)
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        }
+    }
+}
+
+extension DsymViewController: DsymDownloadTaskObserver {
+    func downloadTaskProgressUpdated(_ task: DsymDownloadTask, progress: DsymDownloadProgress) {
+        self.updateDownloadStatus()
+    }
+    
+    func downloadTaskStatusChanged(_ task: DsymDownloadTask, status: DsymDownloadTask.Status) {
+        self.updateDownloadStatus()
+    }
+    
+    private func updateDownloadStatus() {
+        guard DsymDownloader.shared.canDownload(),
+            let status = self.downloadTask?.status else {
+            self.downloadButton.isEnabled = self.dsymManager?.crash != nil
+            self.progressBar.isHidden = true
+            return
+        }
+
+        let progress = self.downloadTask?.progress.percentage ?? 0
+
+        switch status {
+        case .running:
+            self.downloadButton.isEnabled = false
+            self.progressBar.isHidden = false
+            if progress > 0 {
+                self.progressBar.doubleValue = Double(progress)
+                self.progressBar.isIndeterminate = false
+            } else {
+                self.progressBar.isIndeterminate = true
+                self.progressBar.startAnimation(nil)
+            }
+        case .canceled:
+            self.progressBar.isHidden = true
+            self.downloadButton.isEnabled = true
+        case .failed(let code, let message):
+            self.progressBar.isHidden = true
+            self.downloadButton.isEnabled = true
+        case .success:
+            self.progressBar.isHidden = true
+        case .waiting:
+            self.progressBar.isHidden = false
+            self.progressBar.isIndeterminate = true
+            self.progressBar.startAnimation(nil)
+            self.downloadButton.isEnabled = false
+        }
     }
 }

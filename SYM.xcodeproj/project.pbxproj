@@ -93,7 +93,6 @@
 		F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */; };
 		F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A679731E21319D009F93E7 /* BundleDocument.swift */; };
 		F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */; };
-		F4B9025421538B5000B1DC0A /* DownloadTaskListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B9025321538B5000B1DC0A /* DownloadTaskListViewController.swift */; };
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 		F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
@@ -196,7 +195,6 @@
 		F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymDownloader.swift; sourceTree = "<group>"; };
 		F4A679731E21319D009F93E7 /* BundleDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BundleDocument.swift; sourceTree = "<group>"; };
 		F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Symbolicate.swift; sourceTree = "<group>"; };
-		F4B9025321538B5000B1DC0A /* DownloadTaskListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadTaskListViewController.swift; sourceTree = "<group>"; };
 		F4CD14621D39D323006BAB2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4CD14641D39D5B7006BAB2B /* file.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = file.icns; sourceTree = "<group>"; };
 		F4EFE81421242D9300E9EDA9 /* SYM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SYM-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -426,7 +424,6 @@
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 				F49E2D44214BA5E3001A6A88 /* DownloadScriptViewController.swift */,
-				F4B9025321538B5000B1DC0A /* DownloadTaskListViewController.swift */,
 				F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */,
 				B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */,
 				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
@@ -778,7 +775,6 @@
 			files = (
 				B53E2F8622D48383003BC45C /* MDHouseArrest.m in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
-				F4B9025421538B5000B1DC0A /* DownloadTaskListViewController.swift in Sources */,
 				B5F3578922C3121200111FF3 /* Image.swift in Sources */,
 				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,

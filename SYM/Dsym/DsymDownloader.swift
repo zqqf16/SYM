@@ -81,10 +81,30 @@ class DsymDownloadProgress: CustomStringConvertible {
     }
 }
 
+protocol DsymDownloadTaskObserver: class {
+    func downloadTaskProgressUpdated(_ task: DsymDownloadTask, progress: DsymDownloadProgress)
+    func downloadTaskStatusChanged(_ task: DsymDownloadTask, status: DsymDownloadTask.Status)
+}
+
 class DsymDownloadTask {
     var crashInfo: CrashInfo
     
-    var isRunning: Bool = false
+    enum Status {
+        case waiting
+        case running
+        case canceled
+        case failed(code: Int, message: String?)
+        case success
+    }
+
+    var status: Status = .waiting {
+        didSet {
+            self.notifyObservers { (observer) in
+                observer.downloadTaskStatusChanged(self, status: self.status)
+            }
+        }
+    }
+
     var statusCode: Int = 0
     var message: String?
     var progress: DsymDownloadProgress = DsymDownloadProgress()
@@ -94,15 +114,22 @@ class DsymDownloadTask {
     private var fileURL: URL?
     private var scriptURL: URL
     
+    private class _TaskObserver {
+        weak var target: DsymDownloadTaskObserver?
+        init(_ target: DsymDownloadTaskObserver?) {
+            self.target = target
+        }
+    }
+    private var observers: [_TaskObserver] = []
+    
     init(crashInfo: CrashInfo, scriptURL: URL, fileURL: URL?) {
         self.crashInfo = crashInfo
         self.fileURL = fileURL;
         self.scriptURL = scriptURL;
     }
-    
+
     func run() {
         defer {
-            self.isRunning = false
             self.process = nil
         }
 
@@ -116,6 +143,7 @@ class DsymDownloadTask {
             try self.crashInfo.raw.write(toFile: crashPath, atomically: true, encoding: .utf8)
         } catch {
             self.statusCode = -1001
+            self.status = .failed(code: self.statusCode, message: "Failed to save file")
             return
         }
         
@@ -125,21 +153,58 @@ class DsymDownloadTask {
         self.process.errorHandler = { [weak self] (_) in
             if let this = self {
                 this.progress.update(fromConsoleOutput: this.process.error)
+                this.notifyObservers { (observer) in
+                    observer.downloadTaskProgressUpdated(this, progress: this.progress)
+                }
             }
         }
-        self.isRunning = true
+        self.status = .running
         self.process.run()
         
         self.parse(output: self.process.output)
         self.statusCode = self.process.exitCode
         self.message = self.process.output
+        
+        if self.statusCode != 0 {
+            self.status = .failed(code: self.statusCode, message: self.message)
+        } else {
+            self.status = .success
+        }
     }
 
     func cancel() {
         self.process.terminate()
-        self.isRunning = false
+        self.status = .canceled
     }
     
+    func register(observer: DsymDownloadTaskObserver) {
+        DispatchQueue.main.async {
+            self.observers.append(_TaskObserver(observer))
+        }
+    }
+    
+    func unregister(observer: DsymDownloadTaskObserver) {
+        DispatchQueue.main.async {
+            self.observers = self.observers.filter({ (o) -> Bool in
+                return o.target != nil && o.target === observer
+            })
+        }
+    }
+    
+    private func notifyObservers(handler: @escaping ((DsymDownloadTaskObserver)->Void)) {
+        DispatchQueue.main.async {
+            self.observers.forEach { (innerObserver) in
+                if let target = innerObserver.target {
+                    handler(target)
+                }
+            }
+            
+            self.observers = self.observers.filter({ (o) -> Bool in
+                return o.target != nil
+            })
+        }
+    }
+        
     private func crashInfoToEnv(_ crashInfo: CrashInfo) -> [String: String] {
         var env: [String: String] = [:]
         env["APP_NAME"] = crashInfo.appName ?? ""
@@ -207,18 +272,15 @@ class DsymDownloader {
     
     @discardableResult
     func download(crashInfo: CrashInfo, fileURL: URL?) -> DsymDownloadTask? {
-        if !self.canDownload() {
+        guard let uuid = crashInfo.uuid, self.canDownload() else {
             return nil
         }
         
-        if let uuid = crashInfo.uuid {
-            if let task = self.tasks[uuid] {
-                return task
-            }
+        if let task = self.tasks[uuid] {
+            return task
         }
         
         let task = DsymDownloadTask(crashInfo: crashInfo, scriptURL: self.scriptURL, fileURL: fileURL)
-        let uuid = NSUUID().uuidString
         self.tasks[uuid] = task
         DispatchQueue.global().async {
             task.run()
