@@ -22,120 +22,129 @@
 
 import Cocoa
 
-extension Notification.Name {
-    static let dsymBinaryListDidUpdated = Notification.Name("sym.dsym.binaryListDidUpdated")
-}
-
-class DsymWindowController: NSWindowController {
-    let notificationCenter: NotificationCenter = NotificationCenter()
-    var binaries: [Binary] = [] {
-        didSet {
-            self.notificationCenter.post(name: .dsymBinaryListDidUpdated, object: self.binaries)
+class DsymTableCellView: NSTableCellView {
+    @IBOutlet weak var image: NSImageView!
+    @IBOutlet weak var title: NSTextField!
+    @IBOutlet weak var uuid: NSTextField!
+    @IBOutlet weak var path: NSTextField!
+    @IBOutlet weak var actionButton: NSButton!
+    
+    var binary: Binary!
+    var dsymManager: DsymManager?
+    var dsym: DsymFile? {
+        if let uuid = self.binary.uuid {
+            return self.dsymManager?.dsymFile(withUuid: uuid)
         }
+        return nil
+    }
+    
+    func updateUI(binary: Binary, dsymManager: DsymManager?) {
+        self.binary = binary
+        self.dsymManager = dsymManager
+
+        self.title.stringValue = self.binary.name
+        self.uuid.stringValue = self.binary.uuid ?? ""
+        if let path = self.dsym?.path {
+            self.path.stringValue = path
+            self.actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
+        } else {
+            self.path.stringValue = ""
+            self.actionButton.title = NSLocalizedString("Select", comment: "Select a dSYM file")
+        }
+    }
+    
+    @IBAction func didClickActionButton(_ sender: NSButton) {
+        guard let path = self.dsym?.path else {
+            // select
+            self.chooseDsymFile(self)
+            return
+        }
+        let url = URL(fileURLWithPath: path)
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+    
+    func chooseDsymFile(_ sender: Any) {
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        
+        openPanel.begin { (result) in
+            //
+        }
+        
+        /*
+        openPanel.beginSheetModal(for: self.window!) { [weak openPanel] (result) in
+            guard result == .OK, let url = openPanel?.url else {
+                return
+            }
+            
+            let path = url.path
+            let name = url.lastPathComponent
+            //let uuid = self.crashInfo?.uuid ?? ""
+            //self.dsymFiles = [DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])]
+        }
+ */
     }
 }
 
 class DsymViewController: NSViewController {
-    var dsymWindowController: DsymWindowController? {
-        if let wc = self.view.window?.windowController as? DsymWindowController {
-            return wc
+    @IBOutlet weak var tableView: NSTableView!
+    @IBOutlet weak var tableViewHeight: NSLayoutConstraint!
+    
+    private var binaries: [Binary] = [] {
+        didSet {
+            self.reloadData()
         }
-        return nil
-    }
-}
-
-struct BinaryGroup {
-    let name: String
-    let children: [Binary]
-}
-
-class DsymBinaryListViewController: DsymViewController {
-    @IBOutlet weak var outletView: NSOutlineView!
-   
-    var binaries: [Binary]? {
-        return self.dsymWindowController?.binaries
-    }
-
-    private var binaryGroups: [BinaryGroup] = []
-
-    private func updateBinaryGroups() {
-        var system: [Binary] = []
-        var app: [Binary] = []
-        self.binaries?.forEach({ (binary) in
-            if binary.inApp {
-                app.append(binary)
-            } else {
-                system.append(binary)
-            }
-        })
-        
-        self.binaryGroups.removeAll()
-        self.binaryGroups.append(BinaryGroup(name: "App", children: app))
-        self.binaryGroups.append(BinaryGroup(name: "System", children: system))
-        
-        self.outletView.reloadData()
     }
     
-    override func viewWillLayout() {
-        super.viewWillLayout()
-        self.updateBinaryGroups()
+    var dsymManager: DsymManager? {
+        didSet {
+            self.binaries = self.dsymManager?.binaries ?? []
+            self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
+        }
+    }
+
+    private func reloadData() {
+        guard self.tableView != nil else {
+            return
+        }
         
-        self.outletView.expandItem(self.outletView.item(atRow: 0))
+        self.tableView.reloadData()
+        self.updateViewHeight()
+    }
+    
+    private func updateViewHeight() {
+        self.tableViewHeight.constant = CGFloat(70 * self.binaries.count)
+    }
+    
+    override func viewDidLayout() {
+        super.viewDidLayout()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.outletView.delegate = self
-        self.outletView.dataSource = self
+        self.updateViewHeight()
+    }
+    
+    @objc func dsymDidUpdated(_ notification: Notification?) {
+        self.tableView.reloadData()
     }
 }
 
-extension DsymBinaryListViewController: NSOutlineViewDelegate, NSOutlineViewDataSource {
-    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int{
-        if let group = item as? BinaryGroup {
-            return group.children.count
-        }
-        
-        if item == nil {
-            return self.binaryGroups.count
-        }
-
-        return 0
+extension DsymViewController: NSTableViewDelegate, NSTableViewDataSource {
+    func numberOfRows(in tableView: NSTableView) -> Int {
+        return self.binaries.count
     }
     
-    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-        if let group = item as? BinaryGroup {
-            return group.children[index]
-        }
-        
-        return self.binaryGroups[index]
-    }
-
-    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        let cellId = NSUserInterfaceItemIdentifier(rawValue: "BinaryName")
-        let view = outlineView.makeView(withIdentifier: cellId, owner: nil) as? NSTableCellView
-        
-        var title: String
-        if let group = item as? BinaryGroup {
-            title = group.name
-        } else {
-            let binary = item as! Binary
-            title = binary.name
-        }
-        view?.textField?.stringValue = title
-        
-        return view
+    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "cell"), owner: nil) as? DsymTableCellView
+        cell?.updateUI(binary: self.binaries[row], dsymManager: self.dsymManager!)
+        return cell
     }
     
-    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        if let group = item as? BinaryGroup {
-            return group.children.count > 0
-        }
-        
+    func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
         return false
-    }
-
-    
-    func outlineViewSelectionDidChange(_ notification: Notification) {
     }
 }

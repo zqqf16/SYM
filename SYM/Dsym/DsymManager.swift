@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - 2019 zqqf16
+// Copyright (c) 2017 - present zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,9 @@
 // SOFTWARE.
 
 import Foundation
-import Cocoa
 
 extension Notification.Name {
-    static let dsymListUpdated = Notification.Name("sym.DsymListUpdated")
+    static let dsymDidUpdate = Notification.Name("sym.dsymDidUpdate")
 }
 
 class DsymFile: Hashable {
@@ -51,85 +50,102 @@ class DsymFile: Hashable {
     }
 }
 
-protocol DsymFileMonitorDelegate: class {
-    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFiles dsymFiles:[DsymFile]?) -> Void
-}
-
-class DsymFileMonitor {
-    private let operationQueue = DispatchQueue(label: "dsym.finder")
-    private let query = NSMetadataQuery()
-    
-    var uuids: [String]?
+class DsymManager {
+    let nc = NotificationCenter()
+    var crash: CrashInfo!
     var binaries: [Binary]?
-    var bundleID: String?
+    var dsymFiles: [String:DsymFile] = [:]
+
+    private let operationQueue = DispatchQueue(label: "dsym.manager")
+    private lazy var monitor: MdfindWrapper = {
+        let mdfind = MdfindWrapper()
+        mdfind.delegate = self
+        return mdfind
+    }()
     
-    weak var delegate: DsymFileMonitorDelegate?
-    
+    private var uuids: [String]?
+
     init() {
-        let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidFinishGathering, object: nil)
-        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidUpdate, object: nil)
+        self.monitor.delegate = self
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    func update(bundleID: String?, binaries:[Binary]?) {
-        self.binaries = binaries
-        self.bundleID = bundleID
-        self.uuids = binaries?.compactMap({ (binary) -> String? in
+    func update(_ crash: CrashInfo) {
+        self.crash = crash
+        self.binaries = crash.embeddedBinaries
+        self.uuids = self.binaries?.compactMap({ (binary) -> String? in
             return binary.uuid
         })
-        self.stop()
         self.start()
     }
     
     func start() {
-        var condition: String = ""
-        var isFirst = true
-        self.uuids?.forEach({ (uuid) in
-            if !isFirst {
-                condition += " || "
-            }
-            condition += "com_apple_xcode_dsym_uuids = \(uuid)"
-            isFirst = false
-        })
-        
-        if let bundleID = self.bundleID {
-            if !isFirst {
-                condition += " || "
-            }
-            condition += "kMDItemCFBundleIdentifier = \(bundleID)"
-            isFirst = false
+        if let condition = self.createCondition(bundleID: self.crash.bundleID, binaries: self.crash.embeddedBinaries) {
+            self.monitor.start(withCondition: condition)
         }
-        
-        if condition.count == 0 {
-            return
-        }
-        self.query.predicate = NSPredicate(fromMetadataQueryString: condition)
-        self.query.start()
     }
     
     func stop() {
-        self.query.stop()
+        self.monitor.stop()
     }
     
-    // MARK: Result
-    @objc func handleResult(_ notification: NSNotification) {
-        // query
-        guard let query = notification.object as? NSMetadataQuery,
-            query == self.query,
-            let results = self.query.results as? [NSMetadataItem]
-        else {
-            self.delegate?.dsymFileMonitor(self, didFindDsymFiles: nil)
+    func dsymFile(withUuid uuid: String) -> DsymFile? {
+        return self.dsymFiles[uuid]
+    }
+    
+    private func createCondition(bundleID: String?, binaries:[Binary]?) -> String? {
+        var condition = ""
+        var hasPrefix = false
+        
+        binaries?.forEach({ (bin) in
+            if let uuid = bin.uuid {
+                if hasPrefix {
+                    condition += " || "
+                }
+                condition += "com_apple_xcode_dsym_uuids = \(uuid)"
+                hasPrefix = true
+            }
+        })
+        
+        if bundleID != nil {
+            if hasPrefix {
+                condition += " || "
+            }
+            condition += "kMDItemCFBundleIdentifier = \(bundleID!)"
+            hasPrefix = true
+        }
+        
+        if condition.count == 0 {
+            return nil
+        }
+        
+        return condition
+    }
+    
+    private func dsymFileDidUpdate(_ dsymFile: [DsymFile] = []) {
+        DispatchQueue.main.async {
+            self.dsymFiles.removeAll()
+            dsymFile.forEach { (dsym) in
+                dsym.uuids.forEach { (uuid) in
+                    self.dsymFiles[uuid] = dsym
+                }
+            }
+            self.nc.post(name: .dsymDidUpdate, object: dsymFile)
+        }
+    }
+}
+
+//MARK: Monitor
+extension DsymManager: MdfindWrapperDelegate {
+    func mdfindWrapper(_ wrapper: MdfindWrapper, didFindResult result: [NSMetadataItem]?) {
+        if result == nil {
+            self.dsymFileDidUpdate()
             return
         }
         
         var appItems = [NSMetadataItem]()
         var dsyms = [DsymFile]()
 
-        for item in results {
+        for item in result! {
             let type = item.value(forKey: NSMetadataItemContentTypeKey) as! String
             if type == "com.apple.xcode.dsym" {
                 // dsym
@@ -149,21 +165,21 @@ class DsymFileMonitor {
         
         if dsyms.count > 0 {
             // found dsyms
-            self.delegate?.dsymFileMonitor(self, didFindDsymFiles: dsyms)
+            self.dsymFileDidUpdate(dsyms)
             return
         }
         
         self.operationQueue.async {
             for app in appItems {
                 if let dsyms = self.parseAppBundle(app) {
-                    self.delegate?.dsymFileMonitor(self, didFindDsymFiles: dsyms)
+                    self.dsymFileDidUpdate(dsyms)
                     return
                 }
             }
         }
     }
     
-    func parseDsymFile(_ item: NSMetadataItem) -> DsymFile? {
+    private func parseDsymFile(_ item: NSMetadataItem) -> DsymFile? {
         guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
@@ -176,7 +192,7 @@ class DsymFileMonitor {
         return DsymFile(name: name, path: path, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
-    func parseXcarchiveFile(_ item: NSMetadataItem) -> DsymFile? {
+    private func parseXcarchiveFile(_ item: NSMetadataItem) -> DsymFile? {
         guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
@@ -211,7 +227,7 @@ class DsymFileMonitor {
         return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
-    func parseAppBundle(_ item: NSMetadataItem) -> [DsymFile]? {
+    private func parseAppBundle(_ item: NSMetadataItem) -> [DsymFile]? {
         guard let binaries = self.binaries,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let bundle = Bundle(path: path) else {

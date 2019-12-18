@@ -58,25 +58,9 @@ class MainWindowController: NSWindowController {
     }
     
     // Dsym
-    private var monitor = DsymFileMonitor()
+    private var dsymManager = DsymManager()
     private var downloader = DsymDownloader()
     private var downloadTask: DsymDownloadTask?
-
-    private var dsymFiles: [DsymFile]? {
-        didSet {
-            DispatchQueue.main.async {
-                if let dsymFile = self.dsymFiles?.first {
-                    self.dsymMenuItemName.image = .symbol
-                    self.dsymButton.title = dsymFile.name
-                    self.dsymMenuItemReveal.isEnabled = true
-                } else {
-                    self.dsymMenuItemName.image = .alert
-                    self.dsymButton.title = NSLocalizedString("dsym_file_not_found", comment: "")
-                    self.dsymMenuItemReveal.isEnabled = false
-                }
-            }
-        }
-    }
 
     // Crash
     var crashContentViewController: ContentViewController! {
@@ -101,16 +85,16 @@ class MainWindowController: NSWindowController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(dsymDownloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder:coder)
-        self.monitor.delegate = self
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        self.monitor.stop()
+        self.dsymManager.stop()
         if let document = self.crashDocument {
             document.notificationCenter.removeObserver(self)
         }
@@ -118,7 +102,6 @@ class MainWindowController: NSWindowController {
     
     override var document: AnyObject? {
         didSet {
-            self.dsymFiles = nil;
             guard let document = document as? CrashDocument else {
                 return
             }
@@ -131,8 +114,9 @@ class MainWindowController: NSWindowController {
     
     // MARK: Notifications
     @objc func updateCrashInfo(_ notification: Notification?) {
-        self.dsymFiles = nil
-        self.monitor.update(bundleID: self.crashInfo?.bundleID, binaries: self.crashInfo?.embededBinaries)
+        if let crash = self.crashInfo {
+            self.dsymManager.update(crash)
+        }
     }
     
     @objc func updateDeviceButton(_ notification: Notification) {
@@ -144,10 +128,13 @@ class MainWindowController: NSWindowController {
     }
     
     @objc func dsymDownloadStatusChanged(_ notification: Notification) {
-        if self.dsymFiles == nil, let dsymFiles = self.downloadTask?.dsymFiles {
+        // TODO: Downloader
+        /*
+        if self.dsymManager.dsymFiles == nil, let dsymFiles = self.downloadTask?.dsymFiles {
             self.dsymFiles = dsymFiles
             self.downloadTask = nil
         }
+         */
     }
     
     // MARK: IBActions
@@ -158,10 +145,12 @@ class MainWindowController: NSWindowController {
         }
         
         self.isSymbolicating = true
-        self.crashDocument?.symbolicate(withDsymPaths: self.dsymFiles?.compactMap( {$0.binaryPath} ))
+        let dsyms = self.dsymManager.dsymFiles.values.compactMap {$0.binaryPath}
+        self.crashDocument?.symbolicate(withDsymPaths: dsyms)
     }
     
     @IBAction func chooseDsymFile(_ sender: Any) {
+        /*
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = false
@@ -177,9 +166,11 @@ class MainWindowController: NSWindowController {
             let uuid = self.crashInfo?.uuid ?? ""
             self.dsymFiles = [DsymFile(name: name, path: path, binaryPath: path, uuids: [uuid])]
         }
+ */
     }
     
     @IBAction func showInFinder(_ sender: Any) {
+        /*
         guard let dsymFile = self.dsymFiles?.first else {
             return
         }
@@ -189,6 +180,7 @@ class MainWindowController: NSWindowController {
         vc.dsymFile = dsymFile
         
         self.contentViewController?.presentAsSheet(vc)
+ */
     }
     
     @IBAction func downloadDsym(_ sender: Any) {
@@ -199,17 +191,16 @@ class MainWindowController: NSWindowController {
         self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: doc.fileURL)
     }
     
-    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        if let dsym = segue.destinationController as? DsymWindowController {
-            dsym.binaries = self.crashInfo?.binaryImages ?? []
-        }
-    }
-}
-
-// MARK: - DsymFileMonitorDelegate
-extension MainWindowController: DsymFileMonitorDelegate {
-    func dsymFileMonitor(_ monitor: DsymFileMonitor, didFindDsymFiles dsymFiles:[DsymFile]?) {
-        self.dsymFiles = dsymFiles
+    @IBAction func showDsymInfo(_ sender: NSButton) {
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
+        let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
+        vc.dsymManager = self.dsymManager
+        vc.view.layout()
+        let popover = NSPopover()
+        popover.behavior = .transient
+        popover.contentViewController = vc
+        popover.contentSize = vc.view.frame.size
+        popover.show(relativeTo: sender.frame, of: sender, preferredEdge: .maxY)
     }
 }
 
@@ -218,7 +209,7 @@ extension MainWindowController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         if menu == self.dsymMenu {
             self.dsymMenuItemDownload.isEnabled = self.crashInfo != nil && DsymDownloader.shared.canDownload()
-            self.dsymMenuItemReveal.isEnabled = self.dsymFiles != nil
+            //self.dsymMenuItemReveal.isEnabled = self.dsymFiles != nil
         }
     }
 }

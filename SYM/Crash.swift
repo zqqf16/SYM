@@ -95,7 +95,7 @@ class CrashInfo {
     var uuid: String?
     var osVersion: String?
     var appVersion: String?
-    var embededBinaries: [Binary] = []
+    var embeddedBinaries: [Binary] = []
     var binaryImages: [Binary] = []
     
     init(_ raw: String) {
@@ -138,7 +138,7 @@ class CrashInfo {
             }
         }
         
-        self.embededBinaries = self.binaryImages.filter { $0.inApp }
+        self.embeddedBinaries = self.binaryImages.filter { $0.inApp }
     }
 
     func crashedThreadRange() -> NSRange? {
@@ -156,8 +156,8 @@ class CrashInfo {
     
     func appBacktraceRanges() -> [NSRange] {
         var binaryNames: [String] = []
-        if self.embededBinaries.count > 0 {
-            self.embededBinaries.forEach { (binary) in
+        if self.embeddedBinaries.count > 0 {
+            self.embeddedBinaries.forEach { (binary) in
                 binaryNames.append(binary.name)
             }
         } else if let appName = self.appName {
@@ -211,7 +211,7 @@ class CPUUsageLog: CrashInfo {
             }
         }
         
-        self.embededBinaries = self.binaryImages.filter { $0.inApp }
+        self.embeddedBinaries = self.binaryImages.filter { $0.inApp }
     }
 
     override func backtraceRanges(withBinary binary: String) -> [NSRange] {

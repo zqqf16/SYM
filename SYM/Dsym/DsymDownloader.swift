@@ -155,8 +155,8 @@ class DsymDownloadTask {
         }
         
         var uuids: [String] = [self.crashInfo.uuid ?? ""]
-        if self.crashInfo.embededBinaries.count > 0 {
-            uuids = self.crashInfo.embededBinaries.compactMap { (binary) -> String? in
+        if self.crashInfo.embeddedBinaries.count > 0 {
+            uuids = self.crashInfo.embeddedBinaries.compactMap { (binary) -> String? in
                 return binary.uuid
             }
         }

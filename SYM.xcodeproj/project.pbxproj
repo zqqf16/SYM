@@ -49,6 +49,8 @@
 		B53E2F9C22D4949C003BC45C /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
 		B56B9B8923A379CE00049491 /* Dsym.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B56B9B8723A379CE00049491 /* Dsym.storyboard */; };
 		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
+		B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA4F23A8E8EB00049491 /* DsymManager.swift */; };
+		B56BAA5623A8ECDB00049491 /* MdfindWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */; };
 		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
 		B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */; };
 		B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
@@ -77,7 +79,6 @@
 		F41CD76221291AA300F7CEFB /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
 		F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
-		F422C7C51D36A6A000066837 /* Dsym.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C41D36A6A000066837 /* Dsym.swift */; };
 		F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
@@ -152,6 +153,8 @@
 		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
 		B56B9B8823A379CE00049491 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Dsym.storyboard; sourceTree = "<group>"; };
 		B56B9B8C23A3869100049491 /* DsymViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymViewController.swift; sourceTree = "<group>"; };
+		B56BAA4F23A8E8EB00049491 /* DsymManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DsymManager.swift; path = SYM/dSYM/DsymManager.swift; sourceTree = SOURCE_ROOT; };
+		B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MdfindWrapper.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
 		B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBaseViewController.swift; sourceTree = "<group>"; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
@@ -177,7 +180,6 @@
 		F40B9DBC2123E32D000DF7C6 /* models.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = models.txt; sourceTree = "<group>"; };
 		F40B9DBD2123E32D000DF7C6 /* models.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = models.py; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
-		F422C7C41D36A6A000066837 /* Dsym.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dsym.swift; sourceTree = "<group>"; };
 		F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymInfoViewController.swift; sourceTree = "<group>"; };
 		F45320FA1D30A33C00639917 /* Crash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crash.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
@@ -372,7 +374,7 @@
 		F4095A32213F81520050D903 /* Dsym */ = {
 			isa = PBXGroup;
 			children = (
-				F422C7C41D36A6A000066837 /* Dsym.swift */,
+				B56BAA4F23A8E8EB00049491 /* DsymManager.swift */,
 				F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */,
 			);
 			path = Dsym;
@@ -406,6 +408,7 @@
 				B5F3578622C30B7C00111FF3 /* Color.swift */,
 				B5F3578822C3121200111FF3 /* Image.swift */,
 				B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */,
+				B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -783,7 +786,6 @@
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
-				F422C7C51D36A6A000066837 /* Dsym.swift in Sources */,
 				B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */,
 				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */,
@@ -791,6 +793,8 @@
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F49E2D47214BA704001A6A88 /* Config.swift in Sources */,
+				B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */,
+				B56BAA5623A8ECDB00049491 /* MdfindWrapper.swift in Sources */,
 				B53E2F8322D47E46003BC45C /* MDDeviceFile.m in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F49E2D45214BA5E3001A6A88 /* DownloadScriptViewController.swift in Sources */,
