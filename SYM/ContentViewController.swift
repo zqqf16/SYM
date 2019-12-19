@@ -117,14 +117,14 @@ class ContentViewController: NSViewController {
     }
     
     private func updateHighlighting(_ crashInfo: CrashInfo?) {
-        if let textStorage = self.textView.textStorage,
-            let ranges = crashInfo?.appBacktraceRanges() {
-            self.textView.font = self.font
-            textStorage.beginEditing()
-            textStorage.font = self.font
-            textStorage.processHighlighting(ranges)
-            textStorage.endEditing()
+        guard let textStorage = self.textView.textStorage, let ranges = crashInfo?.appBacktraceRanges() else {
+            return
         }
+        self.textView.font = self.font
+        textStorage.beginEditing()
+        textStorage.font = self.font
+        textStorage.processHighlighting(ranges)
+        textStorage.endEditing()
     }
     
     private func updateSummary(_ crashInfo: CrashInfo?) {
@@ -170,6 +170,7 @@ extension ContentViewController {
         }
         
         self.textView.scrollRangeToVisible(range)
+        self.textView.highlight(range)
     }
     
     @IBAction func zoomIn(_ sender: AnyObject?) {
