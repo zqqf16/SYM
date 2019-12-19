@@ -55,20 +55,9 @@ class DsymStatusBarItem: NSTextField {
         }
     }
     
-    private var downloadTask: DsymDownloadTask? {
-        willSet {
-            self.downloadTask?.unregister(observer: self)
-        }
-        didSet {
-            self.downloadTask?.register(observer: self)
-        }
-    }
     var dsymManager: DsymManager! {
         didSet {
             self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
-            if let uuid = self.dsymManager?.crash?.uuid {
-                self.downloadTask = DsymDownloader.shared.tasks[uuid]
-            }
         }
     }
     
@@ -77,7 +66,13 @@ class DsymStatusBarItem: NSTextField {
         self._initSubviews()
         self.dsymDidUpdated(nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadStatusChanged(_:)), name: .dsymDownloadStatusChanged, object: nil)
+        let eventBus = DsymDownloader.shared.eventBus
+        eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
+            self.updateDownloadStatus(event.task)
+        }
+        eventBus.sub(self, for: DsymDownloadProgressEvent.self).async { (event) in
+            self.updateDownloadStatus(event.task)
+        }
     }
     
     private func _initSubviews() {
@@ -132,7 +127,7 @@ class DsymStatusBarItem: NSTextField {
     
     @objc func didClickRightButton() {
         if let crash = self.dsymManager?.crash {
-            self.downloadTask = DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+            DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
         }
     }
     
@@ -157,36 +152,21 @@ class DsymStatusBarItem: NSTextField {
             self.stringValue = "dSYM file not found"
         }
     }
-    
-    @objc func downloadStatusChanged(_ notification: Notification?) {
-        if self.downloadTask == nil, let uuid = self.dsymManager.crash.uuid {
-            self.downloadTask = DsymDownloader.shared.tasks[uuid]
-        }
-    }
 }
 
-extension DsymStatusBarItem: DsymDownloadTaskObserver {
-    func downloadTaskProgressUpdated(_ task: DsymDownloadTask, progress: DsymDownloadProgress) {
-        self.updateDownloadStatus()
-    }
-    
-    func downloadTaskStatusChanged(_ task: DsymDownloadTask, status: DsymDownloadTask.Status) {
-        self.updateDownloadStatus()
-    }
-    
-    private func updateDownloadStatus() {
-        guard DsymDownloader.shared.canDownload(),
-            let status = self.downloadTask?.status else {
+extension DsymStatusBarItem {
+    private func updateDownloadStatus(_ task: DsymDownloadTask) {
+        guard let uuid = self.dsymManager?.crash?.uuid, uuid == task.crashInfo.uuid else {
             return
         }
 
-        let progress = self.downloadTask?.progress.percentage ?? 0
-        switch status {
+        let progress = task.progress.percentage
+        switch task.status {
         case .running:
             self.stringValue = "Downloading ... \(progress)%"
         case .canceled:
             self.stringValue = "Downloading ... \(progress)%"
-        case .failed(let code, let message):
+        case .failed(let code, _):
             self.stringValue = "Download failed: | \(code)"
         case .success:
             self.stringValue = "Finished downloading"

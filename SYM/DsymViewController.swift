@@ -72,22 +72,10 @@ class DsymViewController: NSViewController {
         }
     }
     
-    private var downloadTask: DsymDownloadTask? {
-        willSet {
-            self.downloadTask?.unregister(observer: self)
-        }
-        didSet {
-            self.downloadTask?.register(observer: self)
-        }
-    }
-    
     var dsymManager: DsymManager? {
         didSet {
             self.binaries = self.dsymManager?.binaries ?? []
             self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
-            if let uuid = self.dsymManager?.crash?.uuid {
-                self.downloadTask = DsymDownloader.shared.tasks[uuid]
-            }
         }
     }
 
@@ -114,7 +102,13 @@ class DsymViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateViewHeight()
-        self.updateDownloadStatus()
+        let eventBus = DsymDownloader.shared.eventBus
+        eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
+            self.updateDownloadStatus(event.task)
+        }
+        eventBus.sub(self, for: DsymDownloadProgressEvent.self).async { (event) in
+            self.updateDownloadStatus(event.task)
+        }
     }
     
     @objc func dsymDidUpdated(_ notification: Notification?) {
@@ -128,8 +122,7 @@ class DsymViewController: NSViewController {
     
     @IBAction func didClickDownloadButton(_ sender: NSButton) {
         if let crashInfo = self.dsymManager?.crash {
-            self.downloadTask = DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
-            self.updateDownloadStatus()
+            DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
         }
     }
 }
@@ -178,25 +171,16 @@ extension DsymViewController: DsymTableCellViewDelegate {
     }
 }
 
-extension DsymViewController: DsymDownloadTaskObserver {
-    func downloadTaskProgressUpdated(_ task: DsymDownloadTask, progress: DsymDownloadProgress) {
-        self.updateDownloadStatus()
-    }
-    
-    func downloadTaskStatusChanged(_ task: DsymDownloadTask, status: DsymDownloadTask.Status) {
-        self.updateDownloadStatus()
-    }
-    
-    private func updateDownloadStatus() {
-        guard DsymDownloader.shared.canDownload(),
-            let status = self.downloadTask?.status else {
+extension DsymViewController {
+    private func updateDownloadStatus(_ task: DsymDownloadTask) {
+        guard let uuid = self.dsymManager?.crash?.uuid, uuid == task.crashInfo.uuid else {
             self.downloadButton.isEnabled = self.dsymManager?.crash != nil
             self.progressBar.isHidden = true
             return
         }
 
-        let progress = self.downloadTask?.progress.percentage ?? 0
-
+        let progress = task.progress.percentage
+        let status = task.status
         switch status {
         case .running:
             self.downloadButton.isEnabled = false
@@ -211,7 +195,7 @@ extension DsymViewController: DsymDownloadTaskObserver {
         case .canceled:
             self.progressBar.isHidden = true
             self.downloadButton.isEnabled = true
-        case .failed(let code, let message):
+        case .failed(_, _):
             self.progressBar.isHidden = true
             self.downloadButton.isEnabled = true
         case .success:

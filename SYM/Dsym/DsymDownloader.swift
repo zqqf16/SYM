@@ -23,8 +23,14 @@
 import Foundation
 import Cocoa
 
-extension Notification.Name {
-    static let dsymDownloadStatusChanged = Notification.Name("sym.dsymDownloadStatusChanged")
+struct DsymDownloadStatusEvent: Event {
+    let task: DsymDownloadTask
+    let status: DsymDownloadTask.Status
+}
+
+struct DsymDownloadProgressEvent: Event {
+    let task: DsymDownloadTask
+    let progress: DsymDownloadProgress
 }
 
 class DsymDownloadProgress: CustomStringConvertible {
@@ -81,11 +87,6 @@ class DsymDownloadProgress: CustomStringConvertible {
     }
 }
 
-protocol DsymDownloadTaskObserver: class {
-    func downloadTaskProgressUpdated(_ task: DsymDownloadTask, progress: DsymDownloadProgress)
-    func downloadTaskStatusChanged(_ task: DsymDownloadTask, status: DsymDownloadTask.Status)
-}
-
 class DsymDownloadTask {
     var crashInfo: CrashInfo
     
@@ -97,10 +98,12 @@ class DsymDownloadTask {
         case success
     }
 
+    fileprivate var eventBus: EventBus?
+    
     var status: Status = .waiting {
         didSet {
-            self.notifyObservers { (observer) in
-                observer.downloadTaskStatusChanged(self, status: self.status)
+            if let eb = self.eventBus {
+                eb.post(DsymDownloadStatusEvent(task: self, status: self.status))
             }
         }
     }
@@ -113,14 +116,6 @@ class DsymDownloadTask {
     private var process: SubProcess!
     private var fileURL: URL?
     private var scriptURL: URL
-    
-    private class _TaskObserver {
-        weak var target: DsymDownloadTaskObserver?
-        init(_ target: DsymDownloadTaskObserver?) {
-            self.target = target
-        }
-    }
-    private var observers: [_TaskObserver] = []
     
     init(crashInfo: CrashInfo, scriptURL: URL, fileURL: URL?) {
         self.crashInfo = crashInfo
@@ -153,8 +148,8 @@ class DsymDownloadTask {
         self.process.errorHandler = { [weak self] (_) in
             if let this = self {
                 this.progress.update(fromConsoleOutput: this.process.error)
-                this.notifyObservers { (observer) in
-                    observer.downloadTaskProgressUpdated(this, progress: this.progress)
+                if let eventBus = this.eventBus {
+                    eventBus.post(DsymDownloadProgressEvent(task: this, progress: this.progress))
                 }
             }
         }
@@ -175,34 +170,6 @@ class DsymDownloadTask {
     func cancel() {
         self.process.terminate()
         self.status = .canceled
-    }
-    
-    func register(observer: DsymDownloadTaskObserver) {
-        DispatchQueue.main.async {
-            self.observers.append(_TaskObserver(observer))
-        }
-    }
-    
-    func unregister(observer: DsymDownloadTaskObserver) {
-        DispatchQueue.main.async {
-            self.observers = self.observers.filter({ (o) -> Bool in
-                return o.target != nil && o.target === observer
-            })
-        }
-    }
-    
-    private func notifyObservers(handler: @escaping ((DsymDownloadTaskObserver)->Void)) {
-        DispatchQueue.main.async {
-            self.observers.forEach { (innerObserver) in
-                if let target = innerObserver.target {
-                    handler(target)
-                }
-            }
-            
-            self.observers = self.observers.filter({ (o) -> Bool in
-                return o.target != nil
-            })
-        }
     }
         
     private func crashInfoToEnv(_ crashInfo: CrashInfo) -> [String: String] {
@@ -250,9 +217,10 @@ class DsymDownloadTask {
 
 class DsymDownloader {
     static let shared = DsymDownloader()
-
-    var tasks:[String: DsymDownloadTask] = [:]
     
+    let eventBus = EventBus()
+    var tasks:[String: DsymDownloadTask] = [:]
+
     private let scriptURL = Config.downloadScriptURL()
     
     func canDownload() -> Bool {
@@ -281,12 +249,13 @@ class DsymDownloader {
         }
         
         let task = DsymDownloadTask(crashInfo: crashInfo, scriptURL: self.scriptURL, fileURL: fileURL)
+        task.eventBus = self.eventBus
         self.tasks[uuid] = task
         DispatchQueue.global().async {
             task.run()
-            NotificationCenter.default.post(name: .dsymDownloadStatusChanged, object: task)
         }
-        NotificationCenter.default.post(name: .dsymDownloadStatusChanged, object: task)
+        
+        self.eventBus.post(DsymDownloadStatusEvent(task: task, status: task.status))
         return task
     }
 }
