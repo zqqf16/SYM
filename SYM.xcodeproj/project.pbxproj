@@ -71,7 +71,6 @@
 		B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B5F357B322C5E90C00111FF3 /* Localizable.strings */; };
 		B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */; };
 		F400154821539E8500267818 /* Automator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F400154721539E8500267818 /* Automator.framework */; };
-		F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F402D2D1214A90BF00B75B40 /* DownloadButton.swift */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
@@ -79,12 +78,11 @@
 		F41CD76221291AA300F7CEFB /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE905212530CF00E9EDA9 /* libcrypto.a */; };
 		F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE904212530CF00E9EDA9 /* libssl.a */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
-		F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */; };
 		F45320FB1D30A33C00639917 /* Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45320FA1D30A33C00639917 /* Crash.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
 		F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B68F21E227B8100128D8D /* MainWindowController.swift */; };
-		F48D8C9121492079009E2DA6 /* StatusBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48D8C9021492079009E2DA6 /* StatusBar.swift */; };
+		F48D8C9121492079009E2DA6 /* DsymStatusBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48D8C9021492079009E2DA6 /* DsymStatusBarItem.swift */; };
 		F49030FF20F769ED00249832 /* DocumentController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49030FE20F769ED00249832 /* DocumentController.swift */; };
 		F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */; };
 		F49BD1F71D2FF46300024AAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F49BD1F51D2FF46300024AAE /* Main.storyboard */; };
@@ -172,19 +170,17 @@
 		B5F357B622C5E92000111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineNumberRulerView.swift; sourceTree = "<group>"; };
 		F400154721539E8500267818 /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
-		F402D2D1214A90BF00B75B40 /* DownloadButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadButton.swift; sourceTree = "<group>"; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A31D3FBB7200F3B00C /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
 		F40B9DBC2123E32D000DF7C6 /* models.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = models.txt; sourceTree = "<group>"; };
 		F40B9DBD2123E32D000DF7C6 /* models.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = models.py; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
-		F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymInfoViewController.swift; sourceTree = "<group>"; };
 		F45320FA1D30A33C00639917 /* Crash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crash.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
 		F45B68F21E227B8100128D8D /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
-		F48D8C9021492079009E2DA6 /* StatusBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBar.swift; sourceTree = "<group>"; };
+		F48D8C9021492079009E2DA6 /* DsymStatusBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymStatusBarItem.swift; sourceTree = "<group>"; };
 		F49030FE20F769ED00249832 /* DocumentController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentController.swift; sourceTree = "<group>"; };
 		F49BD1EC1D2FF46300024AAE /* SYM.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SYM.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F49BD1EF1D2FF46300024AAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -416,7 +412,6 @@
 			children = (
 				B5F357A222C5E54A00111FF3 /* Resources */,
 				F49E2D46214BA704001A6A88 /* Config.swift */,
-				F48D8C8F21492055009E2DA6 /* ToolbarItems */,
 				B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */,
 				F40543691D321E37009B2923 /* Window.swift */,
 				F45B68F21E227B8100128D8D /* MainWindowController.swift */,
@@ -424,22 +419,13 @@
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 				F49E2D44214BA5E3001A6A88 /* DownloadScriptViewController.swift */,
-				F4441176215CDFD600B20E2F /* DsymInfoViewController.swift */,
 				B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */,
 				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
 				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
+				F48D8C9021492079009E2DA6 /* DsymStatusBarItem.swift */,
 				B56B9B8C23A3869100049491 /* DsymViewController.swift */,
 			);
 			name = UI;
-			sourceTree = "<group>";
-		};
-		F48D8C8F21492055009E2DA6 /* ToolbarItems */ = {
-			isa = PBXGroup;
-			children = (
-				F402D2D1214A90BF00B75B40 /* DownloadButton.swift */,
-				F48D8C9021492079009E2DA6 /* StatusBar.swift */,
-			);
-			path = ToolbarItems;
 			sourceTree = "<group>";
 		};
 		F49BD1E31D2FF46300024AAE = {
@@ -805,11 +791,9 @@
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
 				B5F3578722C30B7C00111FF3 /* Color.swift in Sources */,
-				F4441177215CDFD600B20E2F /* DsymInfoViewController.swift in Sources */,
 				B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */,
-				F402D2D2214A90BF00B75B40 /* DownloadButton.swift in Sources */,
 				B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */,
-				F48D8C9121492079009E2DA6 /* StatusBar.swift in Sources */,
+				F48D8C9121492079009E2DA6 /* DsymStatusBarItem.swift in Sources */,
 				51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */,
 				51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */,
 				B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */,

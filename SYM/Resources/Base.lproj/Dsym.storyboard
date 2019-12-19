@@ -29,7 +29,7 @@
                                             <tableColumns>
                                                 <tableColumn width="537" minWidth="40" maxWidth="1000" id="dZB-S7-aPT">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
-                                                        <font key="font" metaFont="label" size="11"/>
+                                                        <font key="font" metaFont="toolTip"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                     </tableHeaderCell>
@@ -44,16 +44,8 @@
                                                             <rect key="frame" x="1" y="2" width="537" height="66"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TuE-4w-tvE">
-                                                                    <rect key="frame" x="3" y="39" width="20" height="20"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="20" id="fQU-V8-7wC"/>
-                                                                        <constraint firstAttribute="height" constant="20" id="hPD-kd-dK5"/>
-                                                                    </constraints>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="symbol" id="6Z0-zx-mxh"/>
-                                                                </imageView>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="BK2-SP-JlU">
-                                                                    <rect key="frame" x="24" y="42" width="513" height="16"/>
+                                                                    <rect key="frame" x="8" y="42" width="529" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="im_zorro_sym_demo" id="jqn-ai-2H1">
                                                                         <font key="font" metaFont="systemBold"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -61,15 +53,15 @@
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QIA-HE-lCu">
-                                                                    <rect key="frame" x="24" y="23" width="264" height="15"/>
+                                                                    <rect key="frame" x="8" y="23" width="264" height="15"/>
                                                                     <textFieldCell key="cell" lineBreakMode="clipping" title="E556F3F3-AA90-34CB-8E57-5214547C1888" id="Xi3-QH-IaD">
-                                                                        <font key="font" metaFont="label" size="12"/>
+                                                                        <font key="font" metaFont="controlContent"/>
                                                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="45z-MR-80i">
-                                                                    <rect key="frame" x="24" y="6" width="329" height="16"/>
+                                                                    <rect key="frame" x="8" y="6" width="329" height="16"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" allowsUndo="NO" alignment="left" title="/Users/zorro/Downloads/dSYMS/SYM/0.7.0/sym.dsym" usesSingleLineMode="YES" id="Eow-Ck-gSg">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -77,7 +69,7 @@
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0ia-MG-ifx">
-                                                                    <rect key="frame" x="355" y="4" width="41" height="16"/>
+                                                                    <rect key="frame" x="339" y="4" width="41" height="16"/>
                                                                     <buttonCell key="cell" type="inline" title="Show" bezelStyle="inline" alignment="center" controlSize="small" borderStyle="border" inset="2" id="DO7-Tq-bfR">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="systemBold" size="10"/>
@@ -90,21 +82,18 @@
                                                             <constraints>
                                                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="QIA-HE-lCu" secondAttribute="trailing" constant="2" id="1nk-Kl-kKf"/>
                                                                 <constraint firstItem="45z-MR-80i" firstAttribute="leading" secondItem="QIA-HE-lCu" secondAttribute="leading" id="E4h-pi-wVr"/>
-                                                                <constraint firstItem="TuE-4w-tvE" firstAttribute="centerY" secondItem="BK2-SP-JlU" secondAttribute="centerY" constant="1" id="HoW-Ey-SOI"/>
                                                                 <constraint firstItem="QIA-HE-lCu" firstAttribute="leading" secondItem="BK2-SP-JlU" secondAttribute="leading" id="JTV-fP-hkS"/>
                                                                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0ia-MG-ifx" secondAttribute="trailing" constant="2" id="LGA-en-5Bh"/>
                                                                 <constraint firstItem="0ia-MG-ifx" firstAttribute="leading" secondItem="45z-MR-80i" secondAttribute="trailing" constant="4" id="NiF-kv-enc"/>
                                                                 <constraint firstItem="QIA-HE-lCu" firstAttribute="top" secondItem="BK2-SP-JlU" secondAttribute="bottom" constant="4" id="TGn-PE-eJ5"/>
                                                                 <constraint firstItem="0ia-MG-ifx" firstAttribute="firstBaseline" secondItem="45z-MR-80i" secondAttribute="firstBaseline" id="VXO-5a-Kgt"/>
                                                                 <constraint firstItem="45z-MR-80i" firstAttribute="top" secondItem="QIA-HE-lCu" secondAttribute="bottom" constant="1" id="WaM-m2-kcI"/>
-                                                                <constraint firstItem="BK2-SP-JlU" firstAttribute="leading" secondItem="Itq-30-i3Z" secondAttribute="leading" constant="26" id="YtY-fg-hmB"/>
-                                                                <constraint firstItem="TuE-4w-tvE" firstAttribute="leading" secondItem="Itq-30-i3Z" secondAttribute="leading" constant="3" id="gJ4-CF-GSI"/>
+                                                                <constraint firstItem="BK2-SP-JlU" firstAttribute="leading" secondItem="Itq-30-i3Z" secondAttribute="leading" constant="10" id="YtY-fg-hmB"/>
                                                                 <constraint firstItem="BK2-SP-JlU" firstAttribute="top" secondItem="Itq-30-i3Z" secondAttribute="top" constant="8" id="jf4-s2-lVp"/>
                                                                 <constraint firstAttribute="trailing" secondItem="BK2-SP-JlU" secondAttribute="trailing" constant="2" id="vvb-MZ-Av1"/>
                                                             </constraints>
                                                             <connections>
                                                                 <outlet property="actionButton" destination="0ia-MG-ifx" id="UOC-mj-Kgp"/>
-                                                                <outlet property="image" destination="TuE-4w-tvE" id="Qze-Cx-EZg"/>
                                                                 <outlet property="path" destination="45z-MR-80i" id="uDd-xD-Khw"/>
                                                                 <outlet property="title" destination="BK2-SP-JlU" id="sXc-dX-aC2"/>
                                                                 <outlet property="uuid" destination="QIA-HE-lCu" id="ikm-rQ-dLi"/>
@@ -185,7 +174,4 @@ DQ
             <point key="canvasLocation" x="-2020" y="361"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="symbol" width="19" height="19"/>
-    </resources>
 </document>

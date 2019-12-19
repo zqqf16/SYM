@@ -460,14 +460,13 @@
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <rect key="contentRect" x="385" y="219" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
+                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" centeredItem="wHv-dg-CLj" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
                             <allowedToolbarItems>
-                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
                                 <toolbarItem implicitItemIdentifier="E7F1423A-A157-45A9-B44E-90697E12AE45" label="Symbolicate" paletteLabel="Symbolicate" toolTip="Symbolicate" image="Play" id="jOx-ar-DOP">
                                     <size key="minSize" width="32" height="25"/>
-                                    <size key="maxSize" width="36" height="28"/>
+                                    <size key="maxSize" width="37" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="Qu1-si-H6N">
-                                        <rect key="frame" x="18" y="14" width="36" height="28"/>
+                                        <rect key="frame" x="18" y="14" width="37" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Play" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="fS4-X2-1L4">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -480,9 +479,9 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Import crash report from device" image="Device" id="4T4-1f-Y26">
                                     <size key="minSize" width="32" height="25"/>
-                                    <size key="maxSize" width="36" height="28"/>
+                                    <size key="maxSize" width="37" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="5Nz-F0-1ts">
-                                        <rect key="frame" x="4" y="14" width="36" height="28"/>
+                                        <rect key="frame" x="3" y="14" width="37" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Device" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="CAj-xe-cd5">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -495,9 +494,9 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Scroll to crashed thread" image="Reticle" id="SZU-E2-ttI">
                                     <size key="minSize" width="32" height="25"/>
-                                    <size key="maxSize" width="36" height="28"/>
+                                    <size key="maxSize" width="37" height="28"/>
                                     <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
-                                        <rect key="frame" x="1" y="14" width="36" height="28"/>
+                                        <rect key="frame" x="0.0" y="14" width="37" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Reticle" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -508,72 +507,19 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="39CAE711-CC86-4C2F-9D7C-2A0ACDD4CD18" label="dSYM" paletteLabel="dSYM" toolTip="dSYM download list" image="symbol" id="ZMq-01-VJi">
-                                    <size key="minSize" width="32" height="25"/>
-                                    <size key="maxSize" width="89" height="31"/>
-                                    <button key="view" verticalHuggingPriority="750" imageHugsTitle="YES" id="GGe-Tb-Qbo">
-                                        <rect key="frame" x="0.0" y="14" width="81" height="31"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" title="dSYM" bezelStyle="texturedRounded" image="symbol" imagePosition="left" alignment="center" borderStyle="border" inset="2" id="vF1-Fr-Scp">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="showDsymInfo:" target="akE-CK-Bh4" id="d5S-Kq-00n"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
                                 <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" id="wHv-dg-CLj">
                                     <size key="minSize" width="100" height="22"/>
                                     <size key="maxSize" width="480" height="22"/>
-                                    <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="StatusBar" customModule="SYM" customModuleProvider="target">
+                                    <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="DsymStatusBarItem" customModule="SYM" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="14" width="320" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" bezelStyle="round" id="N1P-ok-3bD" customClass="StatusBarCell" customModule="SYM" customModuleProvider="target">
-                                            <font key="font" metaFont="systemLight" size="12"/>
+                                        <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" bezelStyle="round" id="N1P-ok-3bD" customClass="DsymStatusBarItemCell" customModule="SYM" customModuleProvider="target">
+                                            <font key="font" metaFont="system"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="8AA3EEF4-4EAF-472F-AE5D-F3B189A7277A" label="dSYM" paletteLabel="dSYM" toolTip="Choose or download dSYM file" image="alert" id="x2M-ly-xLG">
-                                    <size key="minSize" width="36" height="28"/>
-                                    <size key="maxSize" width="200" height="28"/>
-                                    <popUpButton key="view" verticalHuggingPriority="750" id="iaa-hN-kZp">
-                                        <rect key="frame" x="0.0" y="14" width="200" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <popUpButtonCell key="cell" type="roundTextured" title="dSYM file not found" bezelStyle="texturedRounded" image="alert" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="Dlc-9A-Ldz" id="1nB-M4-fq1">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                            <menu key="menu" autoenablesItems="NO" id="uu2-q5-bEn">
-                                                <items>
-                                                    <menuItem title="dSYM file not found" image="alert" hidden="YES" id="Dlc-9A-Ldz">
-                                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                                    </menuItem>
-                                                    <menuItem title="Choose" id="zR3-sH-tLI">
-                                                        <connections>
-                                                            <action selector="chooseDsymFile:" target="akE-CK-Bh4" id="nTj-Ip-fFi"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem title="Show dSYM Info" enabled="NO" id="64e-AO-Xx2" userLabel="Show in Finder">
-                                                        <connections>
-                                                            <action selector="showInFinder:" target="akE-CK-Bh4" id="8Za-yo-oct"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                    <menuItem isSeparatorItem="YES" id="f2X-Mh-3Y6"/>
-                                                    <menuItem title="Download" tag="1" enabled="NO" id="MKW-Iv-70M">
-                                                        <connections>
-                                                            <action selector="downloadDsym:" target="akE-CK-Bh4" id="zrv-Jc-KHh"/>
-                                                        </connections>
-                                                    </menuItem>
-                                                </items>
-                                                <connections>
-                                                    <outlet property="delegate" destination="akE-CK-Bh4" id="NNX-Il-TaB"/>
-                                                </connections>
-                                            </menu>
-                                        </popUpButtonCell>
-                                    </popUpButton>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="C5AD0D29-9AF0-4059-9039-100C6BAE05ED" label="Indicator" paletteLabel="Indicator" tag="-1" sizingBehavior="auto" id="56F-jO-Bdr">
                                     <progressIndicator key="view" hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="zP5-Pn-E5C">
@@ -581,12 +527,14 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     </progressIndicator>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="56F-jO-Bdr"/>
-                                <toolbarItem reference="ZMq-01-VJi"/>
                                 <toolbarItem reference="SZU-E2-ttI"/>
+                                <toolbarItem reference="fQX-8I-pLN"/>
+                                <toolbarItem reference="wHv-dg-CLj"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
                                 <toolbarItem reference="4T4-1f-Y26"/>
                             </defaultToolbarItems>
@@ -597,13 +545,8 @@
                     </window>
                     <connections>
                         <outlet property="deviceItem" destination="4T4-1f-Y26" id="TaU-FR-WmN"/>
-                        <outlet property="dsymButton" destination="GGe-Tb-Qbo" id="wRy-Zi-764"/>
-                        <outlet property="dsymMenu" destination="uu2-q5-bEn" id="TYf-3G-VTK"/>
-                        <outlet property="dsymMenuItemDownload" destination="MKW-Iv-70M" id="pS9-28-VcJ"/>
-                        <outlet property="dsymMenuItemName" destination="Dlc-9A-Ldz" id="EpT-uv-NxJ"/>
-                        <outlet property="dsymMenuItemReveal" destination="64e-AO-Xx2" id="jRZ-kn-lmK"/>
                         <outlet property="indicator" destination="zP5-Pn-E5C" id="z4w-VT-HaL"/>
-                        <outlet property="statusBar" destination="UYX-wf-f6l" id="bFC-Eh-UiL"/>
+                        <outlet property="statusBar" destination="UYX-wf-f6l" id="6gq-N9-7ZW"/>
                         <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
                         <segue destination="5WI-tf-yEY" kind="relationship" relationship="window.shadowedContentViewController" id="Lwr-gD-c6J"/>
                     </connections>
@@ -665,7 +608,7 @@
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QhV-nK-34r">
                                                 <rect key="frame" x="8" y="0.0" width="784" height="17"/>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" alignment="left" title="iPhone 8 Plus - iOS 11.4.1 - v0.4.5" id="UG5-2y-TCM">
-                                                    <font key="font" metaFont="label" size="12"/>
+                                                    <font key="font" metaFont="controlContent"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -769,7 +712,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mLi-CY-HTg">
                                 <rect key="frame" x="137" y="49" width="255" height="14"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Copyright © 2016年 zqqf16. All rights reserved." id="Jsd-cK-7rO">
-                                    <font key="font" metaFont="controlContent" size="11"/>
+                                    <font key="font" metaFont="toolTip"/>
                                     <color key="textColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -833,9 +776,7 @@
         <image name="Device" width="16" height="16"/>
         <image name="Play" width="20" height="16"/>
         <image name="Reticle" width="20" height="16"/>
-        <image name="alert" width="19" height="19"/>
         <image name="file" width="512" height="512"/>
-        <image name="symbol" width="19" height="19"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="o44-9z-7zV"/>

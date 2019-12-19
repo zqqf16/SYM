@@ -191,7 +191,7 @@ extension DsymManager: MdfindWrapperDelegate {
             }
         }
         
-        if dsyms.count > 0 {
+        if dsyms.count > 0 || appItems.count == 0 {
             // found dsyms
             self.dsymFileDidUpdate(dsyms)
             return

@@ -28,20 +28,11 @@ extension NSImage {
 }
 
 class MainWindowController: NSWindowController {
-    // Toolbar buttons
+    // Toolbar items
     @IBOutlet weak var symButton: NSButton!
-    //@IBOutlet weak var deviceButton: NSButton!
-    //@IBOutlet weak var statusBar: StatusBar!
-    @IBOutlet weak var downloadButton: DownloadButton!
     @IBOutlet weak var deviceItem: NSToolbarItem!
-    
     @IBOutlet weak var indicator: NSProgressIndicator!
-
-    @IBOutlet weak var dsymMenu: NSMenu!
-    @IBOutlet weak var dsymMenuItemName: NSMenuItem!
-    @IBOutlet weak var dsymMenuItemReveal: NSMenuItem!
-    @IBOutlet weak var dsymMenuItemDownload: NSMenuItem!
-    @IBOutlet weak var dsymButton: NSButton!
+    @IBOutlet weak var statusBar: DsymStatusBarItem!
     
     var isSymbolicating: Bool = false {
         didSet {
@@ -82,10 +73,9 @@ class MainWindowController: NSWindowController {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
-        self.dsymButton.image = .alert
+        self.statusBar.dsymManager = self.dsymManager
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
-        self.dsymManager.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -126,15 +116,7 @@ class MainWindowController: NSWindowController {
     @objc func crashDidSymbolicated(_ notification: Notification) {
         self.isSymbolicating = false
     }
-    
-    @objc func dsymDidUpdated(_ notification: Notification) {
-        if self.dsymManager.dsymFiles.count > 0 {
-            self.dsymButton.image = .symbol
-        } else {
-            self.dsymButton.image = .alert
-        }
-    }
-    
+
     // MARK: IBActions
     @IBAction func symbolicate(_ sender: AnyObject?) {
         let content = self.crashDocument?.textStorage.string ?? ""
@@ -145,32 +127,6 @@ class MainWindowController: NSWindowController {
         self.isSymbolicating = true
         let dsyms = self.dsymManager.dsymFiles.values.compactMap {$0.binaryPath}
         self.crashDocument?.symbolicate(withDsymPaths: dsyms)
-    }
-    
-    @IBAction func chooseDsymFile(_ sender: Any) {
-    }
-    
-    @IBAction func showInFinder(_ sender: Any) {
-    }
-    
-    @IBAction func downloadDsym(_ sender: Any) {
-    }
-    
-    @IBAction func showDsymInfo(_ sender: NSButton) {
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
-        let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
-        vc.dsymManager = self.dsymManager
-        self.contentViewController?.presentAsSheet(vc)
-    }
-}
-
-// MARK: - NSMenuDelegate
-extension MainWindowController: NSMenuDelegate {
-    func menuWillOpen(_ menu: NSMenu) {
-        if menu == self.dsymMenu {
-            self.dsymMenuItemDownload.isEnabled = self.crashInfo != nil && DsymDownloader.shared.canDownload()
-            //self.dsymMenuItemReveal.isEnabled = self.dsymFiles != nil
-        }
     }
 }
 
