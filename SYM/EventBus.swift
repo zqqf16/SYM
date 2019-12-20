@@ -44,7 +44,7 @@ class EventHandler<E> {
         self.target = target
     }
     
-    func async(_ queue: DispatchQueue = DispatchQueue.main, block: @escaping Block) {
+    func async(_ queue: DispatchQueue = DispatchQueue.main, _ block: @escaping Block) {
         self.queue = queue
         self.block = block
     }
@@ -75,15 +75,16 @@ class EventBus {
     
     private var handlers: [String: [Any]] = [:]
     
-    private func synchronized(_ obj: Any, closure: ()->Void) {
-        objc_sync_enter(obj)
+    private let syncKey = 0
+    private func synchronized(_ closure: ()->Void) {
+        objc_sync_enter(self.syncKey)
         closure()
-        objc_sync_exit(obj)
+        objc_sync_exit(self.syncKey)
     }
     
     func sub<E:Event>(_ target: AnyObject, for eventType: E.Type) -> EventHandler<E> {
         let handler = EventHandler<E>(target: target)
-        self.synchronized(self.handlers) {
+        self.synchronized {
             var handlers = self.handlers[eventType.identifier] ?? []
             handlers.append(handler)
             self.handlers[eventType.identifier] = handlers
@@ -92,7 +93,7 @@ class EventBus {
     }
     
     func post<E:Event>(_ event: E) {
-        self.synchronized(self.handlers) {
+        self.synchronized {
             if var handlers = self.handlers[E.identifier] {
                 handlers.removeAll { (h) -> Bool in
                     if let handler = h as? EventHandler<E> {
