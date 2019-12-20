@@ -75,7 +75,9 @@ class DsymViewController: NSViewController {
     var dsymManager: DsymManager? {
         didSet {
             self.binaries = self.dsymManager?.binaries ?? []
-            self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
+            self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
+                self.tableView.reloadData()
+            }
         }
     }
 
@@ -111,11 +113,7 @@ class DsymViewController: NSViewController {
             self.updateDownloadStatus(event.task)
         }
     }
-    
-    @objc func dsymDidUpdated(_ notification: Notification?) {
-        self.tableView.reloadData()
-    }
-    
+
     //MARK: UI
     private func updateViewHeight() {
         self.tableViewHeight.constant = min(CGFloat(70 * self.binaries.count), 520.0)

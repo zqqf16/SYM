@@ -59,7 +59,7 @@ class SubProcess {
         }
         errorPipe.fileHandleForReading.readabilityHandler = { handle in
             guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
-                    return
+                return
             }
             self.error += string
             if let errorHandler = self.errorHandler {

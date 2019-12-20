@@ -57,14 +57,16 @@ class DsymStatusBarItem: NSTextField {
     
     var dsymManager: DsymManager! {
         didSet {
-            self.dsymManager?.nc.addObserver(self, selector: #selector(dsymDidUpdated(_:)), name: .dsymDidUpdate, object: nil)
+            self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
+                self.dsymDidUpdated()
+            }
         }
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
         self._initSubviews()
-        self.dsymDidUpdated(nil)
+        self.dsymDidUpdated()
         
         let eventBus = DsymDownloader.shared.eventBus
         eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
@@ -131,7 +133,7 @@ class DsymStatusBarItem: NSTextField {
         }
     }
     
-    @objc func dsymDidUpdated(_ notification: Notification?) {
+    func dsymDidUpdated() {
         if self.dsymManager?.crash == nil {
             self.stringValue = "Open a crash file"
             self.rightButton.isHidden = true

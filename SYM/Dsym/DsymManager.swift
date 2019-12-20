@@ -50,8 +50,12 @@ class DsymFile: Hashable {
     }
 }
 
+struct DsymUpdateEvent: Event {
+    let dsymFiles: [DsymFile]
+}
+
 class DsymManager {
-    let nc = NotificationCenter()
+    let eventBus = EventBus()
     var crash: CrashInfo!
     var binaries: [Binary]?
     var dsymFiles: [String:DsymFile] = [:]
@@ -77,11 +81,7 @@ class DsymManager {
             self.dsymFileDidUpdate(dsymFiles)
         }
     }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
+
     func update(_ crash: CrashInfo) {
         self.crash = crash
         self.binaries = crash.embeddedBinaries
@@ -113,7 +113,7 @@ class DsymManager {
         
         DispatchQueue.main.async {
             self.dsymFiles[uuid] = dsymFile
-            self.nc.post(name: .dsymDidUpdate, object: [dsymFile])
+            self.eventBus.post(DsymUpdateEvent(dsymFiles: Array(self.dsymFiles.values)))
         }
     }
     
@@ -154,19 +154,8 @@ class DsymManager {
                     self.dsymFiles[uuid] = dsym
                 }
             }
-            self.nc.post(name: .dsymDidUpdate, object: dsymFiles)
+            self.eventBus.post(DsymUpdateEvent(dsymFiles: dsymFiles))
         }
-    }
-    
-    @objc func dsymDownloadStatusChanged(_ notification: Notification) {
-        guard let task = notification.object as? DsymDownloadTask,
-            task.crashInfo.uuid == self.crash.uuid,
-            self.dsymFiles.count == 0,
-            let dsymFiles = task.dsymFiles else {
-                return
-        }
-        
-        self.dsymFileDidUpdate(dsymFiles)
     }
 }
 
