@@ -1,1 +1,9 @@
 
+/* Class = "NSButtonCell"; title = "Hide"; ObjectID = "ASu-JF-oz9"; */
+"ASu-JF-oz9.title" = "隐藏";
+
+/* Class = "NSButtonCell"; title = "Show"; ObjectID = "DO7-Tq-bfR"; */
+"DO7-Tq-bfR.title" = "显示";
+
+/* Class = "NSButtonCell"; title = "Download"; ObjectID = "eay-Je-Z5i"; */
+"eay-Je-Z5i.title" = "下载";
