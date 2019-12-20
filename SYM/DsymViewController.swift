@@ -102,6 +102,7 @@ class DsymViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateViewHeight()
+        self.downloadButton.isEnabled = self.dsymManager?.crash != nil
         let eventBus = DsymDownloader.shared.eventBus
         eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
             self.updateDownloadStatus(event.task)
