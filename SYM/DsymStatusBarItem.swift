@@ -26,9 +26,41 @@ extension NSImage {
     static let download: NSImage = #imageLiteral(resourceName: "Cloud")
 }
 
+class DsymToolBarButton: NSButton {
+    var dsymManager: DsymManager! {
+        didSet {
+            self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
+                self.dsymDidUpdated()
+            }
+        }
+    }
+    
+    func dsymDidUpdated() {
+        if let crash = self.dsymManager?.crash,
+            let uuid = crash.uuid,
+            let dsym = self.dsymManager.dsymFile(withUuid: uuid) {
+            self.title = dsym.name
+            self.image = .symbol
+        } else {
+            self.title = NSLocalizedString("dsym_file_not_found", comment: "")
+            self.image = .alert
+        }
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.dsymDidUpdated()
+    }
+}
+
 class DsymStatusBarItemCell: NSTextFieldCell {
+    var leftPadding: CGFloat = 0
+
     override func drawingRect(forBounds rect: NSRect) -> NSRect {
-        let newRect = NSRect(x: rect.origin.x + 16, y: rect.origin.y, width: rect.width-16, height: rect.height)
+        let newRect = NSRect(x: rect.origin.x + self.leftPadding,
+                             y: rect.origin.y,
+                             width: rect.width - self.leftPadding,
+                             height: rect.height)
         return super.drawingRect(forBounds: newRect)
     }
 }
@@ -37,6 +69,7 @@ class DsymStatusBarItem: NSTextField {
     var indicator: NSProgressIndicator!
     var imageView: NSImageView!
     var rightButton: NSButton!
+    var showImage: Bool = false
     
     func update(title: String, isLoading: Bool, buttonTitle: String? = nil) {
         self.stringValue = title
@@ -78,6 +111,12 @@ class DsymStatusBarItem: NSTextField {
     }
     
     private func _initSubviews() {
+        if self.showImage {
+            if let cell = self.cell as? DsymStatusBarItemCell {
+                cell.leftPadding = 16.0
+            }
+        }
+        
         // indicator
         self.indicator = NSProgressIndicator()
         self.indicator.style = .spinning
@@ -98,6 +137,7 @@ class DsymStatusBarItem: NSTextField {
         self.imageView = NSImageView(image: #imageLiteral(resourceName: "symbol"))
         self.imageView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(self.imageView)
+        self.imageView.isHidden = !self.showImage
         
         self.addConstraints([
             NSLayoutConstraint(item: self.imageView!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1.0, constant: 4),
@@ -118,13 +158,9 @@ class DsymStatusBarItem: NSTextField {
     }
     
     override func mouseDown(with event: NSEvent) {
-        guard self.dsymManager?.crash != nil else {
-            return
+        if let wc = self.window?.windowController as? MainWindowController {
+            wc.showDsymInfo(self)
         }
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
-        let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
-        vc.dsymManager = self.dsymManager
-        self.window?.windowController?.contentViewController?.presentAsSheet(vc)
     }
     
     @objc func didClickRightButton() {
@@ -144,14 +180,22 @@ class DsymStatusBarItem: NSTextField {
 
         if let dsyms = self.dsymManager?.dsymFiles, dsyms.count > 0 {
             var title: String = "Ready to symbolicate"
-            if let uuid = self.dsymManager?.crash.uuid {
+            
+            let dsymList = dsyms.values.map({ (dsym) -> String in
+                return dsym.path
+            })
+            
+            let count = Set(dsymList).count
+            if count > 1 {
+                title += " | \(count) dSYMs"
+            } else if let uuid = self.dsymManager?.crash.uuid {
                 if let dsymFile = dsyms[uuid] {
                     title += " | \(dsymFile.name)"
                 }
             }
             self.stringValue = title
         } else {
-            self.stringValue = "dSYM file not found"
+            self.stringValue = "Import or download dSYM files"
         }
     }
 }
@@ -165,13 +209,17 @@ extension DsymStatusBarItem {
         let progress = task.progress.percentage
         switch task.status {
         case .running:
-            self.stringValue = "Downloading ... \(progress)%"
+            if progress > 0 {
+                self.stringValue = "Downloading ... \(progress)%"
+            } else {
+                self.stringValue = "Downloading ..."
+            }
         case .canceled:
-            self.stringValue = "Downloading ... \(progress)%"
+            self.stringValue = "Download canceled"
         case .failed(let code, _):
             self.stringValue = "Download failed: | \(code)"
         case .success:
-            self.stringValue = "Finished downloading"
+            self.stringValue = "Download completed"
         case .waiting:
             self.stringValue = "Downloading ..."
         }

@@ -33,6 +33,7 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var deviceItem: NSToolbarItem!
     @IBOutlet weak var indicator: NSProgressIndicator!
     @IBOutlet weak var statusBar: DsymStatusBarItem!
+    @IBOutlet weak var dsymButton: DsymToolBarButton!
     
     var isSymbolicating: Bool = false {
         didSet {
@@ -74,6 +75,7 @@ class MainWindowController: NSWindowController {
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
         self.statusBar.dsymManager = self.dsymManager
+        self.dsymButton.dsymManager = self.dsymManager
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
     }
@@ -127,6 +129,16 @@ class MainWindowController: NSWindowController {
         self.isSymbolicating = true
         let dsyms = self.dsymManager.dsymFiles.values.compactMap {$0.binaryPath}
         self.crashDocument?.symbolicate(withDsymPaths: dsyms)
+    }
+
+    @IBAction func showDsymInfo(_ sender: Any) {
+        guard self.dsymManager.crash != nil else {
+            return
+        }
+        let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
+        let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
+        vc.dsymManager = self.dsymManager
+        self.contentViewController?.presentAsSheet(vc)
     }
 }
 
