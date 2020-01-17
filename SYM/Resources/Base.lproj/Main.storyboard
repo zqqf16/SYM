@@ -763,18 +763,8 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jQO-Tk-XrS">
-                                <rect key="frame" x="329" y="13" width="67" height="32"/>
-                                <buttonCell key="cell" type="push" title="Blog" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qeO-ni-8aK">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="systemLight" size="13"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="gotoWebsite:" target="PAq-bZ-5Xh" id="t8c-OO-vL0"/>
-                                </connections>
-                            </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fwf-Au-kLz">
-                                <rect key="frame" x="249" y="13" width="80" height="32"/>
+                                <rect key="frame" x="326" y="13" width="80" height="32"/>
                                 <buttonCell key="cell" type="push" title="Github" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="thC-WT-ob8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="systemLight" size="13"/>
@@ -785,25 +775,21 @@
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="fwf-Au-kLz" secondAttribute="trailing" constant="20" id="1Qu-Ys-SGK"/>
                             <constraint firstItem="Ier-eo-cQw" firstAttribute="leading" secondItem="I5e-s3-CED" secondAttribute="leading" id="4Eq-HB-B54"/>
                             <constraint firstItem="mLi-CY-HTg" firstAttribute="leading" secondItem="I5e-s3-CED" secondAttribute="leading" id="5ga-TE-QGp"/>
-                            <constraint firstAttribute="trailing" secondItem="jQO-Tk-XrS" secondAttribute="trailing" constant="30" id="5wW-SM-KnE"/>
                             <constraint firstItem="o1t-Z8-VEV" firstAttribute="leading" secondItem="fcD-1M-B00" secondAttribute="leading" constant="20" id="6u8-He-iqN"/>
                             <constraint firstItem="Ier-eo-cQw" firstAttribute="top" secondItem="I5e-s3-CED" secondAttribute="bottom" id="Hhy-b5-qS1"/>
-                            <constraint firstAttribute="bottom" secondItem="jQO-Tk-XrS" secondAttribute="bottom" constant="20" id="ICR-ax-pJb"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Ier-eo-cQw" secondAttribute="trailing" constant="20" symbolic="YES" id="IVN-Su-yhU"/>
                             <constraint firstAttribute="trailing" secondItem="mLi-CY-HTg" secondAttribute="trailing" constant="30" id="IqJ-UA-58S"/>
-                            <constraint firstItem="fwf-Au-kLz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="o1t-Z8-VEV" secondAttribute="trailing" constant="8" symbolic="YES" id="PhO-sW-xBG"/>
                             <constraint firstItem="I5e-s3-CED" firstAttribute="leading" secondItem="o1t-Z8-VEV" secondAttribute="trailing" constant="19" id="RW1-Aq-lOG"/>
-                            <constraint firstItem="jQO-Tk-XrS" firstAttribute="leading" secondItem="fwf-Au-kLz" secondAttribute="trailing" constant="12" id="UEK-SO-rbJ"/>
-                            <constraint firstItem="jQO-Tk-XrS" firstAttribute="top" secondItem="mLi-CY-HTg" secondAttribute="bottom" constant="8" id="XhU-r1-mB2"/>
                             <constraint firstItem="I5e-s3-CED" firstAttribute="top" secondItem="fcD-1M-B00" secondAttribute="top" constant="42" id="cy2-Gl-wco"/>
-                            <constraint firstItem="jQO-Tk-XrS" firstAttribute="leading" secondItem="fwf-Au-kLz" secondAttribute="trailing" constant="12" id="kk3-d9-UPB"/>
                             <constraint firstAttribute="bottom" secondItem="o1t-Z8-VEV" secondAttribute="bottom" constant="30" id="l0S-1E-u1c"/>
                             <constraint firstItem="o1t-Z8-VEV" firstAttribute="top" secondItem="fcD-1M-B00" secondAttribute="top" constant="48" id="m7W-pq-BaV"/>
-                            <constraint firstItem="fwf-Au-kLz" firstAttribute="centerY" secondItem="jQO-Tk-XrS" secondAttribute="centerY" id="uSW-86-a2j"/>
+                            <constraint firstItem="fwf-Au-kLz" firstAttribute="top" secondItem="mLi-CY-HTg" secondAttribute="bottom" constant="8" symbolic="YES" id="rRW-kc-ECN"/>
                             <constraint firstItem="Ier-eo-cQw" firstAttribute="top" secondItem="I5e-s3-CED" secondAttribute="bottom" id="wD3-o4-qRM"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="I5e-s3-CED" secondAttribute="trailing" constant="20" symbolic="YES" id="xc3-Uz-QpF"/>
+                            <constraint firstAttribute="bottom" secondItem="fwf-Au-kLz" secondAttribute="bottom" constant="20" id="zNW-tl-YcO"/>
                         </constraints>
                     </view>
                     <connections>
