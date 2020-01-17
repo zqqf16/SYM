@@ -507,19 +507,6 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="0BD2B1F2-84E7-4DB1-B5CC-FB03A913D69C" label="dSYM" paletteLabel="dSYM" toolTip="Scroll to crashed thread" image="alert" sizingBehavior="auto" id="mGa-u9-JMD">
-                                    <button key="view" verticalHuggingPriority="750" id="mcA-YJ-MYg" customClass="DsymToolBarButton" customModule="SYM" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="14" width="158" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" title="dSYM not found" bezelStyle="texturedRounded" image="alert" imagePosition="leading" alignment="center" borderStyle="border" inset="2" id="b1X-wn-CUa">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="showDsymInfo:" target="akE-CK-Bh4" id="VXd-eQ-ogO"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
                                 <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" id="wHv-dg-CLj">
                                     <size key="minSize" width="100" height="22"/>
@@ -541,11 +528,56 @@
                                     </progressIndicator>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
+                                <toolbarItem implicitItemIdentifier="C275397C-EACE-4CE8-8D06-593F0445D4DF" label="Download" paletteLabel="Download" toolTip="Scroll to crashed thread" image="Cloud" id="QFd-N4-QA7">
+                                    <size key="minSize" width="32" height="25"/>
+                                    <size key="maxSize" width="37" height="28"/>
+                                    <button key="view" verticalHuggingPriority="750" id="25C-7N-oUo">
+                                        <rect key="frame" x="11" y="14" width="37" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Cloud" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="GDR-1P-1fb">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="downloadDsym:" target="wBG-Uk-v7d" id="Xa6-kq-OkZ"/>
+                                        </connections>
+                                    </button>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="3BAF066C-E5CB-4E93-935A-AC8D1EA73E49" label="dSYM" paletteLabel="dSYM" toolTip="Choose or download dSYM file" image="alert" sizingBehavior="auto" id="CeZ-6B-0tO">
+                                    <popUpButton key="view" verticalHuggingPriority="750" id="Nv0-ye-SGb" customClass="DsymToolBarButton" customModule="SYM" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="14" width="200" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <popUpButtonCell key="cell" type="roundTextured" title="dSYM file not found" bezelStyle="texturedRounded" image="alert" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" id="t3m-jQ-qaC">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                            <menu key="menu" autoenablesItems="NO" id="Vbx-Ql-3h4">
+                                                <items>
+                                                    <menuItem title="dSYM file not found" image="alert" hidden="YES" id="9iW-se-3R0">
+                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                    </menuItem>
+                                                    <menuItem title="Show dSYM Info" id="NN1-bu-nns" userLabel="Show dSYM Info">
+                                                        <connections>
+                                                            <action selector="showDsymInfo:" target="wBG-Uk-v7d" id="Q0k-5H-V0T"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                    <menuItem isSeparatorItem="YES" id="R3q-Pd-DpS"/>
+                                                    <menuItem title="Download" tag="1" id="5g8-O7-UCs">
+                                                        <connections>
+                                                            <action selector="downloadDsym:" target="wBG-Uk-v7d" id="smg-bW-1QI"/>
+                                                        </connections>
+                                                    </menuItem>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                    </popUpButton>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="56F-jO-Bdr"/>
-                                <toolbarItem reference="mGa-u9-JMD"/>
+                                <toolbarItem reference="CeZ-6B-0tO"/>
+                                <toolbarItem reference="QFd-N4-QA7"/>
+                                <toolbarItem reference="wx0-ub-BB0"/>
                                 <toolbarItem reference="SZU-E2-ttI"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
                                 <toolbarItem reference="wHv-dg-CLj"/>
@@ -559,10 +591,9 @@
                     </window>
                     <connections>
                         <outlet property="deviceItem" destination="4T4-1f-Y26" id="TaU-FR-WmN"/>
-                        <outlet property="dsymButton" destination="mcA-YJ-MYg" id="cvF-Gd-VNM"/>
+                        <outlet property="dsymPopUpButton" destination="Nv0-ye-SGb" id="CoR-6R-2XD"/>
                         <outlet property="indicator" destination="zP5-Pn-E5C" id="z4w-VT-HaL"/>
                         <outlet property="statusBar" destination="UYX-wf-f6l" id="6gq-N9-7ZW"/>
-                        <outlet property="symButton" destination="Qu1-si-H6N" id="Oej-Cu-HTh"/>
                         <segue destination="5WI-tf-yEY" kind="relationship" relationship="window.shadowedContentViewController" id="Lwr-gD-c6J"/>
                     </connections>
                 </windowController>
@@ -727,7 +758,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mLi-CY-HTg">
                                 <rect key="frame" x="137" y="49" width="255" height="14"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Copyright © 2016年 zqqf16. All rights reserved." id="Jsd-cK-7rO">
-                                    <font key="font" metaFont="controlContent" size="11"/>
+                                    <font key="font" metaFont="label" size="11"/>
                                     <color key="textColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -788,6 +819,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Cloud" width="20" height="16"/>
         <image name="Device" width="16" height="16"/>
         <image name="Play" width="20" height="16"/>
         <image name="Reticle" width="20" height="16"/>

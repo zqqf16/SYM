@@ -30,10 +30,11 @@ extension NSImage {
 class MainWindowController: NSWindowController {
     // Toolbar items
     @IBOutlet weak var symButton: NSButton!
+    
     @IBOutlet weak var deviceItem: NSToolbarItem!
     @IBOutlet weak var indicator: NSProgressIndicator!
     @IBOutlet weak var statusBar: DsymStatusBarItem!
-    @IBOutlet weak var dsymButton: DsymToolBarButton!
+    @IBOutlet weak var dsymPopUpButton: DsymToolBarButton!
     
     var isSymbolicating: Bool = false {
         didSet {
@@ -75,7 +76,7 @@ class MainWindowController: NSWindowController {
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
         self.statusBar.dsymManager = self.dsymManager
-        self.dsymButton.dsymManager = self.dsymManager
+        self.dsymPopUpButton.dsymManager = self.dsymManager
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
     }
@@ -139,6 +140,12 @@ class MainWindowController: NSWindowController {
         let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
         vc.dsymManager = self.dsymManager
         self.contentViewController?.presentAsSheet(vc)
+    }
+    
+    @IBAction func downloadDsym(_ sender: AnyObject?) {
+        if let crash = self.dsymManager.crash {
+            DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+        }
     }
 }
 

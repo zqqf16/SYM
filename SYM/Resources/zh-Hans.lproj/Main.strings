@@ -53,9 +53,6 @@
 /* Class = "NSMenuItem"; title = "About SYM"; ObjectID = "5kV-Vb-QxS"; */
 "5kV-Vb-QxS.title" = "关于 SYM";
 
-/* Class = "NSMenuItem"; title = "Show dSYM Info"; ObjectID = "64e-AO-Xx2"; */
-"64e-AO-Xx2.title" = "显示 dSYM 信息";
-
 /* Class = "NSMenuItem"; title = "Revert to Saved"; ObjectID = "7fK-ou-zU2"; */
 "7fK-ou-zU2.title" = "复原到";
 
@@ -372,3 +369,9 @@
 "zVG-Ln-82I.title" = "1.1.1 (200)";
 
 "kDi-ec-idF.title" = "设备";
+
+/* Class = "NSMenuItem"; title = "Show dSYM Info"; ObjectID = "NN1-bu-nns"; */
+"NN1-bu-nns.title" = "显示 dSYM 信息";
+
+/* Class = "NSMenuItem"; title = "Download"; ObjectID = "5g8-O7-UCs"; */
+"5g8-O7-UCs.title" = "下载";

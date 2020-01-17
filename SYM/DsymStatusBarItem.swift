@@ -26,7 +26,7 @@ extension NSImage {
     static let download: NSImage = #imageLiteral(resourceName: "Cloud")
 }
 
-class DsymToolBarButton: NSButton {
+class DsymToolBarButton: NSPopUpButton {
     var dsymManager: DsymManager! {
         didSet {
             self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
