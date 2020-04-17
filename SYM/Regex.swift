@@ -133,7 +133,9 @@ extension RE {
     }
     
     // 0x18876d000 -        0x188790fff  libsystem_malloc.dylib  <6E321806-C54E-31DB-B4A8-9DEC04A5CA2C>  /usr/lib/system/libsystem_malloc.dylib
-    static let cpuUsageImage = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+[^\\s]+\\s+([^\\s]+)\\s*\\s*<(.*)> (.*)")
+    // 0x18876d000 -        ???          libsystem_malloc.dylib  <6E321806-C54E-31DB-B4A8-9DEC04A5CA2C>  /usr/lib/system/libsystem_malloc.dylib
+    // 0x18876d000 -        ???          libsystem_malloc.dylib 123 (1.1.1)  <6E321806-C54E-31DB-B4A8-9DEC04A5CA2C>  /usr/lib/system/libsystem_malloc.dylib
+    static let cpuUsageImage = try! RE("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+[^\\s]+\\s+([^\\s]+).*\\s*<(.*)> (.*)")
 
     // 2   -[NSRunLoop run] + 87 (Foundation + 512424) [0x182f721a8]
     // 2   -[TheClass function:] (xxx.m:1476 in binary + 12591292) [0x101b720bc]

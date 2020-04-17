@@ -187,13 +187,29 @@ class CPUUsageLog: CrashInfo {
         self.device = self.parseOneLineInfo(.hardware)
         self.arch = self.parseOneLineInfo(.architecture) ?? "arm64"
         self.osVersion = self.parseOneLineInfo(.osVersion)
-        self.appVersion = self.parseOneLineInfo(.version)
+        self.appVersion = self.parseAppVersion()
         if let path = self.parseOneLineInfo(.path),
             let imageRE = RE.image(withPath: path),
             let imageMatch = imageRE.findFirst(self.raw) {
             //self.bundleID = imageMatch[1]
             self.uuid = imageMatch[1].uuidFormat()
         }
+    }
+    
+    private func parseAppVersion() -> String? {
+        guard let versionString = self.parseOneLineInfo(.version) else {
+            return nil
+        }
+        
+        // 1.1.1 (123) to 123 (1.1.1)
+        let components = versionString.components(separatedBy: " ")
+        if components.count != 2 {
+            return versionString;
+        }
+        
+        let version = components[0]
+        let build = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
+        return "\(build) (\(version))"
     }
     
     override func parseBinaries() {
