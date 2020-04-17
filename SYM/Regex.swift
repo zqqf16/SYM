@@ -124,6 +124,12 @@ extension RE {
     // Version:             521 (5.7.8)
     static let version = try! RE("^Version:\\s*(.*)", options: .anchorsMatchLines)
     
+    // App version:         5.7.8
+    static let appVersion = try! RE("^App version:\\s*(.*)", options: .anchorsMatchLines)
+    
+    // Build version:       521
+    static let buildVersion = try! RE("^Build version:\\s*(.*)", options: .anchorsMatchLines)
+    
     // Path: /private/var/containers/Bundle/Application/xxx
     static let path = try! RE("^Path:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     

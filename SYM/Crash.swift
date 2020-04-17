@@ -197,6 +197,10 @@ class CPUUsageLog: CrashInfo {
     }
     
     private func parseAppVersion() -> String? {
+        if let app = self.parseOneLineInfo(.appVersion), let build = self.parseOneLineInfo(.buildVersion) {
+            return "\(build) (\(app))"
+        }
+        
         guard let versionString = self.parseOneLineInfo(.version) else {
             return nil
         }
@@ -207,9 +211,9 @@ class CPUUsageLog: CrashInfo {
             return versionString;
         }
         
-        let version = components[0]
+        let app = components[0]
         let build = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
-        return "\(build) (\(version))"
+        return "\(build) (\(app))"
     }
     
     override func parseBinaries() {
