@@ -96,6 +96,15 @@ class DsymDownloadTask {
         case canceled
         case failed(code: Int, message: String?)
         case success
+        
+        func shouldRetry() -> Bool {
+            switch self {
+            case .waiting, .running:
+                return false
+            default:
+                return true
+            }
+        }
     }
 
     fileprivate var eventBus: EventBus?
@@ -244,7 +253,7 @@ class DsymDownloader {
             return nil
         }
         
-        if let task = self.tasks[uuid] {
+        if let task = self.tasks[uuid], !task.status.shouldRetry() {
             return task
         }
         
