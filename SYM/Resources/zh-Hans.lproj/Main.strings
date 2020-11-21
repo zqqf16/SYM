@@ -164,6 +164,10 @@
 /* Class = "NSToolbarItem"; toolTip = "Scroll to crashed thread"; ObjectID = "SZU-E2-ttI"; */
 "SZU-E2-ttI.toolTip" = "定位到崩溃线程";
 
+"QFd-N4-QA7.label" = "下载dSYM";
+"QFd-N4-QA7.paletteLabel" = "下载dSYM";
+"QFd-N4-QA7.toolTip" = "下载dSYM文件";
+
 /* Class = "NSMenuItem"; title = "Copy"; ObjectID = "TB7-TD-ave"; */
 "TB7-TD-ave.title" = "复制";
 
