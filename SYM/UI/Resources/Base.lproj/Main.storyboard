@@ -562,9 +562,9 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="82A91B34-0732-4B48-8602-502E69540025" label="" paletteLabel="" tag="-1" sizingBehavior="auto" id="TiT-4F-eoC">
                                     <nil key="toolTip"/>
-                                    <progressIndicator key="view" maxValue="100" doubleValue="65" controlSize="small" style="spinning" id="X9S-hi-O70">
+                                    <progressIndicator key="view" hidden="YES" maxValue="100" controlSize="small" style="spinning" id="X9S-hi-O70">
                                         <rect key="frame" x="0.0" y="14" width="16" height="16"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <autoresizingMask key="autoresizingMask"/>
                                     </progressIndicator>
                                 </toolbarItem>
                             </allowedToolbarItems>
@@ -755,13 +755,13 @@
                                 <rect key="frame" x="137" y="48" width="255" height="14"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Copyright © 2016年 zqqf16. All rights reserved." id="Jsd-cK-7rO">
                                     <font key="font" metaFont="label" size="11"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fwf-Au-kLz">
-                                <rect key="frame" x="333" y="13" width="74" height="32"/>
-                                <buttonCell key="cell" type="push" title="Github" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="thC-WT-ob8">
+                                <rect key="frame" x="295" y="13" width="112" height="32"/>
+                                <buttonCell key="cell" type="push" title="Source Code" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="thC-WT-ob8">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="systemLight" size="13"/>
                                 </buttonCell>

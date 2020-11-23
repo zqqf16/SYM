@@ -73,12 +73,6 @@ class MainWindowController: NSWindowController {
         return self.crashDocument?.crashInfo
     }
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        self.downloadIndicator.doubleValue = 0
-        self.downloadIndicator.isHidden = true
-    }
-    
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
