@@ -23,68 +23,65 @@
 import Cocoa
 import Combine
 
-struct DeviceSidebarHeaderNode: SidebarNode {
+class DeviceSidebarNode: SidebarNode {
     var title: String
-    var lockdown: MDLockdown
-
-    var children: [SidebarNode]? = []
+    var children: [SidebarNode]?
     var image: NSImage?
     var isGroup: Bool = true
     var isSelectable: Bool = true
-    
-    init(lockdown: MDLockdown, children: [SidebarNode]) {
-        self.lockdown = lockdown
-        self.title = lockdown.deviceName ?? "Unnamed device"
-        self.children = children
+
+    init(title: String, imageName: String = "") {
+        self.title = title
+        self.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
     }
 }
 
-struct DeviceSidebarFileHeaderNode: SidebarNode {
-    var title: String = "File Browser"
-    var children: [SidebarNode]?
-    var image: NSImage? = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
-    var isGroup: Bool = false
-    var isSelectable: Bool = false
-
-    init(children: [DeviceSidebarFileNode]) {
-        self.children = children
-    }
-}
-
-struct DeviceSidebarFileNode: SidebarNode {
-    var title: String
-    var children: [SidebarNode]? = nil
-    var image: NSImage? = NSImage(systemSymbolName: "folder", accessibilityDescription: nil)
-    var isGroup: Bool = false
-    var isSelectable: Bool = true
-    
+class DeviceSidebarFileNode: DeviceSidebarNode {
     var deviceID: String
     var appID: String
 
     init(deviceID: String, appID: String, title: String) {
         self.deviceID = deviceID
         self.appID = appID
-        self.title = title
+        super.init(title: title, imageName: "folder")
+        self.isGroup = false
+        self.isSelectable = true
     }
 }
 
-struct DeviceSidebarCrashNode: SidebarNode {
-    var title: String = "Crash"
-    var children: [SidebarNode]? = []
-    var image: NSImage? = NSImage(systemSymbolName: "ladybug", accessibilityDescription: nil)
-    var isGroup: Bool = false
-    var isSelectable: Bool = true
-    
+class DeviceSidebarCrashNode: DeviceSidebarNode {
     var deviceID: String
 
     init(deviceID: String) {
         self.deviceID = deviceID
+        super.init(title: NSLocalizedString("Crash Log", comment: "Crash Log"), imageName: "ladybug")
+        self.isGroup = false
+        self.isSelectable = true
+    }
+}
+
+extension DeviceSidebarNode {
+    static func deviceHeaderNode(_ title: String?,  children: [DeviceSidebarNode]) -> DeviceSidebarNode {
+        let node = DeviceSidebarNode(title: title ?? "Unnamed device")
+        node.children = children
+        node.isGroup = true
+        node.isSelectable = true
+        return node
+    }
+    
+    static func fileHeaderNode(_ children: [DeviceSidebarNode]) -> DeviceSidebarNode {
+        let title = NSLocalizedString("File Browser", comment: "File Browser")
+        let node = DeviceSidebarNode(title: title, imageName: "folder")
+        node.isGroup = false
+        node.isSelectable = false
+        node.children = children
+        return node
     }
 }
 
 class DeviceDataSource {
     @Published
-    var nodes: [SidebarNode] = []
+    var nodes: [DeviceSidebarNode] = []
     
     private var cancellable: AnyCancellable!
     private var storage = Set<AnyCancellable>()
@@ -100,7 +97,7 @@ class DeviceDataSource {
     func prepareDevices() {
         DispatchQueue.global().async {
             let udids = MDDeviceMonitor.shared().connectedDevices
-            let nodes = udids.map { (udid) -> SidebarNode in
+            let nodes = udids.map { (udid) -> DeviceSidebarNode in
                 let lockdown = MDLockdown(udid: udid)
                 let instproxy = MDInstProxy(lockdown: lockdown)
                 let appInfoList = instproxy.listApps().filter { $0.isDeveloping }
@@ -108,9 +105,9 @@ class DeviceDataSource {
                 let appNodes = appInfoList.map { info in
                     return DeviceSidebarFileNode(deviceID: udid, appID: info.identifier , title: info.name)
                 }
-                let fileNode = DeviceSidebarFileHeaderNode(children: appNodes)
+                let fileNode = DeviceSidebarNode.fileHeaderNode(appNodes)
                 let crashNode = DeviceSidebarCrashNode(deviceID: udid)
-                return DeviceSidebarHeaderNode(lockdown: lockdown, children: [fileNode, crashNode])
+                return DeviceSidebarNode.deviceHeaderNode(lockdown.deviceName, children: [fileNode, crashNode])
             }
             
             DispatchQueue.main.async {
@@ -134,7 +131,7 @@ class DeviceHomeViewController: NSSplitViewController {
     let dataSource = DeviceDataSource()
     var storage = Set<AnyCancellable>()
     
-    var nodes: [SidebarNode] = [] {
+    var nodes: [DeviceSidebarNode] = [] {
         didSet {
             self.reloadData()
         }

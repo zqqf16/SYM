@@ -51,6 +51,18 @@ class DeviceSidebarViewController: NSViewController {
         }
     }
     
+    var selectedNode: SidebarNode? {
+        get {
+            let row = self.outlineView.selectedRow
+            return self.outlineView.item(atRow: row) as? SidebarNode
+        }
+        set {
+            let index = self.outlineView.row(forItem: newValue)
+            let indexSet = IndexSet(integer: index)
+            self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: true)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.outlineView.dataSource = self
