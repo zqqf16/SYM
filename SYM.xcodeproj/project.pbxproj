@@ -31,6 +31,7 @@
 		51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */; };
 		51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A4A11EEFF78500F21AE4 /* Doctor.swift */; };
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
+		B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */; };
 		B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
 		B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
@@ -52,8 +53,8 @@
 		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
 		B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA4F23A8E8EB00049491 /* DsymManager.swift */; };
 		B56BAA5623A8ECDB00049491 /* MdfindWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */; };
+		B5847A8D2569419600B674CA /* DeviceContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5847A8C2569419600B674CA /* DeviceContentViewController.swift */; };
 		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
-		B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */; };
 		B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
 		B59B326C22E0112800013B67 /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
 		B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8222D47E46003BC45C /* MDDeviceFile.m */; };
@@ -63,6 +64,7 @@
 		B59B327122E0113600013B67 /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
+		B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
 		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
 		B5F3578922C3121200111FF3 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578822C3121200111FF3 /* Image.swift */; };
@@ -136,6 +138,7 @@
 		51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		51C9A4A11EEFF78500F21AE4 /* Doctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doctor.swift; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
+		B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHomeViewController.swift; sourceTree = "<group>"; };
 		B53E2F7522D44838003BC45C /* MDLockdown.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDLockdown.h; sourceTree = "<group>"; };
 		B53E2F7622D44838003BC45C /* MDLockdown.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDLockdown.m; sourceTree = "<group>"; };
 		B53E2F7822D4710C003BC45C /* MDUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDUtil.h; sourceTree = "<group>"; };
@@ -155,10 +158,11 @@
 		B56B9B8C23A3869100049491 /* DsymViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymViewController.swift; sourceTree = "<group>"; };
 		B56BAA4F23A8E8EB00049491 /* DsymManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DsymManager.swift; path = SYM/dSYM/DsymManager.swift; sourceTree = SOURCE_ROOT; };
 		B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MdfindWrapper.swift; sourceTree = "<group>"; };
+		B5847A8C2569419600B674CA /* DeviceContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContentViewController.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
-		B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBaseViewController.swift; sourceTree = "<group>"; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
+		B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSidebarViewController.swift; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		B5F3578822C3121200111FF3 /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
@@ -325,6 +329,18 @@
 			path = SYMTests;
 			sourceTree = "<group>";
 		};
+		B50FE45425693C760031E62E /* Device */ = {
+			isa = PBXGroup;
+			children = (
+				B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */,
+				B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */,
+				B5847A8C2569419600B674CA /* DeviceContentViewController.swift */,
+				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
+				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
+			);
+			path = Device;
+			sourceTree = "<group>";
+		};
 		B53E2F8C22D48E28003BC45C /* icp */ = {
 			isa = PBXGroup;
 			children = (
@@ -414,6 +430,7 @@
 		F45321071D30CC6E00639917 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				B50FE45425693C760031E62E /* Device */,
 				B5F357A222C5E54A00111FF3 /* Resources */,
 				F49E2D46214BA704001A6A88 /* Config.swift */,
 				B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */,
@@ -423,13 +440,10 @@
 				51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */,
 				F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */,
 				F49E2D44214BA5E3001A6A88 /* DownloadScriptViewController.swift */,
-				B597FE1622DCA79A00BE439A /* DeviceBaseViewController.swift */,
-				F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */,
-				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
 				F48D8C9021492079009E2DA6 /* DsymStatusBarItem.swift */,
 				B56B9B8C23A3869100049491 /* DsymViewController.swift */,
 			);
-			name = UI;
+			path = UI;
 			sourceTree = "<group>";
 		};
 		F49BD1E31D2FF46300024AAE = {
@@ -770,12 +784,14 @@
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */,
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
+				B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
 				B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */,
 				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,
+				B5847A8D2569419600B674CA /* DeviceContentViewController.swift in Sources */,
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F49E2D47214BA704001A6A88 /* Config.swift in Sources */,
@@ -783,12 +799,12 @@
 				B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */,
 				B56BAA5623A8ECDB00049491 /* MdfindWrapper.swift in Sources */,
 				B53E2F8322D47E46003BC45C /* MDDeviceFile.m in Sources */,
+				B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */,
 				F405436A1D321E37009B2923 /* Window.swift in Sources */,
 				F49E2D45214BA5E3001A6A88 /* DownloadScriptViewController.swift in Sources */,
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
 				B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */,
-				B597FE1722DCA79A00BE439A /* DeviceBaseViewController.swift in Sources */,
 				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
 				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
@@ -1039,7 +1055,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -1089,7 +1105,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -1121,7 +1137,7 @@
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 0.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1160,7 +1176,7 @@
 					"$(PROJECT_DIR)/SYM/Device/usbmuxd",
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 0.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -462,11 +461,11 @@
                         <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
                         <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" centeredItem="wHv-dg-CLj" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
                             <allowedToolbarItems>
-                                <toolbarItem implicitItemIdentifier="E7F1423A-A157-45A9-B44E-90697E12AE45" label="Symbolicate" paletteLabel="Symbolicate" toolTip="Symbolicate" image="play.fill" sizingBehavior="auto" id="jOx-ar-DOP">
+                                <toolbarItem implicitItemIdentifier="E7F1423A-A157-45A9-B44E-90697E12AE45" label="Symbolicate" paletteLabel="Symbolicate" toolTip="Symbolicate" image="play.fill" catalog="system" sizingBehavior="auto" id="jOx-ar-DOP">
                                     <button key="view" verticalHuggingPriority="750" id="Qu1-si-H6N">
-                                        <rect key="frame" x="18" y="14" width="37" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="play.fill" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="fS4-X2-1L4">
+                                        <rect key="frame" x="24" y="14" width="24" height="23"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="play.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="fS4-X2-1L4">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -475,11 +474,11 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Import crash report from device" image="Device" sizingBehavior="auto" id="4T4-1f-Y26">
+                                <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Import crash report from device" image="iphone" catalog="system" sizingBehavior="auto" id="4T4-1f-Y26">
                                     <button key="view" verticalHuggingPriority="750" id="5Nz-F0-1ts">
-                                        <rect key="frame" x="3" y="14" width="37" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="Device" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="CAj-xe-cd5">
+                                        <rect key="frame" x="9" y="14" width="26" height="23"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="iphone" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="CAj-xe-cd5">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -488,11 +487,11 @@
                                         </connections>
                                     </button>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Scroll to crashed thread" image="target" sizingBehavior="auto" autovalidates="NO" id="SZU-E2-ttI">
+                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Scroll to crashed thread" image="target" catalog="system" sizingBehavior="auto" autovalidates="NO" id="SZU-E2-ttI">
                                     <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
-                                        <rect key="frame" x="0.0" y="14" width="37" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="target" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
+                                        <rect key="frame" x="5" y="14" width="27" height="23"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="target" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -504,7 +503,7 @@
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
                                 <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" sizingBehavior="auto" id="wHv-dg-CLj">
                                     <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="DsymStatusBarItem" customModule="SYM" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="14" width="320" height="22"/>
+                                        <rect key="frame" x="10" y="14" width="21" height="22"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" bezelStyle="round" id="N1P-ok-3bD" customClass="DsymStatusBarItemCell" customModule="SYM" customModuleProvider="target">
                                             <font key="font" metaFont="system"/>
@@ -520,11 +519,11 @@
                                     </progressIndicator>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
-                                <toolbarItem implicitItemIdentifier="C275397C-EACE-4CE8-8D06-593F0445D4DF" label="Download dSYM" paletteLabel="Download dSYM" toolTip="Download dSYM file" image="cloud.fill" sizingBehavior="auto" id="QFd-N4-QA7">
+                                <toolbarItem implicitItemIdentifier="C275397C-EACE-4CE8-8D06-593F0445D4DF" label="Download dSYM" paletteLabel="Download dSYM" toolTip="Download dSYM file" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="QFd-N4-QA7">
                                     <button key="view" verticalHuggingPriority="750" id="25C-7N-oUo">
-                                        <rect key="frame" x="28" y="14" width="37" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="cloud.fill" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="GDR-1P-1fb">
+                                        <rect key="frame" x="32" y="14" width="30" height="23"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="icloud.and.arrow.down.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="GDR-1P-1fb">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -796,11 +795,11 @@
         <segue reference="o44-9z-7zV"/>
     </inferredMetricsTieBreakers>
     <resources>
-        <image name="Device" width="16" height="16"/>
         <image name="alert" width="19" height="19"/>
-        <image name="cloud.fill" width="15" height="10"/>
         <image name="file" width="512" height="512"/>
-        <image name="play.fill" width="10" height="11"/>
-        <image name="target" width="13" height="13"/>
+        <image name="icloud.and.arrow.down.fill" catalog="system" width="18" height="17"/>
+        <image name="iphone" catalog="system" width="14" height="16"/>
+        <image name="play.fill" catalog="system" width="12" height="13"/>
+        <image name="target" catalog="system" width="15" height="15"/>
     </resources>
 </document>

@@ -23,7 +23,7 @@
 import Cocoa
 
 extension NSImage {
-    static let download: NSImage = NSImage(named: "cloud.fill")!
+    static let download: NSImage = NSImage(systemSymbolName: "cloud.fill", accessibilityDescription: nil)!
 }
 
 class DsymToolBarButton: NSPopUpButton {
