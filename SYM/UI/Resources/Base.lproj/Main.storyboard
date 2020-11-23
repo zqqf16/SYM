@@ -560,12 +560,20 @@
                                         </popUpButtonCell>
                                     </popUpButton>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="82A91B34-0732-4B48-8602-502E69540025" label="" paletteLabel="" tag="-1" sizingBehavior="auto" id="TiT-4F-eoC">
+                                    <nil key="toolTip"/>
+                                    <progressIndicator key="view" maxValue="100" doubleValue="65" controlSize="small" style="spinning" id="X9S-hi-O70">
+                                        <rect key="frame" x="0.0" y="14" width="16" height="16"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    </progressIndicator>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="jOx-ar-DOP"/>
                                 <toolbarItem reference="56F-jO-Bdr"/>
                                 <toolbarItem reference="CeZ-6B-0tO"/>
                                 <toolbarItem reference="QFd-N4-QA7"/>
+                                <toolbarItem reference="TiT-4F-eoC"/>
                                 <toolbarItem reference="wx0-ub-BB0"/>
                                 <toolbarItem reference="SZU-E2-ttI"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
@@ -578,6 +586,7 @@
                     </window>
                     <connections>
                         <outlet property="deviceItem" destination="4T4-1f-Y26" id="TaU-FR-WmN"/>
+                        <outlet property="downloadIndicator" destination="X9S-hi-O70" id="Ns9-bD-QRC"/>
                         <outlet property="dsymPopUpButton" destination="Nv0-ye-SGb" id="CoR-6R-2XD"/>
                         <outlet property="indicator" destination="zP5-Pn-E5C" id="z4w-VT-HaL"/>
                         <outlet property="statusBar" destination="UYX-wf-f6l" id="6gq-N9-7ZW"/>

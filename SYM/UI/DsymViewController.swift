@@ -47,7 +47,7 @@ class DsymTableCellView: NSTableCellView {
             self.actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
         } else {
             self.path.stringValue = NSLocalizedString("dsym_file_not_found", comment: "Dsym file not found")
-            self.actionButton.title = NSLocalizedString("Select", comment: "Select a dSYM file")
+            self.actionButton.title = NSLocalizedString("Import", comment: "Import a dSYM file")
         }
     }
     
