@@ -32,6 +32,7 @@
 		51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A4A11EEFF78500F21AE4 /* Doctor.swift */; };
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
 		B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */; };
+		B51F9AFA256BF26800E52FAF /* DownloadManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B51F9AFC256BF26800E52FAF /* DownloadManager.storyboard */; };
 		B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
 		B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
@@ -139,6 +140,8 @@
 		51C9A4A11EEFF78500F21AE4 /* Doctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doctor.swift; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHomeViewController.swift; sourceTree = "<group>"; };
+		B51F9B01256BF26F00E52FAF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DownloadManager.storyboard; sourceTree = "<group>"; };
+		B51F9B02256BF28300E52FAF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DownloadManager.strings"; sourceTree = "<group>"; };
 		B53E2F7522D44838003BC45C /* MDLockdown.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDLockdown.h; sourceTree = "<group>"; };
 		B53E2F7622D44838003BC45C /* MDLockdown.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDLockdown.m; sourceTree = "<group>"; };
 		B53E2F7822D4710C003BC45C /* MDUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDUtil.h; sourceTree = "<group>"; };
@@ -380,6 +383,7 @@
 				B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */,
 				B5F357B322C5E90C00111FF3 /* Localizable.strings */,
 				B56B9B8723A379CE00049491 /* Dsym.storyboard */,
+				B51F9AFC256BF26800E52FAF /* DownloadManager.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -718,6 +722,7 @@
 				B5F3579822C5CAD400111FF3 /* ScriptImporter.storyboard in Resources */,
 				519FF5881D54BB2600B07A65 /* symbolicatecrash in Resources */,
 				B5F3579D22C5CB1000111FF3 /* Preferences.storyboard in Resources */,
+				B51F9AFA256BF26800E52FAF /* DownloadManager.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -832,6 +837,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		B51F9AFC256BF26800E52FAF /* DownloadManager.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B51F9B01256BF26F00E52FAF /* Base */,
+				B51F9B02256BF28300E52FAF /* zh-Hans */,
+			);
+			name = DownloadManager.storyboard;
+			sourceTree = "<group>";
+		};
 		B56B9B8723A379CE00049491 /* Dsym.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1120,7 +1134,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 74;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -1159,7 +1173,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 73;
+				CURRENT_PROJECT_VERSION = 74;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";

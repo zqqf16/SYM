@@ -459,59 +459,9 @@
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <rect key="contentRect" x="385" y="219" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
-                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" centeredItem="wHv-dg-CLj" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
+                        <toolbar key="toolbar" implicitIdentifier="F55F15A0-4B1F-42C4-B116-BC34ED8690BA" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="686-NV-b5Y">
                             <allowedToolbarItems>
-                                <toolbarItem implicitItemIdentifier="E7F1423A-A157-45A9-B44E-90697E12AE45" label="Symbolicate" paletteLabel="Symbolicate" toolTip="Symbolicate" image="play.fill" catalog="system" sizingBehavior="auto" id="jOx-ar-DOP">
-                                    <button key="view" verticalHuggingPriority="750" id="Qu1-si-H6N">
-                                        <rect key="frame" x="24" y="14" width="24" height="23"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="play.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="fS4-X2-1L4">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="symbolicate:" target="akE-CK-Bh4" id="MZk-Xf-oCd"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="DFDC7765-BEDF-4D15-AB79-8ACF0AB0F88F" label="Device" paletteLabel="Device" toolTip="Import crash report from device" image="iphone" catalog="system" sizingBehavior="auto" id="4T4-1f-Y26">
-                                    <button key="view" verticalHuggingPriority="750" id="5Nz-F0-1ts">
-                                        <rect key="frame" x="9" y="14" width="26" height="23"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="iphone" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="CAj-xe-cd5">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <segue destination="BZX-tn-6tC" kind="show" id="o44-9z-7zV"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="37F8A00E-BE1B-415B-9BFD-93132BA81DC8" label="Scroll" paletteLabel="Scroll" toolTip="Scroll to crashed thread" image="target" catalog="system" sizingBehavior="auto" autovalidates="NO" id="SZU-E2-ttI">
-                                    <button key="view" verticalHuggingPriority="750" id="q6F-i6-V4g">
-                                        <rect key="frame" x="5" y="14" width="27" height="23"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="target" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="8oZ-nV-kLn">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="vhL-6a-p4l"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wx0-ub-BB0"/>
-                                <toolbarItem implicitItemIdentifier="FEFA1E4B-D582-41A7-BD6A-3E150606E6DC" label="Status" paletteLabel="Status" toolTip="Status" sizingBehavior="auto" id="wHv-dg-CLj">
-                                    <textField key="view" verticalHuggingPriority="750" textCompletion="NO" id="UYX-wf-f6l" customClass="DsymStatusBarItem" customModule="SYM" customModuleProvider="target">
-                                        <rect key="frame" x="10" y="14" width="21" height="22"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" bezelStyle="round" id="N1P-ok-3bD" customClass="DsymStatusBarItemCell" customModule="SYM" customModuleProvider="target">
-                                            <font key="font" metaFont="system"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </textFieldCell>
-                                    </textField>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="C5AD0D29-9AF0-4059-9039-100C6BAE05ED" label="Indicator" paletteLabel="Indicator" tag="-1" sizingBehavior="auto" id="56F-jO-Bdr">
                                     <progressIndicator key="view" hidden="YES" wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="zP5-Pn-E5C">
                                         <rect key="frame" x="19" y="14" width="16" height="16"/>
@@ -519,19 +469,6 @@
                                     </progressIndicator>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="fQX-8I-pLN"/>
-                                <toolbarItem implicitItemIdentifier="C275397C-EACE-4CE8-8D06-593F0445D4DF" label="Download dSYM" paletteLabel="Download dSYM" toolTip="Download dSYM file" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="QFd-N4-QA7">
-                                    <button key="view" verticalHuggingPriority="750" id="25C-7N-oUo">
-                                        <rect key="frame" x="32" y="14" width="30" height="23"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="icloud.and.arrow.down.fill" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="GDR-1P-1fb">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <connections>
-                                            <action selector="downloadDsym:" target="wBG-Uk-v7d" id="Xa6-kq-OkZ"/>
-                                        </connections>
-                                    </button>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="3BAF066C-E5CB-4E93-935A-AC8D1EA73E49" label="dSYM" paletteLabel="dSYM" toolTip="Choose or download dSYM file" image="alert" sizingBehavior="auto" id="CeZ-6B-0tO">
                                     <popUpButton key="view" verticalHuggingPriority="750" id="Nv0-ye-SGb" customClass="DsymToolBarButton" customModule="SYM" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="14" width="182" height="25"/>
@@ -567,17 +504,45 @@
                                         <autoresizingMask key="autoresizingMask"/>
                                     </progressIndicator>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="9022F606-5B9B-487F-B2BF-F4ACAC2D1813" label="Download" paletteLabel="Download" tag="-1" image="icloud.and.arrow.down.fill" catalog="system" id="oKM-0d-zz3">
+                                    <size key="minSize" width="44" height="30"/>
+                                    <size key="maxSize" width="44" height="30"/>
+                                    <connections>
+                                        <segue destination="dcd-CR-DNH" kind="show" id="bXp-YH-5jg"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="F6E373C6-5175-4DC4-9B0A-A6E3708520AA" label="Scroll" paletteLabel="Scroll" tag="-1" image="target" catalog="system" id="K4t-4V-GK0">
+                                    <size key="minSize" width="37" height="28"/>
+                                    <size key="maxSize" width="37" height="28"/>
+                                    <connections>
+                                        <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="iTE-mK-YcY"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="2F022895-2D9A-4B32-A35A-1623C4079DF3" label="Device" paletteLabel="Device" tag="-1" image="iphone" catalog="system" id="xhX-rJ-mGX">
+                                    <size key="minSize" width="33.5" height="29"/>
+                                    <size key="maxSize" width="33.5" height="29"/>
+                                    <connections>
+                                        <segue destination="BZX-tn-6tC" kind="show" id="CZc-wr-qJw"/>
+                                    </connections>
+                                </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="25484914-A2E8-481A-9873-E66AEF909858" label="Symbolicate" paletteLabel="Symbolicate" tag="-1" image="play.fill" catalog="system" id="59w-fW-llj">
+                                    <size key="minSize" width="28.5" height="26"/>
+                                    <size key="maxSize" width="28.5" height="26"/>
+                                    <connections>
+                                        <action selector="symbolicate:" target="wBG-Uk-v7d" id="MfL-wm-igJ"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
-                                <toolbarItem reference="jOx-ar-DOP"/>
+                                <toolbarItem reference="59w-fW-llj"/>
                                 <toolbarItem reference="56F-jO-Bdr"/>
                                 <toolbarItem reference="CeZ-6B-0tO"/>
-                                <toolbarItem reference="QFd-N4-QA7"/>
                                 <toolbarItem reference="TiT-4F-eoC"/>
                                 <toolbarItem reference="wx0-ub-BB0"/>
-                                <toolbarItem reference="SZU-E2-ttI"/>
+                                <toolbarItem reference="K4t-4V-GK0"/>
                                 <toolbarItem reference="fQX-8I-pLN"/>
-                                <toolbarItem reference="4T4-1f-Y26"/>
+                                <toolbarItem reference="oKM-0d-zz3"/>
+                                <toolbarItem reference="xhX-rJ-mGX"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -585,11 +550,10 @@
                         </connections>
                     </window>
                     <connections>
-                        <outlet property="deviceItem" destination="4T4-1f-Y26" id="TaU-FR-WmN"/>
+                        <outlet property="deviceItem" destination="xhX-rJ-mGX" id="vOI-mz-pdA"/>
                         <outlet property="downloadIndicator" destination="X9S-hi-O70" id="Ns9-bD-QRC"/>
                         <outlet property="dsymPopUpButton" destination="Nv0-ye-SGb" id="CoR-6R-2XD"/>
                         <outlet property="indicator" destination="zP5-Pn-E5C" id="z4w-VT-HaL"/>
-                        <outlet property="statusBar" destination="UYX-wf-f6l" id="6gq-N9-7ZW"/>
                         <segue destination="5WI-tf-yEY" kind="relationship" relationship="window.shadowedContentViewController" id="Lwr-gD-c6J"/>
                     </connections>
                 </windowController>
@@ -604,6 +568,14 @@
                 <customObject id="7Rm-lf-inn" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-341" y="-499"/>
+        </scene>
+        <!--DownloadManager-->
+        <scene sceneID="yga-UJ-Joi">
+            <objects>
+                <controllerPlaceholder storyboardIdentifier="DownloadManager" storyboardName="DownloadManager" id="dcd-CR-DNH" sceneMemberID="viewController"/>
+                <customObject id="9A5-Kz-fTD" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-160" y="-495"/>
         </scene>
         <!--Content View Controller-->
         <scene sceneID="bhh-am-SLo">
@@ -801,7 +773,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="o44-9z-7zV"/>
+        <segue reference="Czv-jy-NCk"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="alert" width="19" height="19"/>

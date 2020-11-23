@@ -33,7 +33,6 @@ class MainWindowController: NSWindowController {
     
     @IBOutlet weak var deviceItem: NSToolbarItem!
     @IBOutlet weak var indicator: NSProgressIndicator!
-    @IBOutlet weak var statusBar: DsymStatusBarItem!
     @IBOutlet weak var dsymPopUpButton: DsymToolBarButton!
     
     @IBOutlet weak var downloadIndicator: NSProgressIndicator!
@@ -77,7 +76,6 @@ class MainWindowController: NSWindowController {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
-        self.statusBar.dsymManager = self.dsymManager
         self.dsymPopUpButton.dsymManager = self.dsymManager
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
