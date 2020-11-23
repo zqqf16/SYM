@@ -72,7 +72,7 @@ class DsymManager {
     init() {
         self.monitor.delegate = self
         DsymDownloader.shared.eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
-            guard event.task.crashInfo.uuid == self.crash.uuid,
+            guard event.task.crashInfo.uuid == self.crash?.uuid,
                 self.dsymFiles.count == 0,
                 let dsymFiles = event.task.dsymFiles else {
                     return
