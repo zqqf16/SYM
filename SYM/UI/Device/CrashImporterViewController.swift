@@ -62,21 +62,21 @@ class DeviceFileProvider: NSFilePromiseProvider {
     var file: MDDeviceFile?
 }
 
-class CrashImporterViewController: DeviceBaseViewController {
+class CrashImporterViewController: NSViewController {
     private var fileList: [MDDeviceFile] = []
-    private var currentDeviceID: String?
     private var afcClient: MDAfcClient? {
         // Always create a new one
-        let lockdown = MDLockdown(udid: self.currentDeviceID)
+        let lockdown = MDLockdown(udid: self.deviceID)
         return MDAfcClient.crash(with: lockdown)
     }
+        
+    private var deviceID: String?
     
     @IBOutlet var tableView: NSTableView!
     @IBOutlet weak var openButton: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.deviceConnectionChanged()
         
         let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.name, ascending: true)
         let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
@@ -86,20 +86,23 @@ class CrashImporterViewController: DeviceBaseViewController {
         self.tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
         self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
-    
-    override func deviceConnectionChanged() {
-        self.deviceButton.reloadItemsWithDevices(self.deviceList)
-        if let currentUdid = self.currentDeviceID, let index = self.deviceList.firstIndex(of: currentUdid) {
-            self.deviceButton.selectItem(at: index)
-        } else {
-            self.select(lockdown: MDLockdown(udid: self.deviceList.first))
+
+    func reloadData(withDeviceID deviceID: String?) {
+        if self.deviceID == deviceID {
+            return
         }
-    }
+        self.deviceID = deviceID
     
-    func select(lockdown: MDLockdown?) {
-        self.currentDeviceID = lockdown?.deviceID
+        if self.deviceID == nil {
+            DispatchQueue.main.async {
+                self.fileList = []
+                self.tableView.reloadData()
+            }
+            return
+        }
+        
         DispatchQueue.global().async {
-            let lockdown = MDLockdown(udid: self.currentDeviceID)
+            let lockdown = MDLockdown(udid: self.deviceID)
             if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
                 // trigger moving
                 moveService.ping()
@@ -113,10 +116,6 @@ class CrashImporterViewController: DeviceBaseViewController {
             }
         }
     }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
     
     func openCrash(atIndex index: Int) {
         if index < 0 || index > self.fileList.count - 1 {
@@ -124,7 +123,7 @@ class CrashImporterViewController: DeviceBaseViewController {
         }
         let file = self.fileList[index]
         DispatchQueue.global().async {
-            guard let udid = self.currentDeviceID else {
+            guard let udid = self.deviceID else {
                 return
             }
             
@@ -145,15 +144,15 @@ class CrashImporterViewController: DeviceBaseViewController {
         self.openCrash(atIndex: row)
     }
 
-    @IBAction func openCrash(_ sender: NSButton) {
+    @IBAction func openFile(_ sender: AnyObject?) {
         let row = self.tableView.selectedRow
         self.openCrash(atIndex: row)
     }
-
-    override func deviceSelectionChanged(_ udid: String?) {
-        if udid != self.currentDeviceID {
-            self.select(lockdown: MDLockdown(udid: udid))
-        }
+    
+    @IBAction func reloadFiles(_ sender: AnyObject?) {
+        let deviceID = self.deviceID
+        self.deviceID = nil
+        self.reloadData(withDeviceID: deviceID)
     }
 }
 
@@ -192,7 +191,7 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
     }
     
     func tableViewSelectionDidChange(_ notification: Notification) {
-        self.openButton.isEnabled = self.tableView.selectedRow >= 0
+        //self.openButton.isEnabled = self.tableView.selectedRow >= 0
     }
 }
 

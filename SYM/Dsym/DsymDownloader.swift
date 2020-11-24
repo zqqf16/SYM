@@ -20,72 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import Cocoa
-
-struct DsymDownloadStatusEvent: Event {
-    let task: DsymDownloadTask
-    let status: DsymDownloadTask.Status
-}
-
-struct DsymDownloadProgressEvent: Event {
-    let task: DsymDownloadTask
-    let progress: DsymDownloadProgress
-}
-
-class DsymDownloadProgress: CustomStringConvertible {
-    var percentage: Int = 0
-    var totalSize: String = "0"
-    var downloadedSize: String = "0"
-    var timeLeft: String = "Unknow"
-    var speed: String = "0"
-    
-    var description: String {
-        return "\(percentage)% \(downloadedSize)/\(totalSize) \(timeLeft) \(speed)/s"
-    }
-    
-    func update(fromConsoleOutput output: String) {
-        /*
-         curl
-         % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-         Dload  Upload   Total   Spent    Left  Speed
-         10  286M   10 30.2M    0     0   830k      0  0:05:53  0:00:37  0:05:16 1660k
-         */
-        let title = "% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current"
-        guard let range = output.range(of: title) else {
-            return
-        }
-        
-        let content = output[range.upperBound...]
-        let lines = content.components(separatedBy: "\r")
-        let count = lines.count
-        if count < 3 {
-            return;
-        }
-        
-        var items: [String] = []
-        for index in (count-2..<count).reversed() {
-            let lastLine = lines[index]
-            items = lastLine.components(separatedBy: " ").filter({ (string) -> Bool in
-                string != ""
-            })
-            if items.count >= 12 {
-                break
-            }
-        }
-        
-        if items.count != 12 || !items[10].contains(":") {
-            return
-        }
-        
-        self.percentage = Int(items[0]) ?? 0
-        self.totalSize = items[1]
-        self.downloadedSize = items[3]
-        self.timeLeft = items[10]
-        self.speed = items[11]
-        //print(self)
-    }
-}
+import Combine
 
 class DsymDownloadTask {
     var crashInfo: CrashInfo
@@ -106,20 +42,62 @@ class DsymDownloadTask {
             }
         }
     }
-
-    fileprivate var eventBus: EventBus?
     
-    var status: Status = .waiting {
-        didSet {
-            if let eb = self.eventBus {
-                eb.post(DsymDownloadStatusEvent(task: self, status: self.status))
+    struct Progress {
+        var percentage: Int = 0
+        var totalSize: String = "0"
+        var downloadedSize: String = "0"
+        var timeLeft: String = "Unknow"
+        var speed: String = "0"
+        
+        mutating func update(fromConsoleOutput output: String) {
+            /*
+             curl
+             % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+             Dload  Upload   Total   Spent    Left  Speed
+             10  286M   10 30.2M    0     0   830k      0  0:05:53  0:00:37  0:05:16 1660k
+             */
+            let title = "% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current"
+            guard let range = output.range(of: title) else {
+                return
             }
+            
+            let content = output[range.upperBound...]
+            let lines = content.components(separatedBy: "\r")
+            let count = lines.count
+            if count < 3 {
+                return;
+            }
+            
+            var items: [String] = []
+            for index in (count-2..<count).reversed() {
+                let lastLine = lines[index]
+                items = lastLine.components(separatedBy: " ").filter({ (string) -> Bool in
+                    string != ""
+                })
+                if items.count >= 12 {
+                    break
+                }
+            }
+            
+            if items.count != 12 || !items[10].contains(":") {
+                return
+            }
+            
+            self.percentage = Int(items[0]) ?? 0
+            self.totalSize = items[1]
+            self.downloadedSize = items[3]
+            self.timeLeft = items[10]
+            self.speed = items[11]
+            //print(self)
         }
     }
+    
+    @Published var status: Status = .waiting
+    @Published var progress: Progress = Progress()
 
     var statusCode: Int = 0
     var message: String?
-    var progress: DsymDownloadProgress = DsymDownloadProgress()
     var dsymFiles: [DsymFile]?
 
     private var process: SubProcess!
@@ -157,9 +135,6 @@ class DsymDownloadTask {
         self.process.errorHandler = { [weak self] (_) in
             if let this = self {
                 this.progress.update(fromConsoleOutput: this.process.error)
-                if let eventBus = this.eventBus {
-                    eventBus.post(DsymDownloadProgressEvent(task: this, progress: this.progress))
-                }
             }
         }
         self.status = .running
@@ -177,7 +152,7 @@ class DsymDownloadTask {
     }
 
     func cancel() {
-        self.process.terminate()
+        self.process?.terminate()
         self.status = .canceled
     }
         
@@ -227,8 +202,7 @@ class DsymDownloadTask {
 class DsymDownloader {
     static let shared = DsymDownloader()
     
-    let eventBus = EventBus()
-    var tasks:[String: DsymDownloadTask] = [:]
+    @Published var tasks:[String: DsymDownloadTask] = [:]
 
     private let scriptURL = Config.downloadScriptURL()
     
@@ -258,13 +232,11 @@ class DsymDownloader {
         }
         
         let task = DsymDownloadTask(crashInfo: crashInfo, scriptURL: self.scriptURL, fileURL: fileURL)
-        task.eventBus = self.eventBus
         self.tasks[uuid] = task
         DispatchQueue.global().async {
             task.run()
         }
-        
-        self.eventBus.post(DsymDownloadStatusEvent(task: task, status: task.status))
+
         return task
     }
 }

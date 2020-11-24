@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Cocoa
+import Combine
 
 extension NSImage {
     static let alert: NSImage = #imageLiteral(resourceName: "alert")
@@ -31,11 +32,13 @@ class MainWindowController: NSWindowController {
     // Toolbar items
     @IBOutlet weak var symButton: NSButton!
     
+    @IBOutlet weak var downloadItem: DownloadToolbarItem!
     @IBOutlet weak var deviceItem: NSToolbarItem!
     @IBOutlet weak var indicator: NSProgressIndicator!
-    @IBOutlet weak var statusBar: DsymStatusBarItem!
     @IBOutlet weak var dsymPopUpButton: DsymToolBarButton!
-    
+
+    @IBOutlet weak var downloadIndicator: NSProgressIndicator!
+
     var isSymbolicating: Bool = false {
         didSet {
             DispatchQueue.main.async {
@@ -53,7 +56,8 @@ class MainWindowController: NSWindowController {
     // Dsym
     private var dsymManager = DsymManager()
     private var downloader = DsymDownloader()
-    private var downloadTask: DsymDownloadTask?
+    
+    private var storage = Set<AnyCancellable>()
 
     // Crash
     var crashContentViewController: ContentViewController! {
@@ -75,10 +79,15 @@ class MainWindowController: NSWindowController {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
-        self.statusBar.dsymManager = self.dsymManager
         self.dsymPopUpButton.dsymManager = self.dsymManager
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
+        
+        DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
+            if let uuid = self?.crashInfo?.uuid, let task = tasks[uuid] {
+                self?.downloadItem.bind(task: task)
+            }
+        }.store(in: &storage)
     }
     
     required init?(coder: NSCoder) {
@@ -145,6 +154,14 @@ class MainWindowController: NSWindowController {
     @IBAction func downloadDsym(_ sender: AnyObject?) {
         if let crash = self.dsymManager.crash {
             DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+        }
+    }
+    
+    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+
+        if let vc = segue.destinationController as? DownloadStatusViewController {
+            vc.crashInfo = self.crashInfo
         }
     }
 }

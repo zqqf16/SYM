@@ -1,0 +1,10 @@
+"dsym_file_not_found" = "没有找到dSYM文件";
+"Select" = "选择";
+"Reveal" = "查看";
+"Import" = "导入";
+"Crash Log" = "崩溃日志";
+"File Browser" = "浏览文件";
+"download_prefix" = "下载中 ...";
+"Failed" = "下载失败";
+"Success" = "下载成功";
+"Waiting" = "等待下载中 ...";

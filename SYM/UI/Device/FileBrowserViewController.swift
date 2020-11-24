@@ -32,40 +32,51 @@ extension NSPopUpButton {
     }
 }
 
-class FileBrowserViewController: DeviceBaseViewController {
+class FileBrowserViewController: NSViewController {
 
     @IBOutlet weak var exportButton: NSButton!
     @IBOutlet weak var exportIndicator: NSProgressIndicator!
     @IBOutlet weak var outlineView: NSOutlineView!
-    @IBOutlet weak var appButton: NSPopUpButton!
     
-    var rootDir: MDDeviceFile!
-    var afcClient: MDAfcClient! {
+    private var deviceID: String?
+    private var appID: String?
+    
+    private var rootDir: MDDeviceFile!
+    private var afcClient: MDAfcClient! {
         didSet {
             self.rootDir = MDDeviceFile(afcClient: self.afcClient)
             self.rootDir.path = "."
             self.rootDir.isDirectory = true
         }
     }
-    var appList: [MDAppInfo] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
-    func loadAppList(_ udid: String?) {
-        DispatchQueue.global().async {
-            let lockdown = MDLockdown()
-            let instproxy = MDInstProxy(lockdown: lockdown)
-            self.appList = instproxy.listApps().filter { $0.isDeveloping }
-            DispatchQueue.main.async {
-                self.appButton.reloadItemsWithApps(self.appList)
-                self.appButton.selectItem(at: 0)
-                self.changeApp(self.appButton)
-            }
-        }
-    }
     
+    func reloadData(withDeviceID deviceID: String?, appID: String?) {
+        if deviceID == self.deviceID && appID == self.appID {
+            return
+        }
+        
+        self.deviceID = deviceID
+        self.appID = appID
+        
+        if deviceID == nil || appID == nil {
+            self.rootDir = nil
+        } else {
+            let lockdown = MDLockdown(udid: deviceID!)
+            let houseArrest = MDHouseArrest(lockdown: lockdown, appID: appID!)
+
+            self.afcClient = MDAfcClient.fileClient(with: houseArrest)
+            self.rootDir = MDDeviceFile(afcClient: self.afcClient)
+            self.rootDir.path = "."
+            self.rootDir.isDirectory = true
+        }
+        
+        self.outlineView.reloadData()
+    }
+
     func loadFiles(_ app: MDAppInfo?) {
         if let appInfo = app {
             let lockdown = MDLockdown()
@@ -77,14 +88,6 @@ class FileBrowserViewController: DeviceBaseViewController {
         self.outlineView.reloadData()
     }
     
-    override func deviceConnectionChanged() {
-        self.loadAppList(self.deviceList.first)
-    }
-    
-    override func deviceSelectionChanged(_ udid: String?) {
-        self.loadAppList(udid)
-    }
-    
     @IBAction func didClickExportButton(_ sender: NSButton) {
         let row = self.outlineView.selectedRow
         self.exportFile(atIndex: row)
@@ -92,6 +95,19 @@ class FileBrowserViewController: DeviceBaseViewController {
 
     @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
         let row = self.outlineView.clickedRow
+        self.exportFile(atIndex: row)
+    }
+    
+    @IBAction func reloadFiles(_ sender: AnyObject?) {
+        let deviceID = self.deviceID
+        let appID = self.appID
+        self.deviceID = nil
+        self.appID = nil
+        self.reloadData(withDeviceID: deviceID, appID: appID)
+    }
+    
+    @IBAction func openFile(_ sender: AnyObject?) {
+        let row = self.outlineView.selectedRow
         self.exportFile(atIndex: row)
     }
 
@@ -117,27 +133,18 @@ class FileBrowserViewController: DeviceBaseViewController {
     }
 
     private func exportFile(_ file: MDDeviceFile, toURL url: URL) {
-        self.exportIndicator.startAnimation(nil)
-        self.exportIndicator.isHidden = false
-        self.exportButton.isEnabled = false
+        //self.exportIndicator.startAnimation(nil)
+        //self.exportIndicator.isHidden = false
+        //self.exportButton.isEnabled = false
         DispatchQueue.global().async {
             file.copy(url.path)
+            /*
             DispatchQueue.main.async {
                 self.exportIndicator.stopAnimation(nil)
                 self.exportIndicator.isHidden = true
                 self.exportButton.isEnabled = true
             }
-        }
-    }
-    
-    @IBAction func changeApp(_ sender: NSPopUpButton) {
-        var app: MDAppInfo?
-        let index = self.appButton.indexOfSelectedItem
-        if index >= 0 && index < self.appList.count {
-            app = self.appList[index]
-        }
-        DispatchQueue.main.async {
-            self.loadFiles(app)
+             */
         }
     }
 }

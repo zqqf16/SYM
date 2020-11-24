@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="15702" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="pg5-Ea-0Pu">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="pg5-Ea-0Pu">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15702"/>
-        <plugIn identifier="com.apple.automator.AutomatorPalette" version="15702"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.automator.AutomatorPalette" version="17506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -71,7 +70,7 @@
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3G3-r4-xZa">
-                                <rect key="frame" x="476" y="3" width="70" height="32"/>
+                                <rect key="frame" x="483" y="3" width="64" height="32"/>
                                 <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="f7k-pH-pVK">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -84,7 +83,7 @@ DQ
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QwZ-LJ-pmX">
-                                <rect key="frame" x="394" y="3" width="82" height="32"/>
+                                <rect key="frame" x="409" y="3" width="76" height="32"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Muz-PD-cFf">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -97,13 +96,13 @@ Gw
                                 </connections>
                             </button>
                             <amPathPopUpButton verticalHuggingPriority="750" imageHugsTitle="YES" canChooseDirectories="YES" canChooseNewPaths="YES" canChooseExistingPaths="YES" showStandardPaths="YES" showPathComponents="YES" placeholder="" translatesAutoresizingMaskIntoConstraints="NO" id="EoW-3U-Rsk">
-                                <rect key="frame" x="138" y="17" width="133" height="25"/>
+                                <rect key="frame" x="137" y="16" width="134" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="U3O-Yq-3DC"/>
                                 </constraints>
-                                <amVariablePopUpButtonCell key="cell" type="push" title="Desktop" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1001" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="mgx-un-Moo">
+                                <amVariablePopUpButtonCell key="cell" type="push" title="Desktop" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="1004" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="mgx-un-Moo">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="OtherViews" id="GAT-VH-nSW"/>
                                 </amVariablePopUpButtonCell>
                                 <connections>

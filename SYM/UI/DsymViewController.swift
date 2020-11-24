@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Cocoa
+import Combine
 
 protocol DsymTableCellViewDelegate: class {
     func didClickSelectButton(_ cell: DsymTableCellView, sender: NSButton)
@@ -47,7 +48,7 @@ class DsymTableCellView: NSTableCellView {
             self.actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
         } else {
             self.path.stringValue = NSLocalizedString("dsym_file_not_found", comment: "Dsym file not found")
-            self.actionButton.title = NSLocalizedString("Select", comment: "Select a dSYM file")
+            self.actionButton.title = NSLocalizedString("Import", comment: "Import a dSYM file")
         }
     }
     
@@ -97,21 +98,49 @@ class DsymViewController: NSViewController {
         return nil
     }
     
-    override func viewDidLayout() {
-        super.viewDidLayout()
-    }
-    
+    private var storage = Set<AnyCancellable>()
+    private var downloaderCancellable: AnyCancellable?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateViewHeight()
         self.downloadButton.isEnabled = self.dsymManager?.crash != nil
-        let eventBus = DsymDownloader.shared.eventBus
-        eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
-            self.updateDownloadStatus(event.task)
+        
+        self.downloaderCancellable = DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
+            guard let uuid = self?.dsymManager?.crash.uuid,
+                  let task = tasks[uuid]
+            else {
+                return
+            }
+            
+            self?.bind(task: task)
         }
-        eventBus.sub(self, for: DsymDownloadProgressEvent.self).async { (event) in
-            self.updateDownloadStatus(event.task)
+    }
+    
+    override func viewDidDisappear() {
+        super.viewDidDisappear()
+        self.downloaderCancellable?.cancel()
+        self.storage.forEach { (cancellable) in
+            cancellable.cancel()
         }
+    }
+    
+    private func bind(task: DsymDownloadTask) {
+        self.storage.forEach { (cancellable) in
+            cancellable.cancel()
+        }
+        
+        task.$status.sink { [weak self] (status) in
+            DispatchQueue.main.async {
+                self?.update(status: status)
+            }
+        }.store(in: &storage)
+        
+        task.$progress.sink { [weak self] (progress) in
+            DispatchQueue.main.async {
+                self?.update(progress: progress)
+            }
+        }.store(in: &storage)
     }
 
     //MARK: UI
@@ -171,26 +200,11 @@ extension DsymViewController: DsymTableCellViewDelegate {
 }
 
 extension DsymViewController {
-    private func updateDownloadStatus(_ task: DsymDownloadTask) {
-        guard let uuid = self.dsymManager?.crash?.uuid, uuid == task.crashInfo.uuid else {
-            self.downloadButton.isEnabled = self.dsymManager?.crash != nil
-            self.progressBar.isHidden = true
-            return
-        }
-
-        let progress = task.progress.percentage
-        let status = task.status
+    func update(status: DsymDownloadTask.Status) {
         switch status {
         case .running:
             self.downloadButton.isEnabled = false
             self.progressBar.isHidden = false
-            if progress > 0 {
-                self.progressBar.doubleValue = Double(progress)
-                self.progressBar.isIndeterminate = false
-            } else {
-                self.progressBar.isIndeterminate = true
-                self.progressBar.startAnimation(nil)
-            }
         case .canceled:
             self.progressBar.isHidden = true
             self.downloadButton.isEnabled = true
@@ -204,6 +218,15 @@ extension DsymViewController {
             self.progressBar.isIndeterminate = true
             self.progressBar.startAnimation(nil)
             self.downloadButton.isEnabled = false
+        }
+    }
+    
+    func update(progress: DsymDownloadTask.Progress) {
+        if progress.percentage == 0 {
+            self.progressBar.isIndeterminate = true
+        } else {
+            self.progressBar.isIndeterminate = false
+            self.progressBar.doubleValue = Double(progress.percentage)
         }
     }
 }
