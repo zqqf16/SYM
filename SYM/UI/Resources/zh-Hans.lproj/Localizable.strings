@@ -4,3 +4,7 @@
 "Import" = "导入";
 "Crash Log" = "崩溃日志";
 "File Browser" = "浏览文件";
+"download_prefix" = "下载中 ...";
+"Failed" = "下载失败";
+"Success" = "下载成功";
+"Waiting" = "等待下载中 ...";

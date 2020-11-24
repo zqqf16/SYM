@@ -510,20 +510,19 @@
                                         <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="iTE-mK-YcY"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2F022895-2D9A-4B32-A35A-1623C4079DF3" label="Device" paletteLabel="Device" tag="-1" image="iphone" catalog="system" sizingBehavior="auto" id="xhX-rJ-mGX">
+                                <toolbarItem implicitItemIdentifier="2F022895-2D9A-4B32-A35A-1623C4079DF3" label="Device" paletteLabel="Device" toolTip="Import crash report from device" tag="-1" image="iphone" catalog="system" sizingBehavior="auto" id="xhX-rJ-mGX">
                                     <connections>
                                         <segue destination="BZX-tn-6tC" kind="show" id="CZc-wr-qJw"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="25484914-A2E8-481A-9873-E66AEF909858" label="Symbolicate" paletteLabel="Symbolicate" tag="-1" image="play.fill" catalog="system" sizingBehavior="auto" id="59w-fW-llj">
+                                <toolbarItem implicitItemIdentifier="25484914-A2E8-481A-9873-E66AEF909858" label="Symbolicate" paletteLabel="Symbolicate" toolTip="Symbolicate" tag="-1" image="play.fill" catalog="system" sizingBehavior="auto" id="59w-fW-llj">
                                     <connections>
                                         <action selector="symbolicate:" target="wBG-Uk-v7d" id="MfL-wm-igJ"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="E073D210-15A0-4AAD-8D1B-91F7C98E9F98" label="Custom View" paletteLabel="Custom View" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="xdu-0Z-Pvp" customClass="DownloadToolbarItem" customModule="SYM" customModuleProvider="target">
-                                    <nil key="toolTip"/>
+                                <toolbarItem implicitItemIdentifier="E073D210-15A0-4AAD-8D1B-91F7C98E9F98" label="Download" paletteLabel="Download" toolTip="Download dSYM file" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="xdu-0Z-Pvp" customClass="DownloadToolbarItem" customModule="SYM" customModuleProvider="target">
                                     <button key="view" springLoaded="YES" imageHugsTitle="YES" id="Tlc-kI-3fZ">
-                                        <rect key="frame" x="29" y="14" width="18" height="17"/>
+                                        <rect key="frame" x="21" y="14" width="18" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="icloud.and.arrow.down.fill" catalog="system" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="OhO-0P-Qpn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -595,20 +594,20 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </progressIndicator>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="byL-mi-Pgt">
-                                <rect key="frame" x="50" y="27" width="380" height="16"/>
+                                <rect key="frame" x="18" y="27" width="412" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="1000MB/2000G 1:00:22 2321k/s" id="oVK-JA-5Xw">
+                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" alignment="right" title="1000MB/2000G 1:00:22 2321k/s" id="oVK-JA-5Xw">
                                     <font key="font" size="12" name="Menlo-Regular"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sAX-Qz-zdv">
-                                <rect key="frame" x="411" y="51" width="19.5" height="18"/>
+                                <rect key="frame" x="411" y="51" width="19" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="inline" bezelStyle="inline" image="NSStopProgressFreestandingTemplate" imagePosition="only" alignment="center" inset="2" id="Emw-qv-VSu">
+                                <buttonCell key="cell" type="roundRect" bezelStyle="roundedRect" image="NSStopProgressFreestandingTemplate" imagePosition="only" alignment="center" inset="2" id="Emw-qv-VSu">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystemBold"/>
+                                    <font key="font" metaFont="cellTitle"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="cancelDownload:" target="w6G-BI-E5o" id="HaP-5D-bMv"/>

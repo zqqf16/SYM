@@ -97,7 +97,7 @@ class DownloadStatusViewController: NSViewController {
                 self.progressIndicator.isHidden = false
                 self.cancelButton.image = NSImage(named: NSImage.stopProgressFreestandingTemplateName)
 
-                var title = "Downloading ..."
+                var title = NSLocalizedString("download_prefix", comment: "Downloading ...")
                 if let progress = self.task?.progress {
                     if progress.percentage > 0 {
                         title += " \(progress.percentage)%"
@@ -110,18 +110,20 @@ class DownloadStatusViewController: NSViewController {
                 }
                 self.titleLabel.stringValue = title
             case .canceled:
-                self.titleLabel.stringValue = "Canceled"
+                self.titleLabel.stringValue = NSLocalizedString("Canceled", comment: "Canceled")
                 self.infoLabel.stringValue = ""
                 self.cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
             case .failed(let code, let message):
-                self.titleLabel.stringValue = "Failed (\(code))"
+                let prefix = NSLocalizedString("Failed", comment: "Failed")
+                self.titleLabel.stringValue = "\(prefix) (\(code))"
                 self.infoLabel.stringValue = message ?? ""
                 self.cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
             case .success:
-                self.titleLabel.stringValue = "Success"
+                self.titleLabel.stringValue = NSLocalizedString("Success", comment: "Success")
                 self.infoLabel.stringValue = ""
                 self.cancelButton.isHidden = true
             case .waiting:
+                self.titleLabel.stringValue = NSLocalizedString("Waiting", comment: "Waiting ...")
                 self.titleLabel.stringValue = "Waiting ..."
                 self.infoLabel.stringValue = ""
                 self.progressIndicator.isIndeterminate = true
