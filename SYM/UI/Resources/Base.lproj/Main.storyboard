@@ -495,6 +495,7 @@
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <color key="contentTintColor" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
                                     </popUpButton>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="82A91B34-0732-4B48-8602-502E69540025" label="" paletteLabel="" tag="-1" sizingBehavior="auto" id="TiT-4F-eoC">
@@ -503,11 +504,6 @@
                                         <rect key="frame" x="0.0" y="14" width="16" height="16"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                     </progressIndicator>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="9022F606-5B9B-487F-B2BF-F4ACAC2D1813" label="Download" paletteLabel="Download" tag="-1" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="oKM-0d-zz3">
-                                    <connections>
-                                        <action selector="scrollToTarget:" target="wBG-Uk-v7d" id="XPS-jh-t3G"/>
-                                    </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="F6E373C6-5175-4DC4-9B0A-A6E3708520AA" label="Scroll" paletteLabel="Scroll" tag="-1" image="target" catalog="system" sizingBehavior="auto" id="K4t-4V-GK0">
                                     <connections>
@@ -526,14 +522,14 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="E073D210-15A0-4AAD-8D1B-91F7C98E9F98" label="Custom View" paletteLabel="Custom View" image="icloud.and.arrow.down.fill" catalog="system" sizingBehavior="auto" id="xdu-0Z-Pvp" customClass="DownloadToolbarItem" customModule="SYM" customModuleProvider="target">
                                     <nil key="toolTip"/>
-                                    <button key="view" springLoaded="YES" id="Tlc-kI-3fZ">
+                                    <button key="view" springLoaded="YES" imageHugsTitle="YES" id="Tlc-kI-3fZ">
                                         <rect key="frame" x="29" y="14" width="18" height="17"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="icloud.and.arrow.down.fill" catalog="system" imagePosition="only" alignment="center" controlSize="large" state="on" imageScaling="proportionallyUpOrDown" inset="2" id="OhO-0P-Qpn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                     </button>
                                     <connections>
                                         <segue destination="w6G-BI-E5o" kind="popover" popoverAnchorView="xdu-0Z-Pvp" popoverBehavior="t" preferredEdge="maxY" id="euS-D8-ewc"/>
