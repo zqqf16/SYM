@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Foundation
+import Combine
 
 extension Notification.Name {
     static let dsymDidUpdate = Notification.Name("sym.dsymDidUpdate")
@@ -68,18 +69,20 @@ class DsymManager {
     }()
     
     private var uuids: [String]?
+    private var storage = Set<AnyCancellable>()
 
     init() {
         self.monitor.delegate = self
-        DsymDownloader.shared.eventBus.sub(self, for: DsymDownloadStatusEvent.self).async { (event) in
-            guard event.task.crashInfo.uuid == self.crash?.uuid,
-                self.dsymFiles.count == 0,
-                let dsymFiles = event.task.dsymFiles else {
-                    return
+        DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
+            guard let uuid = self?.crash?.uuid,
+                  let task = tasks[uuid],
+                  let files = task.dsymFiles
+            else {
+                return
             }
             
-            self.dsymFileDidUpdate(dsymFiles)
-        }
+            self?.dsymFileDidUpdate(files)
+        }.store(in: &storage)
     }
 
     func update(_ crash: CrashInfo) {

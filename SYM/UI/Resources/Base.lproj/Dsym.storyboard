@@ -143,13 +143,13 @@ DQ
                                 </connections>
                             </button>
                             <progressIndicator hidden="YES" wantsLayer="YES" maxValue="100" doubleValue="50" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="Zvv-gF-A8E">
-                                <rect key="frame" x="10" y="10" width="403" height="20"/>
+                                <rect key="frame" x="16" y="10" width="397" height="20"/>
                             </progressIndicator>
                         </subviews>
                         <constraints>
                             <constraint firstItem="qd6-P9-i3y" firstAttribute="centerY" secondItem="tHh-Gu-jaA" secondAttribute="centerY" id="HgZ-N9-A9m"/>
                             <constraint firstAttribute="bottom" secondItem="5k0-EM-kNO" secondAttribute="bottom" constant="48" id="Jgi-5N-5D3"/>
-                            <constraint firstItem="Zvv-gF-A8E" firstAttribute="leading" secondItem="WDs-ca-ySf" secondAttribute="leading" constant="10" id="JhZ-9Y-9tz"/>
+                            <constraint firstItem="Zvv-gF-A8E" firstAttribute="leading" secondItem="WDs-ca-ySf" secondAttribute="leading" constant="16" id="JhZ-9Y-9tz"/>
                             <constraint firstAttribute="trailing" secondItem="5k0-EM-kNO" secondAttribute="trailing" constant="10" id="LG2-SO-ek9"/>
                             <constraint firstAttribute="trailing" secondItem="tHh-Gu-jaA" secondAttribute="trailing" constant="10" id="LxX-IQ-nfB"/>
                             <constraint firstItem="qd6-P9-i3y" firstAttribute="leading" secondItem="Zvv-gF-A8E" secondAttribute="trailing" constant="20" id="SQC-7m-Mx3"/>

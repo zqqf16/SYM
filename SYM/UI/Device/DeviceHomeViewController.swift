@@ -83,7 +83,6 @@ class DeviceDataSource {
     @Published
     var nodes: [DeviceSidebarNode] = []
     
-    private var cancellable: AnyCancellable!
     private var storage = Set<AnyCancellable>()
 
     init() {
