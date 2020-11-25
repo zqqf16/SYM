@@ -21,35 +21,37 @@
 // SOFTWARE.
 
 import Cocoa
+import Combine
 
 struct CrashFileType {
     static let crash = "Crash"
     static let plist = "com.apple.property-list"
 }
 
-extension Notification.Name {
-    static let crashInfoUpdated = Notification.Name("sym.crashInfoUpdated")
-    static let crashSymbolicated = Notification.Name("sym.crashSymbolicated")
-    static let crashDidOpen = Notification.Name("sym.crashDidOpen")
-}
-
 class CrashDocument: NSDocument {
-    let notificationCenter = NotificationCenter()
-    
     let textStorage =  NSTextStorage()
-    var crashInfo: CrashInfo? {
-        didSet {
-            self.notificationCenter.post(name: .crashInfoUpdated, object: crashInfo)
-        }
-    }
+    
+    @Published
+    var crashInfo: CrashInfo?
+    
+    @Published
+    var isSymbolicating: Bool = false
     
     var isReplaceable: Bool {
         return self.fileURL == nil && self.textStorage.string.count == 0
     }
     
+    private var contentPublisher = PassthroughSubject<String, Never>()
+    private var cancellable: AnyCancellable?
+    
     override init() {
         super.init()
         self.textStorage.delegate = self
+        self.cancellable = self.contentPublisher
+            .debounce(for: 0.5, scheduler: DispatchQueue.global())
+            .sink { [weak self] (content) in
+                self?.parseCrashInfo(content)
+            }
     }
     
     override func makeWindowControllers() {
@@ -64,7 +66,7 @@ class CrashDocument: NSDocument {
     
     func update(_ content: String) {
         self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
-        self.notificationCenter.post(name: .crashDidOpen, object: nil)
+        //self.notificationCenter.post(name: .crashDidOpen, object: nil)
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
@@ -78,7 +80,6 @@ class CrashDocument: NSDocument {
     private func readCrash(from data: Data) throws {
         let content = String(data: data, encoding: .utf8) ?? ""
         self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
-        self.notificationCenter.post(name: .crashDidOpen, object: nil)
     }
     
     private func readPlist(from data: Data) throws {
@@ -105,13 +106,18 @@ class CrashDocument: NSDocument {
 }
 
 extension CrashDocument: NSTextStorageDelegate {
-    func parseCrashInfo() {
-        self.crashInfo = CrashInfo.parse(self.textStorage.string)
+    func parseCrashInfo(_ content: String) {
+        let crashInfo = CrashInfo.parse(content)
+        DispatchQueue.main.async {
+            self.crashInfo = crashInfo
+            Swift.print("Parse")
+        }
     }
     
     func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
         if editedMask.contains(.editedCharacters) {
-            self.parseCrashInfo()
+            self.contentPublisher.send(self.textStorage.string)
+            Swift.print("Update")
         }
     }
 }
@@ -124,12 +130,13 @@ extension CrashDocument {
         }
         
         DispatchQueue.global().async {
+            self.isSymbolicating = true
             let content = crash.symbolicate(dsyms: dsyms)
             DispatchQueue.main.async {
                 self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
                 self.undoManager?.removeAllActions()
                 self.updateChangeCount(.changeDone)
-                self.notificationCenter.post(name: .crashSymbolicated, object: self)
+                self.isSymbolicating = false
             }
         }
     }

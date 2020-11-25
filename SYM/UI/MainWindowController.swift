@@ -51,6 +51,8 @@ class MainWindowController: NSWindowController {
         }
     }
     
+    private var crashCancellable = Set<AnyCancellable>()
+    
     // Dsym
     private var dsymManager = DsymManager()
     
@@ -69,12 +71,7 @@ class MainWindowController: NSWindowController {
     var crashDocument: CrashDocument? {
         return self.document as? CrashDocument
     }
-    
-    var crashInfo: CrashInfo? {
-        return self.crashDocument?.crashInfo
-    }
-    
-    
+
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
@@ -86,7 +83,7 @@ class MainWindowController: NSWindowController {
         self.downloaderCancellable = DsymDownloader.shared.$tasks
             .receive(on: DispatchQueue.main)
             .map { [weak self] (tasks) -> DsymDownloadTask? in
-                if let uuid = self?.crashInfo?.uuid {
+                if let uuid = self?.crashDocument?.crashInfo?.uuid {
                     return tasks[uuid]
                 }
                 return nil
@@ -102,30 +99,38 @@ class MainWindowController: NSWindowController {
     deinit {
         NotificationCenter.default.removeObserver(self)
         self.dsymManager.stop()
-        if let document = self.crashDocument {
-            document.notificationCenter.removeObserver(self)
-        }
     }
     
     override var document: AnyObject? {
         didSet {
+            self.crashCancellable.forEach { (cancellable) in
+                cancellable.cancel()
+            }
+            
             guard let document = document as? CrashDocument else {
+                self.crashContentViewController.document = nil
                 return
             }
             self.crashContentViewController.document = document
-            document.notificationCenter.addObserver(self, selector: #selector(updateCrashInfo(_:)), name: .crashInfoUpdated, object: nil)
-            document.notificationCenter.addObserver(self, selector: #selector(crashDidSymbolicated(_:)), name: .crashSymbolicated, object: nil)
-            self.updateCrashInfo(nil)
+
+            document.$crashInfo
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] (crashInfo) in
+                    if let crash = crashInfo {
+                        self?.dsymManager.update(crash)
+                    }
+                }
+                .store(in: &crashCancellable)
+            
+            document.$isSymbolicating
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.isSymbolicating, on: self)
+                .store(in: &crashCancellable)
         }
     }
+    
     
     // MARK: Notifications
-    @objc func updateCrashInfo(_ notification: Notification?) {
-        if let crash = self.crashInfo {
-            self.dsymManager.update(crash)
-        }
-    }
-    
     @objc func updateDeviceButton(_ notification: Notification) {
         self.deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
     }

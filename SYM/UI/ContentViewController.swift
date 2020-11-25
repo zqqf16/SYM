@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Cocoa
+import Combine
 
 extension NSViewController {
     func windowController() -> MainWindowController? {
@@ -35,22 +36,22 @@ class ContentViewController: NSViewController {
     @IBOutlet var bottomBar: NSView!
     
     private var font: NSFont = Config.editorFont
-    
+    private var cancellable: AnyCancellable?
+
     var document: CrashDocument? {
         didSet {
+            self.cancellable?.cancel()
             guard let document = document else {
                 return
             }
 
             self.textView.layoutManager?.replaceTextStorage(document.textStorage)
-            self.updateCrashInfo()
-            
-            document.notificationCenter.addObserver(forName: .crashSymbolicated, object: nil, queue: nil) {  [weak self] (notification) in
-                self?.updateCrashInfo()
-            }
-            document.notificationCenter.addObserver(forName: .crashDidOpen, object: nil, queue: nil) {  [weak self] (notification) in
-                self?.updateCrashInfo()
-            }
+            self.cancellable = document.$crashInfo
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] (crashInfo) in
+                    self?.update(crashInfo: crashInfo)
+                }
+            self.update(crashInfo: document.crashInfo)
         }
     }
 
@@ -85,7 +86,7 @@ class ContentViewController: NSViewController {
     }
     
     func textDidChange(_ notification: Notification) {
-        self.updateCrashInfo()
+        self.update(crashInfo: self.document?.crashInfo)
     }
     
     private func infoString(fromCrash crash: CrashInfo) -> String {
@@ -106,23 +107,19 @@ class ContentViewController: NSViewController {
         return info
     }
     
-    func updateCrashInfo() {
-        guard let document = self.document else {
-            return
-        }
-        
-        let crashInfo = document.crashInfo
+    func update(crashInfo: CrashInfo?) {
         self.updateHighlighting(crashInfo)
         self.updateSummary(crashInfo)
     }
     
     private func updateHighlighting(_ crashInfo: CrashInfo?) {
-        guard let textStorage = self.textView.textStorage, let ranges = crashInfo?.appBacktraceRanges() else {
+        guard let textStorage = self.textView.textStorage else {
             return
         }
         self.textView.font = self.font
         textStorage.beginEditing()
         textStorage.font = self.font
+        let ranges = crashInfo?.appBacktraceRanges() ?? []
         textStorage.processHighlighting(ranges)
         textStorage.endEditing()
     }
@@ -138,7 +135,7 @@ class ContentViewController: NSViewController {
     
     @objc func configFontDidChanged(_ notification: Notification) {
         self.font = Config.editorFont
-        self.updateCrashInfo()
+        self.update(crashInfo: self.document?.crashInfo)
     }
 }
 
@@ -176,13 +173,13 @@ extension ContentViewController {
     @IBAction func zoomIn(_ sender: AnyObject?) {
         let size = min(self.font.pointSize + 1, 20.0)
         self.font = NSFont(name: self.font.fontName, size: size)!
-        self.updateCrashInfo()
+        self.update(crashInfo: self.document?.crashInfo)
     }
     
     @IBAction func zoomOut(_ sender: AnyObject?) {
         let size = max(self.font.pointSize - 1, 10.0)
         self.font = NSFont(name: self.font.fontName, size: size)!
-        self.updateCrashInfo()
+        self.update(crashInfo: self.document?.crashInfo)
     }
 }
 
