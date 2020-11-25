@@ -36,9 +36,7 @@ class MainWindowController: NSWindowController {
     @IBOutlet weak var deviceItem: NSToolbarItem!
     @IBOutlet weak var indicator: NSProgressIndicator!
     @IBOutlet weak var dsymPopUpButton: DsymToolBarButton!
-
-    @IBOutlet weak var downloadIndicator: NSProgressIndicator!
-
+    
     var isSymbolicating: Bool = false {
         didSet {
             DispatchQueue.main.async {
@@ -55,9 +53,10 @@ class MainWindowController: NSWindowController {
     
     // Dsym
     private var dsymManager = DsymManager()
-    private var downloader = DsymDownloader()
     
-    private var storage = Set<AnyCancellable>()
+    private var downloaderCancellable: AnyCancellable?
+    private var downloadTask: DsymDownloadTask?
+    private weak var downloadStatusViewController: DownloadStatusViewController?
 
     // Crash
     var crashContentViewController: ContentViewController! {
@@ -75,6 +74,7 @@ class MainWindowController: NSWindowController {
         return self.crashDocument?.crashInfo
     }
     
+    
     override func windowDidLoad() {
         super.windowDidLoad()
         self.windowFrameAutosaveName = "MainWindow"
@@ -83,11 +83,16 @@ class MainWindowController: NSWindowController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
         
-        DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
-            if let uuid = self?.crashInfo?.uuid, let task = tasks[uuid] {
-                self?.downloadItem.bind(task: task)
+        self.downloaderCancellable = DsymDownloader.shared.$tasks
+            .receive(on: DispatchQueue.main)
+            .map { [weak self] (tasks) -> DsymDownloadTask? in
+                if let uuid = self?.crashInfo?.uuid {
+                    return tasks[uuid]
+                }
+                return nil
+            }.sink { [weak self] (task) in
+                self?.bind(task: task)
             }
-        }.store(in: &storage)
     }
     
     required init?(coder: NSCoder) {
@@ -152,16 +157,15 @@ class MainWindowController: NSWindowController {
     }
     
     @IBAction func downloadDsym(_ sender: AnyObject?) {
-        if let crash = self.dsymManager.crash {
-            DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
-        }
+        self.startDownloading()
     }
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
 
         if let vc = segue.destinationController as? DownloadStatusViewController {
-            vc.crashInfo = self.crashInfo
+            vc.delegate = self
+            self.downloadStatusViewController = vc
         }
     }
 }
@@ -169,5 +173,27 @@ class MainWindowController: NSWindowController {
 extension MainWindowController: NSToolbarItemValidation {
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
         return item.isEnabled
+    }
+}
+
+extension MainWindowController: DownloadStatusViewControllerDelegate {
+    func bind(task: DsymDownloadTask?) {
+        self.downloadTask = task
+        self.downloadStatusViewController?.bind(task: task)
+        self.downloadItem.bind(task: task)
+    }
+    
+    func startDownloading() {
+        if let crash = self.dsymManager.crash {
+            DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+        }
+    }
+    
+    func cancelDownload() {
+        self.downloadTask?.cancel()
+    }
+    
+    func currentDownloadTask() -> DsymDownloadTask? {
+        return self.downloadTask
     }
 }

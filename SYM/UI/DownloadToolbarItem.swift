@@ -26,7 +26,7 @@ import Combine
 class DownloadToolbarItem: NSToolbarItem {
     @IBOutlet var indicator: NSProgressIndicator!
 
-    private var storage = Set<AnyCancellable>()
+    private var cancellable: AnyCancellable?
 
     var running: Bool = false {
         didSet {
@@ -56,34 +56,28 @@ class DownloadToolbarItem: NSToolbarItem {
         self.view?.superview?.addSubview(self.indicator)
     }
     
-    func bind(task: DsymDownloadTask) {
-        self.storage.forEach { (cancellable) in
-            cancellable.cancel()
+    func bind(task: DsymDownloadTask?) {
+        self.cancellable?.cancel()
+        if task != nil {
+            self.cancellable = Publishers
+                .CombineLatest(task!.$status, task!.$progress)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] (status, progress) in
+                    self?.update(status: status, progress: progress)
+                }
+        } else {
+            self.running = false
         }
-        
-        task.$status.sink { [weak self] (status) in
-            DispatchQueue.main.async {
-                self?.update(status: status)
-            }
-        }.store(in: &storage)
-        
-        task.$progress.sink { [weak self] (progress) in
-            DispatchQueue.main.async {
-                self?.update(progress: progress)
-            }
-        }.store(in: &storage)
     }
     
-    private func update(status: DsymDownloadTask.Status) {
+    private func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         switch status {
         case .running:
             self.running = true
         default:
             self.running = false
         }
-    }
-    
-    private func update(progress: DsymDownloadTask.Progress) {
+        
         if progress.percentage == 0 {
             self.indicator.isIndeterminate = true
         } else {
