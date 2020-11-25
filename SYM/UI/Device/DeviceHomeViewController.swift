@@ -104,9 +104,12 @@ class DeviceDataSource {
                 let appNodes = appInfoList.map { info in
                     return DeviceSidebarFileNode(deviceID: udid, appID: info.identifier , title: info.name)
                 }
-                let fileNode = DeviceSidebarNode.fileHeaderNode(appNodes)
-                let crashNode = DeviceSidebarCrashNode(deviceID: udid)
-                return DeviceSidebarNode.deviceHeaderNode(lockdown.deviceName, children: [fileNode, crashNode])
+                var children = [DeviceSidebarNode]()
+                if appNodes.count > 0 {
+                    children.append(DeviceSidebarNode.fileHeaderNode(appNodes))
+                }
+                children.append(DeviceSidebarCrashNode(deviceID: udid))
+                return DeviceSidebarNode.deviceHeaderNode(lockdown.deviceName, children: children)
             }
             
             DispatchQueue.main.async {
