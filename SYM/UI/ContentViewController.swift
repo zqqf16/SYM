@@ -76,20 +76,8 @@ class ContentViewController: NSViewController {
         self.textView.textContainerInset = CGSize(width: 0, height: 4)
         self.textView.allowsUndo = true
         self.textView.delegate = self
-        
         self.textView.lnv_setUpLineNumberView()
-        
-        /* horizontally scrolling
-        //self.textView.isHorizontallyResizable = true
-        self.textView.textContainer?.widthTracksTextView = false
-        self.textView.textContainer?.containerSize = NSMakeSize(CGFloat(Float.greatestFiniteMagnitude), CGFloat(Float.greatestFiniteMagnitude))
-        //self.textView.textContainer?.containerSize = self.textView.maxSize
-         */
         self.textView.layoutManager?.allowsNonContiguousLayout = false
-    }
-    
-    func textDidChange(_ notification: Notification) {
-        self.update(crashInfo: self.document?.crashInfo)
     }
     
     private func infoString(fromCrash crash: CrashInfo) -> String {

@@ -63,11 +63,6 @@ class CrashDocument: NSDocument {
     override func data(ofType typeName: String) throws -> Data {
         return self.textStorage.string.data(using: String.Encoding.utf8)!
     }
-    
-    func update(_ content: String) {
-        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
-        //self.notificationCenter.post(name: .crashDidOpen, object: nil)
-    }
 
     override func read(from data: Data, ofType typeName: String) throws {
         if typeName == CrashFileType.plist {
@@ -77,9 +72,16 @@ class CrashDocument: NSDocument {
         }
     }
     
+    private func update(content: String) {
+        self.textStorage.beginEditing()
+        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+        self.textStorage.endEditing()
+    }
+    
     private func readCrash(from data: Data) throws {
         let content = String(data: data, encoding: .utf8) ?? ""
-        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+        self.update(content: content)
+        self.parseCrashInfo(content)
     }
     
     private func readPlist(from data: Data) throws {
@@ -110,14 +112,12 @@ extension CrashDocument: NSTextStorageDelegate {
         let crashInfo = CrashInfo.parse(content)
         DispatchQueue.main.async {
             self.crashInfo = crashInfo
-            Swift.print("Parse")
         }
     }
     
     func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
         if editedMask.contains(.editedCharacters) {
             self.contentPublisher.send(self.textStorage.string)
-            Swift.print("Update")
         }
     }
 }
@@ -133,7 +133,7 @@ extension CrashDocument {
             self.isSymbolicating = true
             let content = crash.symbolicate(dsyms: dsyms)
             DispatchQueue.main.async {
-                self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+                self.update(content: content)
                 self.undoManager?.removeAllActions()
                 self.updateChangeCount(.changeDone)
                 self.isSymbolicating = false
