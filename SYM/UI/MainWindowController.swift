@@ -55,7 +55,8 @@ class MainWindowController: NSWindowController {
     
     // Dsym
     private var dsymManager = DsymManager()
-    
+    private weak var dsymViewController: DsymViewController?
+
     private var downloaderCancellable: AnyCancellable?
     private var downloadTask: DsymDownloadTask?
     private weak var downloadStatusViewController: DownloadStatusViewController?
@@ -158,6 +159,8 @@ class MainWindowController: NSWindowController {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
         let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
         vc.dsymManager = self.dsymManager
+        vc.bind(task: self.downloadTask)
+        self.dsymViewController = vc
         self.contentViewController?.presentAsSheet(vc)
     }
     
@@ -186,6 +189,10 @@ extension MainWindowController: DownloadStatusViewControllerDelegate {
         self.downloadTask = task
         self.downloadStatusViewController?.bind(task: task)
         self.downloadItem.bind(task: task)
+        self.dsymViewController?.bind(task: task)
+        if let files = task?.dsymFiles {
+            self.dsymManager.dsymFileDidUpdate(files)
+        }
     }
     
     func startDownloading() {

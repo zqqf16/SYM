@@ -21,30 +21,31 @@
 // SOFTWARE.
 
 import Cocoa
+import Combine
 
 class DsymToolBarButton: NSPopUpButton {
-    var dsymManager: DsymManager! {
+    private var cancellable: AnyCancellable?
+
+    var dsymManager: DsymManager? {
         didSet {
-            self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
-                self.dsymDidUpdated()
-            }
+            self.cancellable?.cancel()
+            self.cancellable = dsymManager?.$dsymFiles
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] (dsymFiles) in
+                    self?.update(withDsymFiles: dsymFiles)
+                }
         }
     }
     
-    func dsymDidUpdated() {
+    private func update(withDsymFiles dsymFiles: [String: DsymFile]) {
         if let crash = self.dsymManager?.crash,
             let uuid = crash.uuid,
-            let dsym = self.dsymManager.dsymFile(withUuid: uuid) {
+            let dsym = dsymFiles[uuid] {
             self.title = dsym.name
             self.image = .symbol
         } else {
             self.title = NSLocalizedString("dsym_file_not_found", comment: "")
             self.image = .alert
         }
-    }
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        self.dsymDidUpdated()
     }
 }

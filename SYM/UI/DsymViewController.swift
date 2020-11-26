@@ -73,12 +73,29 @@ class DsymViewController: NSViewController {
         }
     }
     
+    private var dsymFiles: [String: DsymFile] = [:] {
+        didSet {
+            self.reloadData()
+        }
+    }
+    
+    private var dsymStorage = Set<AnyCancellable>()
+    private var taskCancellable: AnyCancellable?
+
     var dsymManager: DsymManager? {
         didSet {
-            self.binaries = self.dsymManager?.binaries ?? []
-            self.dsymManager?.eventBus.sub(self, for: DsymUpdateEvent.self).async { (event) in
-                self.tableView.reloadData()
+            self.dsymStorage.forEach { (cancellable) in
+                cancellable.cancel()
             }
+            dsymManager?.$binaries
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.binaries, on: self)
+                .store(in: &dsymStorage)
+            
+            dsymManager?.$dsymFiles
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.dsymFiles, on: self)
+                .store(in: &dsymStorage)
         }
     }
 
@@ -97,50 +114,32 @@ class DsymViewController: NSViewController {
         }
         return nil
     }
-    
-    private var storage = Set<AnyCancellable>()
-    private var downloaderCancellable: AnyCancellable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.updateViewHeight()
         self.downloadButton.isEnabled = self.dsymManager?.crash != nil
-        
-        self.downloaderCancellable = DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
-            guard let uuid = self?.dsymManager?.crash.uuid,
-                  let task = tasks[uuid]
-            else {
-                return
-            }
-            
-            self?.bind(task: task)
-        }
     }
     
     override func viewDidDisappear() {
         super.viewDidDisappear()
-        self.downloaderCancellable?.cancel()
-        self.storage.forEach { (cancellable) in
+        self.taskCancellable?.cancel()
+        self.dsymStorage.forEach { (cancellable) in
             cancellable.cancel()
         }
     }
     
-    private func bind(task: DsymDownloadTask) {
-        self.storage.forEach { (cancellable) in
-            cancellable.cancel()
+    func bind(task: DsymDownloadTask?) {
+        self.taskCancellable?.cancel()
+        guard let downloadTask = task else {
+            return
         }
-        
-        task.$status.sink { [weak self] (status) in
-            DispatchQueue.main.async {
-                self?.update(status: status)
+        self.taskCancellable = Publishers
+            .CombineLatest(downloadTask.$status, downloadTask.$progress)
+            .receive(on: DispatchQueue.main)
+            .sink { (status, progress) in
+                self.update(status: status, progress: progress)
             }
-        }.store(in: &storage)
-        
-        task.$progress.sink { [weak self] (progress) in
-            DispatchQueue.main.async {
-                self?.update(progress: progress)
-            }
-        }.store(in: &storage)
     }
 
     //MARK: UI
@@ -200,7 +199,7 @@ extension DsymViewController: DsymTableCellViewDelegate {
 }
 
 extension DsymViewController {
-    func update(status: DsymDownloadTask.Status) {
+    func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         switch status {
         case .running:
             self.downloadButton.isEnabled = false
@@ -219,9 +218,6 @@ extension DsymViewController {
             self.progressBar.startAnimation(nil)
             self.downloadButton.isEnabled = false
         }
-    }
-    
-    func update(progress: DsymDownloadTask.Progress) {
         if progress.percentage == 0 {
             self.progressBar.isIndeterminate = true
         } else {

@@ -23,10 +23,6 @@
 import Foundation
 import Combine
 
-extension Notification.Name {
-    static let dsymDidUpdate = Notification.Name("sym.dsymDidUpdate")
-}
-
 class DsymFile: Hashable {
     let name: String
     let path: String
@@ -51,15 +47,19 @@ class DsymFile: Hashable {
     }
 }
 
-struct DsymUpdateEvent: Event {
-    let dsymFiles: [DsymFile]
-}
-
 class DsymManager {
-    let eventBus = EventBus()
-    var crash: CrashInfo!
-    var binaries: [Binary]?
-    var dsymFiles: [String:DsymFile] = [:]
+    @Published
+    var binaries: [Binary]  = []
+
+    @Published
+    var dsymFiles: [String: DsymFile] = [:]
+    
+    @Published
+    var crash: CrashInfo?
+
+    private var uuids: [String] {
+        return self.binaries.compactMap { $0.uuid }
+    }
 
     private let operationQueue = DispatchQueue(label: "dsym.manager")
     private lazy var monitor: MdfindWrapper = {
@@ -68,34 +68,18 @@ class DsymManager {
         return mdfind
     }()
     
-    private var uuids: [String]?
-    private var storage = Set<AnyCancellable>()
-
-    init() {
-        self.monitor.delegate = self
-        DsymDownloader.shared.$tasks.sink { [weak self] (tasks) in
-            guard let uuid = self?.crash?.uuid,
-                  let task = tasks[uuid],
-                  let files = task.dsymFiles
-            else {
-                return
-            }
-            
-            self?.dsymFileDidUpdate(files)
-        }.store(in: &storage)
-    }
-
-    func update(_ crash: CrashInfo) {
+    func update(_ crash: CrashInfo?) {
         self.crash = crash
-        self.binaries = crash.embeddedBinaries
-        self.uuids = self.binaries?.compactMap({ (binary) -> String? in
-            return binary.uuid
-        })
-        self.start()
+        self.binaries = crash?.embeddedBinaries ?? []
+        if crash != nil {
+            self.start(crash!)
+        } else {
+            self.stop()
+        }
     }
     
-    func start() {
-        if let condition = self.createCondition(bundleID: self.crash.bundleID, binaries: self.crash.embeddedBinaries) {
+    func start(_ crash: CrashInfo) {
+        if let condition = self.createCondition(bundleID: crash.bundleID, binaries: crash.embeddedBinaries) {
             self.monitor.start(withCondition: condition)
         }
     }
@@ -116,7 +100,6 @@ class DsymManager {
         
         DispatchQueue.main.async {
             self.dsymFiles[uuid] = dsymFile
-            self.eventBus.post(DsymUpdateEvent(dsymFiles: Array(self.dsymFiles.values)))
         }
     }
     
@@ -149,15 +132,15 @@ class DsymManager {
         return condition
     }
     
-    private func dsymFileDidUpdate(_ dsymFiles: [DsymFile] = []) {
+    func dsymFileDidUpdate(_ dsymFiles: [DsymFile] = []) {
         DispatchQueue.main.async {
-            self.dsymFiles.removeAll()
+            var result = [String: DsymFile]()
             dsymFiles.forEach { (dsym) in
                 dsym.uuids.forEach { (uuid) in
-                    self.dsymFiles[uuid] = dsym
+                    result[uuid] = dsym
                 }
             }
-            self.eventBus.post(DsymUpdateEvent(dsymFiles: dsymFiles))
+            self.dsymFiles = result
         }
     }
 }
@@ -224,15 +207,14 @@ extension DsymManager: MdfindWrapperDelegate {
         guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
-            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
-            let uuids = self.uuids
+            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String]
         else {
             return nil
         }
         
         var index: Int = -1
         for (i, u) in dsymUUIDs.enumerated() {
-            if uuids.contains(u) {
+            if self.uuids.contains(u) {
                 index = i
                 break
             }
@@ -256,17 +238,16 @@ extension DsymManager: MdfindWrapperDelegate {
     }
     
     private func parseAppBundle(_ item: NSMetadataItem) -> [DsymFile]? {
-        guard let binaries = self.binaries,
-            let path = item.value(forKey: NSMetadataItemPathKey) as? String,
+        guard  let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let bundle = Bundle(path: path) else {
             return nil
         }
         let name = item.value(forKey: NSMetadataItemFSNameKey) as? String
         var dsyms: [DsymFile] = [DsymFile]()
 
-        if let exe = binaries.filter({ $0.executable }).first, let dsym = self.parseBinary(exe, bundle: bundle, name: name) {
+        if let exe = self.binaries.filter({ $0.executable }).first, let dsym = self.parseBinary(exe, bundle: bundle, name: name) {
             dsyms.append(dsym)
-            for framework in binaries.filter({ !$0.executable }) {
+            for framework in self.binaries.filter({ !$0.executable }) {
                 if let d = self.parseBinary(framework, bundle: bundle, name: name) {
                     dsyms.append(d)
                 }
