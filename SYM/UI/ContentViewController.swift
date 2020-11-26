@@ -47,7 +47,6 @@ class ContentViewController: NSViewController {
 
             self.textView.layoutManager?.replaceTextStorage(document.textStorage)
             self.cancellable = document.$crashInfo
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] (crashInfo) in
                     self?.update(crashInfo: crashInfo)
                 }
@@ -57,10 +56,14 @@ class ContentViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.setupTextView()
         self.toggleBottomBar(false)
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configFontChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        self.setupTextView()
     }
     
     private func toggleBottomBar(_ show: Bool) {
