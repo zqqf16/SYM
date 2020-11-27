@@ -19,7 +19,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </view>
-                        <toolbar key="toolbar" implicitIdentifier="09D11707-F4A3-4FD5-970E-AC5832E91C2B" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="bTZ-U3-q5p">
+                        <toolbar key="toolbar" implicitIdentifier="09D11707-F4A3-4FD5-970E-AC5832E91C2B" autosavesConfiguration="NO" displayMode="iconOnly" sizeMode="regular" id="bTZ-U3-q5p">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="o91-qK-Jya"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="K2G-f9-1aq"/>
@@ -37,8 +37,16 @@
                                         <action selector="reloadFiles:" target="IOy-ac-Qu3" id="Qag-QX-btp"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="127FABA3-24A4-420B-AB65-8508D0B5458C" label="Sidebar" paletteLabel="Sidebar" tag="-1" image="sidebar.left" catalog="system" navigational="YES" id="94a-ji-XOP">
+                                    <size key="minSize" width="44" height="27"/>
+                                    <size key="maxSize" width="44" height="27"/>
+                                    <connections>
+                                        <action selector="toggleSidebar:" target="IOy-ac-Qu3" id="bA0-Ew-voP"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
+                                <toolbarItem reference="94a-ji-XOP"/>
                                 <toolbarItem reference="U4o-wo-THR"/>
                                 <toolbarItem reference="Z8a-qL-5jv"/>
                             </defaultToolbarItems>
@@ -60,7 +68,7 @@
             <objects>
                 <splitViewController id="Xue-bM-Z3e" customClass="DeviceHomeViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
                     <splitViewItems>
-                        <splitViewItem holdingPriority="260" behavior="sidebar" id="eeA-p2-gUB"/>
+                        <splitViewItem canCollapse="YES" holdingPriority="260" behavior="sidebar" id="eeA-p2-gUB"/>
                         <splitViewItem holdingPriority="255" behavior="contentList" id="SRI-PM-JSl"/>
                     </splitViewItems>
                     <splitView key="splitView" dividerStyle="thin" vertical="YES" id="wDs-0p-kAA">
@@ -85,13 +93,13 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X2B-CH-4mg">
-                                <rect key="frame" x="0.0" y="0.0" width="213" height="532"/>
+                                <rect key="frame" x="0.0" y="0.0" width="213" height="530"/>
                                 <clipView key="contentView" drawsBackground="NO" id="fCm-8f-eEt">
-                                    <rect key="frame" x="0.0" y="0.0" width="213" height="532"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="213" height="530"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="sourceList" selectionHighlightStyle="sourceList" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="medium" viewBased="YES" floatsGroupRows="NO" indentationPerLevel="13" outlineTableColumn="OM5-hs-fAr" id="9Ml-mm-V4N">
-                                            <rect key="frame" x="0.0" y="0.0" width="213" height="532"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="213" height="530"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="0.0"/>
                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -229,13 +237,13 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="d7q-Zu-luW">
-                                <rect key="frame" x="0.0" y="0.0" width="755" height="160"/>
+                                <rect key="frame" x="0.0" y="0.0" width="755" height="114"/>
                                 <clipView key="contentView" id="SxV-yQ-eR3">
-                                    <rect key="frame" x="1" y="1" width="753" height="158"/>
+                                    <rect key="frame" x="1" y="1" width="753" height="112"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="systemDefault" headerView="2QY-yv-bJg" viewBased="YES" id="0J0-aG-z6o">
-                                            <rect key="frame" x="0.0" y="0.0" width="753" height="135"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="753" height="89"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -387,7 +395,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Name" id="nrh-MA-sM2">
-                                                            <rect key="frame" x="1" y="1" width="282" height="17"/>
+                                                            <rect key="frame" x="11" y="1" width="282" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qbW-Sz-yAe">
@@ -411,7 +419,7 @@
                                                             </connections>
                                                         </tableCellView>
                                                         <tableCellView identifier="FileName" id="ylz-c5-ZVb">
-                                                            <rect key="frame" x="1" y="20" width="282" height="17"/>
+                                                            <rect key="frame" x="11" y="20" width="282" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         </tableCellView>
                                                     </prototypeCellViews>
@@ -429,7 +437,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Date" id="Mmh-VB-wpP">
-                                                            <rect key="frame" x="286" y="1" width="182" height="17"/>
+                                                            <rect key="frame" x="296" y="1" width="182" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AfG-NN-ins">
@@ -465,7 +473,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Size" id="Qik-mU-2CI">
-                                                            <rect key="frame" x="471" y="1" width="90" height="17"/>
+                                                            <rect key="frame" x="481" y="1" width="90" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dUR-zP-Ei1">
@@ -527,6 +535,7 @@
         <image name="NSActionTemplate" width="15" height="15"/>
         <image name="NSFolder" width="32" height="32"/>
         <image name="arrow.clockwise.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="sidebar.left" catalog="system" width="18" height="14"/>
         <image name="square.and.arrow.up.fill" catalog="system" width="15" height="17"/>
     </resources>
 </document>
