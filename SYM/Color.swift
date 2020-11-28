@@ -69,9 +69,9 @@ extension NSColor {
         
         let startIndex = String.Index(utf16Offset: 1, in: hexString)
         let hex: String = String(hexString[startIndex...])
-        var hexValue:  UInt32 = 0
+        var hexValue: UInt64 = 0
         
-        guard Scanner(string: hex).scanHexInt32(&hexValue) else {
+        guard Scanner(string: hex).scanHexInt64(&hexValue) else {
             return nil
         }
         
@@ -81,9 +81,9 @@ extension NSColor {
         case 4:
             self.init(hex4: UInt16(hexValue))
         case 6:
-            self.init(hex6: hexValue)
+            self.init(hex6: UInt32(hexValue))
         case 8:
-            self.init(hex8: hexValue)
+            self.init(hex8: UInt32(hexValue))
         default:
             return nil
         }
