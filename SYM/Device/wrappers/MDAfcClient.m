@@ -104,6 +104,16 @@
     return [self readString:path encoding:NSUTF8StringEncoding];
 }
 
+- (BOOL)remove:(NSString *)path {
+    const char *cPath = [path cStringUsingEncoding:NSUTF8StringEncoding];
+    if (!_afc || !path) {
+        return NO;
+    }
+    
+    afc_error_t afc_error = afc_remove_path(_afc, cPath);
+    return afc_error == AFC_E_SUCCESS;
+}
+
 - (NSArray<MDDeviceFile *> *)listDirectory:(NSString *)path
 {
     if (!_afc || !path) {

@@ -29,11 +29,38 @@ extension TableViewItemIndex {
     static let fileBrowserIndex = 1
 }
 
+extension NSToolbarItem.Identifier {
+    static let remove = NSToolbarItem.Identifier("ToolbarItemRemove")
+}
+
+extension NSToolbar {
+    func toggleRemoveItem(visiable: Bool) {
+        if visiable {
+            if !self.items.contains(where: { $0.itemIdentifier == .remove }) {
+                self.insertItem(withItemIdentifier: .remove, at: 1)
+            }
+        } else {
+            self.removeItem(with: .remove)
+        }
+    }
+}
+
 class DeviceContentViewController: NSTabViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do view setup here.
+    }
+    
+    private func toggleToolbarItems() {
+        guard let item = self.tabView.selectedTabViewItem,
+              let toolbar = self.view.window?.toolbar
+        else {
+            return
+        }
+        
+        let index = self.tabView.indexOfTabViewItem(item)
+        toolbar.toggleRemoveItem(visiable: index == .fileBrowserIndex)
     }
     
     private var crashViewController: CrashImporterViewController! {
@@ -47,10 +74,12 @@ class DeviceContentViewController: NSTabViewController {
     func showCrashList(_ deviceID: String?) {
         self.tabView.selectTabViewItem(at: .crashImporterIndex)
         self.crashViewController.reloadData(withDeviceID: deviceID)
+        self.toggleToolbarItems()
     }
     
     func showFileList(_ deviceID: String?, appID: String?) {
         self.tabView.selectTabViewItem(at: .fileBrowserIndex)
         self.fileViewController.reloadData(withDeviceID: deviceID, appID: appID)
+        self.toggleToolbarItems()
     }
 }

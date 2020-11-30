@@ -84,7 +84,7 @@ class CrashImporterViewController: NSViewController {
         self.tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
         
         self.tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
-        self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
+        self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)        
     }
 
     func reloadData(withDeviceID deviceID: String?) {

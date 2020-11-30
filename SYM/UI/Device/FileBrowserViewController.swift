@@ -110,6 +110,21 @@ class FileBrowserViewController: NSViewController {
         let row = self.outlineView.selectedRow
         self.exportFile(atIndex: row)
     }
+    
+    @IBAction func removeFile(_ sender: AnyObject?) {
+        let row = self.outlineView.selectedRow
+        guard let file = self.outlineView.item(atRow: row) as? MDDeviceFile,
+              let parent = self.outlineView.parent(forItem: file) as? MDDeviceFile
+        else {
+            // TODO: root dir?
+            return
+        }
+        
+        if parent.removeChild(file) {
+            let index = self.outlineView.childIndex(forItem: file)
+            self.outlineView.removeItems(at: IndexSet(integer: index), inParent: parent, withAnimation: .effectFade)
+        }
+    }
 
     private func exportFile(atIndex index: Int) {
         guard index >= 0, let file = self.outlineView.item(atRow: index) as? MDDeviceFile else {

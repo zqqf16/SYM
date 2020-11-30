@@ -23,14 +23,14 @@
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="o91-qK-Jya"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="K2G-f9-1aq"/>
-                                <toolbarItem implicitItemIdentifier="88F9FCD9-BE37-4F91-B41C-0D920D1AB844" label="Export" paletteLabel="Export" tag="-1" image="square.and.arrow.up.fill" catalog="system" id="Z8a-qL-5jv">
+                                <toolbarItem implicitItemIdentifier="88F9FCD9-BE37-4F91-B41C-0D920D1AB844" label="Export" paletteLabel="Export" tag="-1" image="square.and.arrow.up" catalog="system" id="Z8a-qL-5jv">
                                     <size key="minSize" width="35.5" height="30"/>
                                     <size key="maxSize" width="35.5" height="30"/>
                                     <connections>
                                         <action selector="openFile:" target="IOy-ac-Qu3" id="DEe-7k-MIQ"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="C2AFA926-C726-42A1-BBC0-FCE50D8A2E0F" label="Reload" paletteLabel="Reload" tag="-1" image="arrow.clockwise.circle.fill" catalog="system" id="U4o-wo-THR">
+                                <toolbarItem implicitItemIdentifier="C2AFA926-C726-42A1-BBC0-FCE50D8A2E0F" label="Reload" paletteLabel="Reload" tag="-1" image="arrow.clockwise" catalog="system" id="U4o-wo-THR">
                                     <size key="minSize" width="37" height="28"/>
                                     <size key="maxSize" width="37" height="28"/>
                                     <connections>
@@ -44,9 +44,17 @@
                                         <action selector="toggleSidebar:" target="IOy-ac-Qu3" id="bA0-Ew-voP"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="900D9183-3075-4376-B06B-1CEC502C000D" explicitItemIdentifier="ToolbarItemRemove" label="Remove" paletteLabel="Remove" tag="-1" image="trash" catalog="system" id="RcY-vv-ZEn">
+                                    <size key="minSize" width="35.5" height="30"/>
+                                    <size key="maxSize" width="35.5" height="30"/>
+                                    <connections>
+                                        <action selector="removeFile:" target="IOy-ac-Qu3" id="1VY-Hd-4DW"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="94a-ji-XOP"/>
+                                <toolbarItem reference="RcY-vv-ZEn"/>
                                 <toolbarItem reference="U4o-wo-THR"/>
                                 <toolbarItem reference="Z8a-qL-5jv"/>
                             </defaultToolbarItems>
@@ -88,18 +96,18 @@
         <scene sceneID="5xo-9s-Mvx">
             <objects>
                 <viewController id="hSv-Zj-ApU" customClass="DeviceSidebarViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="JFt-1Y-i7D">
-                        <rect key="frame" x="0.0" y="0.0" width="200" height="474"/>
+                    <view key="view" misplaced="YES" id="JFt-1Y-i7D">
+                        <rect key="frame" x="0.0" y="0.0" width="200" height="473"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="28" horizontalPageScroll="10" verticalLineScroll="28" verticalPageScroll="10" hasHorizontalScroller="NO" hasVerticalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X2B-CH-4mg">
-                                <rect key="frame" x="0.0" y="0.0" width="200" height="422"/>
+                                <rect key="frame" x="0.0" y="0.0" width="200" height="420"/>
                                 <clipView key="contentView" drawsBackground="NO" id="fCm-8f-eEt">
-                                    <rect key="frame" x="0.0" y="0.0" width="200" height="422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="200" height="420"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" tableStyle="sourceList" selectionHighlightStyle="sourceList" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="28" rowSizeStyle="medium" viewBased="YES" floatsGroupRows="NO" indentationPerLevel="13" outlineTableColumn="OM5-hs-fAr" id="9Ml-mm-V4N">
-                                            <rect key="frame" x="0.0" y="0.0" width="200" height="422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="200" height="420"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="0.0"/>
                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -118,7 +126,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="HeaderCell" id="IOg-du-OaJ">
-                                                            <rect key="frame" x="11" y="0.0" width="147" height="17"/>
+                                                            <rect key="frame" x="11" y="0.0" width="177" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9Zu-Ru-yMu">
@@ -140,7 +148,7 @@
                                                             </connections>
                                                         </tableCellView>
                                                         <tableCellView identifier="DataCell" id="8Wp-Y2-bnD">
-                                                            <rect key="frame" x="11" y="17" width="147" height="28"/>
+                                                            <rect key="frame" x="11" y="17" width="177" height="28"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <imageView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q3j-Tb-tO6">
@@ -232,18 +240,18 @@
         <scene sceneID="stp-Sl-nK8">
             <objects>
                 <viewController title="Crashes" id="te4-dk-rcU" customClass="CrashImporterViewController" customModule="SYM" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" id="GWE-gu-geD">
-                        <rect key="frame" x="0.0" y="0.0" width="755" height="176"/>
+                    <view key="view" misplaced="YES" id="GWE-gu-geD">
+                        <rect key="frame" x="0.0" y="0.0" width="755" height="153"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" translatesAutoresizingMaskIntoConstraints="NO" id="d7q-Zu-luW">
-                                <rect key="frame" x="0.0" y="0.0" width="755" height="176"/>
+                                <rect key="frame" x="0.0" y="0.0" width="755" height="130"/>
                                 <clipView key="contentView" id="SxV-yQ-eR3">
-                                    <rect key="frame" x="1" y="1" width="753" height="174"/>
+                                    <rect key="frame" x="1" y="1" width="753" height="128"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="24" rowSizeStyle="systemDefault" headerView="2QY-yv-bJg" viewBased="YES" id="0J0-aG-z6o">
-                                            <rect key="frame" x="0.0" y="0.0" width="753" height="151"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="753" height="105"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -395,7 +403,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Name" id="nrh-MA-sM2">
-                                                            <rect key="frame" x="1" y="1" width="282" height="17"/>
+                                                            <rect key="frame" x="11" y="1" width="282" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="qbW-Sz-yAe">
@@ -428,7 +436,7 @@
                                                             </connections>
                                                         </tableCellView>
                                                         <tableCellView identifier="FileName" id="ylz-c5-ZVb">
-                                                            <rect key="frame" x="1" y="20" width="282" height="17"/>
+                                                            <rect key="frame" x="11" y="20" width="282" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         </tableCellView>
                                                     </prototypeCellViews>
@@ -446,7 +454,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Date" id="Mmh-VB-wpP">
-                                                            <rect key="frame" x="286" y="1" width="164" height="17"/>
+                                                            <rect key="frame" x="296" y="1" width="164" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="AfG-NN-ins">
@@ -482,7 +490,7 @@
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Size" id="Qik-mU-2CI">
-                                                            <rect key="frame" x="453" y="1" width="140" height="17"/>
+                                                            <rect key="frame" x="463" y="1" width="140" height="17"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="dUR-zP-Ei1">
@@ -547,8 +555,9 @@
     <resources>
         <image name="NSActionTemplate" width="15" height="15"/>
         <image name="NSFolder" width="32" height="32"/>
-        <image name="arrow.clockwise.circle.fill" catalog="system" width="15" height="15"/>
+        <image name="arrow.clockwise" catalog="system" width="14" height="16"/>
         <image name="sidebar.left" catalog="system" width="18" height="14"/>
-        <image name="square.and.arrow.up.fill" catalog="system" width="15" height="17"/>
+        <image name="square.and.arrow.up" catalog="system" width="15" height="17"/>
+        <image name="trash" catalog="system" width="15" height="17"/>
     </resources>
 </document>

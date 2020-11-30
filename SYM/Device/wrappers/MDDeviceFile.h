@@ -41,6 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSData *)read;
 - (void)copy:(NSString *)path;
 
+- (BOOL)remove;
+- (BOOL)removeChild:(MDDeviceFile *)child;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSString *)readString:(NSString *)path encoding:(NSStringEncoding)encoding;
 - (nullable NSString *)readUTF8String:(NSString *)path;
 
+- (BOOL)remove:(NSString *)path;
+
 @end
 
 @interface MDAfcClient (Crash)

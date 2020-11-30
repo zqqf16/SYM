@@ -292,3 +292,14 @@ extension UInt {
         return "\(String(format: "%.2f", value))\(units[index])"
     }
 }
+
+extension NSToolbar {
+    open func removeItem(with identifier: NSToolbarItem.Identifier) {
+        let index = self.items.firstIndex { (item) -> Bool in
+            return item.itemIdentifier == identifier
+        }
+        if index != nil {
+            self.removeItem(at: index!)
+        }
+    }
+}

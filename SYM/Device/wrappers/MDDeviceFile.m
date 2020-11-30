@@ -26,11 +26,10 @@
 
 @interface MDDeviceFile ()
 @property (nonatomic, strong) MDAfcClient *afcClient;
+@property (nonatomic, readwrite) NSArray<MDDeviceFile *> *children;
 @end
 
 @implementation MDDeviceFile
-
-@synthesize children = _children;
 
 - (instancetype)initWithAfcClient:(MDAfcClient *)afcClient {
     if (self = [super init]) {
@@ -105,6 +104,35 @@
         NSString *filePath = [path stringByAppendingPathComponent:file.name];
         [file copy:filePath];
     }
+}
+
+- (BOOL)remove {
+    if (!self.afcClient) {
+        return NO;
+    }
+    
+    if (self.isDirectory) {
+        for (MDDeviceFile *file in self.children) {
+            if (![file remove]) {
+                return NO;
+            }
+        }
+        self.children = @[];
+    }
+    
+    return [self.afcClient remove:self.path];
+}
+
+- (BOOL)removeChild:(MDDeviceFile *)child {
+    if ([self.children containsObject:child]) {
+        if ([child remove]) {
+            NSMutableArray *tmpChildren = [self.children mutableCopy];
+            [tmpChildren removeObject:child];
+            self.children = [tmpChildren copy];
+            return YES;
+        }
+    }
+    return NO;
 }
 
 @end
