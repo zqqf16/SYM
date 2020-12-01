@@ -35,6 +35,8 @@
 		B51F9B22256CE51200E52FAF /* DownloadToolbarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */; };
 		B51F9B28256CF06F00E52FAF /* DownloadStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */; };
 		B51F9B80256CF29D00E52FAF /* DsymStatusBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B7F256CF29D00E52FAF /* DsymStatusBarItem.swift */; };
+		B535D7362576223800502711 /* MDSBServices.m in Sources */ = {isa = PBXBuildFile; fileRef = B535D7352576223700502711 /* MDSBServices.m */; };
+		B535D7372576223800502711 /* MDSBServices.m in Sources */ = {isa = PBXBuildFile; fileRef = B535D7352576223700502711 /* MDSBServices.m */; };
 		B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7622D44838003BC45C /* MDLockdown.m */; };
 		B53E2F7A22D4710C003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
@@ -143,6 +145,8 @@
 		B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadToolbarItem.swift; sourceTree = "<group>"; };
 		B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStatusViewController.swift; sourceTree = "<group>"; };
 		B51F9B7F256CF29D00E52FAF /* DsymStatusBarItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DsymStatusBarItem.swift; sourceTree = "<group>"; };
+		B535D7342576223700502711 /* MDSBServices.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDSBServices.h; sourceTree = "<group>"; };
+		B535D7352576223700502711 /* MDSBServices.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDSBServices.m; sourceTree = "<group>"; };
 		B53E2F7522D44838003BC45C /* MDLockdown.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDLockdown.h; sourceTree = "<group>"; };
 		B53E2F7622D44838003BC45C /* MDLockdown.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDLockdown.m; sourceTree = "<group>"; };
 		B53E2F7822D4710C003BC45C /* MDUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDUtil.h; sourceTree = "<group>"; };
@@ -367,6 +371,8 @@
 				B53E2F8522D48383003BC45C /* MDHouseArrest.m */,
 				B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */,
 				B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */,
+				B535D7342576223700502711 /* MDSBServices.h */,
+				B535D7352576223700502711 /* MDSBServices.m */,
 				B53E2F7822D4710C003BC45C /* MDUtil.h */,
 				B53E2F7922D4710C003BC45C /* MDUtil.m */,
 			);
@@ -773,6 +779,7 @@
 				B53E2F9522D49473003BC45C /* MDAfcClient.m in Sources */,
 				B53E2F9322D4946E003BC45C /* MDLockdown.m in Sources */,
 				B53E2F9622D49476003BC45C /* MDHouseArrest.m in Sources */,
+				B535D7372576223800502711 /* MDSBServices.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -780,6 +787,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B535D7362576223800502711 /* MDSBServices.m in Sources */,
 				B53E2F8622D48383003BC45C /* MDHouseArrest.m in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				B5F3578922C3121200111FF3 /* Image.swift in Sources */,

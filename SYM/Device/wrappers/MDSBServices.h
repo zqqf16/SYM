@@ -20,13 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef SYM_Bridging_Header_h
-#define SYM_Bridging_Header_h
 
-#import "MDDeviceMonitor.h"
-#import "MDLockdown.h"
-#import "MDAfcClient.h"
-#import "MDInstProxy.h"
-#import "MDSBServices.h"
+#import <Foundation/Foundation.h>
 
-#endif /* SYM_Bridging_Header_h */
+NS_ASSUME_NONNULL_BEGIN
+
+@class MDLockdown;
+
+@interface MDSBServices : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithLockdown:(nullable MDLockdown *)lockdown NS_DESIGNATED_INITIALIZER;
+
+- (nullable NSImage *)requestIconImage:(NSString *)bundleID;
+
+@end
+
+NS_ASSUME_NONNULL_END

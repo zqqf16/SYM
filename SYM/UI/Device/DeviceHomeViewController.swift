@@ -99,10 +99,15 @@ class DeviceDataSource {
             let nodes = udids.map { (udid) -> DeviceSidebarNode in
                 let lockdown = MDLockdown(udid: udid)
                 let instproxy = MDInstProxy(lockdown: lockdown)
+                let sbServices = MDSBServices(lockdown: lockdown);
                 let appInfoList = instproxy.listApps().filter { $0.isDeveloping }
                 
-                let appNodes = appInfoList.map { info in
-                    return DeviceSidebarFileNode(deviceID: udid, appID: info.identifier , title: info.name)
+                let appNodes = appInfoList.map { info -> DeviceSidebarFileNode in
+                    let app = DeviceSidebarFileNode(deviceID: udid, appID: info.identifier , title: info.name)
+                    if let icon = sbServices.requestIconImage(info.identifier) {
+                        app.image = icon
+                    }
+                    return app
                 }
                 var children = [DeviceSidebarNode]()
                 if appNodes.count > 0 {
