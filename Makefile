@@ -22,6 +22,9 @@ clean:
 	if [ -d ${DMG_DIR} ]; then rm -r $(DMG_DIR); fi;
 	if [ -d ${TOOL_ARCHIVE_PATH} ]; then rm -r $(TOOL_ARCHIVE_PATH); fi;
 
+next:
+	agvtool next-version
+
 archive:
 	xcodebuild -project SYM.xcodeproj -config Release -scheme SYM -archivePath $(ARCHIVE_PATH) archive
 	xcodebuild -exportArchive -archivePath $(ARCHIVE_PATH) -exportOptionsPlist exportOptions.plist -exportPath $(EXPORT_PATH)
