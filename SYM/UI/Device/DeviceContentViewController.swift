@@ -52,7 +52,7 @@ class DeviceContentViewController: NSTabViewController {
         // Do view setup here.
     }
     
-    private func toggleToolbarItems() {
+    private func updateToolbar() {
         guard let item = self.tabView.selectedTabViewItem,
               let toolbar = self.view.window?.toolbar
         else {
@@ -60,7 +60,13 @@ class DeviceContentViewController: NSTabViewController {
         }
         
         let index = self.tabView.indexOfTabViewItem(item)
-        toolbar.toggleRemoveItem(visiable: index == .fileBrowserIndex)
+        if index == .fileBrowserIndex {
+            toolbar.toggleRemoveItem(visiable: true)
+            self.view.window?.title = NSLocalizedString("File Browser", comment: "")
+        } else {
+            toolbar.toggleRemoveItem(visiable: false)
+            self.view.window?.title = NSLocalizedString("Crash Log", comment: "")
+        }
     }
     
     private var crashViewController: CrashImporterViewController! {
@@ -74,12 +80,12 @@ class DeviceContentViewController: NSTabViewController {
     func showCrashList(_ deviceID: String?) {
         self.tabView.selectTabViewItem(at: .crashImporterIndex)
         self.crashViewController.reloadData(withDeviceID: deviceID)
-        self.toggleToolbarItems()
+        self.updateToolbar()
     }
     
     func showFileList(_ deviceID: String?, appID: String?) {
         self.tabView.selectTabViewItem(at: .fileBrowserIndex)
         self.fileViewController.reloadData(withDeviceID: deviceID, appID: appID)
-        self.toggleToolbarItems()
+        self.updateToolbar()
     }
 }
