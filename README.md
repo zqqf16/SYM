@@ -10,11 +10,11 @@ Download the latest version from [here](https://github.com/zqqf16/SYM/releases/l
 
 ## Features
 
-1. Supports Apple/Umeng/Fabric formats report.
-2. Automatically parsing informations from crash report, and finding dSYM files.
-3. Supports import crash report from iOS device directly.
-4. Supports finding symbols from debugging app.
-5. Supports dSYM download script.
+- Apple/Umeng/Fabric crash report supporting.
+- Automatic finding of dSYM files.
+- Customizable dSYM download script.
+- On-device crash reports importing.
+- Sandbox files browser.
 
 ## Usage
 
@@ -22,9 +22,7 @@ Open or paste in a crash report, click the "Symbolicate" button.
 
 ## Example
 
-![Demo](images/demo.png)
-
-
+![Demo](images/demo.jpg)
 
 # SYM
 
@@ -32,14 +30,14 @@ Open or paste in a crash report, click the "Symbolicate" button.
 
 ## 主要功能
 
-1. 支持标准的崩溃日志、cpu usage 日志、Fabric 以及友盟格式的日志
-2. 自动解析崩溃日志信息，自动查找匹配 dSYM 文件
-3. 支持从 iOS 设备中直接导入崩溃日志
-4. 支持从 debug app 中查找符号
-5. 支持 dSYM 文件下载脚本
+- 支持标准的崩溃日志、cpu usage 日志、Fabric 以及友盟格式的日志。
+- 自动解析崩溃日志信息，自动查找匹配 dSYM 文件。
+- 自定义 dSYM 文件下载脚本。
+- 从设备中导入崩溃日志。
+- 浏览沙盒文件。
 
 ## 使用方法
 
-1. 选择崩溃日志文件，右键用 “SYM” 打开
-2. 或打开 SYM，把崩溃日志内容粘贴进来
-3. 点击左上角按钮，开始符号化
+1. 选择崩溃日志文件，右键用 “SYM” 打开。
+2. 或打开 SYM，把崩溃日志内容粘贴进来。
+3. 点击左上角按钮，开始符号化。
