@@ -29,6 +29,7 @@ class DeviceSidebarNode: SidebarNode {
     var image: NSImage?
     var isGroup: Bool = true
     var isSelectable: Bool = true
+    var toolTip: String? = ""
 
     init(title: String, imageName: String = "") {
         self.title = title
@@ -46,6 +47,7 @@ class DeviceSidebarFileNode: DeviceSidebarNode {
         super.init(title: title, imageName: "folder")
         self.isGroup = false
         self.isSelectable = true
+        self.toolTip = appID
     }
 }
 

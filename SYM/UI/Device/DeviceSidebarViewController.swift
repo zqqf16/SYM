@@ -28,6 +28,7 @@ protocol SidebarNode {
     var image: NSImage? { get }
     var isGroup: Bool { get }
     var isSelectable: Bool { get }
+    var toolTip: String? { get }
 }
 
 extension SidebarNode {
@@ -84,6 +85,7 @@ extension DeviceSidebarViewController : NSOutlineViewDelegate {
         
         cell.textField?.stringValue = node.title
         cell.imageView?.image = node.image
+        cell.toolTip = node.toolTip
 
         return cell
     }

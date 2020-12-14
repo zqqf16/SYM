@@ -95,7 +95,7 @@ class FileBrowserViewController: NSViewController {
 
     @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
         let row = self.outlineView.clickedRow
-        self.exportFile(atIndex: row)
+        self.openFile(atIndex: row)
     }
     
     @IBAction func reloadFiles(_ sender: AnyObject?) {
@@ -160,6 +160,28 @@ class FileBrowserViewController: NSViewController {
                 self.exportButton.isEnabled = true
             }
              */
+        }
+    }
+    
+    private func openFile(atIndex index: Int) {
+        guard index >= 0, let file = self.outlineView.item(atRow: index) as? MDDeviceFile else {
+            return
+        }
+        if file.isDirectory {
+            self.exportFile(atIndex: index)
+            return
+        }
+        DispatchQueue.global().async {
+            guard let udid = self.deviceID else {
+                return
+            }
+            
+            let path = FileManager.default.localCrashDirectory(udid) + "/\(file.name)"
+            let url = URL(fileURLWithPath: path)
+            file.copy(url.path)
+            DispatchQueue.main.async {
+                NSWorkspace.shared.open(url)
+            }
         }
     }
 }
