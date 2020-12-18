@@ -28,5 +28,6 @@
 #import "MDAfcClient.h"
 #import "MDInstProxy.h"
 #import "MDSBServices.h"
+#import "MDScreenShotr.h"
 
 #endif /* SYM_Bridging_Header_h */

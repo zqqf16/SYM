@@ -96,6 +96,7 @@ typedef struct lockdownd_pair_record *lockdownd_pair_record_t;
 struct lockdownd_service_descriptor {
 	uint16_t port;
 	uint8_t ssl_enabled;
+	char* identifier;
 };
 typedef struct lockdownd_service_descriptor *lockdownd_service_descriptor_t;
 
@@ -202,7 +203,7 @@ lockdownd_error_t lockdownd_remove_value(lockdownd_client_t client, const char *
  *
  * @param client The lockdownd client
  * @param identifier The identifier of the service to start
- * @param descriptor The service descriptor on success or NULL on failure
+ * @param service The service descriptor on success or NULL on failure
  *
  * @return LOCKDOWN_E_SUCCESS on success, LOCKDOWN_E_INVALID_ARG if a parameter
  *  is NULL, LOCKDOWN_E_INVALID_SERVICE if the requested service is not known
@@ -217,7 +218,7 @@ lockdownd_error_t lockdownd_start_service(lockdownd_client_t client, const char 
  *
  * @param client The lockdownd client
  * @param identifier The identifier of the service to start
- * @param descriptor The service descriptor on success or NULL on failure
+ * @param service The service descriptor on success or NULL on failure
  *
  * @return LOCKDOWN_E_SUCCESS on success, LOCKDOWN_E_INVALID_ARG if a parameter
  *  is NULL, LOCKDOWN_E_INVALID_SERVICE if the requested service is not known
@@ -418,7 +419,7 @@ void lockdownd_client_set_label(lockdownd_client_t client, const char *label);
  *
  * @return LOCKDOWN_E_SUCCESS on success
  */
-lockdownd_error_t lockdownd_get_device_udid(lockdownd_client_t control, char **udid);
+lockdownd_error_t lockdownd_get_device_udid(lockdownd_client_t client, char **udid);
 
 /**
  * Retrieves the name of the device from lockdownd set by the user.
@@ -458,11 +459,20 @@ lockdownd_error_t lockdownd_data_classes_free(char **classes);
 /**
  * Frees memory of a service descriptor as returned by lockdownd_start_service()
  *
- * @param sevice A service descriptor instance to free.
+ * @param service A service descriptor instance to free.
  *
  * @return LOCKDOWN_E_SUCCESS on success
  */
 lockdownd_error_t lockdownd_service_descriptor_free(lockdownd_service_descriptor_t service);
+
+/**
+ * Gets a readable error string for a given lockdown error code.
+ *
+ * @params err A lockdownd error code
+ *
+ * @returns A readable error string
+ */
+const char* lockdownd_strerror(lockdownd_error_t err);
 
 #ifdef __cplusplus
 }

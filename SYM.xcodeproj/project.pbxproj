@@ -31,6 +31,7 @@
 		51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */; };
 		51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C9A4A11EEFF78500F21AE4 /* Doctor.swift */; };
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
+		B5089463258C838D0074254E /* MDScreenShotr.m in Sources */ = {isa = PBXBuildFile; fileRef = B5089462258C838D0074254E /* MDScreenShotr.m */; };
 		B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */; };
 		B51F9B22256CE51200E52FAF /* DownloadToolbarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */; };
 		B51F9B28256CF06F00E52FAF /* DownloadStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */; };
@@ -141,6 +142,8 @@
 		51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
 		51C9A4A11EEFF78500F21AE4 /* Doctor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doctor.swift; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
+		B5089461258C838D0074254E /* MDScreenShotr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDScreenShotr.h; sourceTree = "<group>"; };
+		B5089462258C838D0074254E /* MDScreenShotr.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDScreenShotr.m; sourceTree = "<group>"; };
 		B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHomeViewController.swift; sourceTree = "<group>"; };
 		B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadToolbarItem.swift; sourceTree = "<group>"; };
 		B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStatusViewController.swift; sourceTree = "<group>"; };
@@ -228,7 +231,6 @@
 		F4EFE82E2124361400E9EDA9 /* libboringssl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libboringssl.tbd; path = usr/lib/libboringssl.tbd; sourceTree = SDKROOT; };
 		F4EFE8E82125305100E9EDA9 /* afc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = afc.h; sourceTree = "<group>"; };
 		F4EFE8E92125305100E9EDA9 /* webinspector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = webinspector.h; sourceTree = "<group>"; };
-		F4EFE8EA2125305100E9EDA9 /* asprintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asprintf.h; sourceTree = "<group>"; };
 		F4EFE8EB2125305100E9EDA9 /* installation_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = installation_proxy.h; sourceTree = "<group>"; };
 		F4EFE8EC2125305100E9EDA9 /* misagent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misagent.h; sourceTree = "<group>"; };
 		F4EFE8ED2125305100E9EDA9 /* mobilebackup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobilebackup.h; sourceTree = "<group>"; };
@@ -251,7 +253,6 @@
 		F4EFE8FE2125305300E9EDA9 /* sbservices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sbservices.h; sourceTree = "<group>"; };
 		F4EFE8FF2125305300E9EDA9 /* notification_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = notification_proxy.h; sourceTree = "<group>"; };
 		F4EFE9002125305300E9EDA9 /* service.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = service.h; sourceTree = "<group>"; };
-		F4EFE9012125305300E9EDA9 /* endianness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianness.h; sourceTree = "<group>"; };
 		F4EFE904212530CF00E9EDA9 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		F4EFE905212530CF00E9EDA9 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		F4EFE9092125583700E9EDA9 /* MDDeviceMonitor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDDeviceMonitor.h; sourceTree = "<group>"; };
@@ -373,6 +374,8 @@
 				B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */,
 				B535D7342576223700502711 /* MDSBServices.h */,
 				B535D7352576223700502711 /* MDSBServices.m */,
+				B5089461258C838D0074254E /* MDScreenShotr.h */,
+				B5089462258C838D0074254E /* MDScreenShotr.m */,
 				B53E2F7822D4710C003BC45C /* MDUtil.h */,
 				B53E2F7922D4710C003BC45C /* MDUtil.m */,
 			);
@@ -523,10 +526,8 @@
 			children = (
 				F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */,
 				F4EFE8E82125305100E9EDA9 /* afc.h */,
-				F4EFE8EA2125305100E9EDA9 /* asprintf.h */,
 				F4EFE8F32125305200E9EDA9 /* debugserver.h */,
 				F4EFE8F72125305200E9EDA9 /* diagnostics_relay.h */,
-				F4EFE9012125305300E9EDA9 /* endianness.h */,
 				F4EFE8FA2125305200E9EDA9 /* file_relay.h */,
 				F4EFE8EF2125305200E9EDA9 /* heartbeat.h */,
 				F4EFE8F02125305200E9EDA9 /* house_arrest.h */,
@@ -818,6 +819,7 @@
 				F49030FF20F769ED00249832 /* DocumentController.swift in Sources */,
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
 				B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */,
+				B5089463258C838D0074254E /* MDScreenShotr.m in Sources */,
 				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
 				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
