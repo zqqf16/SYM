@@ -165,8 +165,8 @@ extension DsymManager: MdfindWrapperDelegate {
                 }
             } else if type == "com.apple.xcode.archive" {
                 // xcarchive
-                if let dsym = self.parseXcarchiveFile(item) {
-                    dsyms.append(dsym)
+                if let results = self.parseXcarchiveFile(item) {
+                    dsyms.append(contentsOf: results)
                 }
             } else if type == "com.apple.application-bundle" {
                 // app
@@ -203,38 +203,33 @@ extension DsymManager: MdfindWrapperDelegate {
         return DsymFile(name: name, path: path, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
-    private func parseXcarchiveFile(_ item: NSMetadataItem) -> DsymFile? {
+    private func parseXcarchiveFile(_ item: NSMetadataItem) -> [DsymFile]? {
         guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
             let path = item.value(forKey: NSMetadataItemPathKey) as? String,
             let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
-            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String]
+            let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
+            dsymPaths.count == dsymUUIDs.count
         else {
             return nil
         }
         
-        var index: Int = -1
-        for (i, u) in dsymUUIDs.enumerated() {
-            if self.uuids.contains(u) {
-                index = i
-                break
+        return zip(dsymUUIDs, dsymPaths).compactMap { (dsymUUID, dsymPath) -> DsymFile? in
+            if !self.uuids.contains(dsymUUID) {
+                return nil
             }
+            
+            // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
+            var displayPath = path
+            let realPath = "\(path)/\(dsymPath)"
+            let pathComponents = dsymPath.components(separatedBy: "/")
+            if pathComponents.count > 2 {
+                displayPath += "/\(pathComponents[0])/\(pathComponents[1])"
+            } else {
+                displayPath = realPath
+            }
+            
+            return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: [dsymUUID])
         }
-        if index < 0 {
-            return nil
-        }
-        
-        // dSYMs/xxx.app.dSYM/Contents/Resources/DWARF/xxx
-        let dsymPath = dsymPaths[index]
-        var displayPath = path
-        let realPath = "\(path)/\(dsymPath)"
-        let pathComponents = dsymPath.components(separatedBy: "/")
-        if pathComponents.count > 2 {
-            displayPath += "/\(pathComponents[0])/\(pathComponents[1])"
-        } else {
-            displayPath = realPath
-        }
-        
-        return DsymFile(name: name, path: displayPath, binaryPath: realPath, uuids: dsymUUIDs)
     }
     
     private func parseAppBundle(_ item: NSMetadataItem) -> [DsymFile]? {
