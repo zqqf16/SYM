@@ -1,4 +1,3 @@
-
 /* Class = "NSMenuItem"; title = "File"; ObjectID = "0el-rD-F7v"; */
 "0el-rD-F7v.title" = "文件";
 
@@ -29,13 +28,13 @@
 /* Class = "NSMenuItem"; title = "Symbolicate"; ObjectID = "4IO-T3-Rzp"; */
 "4IO-T3-Rzp.title" = "符号化";
 
-/* Class = "NSToolbarItem"; label = "Device"; ObjectID = "4T4-1f-Y26"; */
+/* Class = "NSToolbarItem"; label = "Device"; ObjectID = "xhX-rJ-mGX"; */
 "xhX-rJ-mGX.label" = "设备";
 
-/* Class = "NSToolbarItem"; paletteLabel = "Device"; ObjectID = "4T4-1f-Y26"; */
+/* Class = "NSToolbarItem"; paletteLabel = "Device"; ObjectID = "xhX-rJ-mGX"; */
 "xhX-rJ-mGX.paletteLabel" = "设备";
 
-/* Class = "NSToolbarItem"; toolTip = "Import crash report from device"; ObjectID = "4T4-1f-Y26"; */
+/* Class = "NSToolbarItem"; toolTip = "Import crash report from device"; ObjectID = "xhX-rJ-mGX"; */
 "xhX-rJ-mGX.toolTip" = "从设备中导入崩溃日志";
 
 /* Class = "NSMenuItem"; title = "Quit SYM"; ObjectID = "4sb-4s-VLi"; */
@@ -155,15 +154,14 @@
 /* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
 "R4o-n2-Eq4.title" = "缩放";
 
-/* Class = "NSToolbarItem"; label = "Scroll"; ObjectID = "SZU-E2-ttI"; */
+/* Class = "NSToolbarItem"; label = "Scroll"; ObjectID = "K4t-4V-GK0"; */
 "K4t-4V-GK0.label" = "定位";
 
-/* Class = "NSToolbarItem"; paletteLabel = "Scroll"; ObjectID = "SZU-E2-ttI"; */
+/* Class = "NSToolbarItem"; paletteLabel = "Scroll"; ObjectID = "K4t-4V-GK0"; */
 "K4t-4V-GK0.paletteLabel" = "定位";
 
 /* Class = "NSToolbarItem"; toolTip = "Scroll to crashed thread"; ObjectID = "SZU-E2-ttI"; */
 "K4t-4V-GK0.toolTip" = "定位到崩溃线程";
-
 "QFd-N4-QA7.label" = "下载dSYM";
 "QFd-N4-QA7.paletteLabel" = "下载dSYM";
 "QFd-N4-QA7.toolTip" = "下载dSYM文件";
@@ -261,13 +259,13 @@
 /* Class = "NSMenuItem"; title = "Smart Copy/Paste"; ObjectID = "ivA-6T-8lr"; */
 "ivA-6T-8lr.title" = "智能复制/粘贴";
 
-/* Class = "NSToolbarItem"; label = "Symbolicate"; ObjectID = "jOx-ar-DOP"; */
+/* Class = "NSToolbarItem"; label = "Symbolicate"; ObjectID = "59w-fW-llj"; */
 "59w-fW-llj.label" = "符号化";
 
-/* Class = "NSToolbarItem"; paletteLabel = "Symbolicate"; ObjectID = "jOx-ar-DOP"; */
+/* Class = "NSToolbarItem"; paletteLabel = "Symbolicate"; ObjectID = "59w-fW-llj"; */
 "59w-fW-llj.paletteLabel" = "符号化";
 
-/* Class = "NSToolbarItem"; toolTip = "Symbolicate"; ObjectID = "jOx-ar-DOP"; */
+/* Class = "NSToolbarItem"; toolTip = "Symbolicate"; ObjectID = "59w-fW-llj"; */
 "59w-fW-llj.toolTip" = "符号化";
 
 /* Class = "NSMenuItem"; title = "Show Spelling and Grammar"; ObjectID = "jkT-xv-H31"; */
@@ -312,13 +310,13 @@
 /* Class = "NSMenuItem"; title = "Find and Replace…"; ObjectID = "rbC-2c-RNA"; */
 "rbC-2c-RNA.title" = "查找和替换…";
 
-/* Class = "NSToolbarItem"; label = "Download"; ObjectID = "rh6-Nt-hIy"; */
+/* Class = "NSToolbarItem"; label = "Download"; ObjectID = "xdu-0Z-Pvp"; */
 "xdu-0Z-Pvp.label" = "下载";
 
-/* Class = "NSToolbarItem"; paletteLabel = "Download"; ObjectID = "rh6-Nt-hIy"; */
+/* Class = "NSToolbarItem"; paletteLabel = "Download"; ObjectID = "xdu-0Z-Pvp"; */
 "xdu-0Z-Pvp.paletteLabel" = "下载";
 
-/* Class = "NSToolbarItem"; toolTip = "dSYM download list"; ObjectID = "rh6-Nt-hIy"; */
+/* Class = "NSToolbarItem"; toolTip = "Download dSYM file"; ObjectID = "xdu-0Z-Pvp"; */
 "xdu-0Z-Pvp.toolTip" = "下载 dSYM 文件";
 
 /* Class = "NSMenuItem"; title = "Jump to Selection"; ObjectID = "sDV-U4-oIL"; */
@@ -330,7 +328,7 @@
 /* Class = "NSMenuItem"; title = "Edit"; ObjectID = "tgP-5D-GEb"; */
 "tgP-5D-GEb.title" = "编辑";
 
-/* Class = "NSButtonCell"; title = "Github"; ObjectID = "thC-WT-ob8"; */
+/* Class = "NSButtonCell"; title = "Source Code"; ObjectID = "thC-WT-ob8"; */
 "thC-WT-ob8.title" = "源码";
 
 /* Class = "NSMenu"; title = "SYM"; ObjectID = "uQy-DD-JDr"; */
@@ -351,13 +349,13 @@
 /* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
 "wpr-3q-Mcd.title" = "帮助";
 
-/* Class = "NSToolbarItem"; label = "dSYM"; ObjectID = "x2M-ly-xLG"; */
+/* Class = "NSToolbarItem"; label = "dSYM"; ObjectID = "CeZ-6B-0tO"; */
 "CeZ-6B-0tO.label" = "dSYM";
 
-/* Class = "NSToolbarItem"; paletteLabel = "dSYM"; ObjectID = "x2M-ly-xLG"; */
+/* Class = "NSToolbarItem"; paletteLabel = "dSYM"; ObjectID = "CeZ-6B-0tO"; */
 "CeZ-6B-0tO.paletteLabel" = "dSYM";
 
-/* Class = "NSToolbarItem"; toolTip = "Choose or download dSYM file"; ObjectID = "x2M-ly-xLG"; */
+/* Class = "NSToolbarItem"; toolTip = "Choose or download dSYM file"; ObjectID = "CeZ-6B-0tO"; */
 "CeZ-6B-0tO.toolTip" = "选择或者下载 dSYM 文件";
 
 /* Class = "NSMenuItem"; title = "Substitutions"; ObjectID = "y4Y-3X-71Y"; */
@@ -372,6 +370,7 @@
 /* Class = "NSTextFieldCell"; title = "1.1.1 (200)"; ObjectID = "zVG-Ln-82I"; */
 "zVG-Ln-82I.title" = "1.1.1 (200)";
 
+/* Class = "NSMenuItem"; title = "Devices"; ObjectID = "kDi-ec-idF"; */
 "kDi-ec-idF.title" = "设备";
 
 /* Class = "NSMenuItem"; title = "Show dSYM Info"; ObjectID = "NN1-bu-nns"; */
@@ -379,3 +378,6 @@
 
 /* Class = "NSMenuItem"; title = "Download"; ObjectID = "5g8-O7-UCs"; */
 "5g8-O7-UCs.title" = "下载";
+
+/* Class = "NSButtonCell"; title = "Download"; ObjectID = "Xk7-O4-2B7"; */
+"Xk7-O4-2B7.title" = "下载";

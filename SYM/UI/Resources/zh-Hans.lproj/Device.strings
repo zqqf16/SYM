@@ -1,4 +1,3 @@
-
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "Gq3-za-3vy"; */
 "Gq3-za-3vy.title" = "Text Cell";
 
@@ -29,12 +28,39 @@
 /* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "xG1-qz-rKj"; */
 "xG1-qz-rKj.title" = "Text Cell";
 
+/* Class = "NSViewController"; title = "Crashes"; ObjectID = "te4-dk-rcU"; */
 "te4-dk-rcU.title" = "崩溃日志";
+
+/* Class = "NSViewController"; title = "Files"; ObjectID = "Ock-S4-Eux"; */
 "Ock-S4-Eux.title" = "文件";
 "EYa-rG-jku.title" = "导出";
+
+/* Class = "NSTableColumn"; headerCell.title = "Date"; ObjectID = "MTr-s9-LFo"; */
 "MTr-s9-LFo.headerCell.title" = "日期";
+
+/* Class = "NSTableColumn"; headerCell.title = "Name"; ObjectID = "aG9-OQ-xEl"; */
 "aG9-OQ-xEl.headerCell.title" = "名称";
+
+/* Class = "NSTableColumn"; headerCell.title = "Size"; ObjectID = "YCF-ak-XN3"; */
 "YCF-ak-XN3.headerCell.title" = "大小";
+
+/* Class = "NSWindow"; title = "File Browser"; ObjectID = "17R-xP-ffZ"; */
 "17R-xP-ffZ.title" = "浏览文件";
+
+/* Class = "NSToolbarItem"; label = "Export"; ObjectID = "Z8a-qL-5jv"; */
 "Z8a-qL-5jv.label" = "导出";
+
+/* Class = "NSToolbarItem"; label = "Reload"; ObjectID = "U4o-wo-THR"; */
 "U4o-wo-THR.label" = "刷新";
+
+/* Class = "NSToolbarItem"; label = "Remove"; ObjectID = "RcY-vv-ZEn"; */
+"RcY-vv-ZEn.label" = "删除";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Remove"; ObjectID = "RcY-vv-ZEn"; */
+"RcY-vv-ZEn.paletteLabel" = "删除";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Reload"; ObjectID = "U4o-wo-THR"; */
+"U4o-wo-THR.paletteLabel" = "刷新";
+
+/* Class = "NSToolbarItem"; paletteLabel = "Export"; ObjectID = "Z8a-qL-5jv"; */
+"Z8a-qL-5jv.paletteLabel" = "导出";
