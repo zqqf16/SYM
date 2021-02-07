@@ -56,7 +56,7 @@ usage() if $opt_help;
 # have this thing to de-HTMLize Leopard-era plists
 my %entity2char = (
     # Some normal chars that have special meaning in SGML context
-    amp    => '&',  # ampersand
+    amp    => '&',  # ampersand 
     'gt'    => '>',  # greater than
     'lt'    => '<',  # less than
     quot   => '"',  # double quote
@@ -64,6 +64,11 @@ my %entity2char = (
     );
 
 #############################
+
+if(!defined($DEVELOPER_DIR)) {
+    #die "Error: \"DEVELOPER_DIR\" is not defined";
+}
+
 
 # We will find these tools once we can guess the right SDK
 my $otool = undef;
@@ -89,7 +94,7 @@ sub HELP_MESSAGE() {
 
 sub usage() {
 print STDERR <<EOF;
-usage:
+usage: 
     $0 [--help] [--dsym=DSYM] [--output OUTPUT_FILE] <LOGFILE> [SYMBOL_PATH ...]
     
     <LOGFILE>                   The crash log to be symbolicated. If "-", then the log will be read from stdin
@@ -270,7 +275,7 @@ sub getSymbolPathAndArchFor_dsymUuid{
 
 #########
 
-sub archForUUID {
+sub archForUUID {  
     my ($path, $uuid) = @_;
     
     if ( ! -f $path ) {
@@ -458,7 +463,7 @@ sub parse_section {
     my ($log_ref, $name, %arg ) = @_;
     my $content;
     
-    $name = quotemeta($name)
+    $name = quotemeta($name) 
     unless $arg{regex};
     
     my $colon = ':';
@@ -474,16 +479,16 @@ sub parse_section {
         
         # or thing after that line.
         if($arg{multiline}) {
-            $content = $1 if( $$log_ref =~ m{
+            $content = $1 if( $$log_ref =~ m{ 
                 \G\n    # from end of last thing...
-                (.*?)
+                (.*?) 
                 (?:\n\s*\n|$) # until next blank line or the end
-            }sgx );
+            }sgx ); 
         }
-    }
+    } 
     
-    pos($$log_ref) = 0
-    unless $arg{continuous};
+    pos($$log_ref) = 0 
+    unless $arg{continuous}; 
     
     return ($name,$content) if wantarray;
     return $content;
@@ -500,7 +505,7 @@ sub parse_sections {
         ($name,$content) = parse_section($log_ref,$re, regex=>1,continuous=>1,%arg);
         last unless defined $content;
         $sections{$name} = $content;
-    }
+    } 
     
     pos($$log_ref) = 0;
     return \%sections;
@@ -577,8 +582,8 @@ sub parse_images {
     #To get all the architectures for string matching.
     my $architectures = "armv[4-8][tfsk]?|arm64\\S*|i386|x86_64\\S?";
     
-    # Once Perl 5.10 becomes the default in Mac OS X, named regexp
-    # capture buffers of the style (?<name>pattern) would make this
+    # Once Perl 5.10 becomes the default in Mac OS X, named regexp 
+    # capture buffers of the style (?<name>pattern) would make this 
     # code much more sane.
     if(! $is_spindump_report) {
         if($report_version == 102 || $report_version == 103) { # Leopard GM
@@ -706,8 +711,8 @@ sub resolve_partial_id {
     return $_partial_cache{$bundle} if exists $_partial_cache{$bundle};
     
     my $re = qr/\Q$bundle\E$/;
-    for (keys %$images) {
-        if( /$re/ ) {
+    for (keys %$images) { 
+        if( /$re/ ) { 
             $_partial_cache{$bundle} = $_;
             return $_;
         }
@@ -740,18 +745,18 @@ sub fixup_last_exception_backtrace {
 #    print STDERR "Parsing last exception backtrace\n" if $opt_verbose;
 #    my ($backtrace,$images, $inHex) = @_;
 #    my @lines = split /\n/,$backtrace;
-#
+#    
 #    my %frames = ();
-#
+#    
 #    # these two have to be parallel; we'll lookup by hex, and replace decimal if needed
 #    my @hexAddr;
 #    my @replAddr;
-#
+#    
 #    for my $line (@lines) {
 #        # end once we're done with the frames
 #        last if $line =~ /\)/;
 #        last if !length($line);
-#
+#        
 #        if ($inHex && $line =~ /0x([[:xdigit:]]+)/) {
 #            push @hexAddr, sprintf("0x%08s", $1);
 #            push @replAddr, "0x".$1;
@@ -761,7 +766,7 @@ sub fixup_last_exception_backtrace {
 #            push @replAddr, $1;
 #        }
 #    }
-#
+#    
 #    # we don't have a hint as to the binary assignment of these frames
 #    # map_addresses will do it for us
 #    return map_addresses(\@hexAddr,$images,\@replAddr);
@@ -1047,7 +1052,7 @@ sub prune_used_images {
     }
     
     # overwrite the incoming image list with that;
-    %$images = %$images_used;
+    %$images = %$images_used; 
 }
 
 # fetch symbolled binaries
