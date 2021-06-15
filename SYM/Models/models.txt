@@ -56,6 +56,14 @@ iPad8,9:iPad Pro (11-inch) (2nd generation)
 iPad8,10:iPad Pro (11-inch) (2nd generation)
 iPad8,11:iPad Pro (12.9-inch) (4th generation)
 iPad8,12:iPad Pro (12.9-inch) (4th generation)
+iPad13,4:iPad Pro (11-inch) (3rd generation)
+iPad13,5:iPad Pro (11-inch) (3rd generation)
+iPad13,6:iPad Pro (11-inch) (3rd generation)
+iPad13,7:iPad Pro (11-inch) (3rd generation)
+iPad13,8:iPad Pro (12.9-inch) (5th generation)
+iPad13,9:iPad Pro (12.9-inch) (5th generation)
+iPad13,10:iPad Pro (12.9-inch) (5th generation)
+iPad13,11:iPad Pro (12.9-inch) (5th generation)
 iPad2,5:iPad mini
 iPad2,6:iPad mini
 iPad2,7:iPad mini
