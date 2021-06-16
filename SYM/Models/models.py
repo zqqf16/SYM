@@ -22,7 +22,7 @@ def parse_models(regex, text):
         else:
             lastModel = item
     return result
-
+    
 def get_all_models(url):
     text = get_raw(url)
     if not text:
@@ -43,8 +43,11 @@ def get_all_models(url):
     iPod = re.compile(r'rowspan.*(iPod[\w \(\)-.]*)')
     results += parse_models(iPod, text)
     
-    watch = re.compile(r'rowspan.*(Watch[\w \(\)-.]*)')
+    watch = re.compile(r'rowspan.*?((?:Apple )*Watch[\w \(\)-.]*)')
     results += parse_models(watch, text)
+    
+    tv = re.compile(r'.*(Apple[ ]*TV[\w \(\)-.]*)')
+    results += parse_models(tv, text)
     
     return results
     
