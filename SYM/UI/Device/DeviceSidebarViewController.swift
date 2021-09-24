@@ -37,7 +37,7 @@ extension SidebarNode {
     }
 }
 
-protocol DeviceSidebarViewControllerDelegate: class {
+protocol DeviceSidebarViewControllerDelegate: AnyObject {
     func sidebar(_ sidebar: DeviceSidebarViewController, didSelectNode node: SidebarNode)
 }
 

@@ -22,7 +22,7 @@
 
 import Foundation
 
-protocol MdfindWrapperDelegate: class {
+protocol MdfindWrapperDelegate: AnyObject {
     func mdfindWrapper(_ wrapper: MdfindWrapper, didFindResult result: [NSMetadataItem]?)
 }
 

@@ -23,7 +23,7 @@
 import Cocoa
 import Combine
 
-protocol DownloadStatusViewControllerDelegate: class {
+protocol DownloadStatusViewControllerDelegate: AnyObject {
     func cancelDownload() -> Void
     func startDownloading() -> Void
     func currentDownloadTask() -> DsymDownloadTask?
