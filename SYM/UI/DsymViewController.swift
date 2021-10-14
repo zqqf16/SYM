@@ -23,7 +23,7 @@
 import Cocoa
 import Combine
 
-protocol DsymTableCellViewDelegate: class {
+protocol DsymTableCellViewDelegate: AnyObject {
     func didClickSelectButton(_ cell: DsymTableCellView, sender: NSButton)
     func didClickRevealButton(_ cell: DsymTableCellView, sender: NSButton)
 }
