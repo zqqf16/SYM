@@ -150,6 +150,10 @@ class LineNumberRulerView: NSRulerView {
                 if layoutManager.extraLineFragmentTextContainer != nil {
                     drawLineNumber("\(lineNumber)", layoutManager.extraLineFragmentRect.minY)
                 }
+                
+                // On macOS 12.0，some line numbers cannot be drawn correctly
+                // Set this to fix it.
+                self.needsDisplay = true
             }
         }
     }
