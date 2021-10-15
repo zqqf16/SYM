@@ -9,7 +9,7 @@
 #
 # Copyright (c) 2008-2015 Apple Inc. All Rights Reserved.
 #
-#
+# Copy from Xcode version 13.0 (13A233)
 
 use strict;
 use warnings;
@@ -598,7 +598,7 @@ sub parse_images {
             %captures = ( 'base' => \$1, 'extent' => \$2, 'plus' => \$3,
             'bundlename' => \$4, 'uuid' => \$5, 'path' => \$6);
         }
-        elsif($report_version == 104 || $report_version == 105) { # Kirkwood
+        elsif($report_version == 104 || $report_version == 105 || $report_version == 199 || $report_version == 200 || $report_version == 209 || $report_version == 210) { # Kirkwood
             # 0x182155000 - 0x1824c6fff CoreFoundation arm64  <f0d21c6db8d83cf3a0c4712fd6e69a8e> /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
             $pat = '
             ^\s* (\w+) \s* \- \s* (\w+) \s*     (?# the range base and extent [1,2] )
@@ -787,16 +787,16 @@ sub parse_backtrace {
         
         for my $line (@lines) {
             if( $line =~ m{
-                ^\d+ \s+                   # stack frame number
-                (\S.*?) \s+                # bundle [1]
-                (                          # description to replace [2]
-                    (0x\w+) \s+            # address [3]
-                    0x\w+ \s+              # library address
-                    (?: \+ \s+ (\d+))?     # offset [4], optional
-                    .*                     # remainder of description
-                )                          # end of capture
-                \s*                        # new line
-                $                          # end of line
+                ^\d+ \s+                     # stack frame number
+                (\S.*?) \s+                  # bundle [1]
+                (                            # description to replace [2]
+                    (0x\w+) \s+              # address [3]
+                    (?:0x\w+|<redacted>) \s+ # library address
+                    (?: \+ \s+ (\d+))?       # offset [4], optional
+                    .*                       # remainder of description
+                )                            # end of capture
+                \s*                          # new line
+                $                            # end of line
             }x ) {
                 my($bundle,$replace,$address,$offset) = ($1,$2,$3,$4);
                 #print STDERR "Parse_bt: $bundle,$replace,$address\n" if ($opt_verbose);
