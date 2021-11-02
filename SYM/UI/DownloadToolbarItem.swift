@@ -45,13 +45,6 @@ class DownloadToolbarItem: NSToolbarItem {
         
         self.indicator = NSProgressIndicator()
         self.indicator.isIndeterminate = true
-                
-        let imageFrame = self.view!.frame
-        self.indicator.frame = CGRect(x: imageFrame.origin.x,
-                                      y: imageFrame.origin.y - 2,
-                                      width: imageFrame.width,
-                                      height: 4.0)
-        
         self.indicator.isHidden = true
         self.view?.superview?.addSubview(self.indicator)
     }
@@ -74,6 +67,7 @@ class DownloadToolbarItem: NSToolbarItem {
         switch status {
         case .running:
             self.running = true
+            self.updateFrame()
         default:
             self.running = false
         }
@@ -84,5 +78,13 @@ class DownloadToolbarItem: NSToolbarItem {
             self.indicator.isIndeterminate = false
             self.indicator.doubleValue = Double(progress.percentage)
         }
+    }
+    
+    private func updateFrame() {
+        let imageFrame = self.view!.frame
+        self.indicator.frame = CGRect(x: imageFrame.origin.x,
+                                      y: imageFrame.origin.y - 2,
+                                      width: imageFrame.width,
+                                      height: 4.0)
     }
 }
