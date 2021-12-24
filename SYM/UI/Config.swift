@@ -48,19 +48,31 @@ struct Config {
         return url
     }
     
-    static func dsymDownloadDirectory() -> String {
+    static func prepareDsymDownloadDirectory() {
+        let path = self.dsymDownloadDirectory
+        UserDefaults.standard.set(path, forKey: .downloadFolderKey)
+    }
+    
+    static var dsymDownloadDirectory: String {
+        let home = NSHomeDirectory()
+        var path: String!
         if let stored = UserDefaults.standard.string(forKey: .downloadFolderKey) {
             if stored.hasPrefix("~/") {
-                let newPath = "\(NSHomeDirectory())/\(stored.dropFirst(2))"
-                UserDefaults.standard.set(newPath, forKey: .downloadFolderKey)
-                return newPath
+                path = "\(home)/\(stored.dropFirst(2))"
+            } else {
+                path = stored
             }
-            
-            return stored
         }
-        let urls = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
-        let path = urls.first?.path ?? NSHomeDirectory()
-        UserDefaults.standard.set(path, forKey: .downloadFolderKey)
+        
+        if path == nil {
+            let urls = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
+            path = urls.first?.path ?? home
+        }
+        
+        if !FileManager.default.fileExists(atPath: path) {
+            FileManager.default.createDirectory(path)
+        }
+
         return path
     }
     

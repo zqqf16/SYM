@@ -31,7 +31,7 @@ class DownloadScriptViewController: NSViewController {
         self.textView.font = NSFont(name: "Menlo", size: 11)!
         self.textView.textContainerInset = CGSize(width: 10, height: 10)
         
-        let _ = Config.dsymDownloadDirectory()
+        Config.prepareDsymDownloadDirectory()
         self.loadContent()
     }
     

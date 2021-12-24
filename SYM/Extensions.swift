@@ -218,6 +218,7 @@ extension FileManager {
         return (NSTemporaryDirectory() as NSString).appendingPathComponent(uuid)
     }
     
+    @discardableResult
     func createDirectory(_ path: String) -> Bool {
         var isDir : ObjCBool = false
         if self.fileExists(atPath: path, isDirectory: &isDir) {

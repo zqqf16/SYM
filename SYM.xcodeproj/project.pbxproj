@@ -69,6 +69,7 @@
 		B59B327122E0113600013B67 /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
+		B5EC56D227759AE5007EB567 /* ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EC56D127759AE5007EB567 /* ConfigTests.swift */; };
 		B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
 		B5F3578722C30B7C00111FF3 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3578622C30B7C00111FF3 /* Color.swift */; };
@@ -172,6 +173,7 @@
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
+		B5EC56D127759AE5007EB567 /* ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigTests.swift; sourceTree = "<group>"; };
 		B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSidebarViewController.swift; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		B5F3578622C30B7C00111FF3 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */,
 				510777781EFBA4C30055E8BD /* AppleDemo.ips */,
 				51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */,
+				B5EC56D127759AE5007EB567 /* ConfigTests.swift */,
 				51BF9C531D6C7A1C00379BFC /* Info.plist */,
 			);
 			path = SYMTests;
@@ -762,6 +765,7 @@
 				B59B326F22E0113100013B67 /* MDHouseArrest.m in Sources */,
 				B59B327122E0113600013B67 /* MDUtil.m in Sources */,
 				B59B326C22E0112800013B67 /* MDLockdown.m in Sources */,
+				B5EC56D227759AE5007EB567 /* ConfigTests.swift in Sources */,
 				B59B326E22E0112E00013B67 /* MDAfcClient.m in Sources */,
 				51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */,
 				B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */,

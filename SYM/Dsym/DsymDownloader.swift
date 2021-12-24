@@ -129,7 +129,7 @@ class DsymDownloadTask {
             return
         }
         
-        let dir = Config.dsymDownloadDirectory()
+        let dir = Config.dsymDownloadDirectory
         let env = self.crashInfoToEnv(crashInfo)
         self.process = SubProcess(cmd: self.scriptURL.path, args: [crashPath, dir], env: env)
         self.process.errorHandler = { [weak self] (_) in
