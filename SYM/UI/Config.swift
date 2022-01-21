@@ -23,7 +23,6 @@
 import Cocoa
 
 extension String {
-    static let downloadScriptURLKey = "symDownloadScriptURL"
     static let downloadFolderKey = "dsymDownloadFolder"
     static let editorFontNameKey = "editorFontName"
     static let editorFontSizeKey = "editorFontSize"
@@ -36,15 +35,10 @@ extension Notification.Name {
 }
 
 struct Config {
-    static func downloadScriptURL() -> URL {
-        if let stored = UserDefaults.standard.url(forKey: .downloadScriptURLKey) {
-            return stored
-        }
-        
-        var path = FileManager.default.appSupportDirectory() ?? NSTemporaryDirectory()
-        path = (path as NSString).appendingPathComponent("download.sh")
-        let url = URL(fileURLWithPath: path)
-        UserDefaults.standard.set(url, forKey: .downloadScriptURLKey)
+    static var downloadScriptURL: URL {
+        let dir = FileManager.default.appSupportDirectory() ?? NSTemporaryDirectory()
+        var url = URL(fileURLWithPath: dir)
+        url.appendPathComponent("download.sh")
         return url
     }
     

@@ -251,6 +251,30 @@ extension FileManager {
         
         return path
     }
+    
+    @discardableResult
+    func chmod(_ path: String, permissions: Int) -> Bool {
+        do {
+            try self.setAttributes([.posixPermissions : permissions], ofItemAtPath: path)
+        } catch {
+            Swift.print("Set permissions \(permissions) to \(path) failed")
+            return false
+        }
+        
+        return true
+    }
+    
+    @discardableResult
+    func cp(fromPath: String, toPath: String) -> Bool {
+        do {
+            try self.copyItem(atPath: fromPath, toPath: toPath)
+        } catch {
+            Swift.print("Copy \(fromPath) to \(toPath) failed")
+            return false
+        }
+        
+        return true
+    }
 }
 
 extension NSPasteboard.PasteboardType {

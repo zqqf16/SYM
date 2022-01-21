@@ -641,6 +641,7 @@
 				F49BD1E81D2FF46300024AAE /* Sources */,
 				F49BD1E91D2FF46300024AAE /* Frameworks */,
 				F49BD1EA1D2FF46300024AAE /* Resources */,
+				B5CDF0FB279A8E1C00BBFE9A /* Copy buildin download script */,
 			);
 			buildRules = (
 			);
@@ -737,6 +738,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		B5CDF0FB279A8E1C00BBFE9A /* Copy buildin download script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy buildin download script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if test -n \"${BUILDIN_DOWNLOAD_SCRIPT_PATH}\"; then\n    echo \"Copy buildin download script ${BUILDIN_DOWNLOAD_SCRIPT_PATH}\"\n    cp ${BUILDIN_DOWNLOAD_SCRIPT_PATH} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/download.sh\"\nelse\n    echo \"Without buildin download script\"\nfi\n";
+		};
 		B5F357BB22C5FDE300111FF3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1140,7 +1159,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 90;
+				CURRENT_PROJECT_VERSION = 91;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -1158,7 +1177,7 @@
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.8.2;
+				MARKETING_VERSION = 0.8.3;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1179,7 +1198,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 90;
+				CURRENT_PROJECT_VERSION = 91;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1197,7 +1216,7 @@
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.8.2;
+				MARKETING_VERSION = 0.8.3;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

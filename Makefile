@@ -26,7 +26,13 @@ next:
 	agvtool next-version
 
 archive:
+
+ifdef script
+	@echo 'make with buildin download script $(script)'
+	xcodebuild -project SYM.xcodeproj -config Release -scheme SYM -archivePath $(ARCHIVE_PATH) archive BUILDIN_DOWNLOAD_SCRIPT_PATH=$(script)
+else
 	xcodebuild -project SYM.xcodeproj -config Release -scheme SYM -archivePath $(ARCHIVE_PATH) archive
+endif
 	xcodebuild -exportArchive -archivePath $(ARCHIVE_PATH) -exportOptionsPlist exportOptions.plist -exportPath $(EXPORT_PATH)
 
 dmg:

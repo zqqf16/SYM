@@ -43,7 +43,7 @@ class DownloadScriptViewController: NSViewController {
             }
         }
         do {
-            try script.write(to: Config.downloadScriptURL(), atomically: true, encoding: .utf8)
+            try script.write(to: Config.downloadScriptURL, atomically: true, encoding: .utf8)
         } catch {
             // TODO: error handling
         }
@@ -82,7 +82,7 @@ class DownloadScriptViewController: NSViewController {
                                 #
                                 
                                 """
-        let saved = try? String(contentsOf: Config.downloadScriptURL(), encoding: .utf8)
+        let saved = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
         if saved != nil && saved!.count > 0 {
             self.textView.string = saved!
         } else {

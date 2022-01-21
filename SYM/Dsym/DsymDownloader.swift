@@ -203,8 +203,35 @@ class DsymDownloader {
     static let shared = DsymDownloader()
     
     @Published var tasks:[String: DsymDownloadTask] = [:]
-
-    private let scriptURL = Config.downloadScriptURL()
+    let scriptURL = Config.downloadScriptURL
+    
+    init() {
+        self.prepareDownloadScript()
+    }
+    
+    func prepareDownloadScript() {
+        let scriptPath = scriptURL.path
+        let fileManager = FileManager.default
+        
+        defer {
+            if fileManager.fileExists(atPath: scriptPath) {
+                fileManager.chmod(scriptPath, permissions: 0o777)
+            }
+        }
+        
+        // check user imported script
+        if fileManager.fileExists(atPath: scriptPath) {
+            let script = try? String(contentsOf: scriptURL, encoding: .utf8)
+            if script != nil && script!.count > 0 {
+                return
+            }
+        }
+        
+        // check buildin script
+        if let buildinPath = Bundle.main.path(forResource: "download", ofType: "sh") {
+            fileManager.cp(fromPath: buildinPath, toPath: scriptPath)
+        }
+    }
     
     func canDownload() -> Bool {
         let script = try? String(contentsOf: self.scriptURL, encoding: .utf8)
@@ -212,13 +239,7 @@ class DsymDownloader {
             return false
         }
         
-        do {
-            try FileManager.default.setAttributes([.posixPermissions : 0o777], ofItemAtPath: self.scriptURL.path)
-        } catch {
-            return false
-        }
-        
-        return true
+        return FileManager.default.chmod(self.scriptURL.path, permissions: 0o777)
     }
     
     @discardableResult
