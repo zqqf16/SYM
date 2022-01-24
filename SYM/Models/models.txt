@@ -112,6 +112,7 @@ iPhone10,6:iPhone X
 iPhone11,8:iPhone XR
 iPhone11,2:iPhone XS
 iPhone11,6:iPhone XS Max
+iPhone11,4:iPhone XS Max
 iPhone12,1:iPhone 11
 iPhone12,3:iPhone 11 Pro
 iPhone12,5:iPhone 11 Pro Max
@@ -157,6 +158,10 @@ Watch6,1:Apple Watch Series 6
 Watch6,2:Apple Watch Series 6
 Watch6,3:Apple Watch Series 6
 Watch6,4:Apple Watch Series 6
+Watch6,6:Apple Watch Series 7
+Watch6,7:Apple Watch Series 7
+Watch6,8:Apple Watch Series 7
+Watch6,9:Apple Watch Series 7
 AppleTV1,1:Apple TV (1st generation)
 AppleTV2,1:Apple TV (2nd generation)
 AppleTV3,1:Apple TV (3rd generation)
