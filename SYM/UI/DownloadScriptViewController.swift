@@ -56,37 +56,13 @@ class DownloadScriptViewController: NSViewController {
     }
     
     func loadContent() {
-        let defaultContent = """
-                                #!/bin/bash
-
-                                # Download the .dSYM file to wherever you want.
-                                # SYM can find it immediately.
-
-                                # Crash informations
-                                #     $1               # original crash file path
-                                #     $2               # download directory
-                                #     ${APP_NAME}      # e.g. im_zorro_sym
-                                #     ${UUID}          # e.g. E5B0A378-6816-3D90-86FD-2AEF15894A85
-                                #     ${BUNDLE_ID}     # e.g. im.zorro.sym
-                                #     ${APP_VERSION}   # e.g. 212 (1.0.1)
-
-                                # Error handling:
-                                #     exit 0           # success
-                                #     exit 1           # crash not supported
-                                #     exit 2           # download failed"
-
-                                # Examples:
-                                #     curl -o $2/${UUID}.zip http://your.server.domain/path/to/${UUID}.zip
-                                #     unzip -o "$2/${UUID}.zip" -d "$2/${UUID}"
-                                #     for f in "$2/${UUID}/*.dSYM"; do dwarfdump --uuid $f ; done
-                                #
-                                
-                                """
-        let saved = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
-        if saved != nil && saved!.count > 0 {
-            self.textView.string = saved!
-        } else {
-            self.textView.string = defaultContent
+        let userImportedScript = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
+        if userImportedScript == nil && userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
+            self.textView.string = userImportedScript!
+            return
         }
+
+        let template = try! String(contentsOf: Bundle.main.url(forResource: "template", withExtension: "sh")!, encoding: .utf8)
+        self.textView.string = template
     }
 }
