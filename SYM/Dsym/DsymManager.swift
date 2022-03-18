@@ -55,7 +55,7 @@ class DsymManager {
     var dsymFiles: [String: DsymFile] = [:]
     
     @Published
-    var crash: CrashInfo?
+    var crash: Crash?
 
     private var uuids: [String] {
         return self.binaries.compactMap { $0.uuid }
@@ -68,7 +68,7 @@ class DsymManager {
         return mdfind
     }()
     
-    func update(_ crash: CrashInfo?) {
+    func update(_ crash: Crash?) {
         self.crash = crash
         self.binaries = crash?.embeddedBinaries ?? []
         if crash != nil {
@@ -78,7 +78,7 @@ class DsymManager {
         }
     }
     
-    func start(_ crash: CrashInfo) {
+    func start(_ crash: Crash) {
         if let condition = self.createCondition(bundleID: crash.bundleID, binaries: crash.embeddedBinaries) {
             self.monitor.start(withCondition: condition)
         }

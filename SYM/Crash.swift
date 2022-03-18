@@ -84,248 +84,34 @@ class Binary {
     }
 }
 
-
-class CrashInfo {
-    let raw: String
+class Crash {
+    let content: String
     
     var appName: String?
     var device: String?
     var bundleID: String?
-    var arch: String = "arm64"
+    var arch: String? = "arm64"
     var uuid: String?
     var osVersion: String?
     var appVersion: String?
-    var embeddedBinaries: [Binary] = []
     var binaryImages: [Binary] = []
     
-    init(_ raw: String) {
-        self.raw = raw
-        self.parseCrashInfo()
-        self.parseBinaries()
+    var crashedThreadRange: NSRange?
+    var appBacktraceRanges: [NSRange] = []
+    
+    var embeddedBinaries: [Binary] {
+        // executable, embedded dynamic libraries
+        return binaryImages.filter { $0.inApp }
     }
     
-    func parseOneLineInfo(_ re: RE) -> String? {
-        return re.findFirst(self.raw)?[0]
+    enum SymbolicateMethod {
+        case atos
+        case symbolicatecrash // buildin symbolicatecrash
     }
     
-    func parseCrashInfo() {
-        self.appName = self.parseOneLineInfo(.process)
-        self.device = self.parseOneLineInfo(.hardware)
-        self.bundleID = self.parseOneLineInfo(.identifier)
-        self.osVersion = self.parseOneLineInfo(.osVersion)
-        self.appVersion = self.parseOneLineInfo(.version)
-        
-        if let binary = self.appName,
-            let imageRE = RE.image(binary, options:[]),
-            let imageMatch = imageRE.findFirst(self.raw) {
-            self.uuid = imageMatch[3].uuidFormat()
-            self.arch = imageMatch[2]
-        }
-    }
+    var symbolicateMethod: SymbolicateMethod = .symbolicatecrash
     
-    func parseBinaries() {
-        self.binaryImages = []
-        if let groups = RE.image.findAll(self.raw) {
-            for group in groups {
-                let binary = Binary(name: group[1],
-                                    uuid: group[3].uuidFormat(),
-                                    arch: group[2],
-                                    loadAddress: group[0],
-                                    path: group[4])
-
-                binary.executable = binary.name == self.appName
-                self.binaryImages.append(binary)
-            }
-        }
-        
-        self.embeddedBinaries = self.binaryImages.filter { $0.inApp }
-    }
-
-    func crashedThreadRange() -> NSRange? {
-        return RE.threadCrashed.findFirstRange(self.raw)
-    }
-    
-    func backtraceRanges(withBinary binary: String) -> [NSRange] {
-        var result:[NSRange] = []
-        if let frameRE = RE.frame(binary),
-            let frames = frameRE.findAllRanges(self.raw) {
-            result = frames
-        }
-        return result
-    }
-    
-    func appBacktraceRanges() -> [NSRange] {
-        var binaryNames: [String] = []
-        if self.embeddedBinaries.count > 0 {
-            self.embeddedBinaries.forEach { (binary) in
-                binaryNames.append(binary.name)
-            }
-        } else if let appName = self.appName {
-            binaryNames.append(appName)
-        }
-        
-        var ranges: [NSRange] = []
-        binaryNames.forEach { (name) in
-            ranges.append(contentsOf: self.backtraceRanges(withBinary: name))
-        }
-        
-        return ranges;
-    }
-    
-    func symbolicate(dsyms: [String]? = nil) -> String {
-        if let content = SubProcess.symbolicatecrash(crash: self.raw, dsyms: dsyms), content.count > 0 {
-            return content
-        }
-        
-        return self.raw
-    }
-}
-
-class CPUUsageLog: CrashInfo {
-    override func parseCrashInfo() {
-        self.appName = self.parseOneLineInfo(.powerstats)
-        self.device = self.parseOneLineInfo(.hardware)
-        self.arch = self.parseOneLineInfo(.architecture) ?? "arm64"
-        self.osVersion = self.parseOneLineInfo(.osVersion)
-        self.appVersion = self.parseAppVersion()
-        if let path = self.parseOneLineInfo(.path),
-            let imageRE = RE.image(withPath: path),
-            let imageMatch = imageRE.findFirst(self.raw) {
-            //self.bundleID = imageMatch[1]
-            self.uuid = imageMatch[1].uuidFormat()
-        }
-    }
-    
-    private func parseAppVersion() -> String? {
-        if let app = self.parseOneLineInfo(.appVersion), let build = self.parseOneLineInfo(.buildVersion) {
-            return "\(build) (\(app))"
-        }
-        
-        guard let versionString = self.parseOneLineInfo(.version) else {
-            return nil
-        }
-        
-        // 1.1.1 (123) to 123 (1.1.1)
-        let components = versionString.components(separatedBy: " ")
-        if components.count != 2 {
-            return versionString;
-        }
-        
-        let app = components[0]
-        let build = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
-        return "\(build) (\(app))"
-    }
-    
-    override func parseBinaries() {
-        self.binaryImages = []
-        if let groups = RE.cpuUsageImage.findAll(self.raw) {
-            for group in groups {
-                let binary = Binary(name: group[1],
-                                    uuid: group[2].uuidFormat(),
-                                    arch: nil,
-                                    loadAddress: group[0],
-                                    path: group[3])
-                
-                binary.executable = binary.name == self.appName
-                self.binaryImages.append(binary)
-            }
-        }
-        
-        self.embeddedBinaries = self.binaryImages.filter { $0.inApp }
-    }
-
-    override func backtraceRanges(withBinary binary: String) -> [NSRange] {
-        var result:[NSRange] = []
-        if let frameRE = RE.cpuUsageFrame(binary),
-            let frames = frameRE.findAllRanges(self.raw) {
-            result = frames
-        }
-        return result
-    }
-}
-
-class FabricCrash: CrashInfo {
-    override func parseCrashInfo() {
-        self.device = self.parseOneLineInfo(.hashDevice)
-        self.osVersion = self.parseOneLineInfo(.hashOSVersion)
-        self.appVersion = self.parseOneLineInfo(.hashAppVersion)
-        self.bundleID = self.parseOneLineInfo(.hashBundleID)
-        if let osVersion = self.osVersion, let platform = self.parseOneLineInfo(.hashPlatform) {
-            self.osVersion = "\(platform) \(osVersion)"
-        }
-    }
-}
-
-class UmengCrash: CrashInfo {
-    override func parseCrashInfo() {
-        self.appName = self.parseOneLineInfo(.binaryImage)
-        self.uuid = self.parseOneLineInfo(.dsymUUID)
-        self.arch = self.parseOneLineInfo(.cpuType) ?? "arm64"
-    }
-
-    func executableBinaryImage() -> Binary? {
-        guard let appName = self.appName else {
-                return nil
-        }
-
-        let loadAddress = self.parseOneLineInfo(.slideAddress)
-        let ranges = self.appBacktraceRanges()
-        let backtrace = ranges.map { (range) -> Frame in
-            let line = self.raw.substring(with: range)!
-            let group = RE.frame.match(line)!
-            // 0       BinaryName    0x00000001000effdc 0x1000e4000 + 49116
-            return Frame(raw: line,
-                         index: group[0],
-                         image: group[1],
-                         address: group[2],
-                         symbol: group[3])
-        }
-
-        let binary = Binary(name: appName,
-                            uuid: self.uuid,
-                            arch: self.arch,
-                            loadAddress: loadAddress,
-                            path: "")
-        binary.backtrace = backtrace
-        return binary
-    }
-    
-    override func symbolicate(dsyms: [String]? = nil) -> String {
-        guard let image = self.executableBinaryImage(), image.isValid else {
-            return self.raw
-        }
-        
-        image.fix()
-        var dsymPath = ""
-        if let dsymPaths = dsyms {
-            dsymPath = dsymPaths[0]
-        }
-        guard let result = SubProcess.atos(image, dsym: dsymPath) else {
-            return self.raw
-        }
-        
-        var newContent = self.raw
-        for frame in image.backtrace! {
-            if let symbol = result[frame.address] {
-                var newFrame = frame
-                newFrame.symbol = symbol
-                newContent = newContent.replacingOccurrences(of: frame.raw, with: newFrame.description)
-            }
-        }
-        
-        return newContent
-    }
-}
-
-extension CrashInfo {
-    static func parse(_ content: String) -> CrashInfo {
-        if content.contains("dSYM UUID") && content.contains("Slide Address") {
-            return UmengCrash(content)
-        } else if (content.contains("Wakeups limit") || content.contains("CPU limit")) && content.contains("Limit duration:") {
-            return CPUUsageLog(content)
-        } else if content.contains("# Crashlytics - plaintext stacktrace") {
-            return FabricCrash(content)
-        }
-        return CrashInfo(content)
+    init(_ content: String) {
+        self.content = content
     }
 }

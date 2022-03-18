@@ -34,6 +34,10 @@ extension NSRange {
 
 // MARK: - String
 extension String {
+    func format(_ args: CVarArg...) -> String {
+        return String(format: self, arguments: args)
+    }
+    
     var hexaToDecimal: Int {
         var hex = self
         if hex.hasPrefix("0x") {
@@ -87,6 +91,13 @@ extension String {
             return self[0..<newLength-toLength]!
             //return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
         }
+    }
+    
+    func padding(length: Int, atLeft: Bool = false) -> String {
+        if atLeft {
+            return String(repeatElement(" ", count: length - self.count)) + self
+        }
+        return self.padding(toLength: length, withPad: " ", startingAt: 0)
     }
     
     func extendToLength(_ length: Int, withString padString: String=" ", atRight: Bool=true) -> String {

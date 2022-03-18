@@ -314,7 +314,7 @@ Thread 0 crashed with ARM Thread State (64-bit):
     sp: 0x000000016fd8eae0   pc: 0x0000000100125780 cpsr: 0xa0000000
 
 Binary Images:
-0x100070000 - 0x101607fff demo        arm64  <42fd89f730be3ac5a40a4c1a99438dfb> /var/containers/Bundle/Application/BC57CB8A-281B-4D12-A9F2-73A7463B79BE/demo.app/demo       
+0x100070000 - 0x101607fff demo        arm64  <42fd89f730be3ac5a40a4c1a99438dfb> /var/containers/Bundle/Application/BC57CB8A-281B-4D12-A9F2-73A7463B79BE/demo.app/demo
 0x101bb8000 - 0x101bc3fff libswiftAVFoundation.dylib arm64  <c0d00c0084fd3cd8adaec5d58289b3f8> /var/containers/Bundle/Application/BC57CB8A-281B-4D12-A9F2-73A7463B79BE/demo.app/Frameworks/libswiftAVFoundation.dylib
 0x101bd4000 - 0x101bdffff libswiftCoreAudio.dylib arm64  <d24aeaf5a8323678b2f6ab65c4b5d7d9> /var/containers/Bundle/Application/BC57CB8A-281B-4D12-A9F2-73A7463B79BE/demo.app/Frameworks/libswiftCoreAudio.dylib
 0x101bf4000 - 0x101bfffff libswiftCoreData.dylib arm64  <73e38baa0e40324fa6358cfb2a0b1cc5> /var/containers/Bundle/Application/BC57CB8A-281B-4D12-A9F2-73A7463B79BE/demo.app/Frameworks/libswiftCoreData.dylib

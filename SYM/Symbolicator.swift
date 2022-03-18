@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2017 - present zqqf16
+// Copyright (c) 2022 zqqf16
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -82,5 +82,53 @@ extension SubProcess {
         let process = SubProcess(cmd: cmd!, args: args)
         process.run()
         return process.output
+    }
+}
+
+
+protocol Symbolicator {
+    func symbolicate(crash: Crash, dsymPaths: [String]?) -> String
+}
+
+struct SymbolicateCrash: Symbolicator {
+    func symbolicate(crash: Crash, dsymPaths: [String]?) -> String {
+        if let content = SubProcess.symbolicatecrash(crash: crash.content, dsyms: dsymPaths), content.count > 0 {
+            return content
+        }
+        
+        return crash.content
+    }
+}
+
+struct Atos: Symbolicator {
+    func symbolicate(crash: Crash, dsymPaths: [String]?) -> String {
+        //TODO: Only support the first binary image now
+        
+        guard let image = crash.binaryImages.first, image.isValid else {
+            return crash.content
+        }
+        
+        image.fix()
+        guard let result = SubProcess.atos(image, dsym: dsymPaths?.first) else {
+            return crash.content
+        }
+        
+        var newContent = crash.content
+        for frame in image.backtrace! {
+            if let symbol = result[frame.address] {
+                var newFrame = frame
+                newFrame.symbol = symbol
+                newContent = newContent.replacingOccurrences(of: frame.raw, with: newFrame.description)
+            }
+        }
+        
+        return newContent
+    }
+}
+
+extension Crash {
+    func symbolicate(dsymPaths: [String]?) -> String {
+        let symbolicator: Symbolicator = self.symbolicateMethod == .atos ? Atos() : SymbolicateCrash()
+        return symbolicator.symbolicate(crash: self, dsymPaths: dsymPaths)
     }
 }

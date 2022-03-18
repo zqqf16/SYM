@@ -32,7 +32,7 @@ class CrashDocument: NSDocument {
     let textStorage =  NSTextStorage()
     
     @Published
-    var crashInfo: CrashInfo?
+    var crashInfo: Crash?
     
     @Published
     var isSymbolicating: Bool = false
@@ -79,7 +79,10 @@ class CrashDocument: NSDocument {
     }
     
     private func readCrash(from data: Data) throws {
-        let content = String(data: data, encoding: .utf8) ?? ""
+        var content = String(data: data, encoding: .utf8) ?? ""
+        if AppleJsonConvertor.match(content) {
+            content = AppleJsonConvertor().convert(content)
+        }
         self.update(content: content)
         self.parseCrashInfo(content)
     }
@@ -109,7 +112,7 @@ class CrashDocument: NSDocument {
 
 extension CrashDocument: NSTextStorageDelegate {
     func parseCrashInfo(_ content: String) {
-        let crashInfo = CrashInfo.parse(content)
+        let crashInfo = Crash.parse(content)
         DispatchQueue.main.async {
             self.crashInfo = crashInfo
         }
@@ -131,7 +134,7 @@ extension CrashDocument {
         
         DispatchQueue.global().async {
             self.isSymbolicating = true
-            let content = crash.symbolicate(dsyms: dsyms)
+            let content = crash.symbolicate(dsymPaths: dsyms)
             DispatchQueue.main.async {
                 self.update(content: content)
                 self.undoManager?.removeAllActions()

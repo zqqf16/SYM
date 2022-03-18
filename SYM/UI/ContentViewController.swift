@@ -80,7 +80,7 @@ class ContentViewController: NSViewController {
         self.textView.layoutManager?.allowsNonContiguousLayout = false
     }
     
-    private func infoString(fromCrash crash: CrashInfo) -> String {
+    private func infoString(fromCrash crash: Crash) -> String {
         var info = ""
         var divider = ""
         if let device = crash.device {
@@ -98,24 +98,24 @@ class ContentViewController: NSViewController {
         return info
     }
     
-    func update(crashInfo: CrashInfo?) {
+    func update(crashInfo: Crash?) {
         self.updateHighlighting(crashInfo)
         self.updateSummary(crashInfo)
     }
     
-    private func updateHighlighting(_ crashInfo: CrashInfo?) {
+    private func updateHighlighting(_ crashInfo: Crash?) {
         guard let textStorage = self.textView.textStorage else {
             return
         }
         self.textView.font = self.font
         textStorage.beginEditing()
         textStorage.font = self.font
-        let ranges = crashInfo?.appBacktraceRanges() ?? []
+        let ranges = crashInfo?.appBacktraceRanges ?? []
         textStorage.processHighlighting(ranges)
         textStorage.endEditing()
     }
     
-    private func updateSummary(_ crashInfo: CrashInfo?) {
+    private func updateSummary(_ crashInfo: Crash?) {
         guard let info = crashInfo else {
             self.toggleBottomBar(false)
             return
@@ -153,7 +153,7 @@ extension ContentViewController: NSSplitViewDelegate {
 
 extension ContentViewController {
     @IBAction func scrollToTarget(_ sender: AnyObject?) {
-        guard let crashInfo = self.document?.crashInfo, let range = crashInfo.crashedThreadRange() else {
+        guard let crashInfo = self.document?.crashInfo, let range = crashInfo.crashedThreadRange else {
             return
         }
         

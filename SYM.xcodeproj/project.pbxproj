@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -58,6 +58,7 @@
 		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
 		B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA4F23A8E8EB00049491 /* DsymManager.swift */; };
 		B56BAA5623A8ECDB00049491 /* MdfindWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */; };
+		B56FBA1C27D72E200065E78F /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56FBA1B27D72E200065E78F /* Parser.swift */; };
 		B5847A8D2569419600B674CA /* DeviceContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5847A8C2569419600B674CA /* DeviceContentViewController.swift */; };
 		B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */; };
 		B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
@@ -70,6 +71,8 @@
 		B5AF3E0327A243AC0037AAAD /* template.sh in Resources */ = {isa = PBXBuildFile; fileRef = B5AF3E0227A243AC0037AAAD /* template.sh */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
+		B5C4EA5827D77C6500D0F8A5 /* Convertor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */; };
+		B5D0512327D77335009E95B0 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D0512227D77335009E95B0 /* Symbolicator.swift */; };
 		B5EC56D227759AE5007EB567 /* ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EC56D127759AE5007EB567 /* ConfigTests.swift */; };
 		B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */; };
 		B5F3577E22C0878800111FF3 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */; };
@@ -80,6 +83,10 @@
 		B5F3579D22C5CB1000111FF3 /* Preferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5F3579F22C5CB1000111FF3 /* Preferences.storyboard */; };
 		B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B5F357B322C5E90C00111FF3 /* Localizable.strings */; };
 		B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */; };
+		B5F935F327E46E9800C2D0C6 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = B5F935F227E46E9800C2D0C6 /* SwiftyJSON */; };
+		B5F935F627E4827C00C2D0C6 /* AppleJson.ips in Resources */ = {isa = PBXBuildFile; fileRef = B5F935F427E4827C00C2D0C6 /* AppleJson.ips */; };
+		B5F935F727E4827C00C2D0C6 /* AppleConverted.log in Resources */ = {isa = PBXBuildFile; fileRef = B5F935F527E4827C00C2D0C6 /* AppleConverted.log */; };
+		B5F935F927E482A000C2D0C6 /* ConvertorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F935F827E482A000C2D0C6 /* ConvertorTests.swift */; };
 		F400154821539E8500267818 /* Automator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F400154721539E8500267818 /* Automator.framework */; };
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
@@ -99,7 +106,6 @@
 		F49E2D47214BA704001A6A88 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49E2D46214BA704001A6A88 /* Config.swift */; };
 		F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */; };
 		F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A679731E21319D009F93E7 /* BundleDocument.swift */; };
-		F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */; };
 		F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14621D39D323006BAB2B /* Assets.xcassets */; };
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 		F4EFE9022125305300E9EDA9 /* libimobiledevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFE8EE2125305200E9EDA9 /* libimobiledevice.a */; };
@@ -170,11 +176,14 @@
 		B56B9B8C23A3869100049491 /* DsymViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymViewController.swift; sourceTree = "<group>"; };
 		B56BAA4F23A8E8EB00049491 /* DsymManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DsymManager.swift; path = SYM/dSYM/DsymManager.swift; sourceTree = SOURCE_ROOT; };
 		B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MdfindWrapper.swift; sourceTree = "<group>"; };
+		B56FBA1B27D72E200065E78F /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		B5847A8C2569419600B674CA /* DeviceContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContentViewController.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
 		B5AF3E0227A243AC0037AAAD /* template.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = template.sh; path = SYM/dSYM/template.sh; sourceTree = SOURCE_ROOT; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
+		B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convertor.swift; sourceTree = "<group>"; };
+		B5D0512227D77335009E95B0 /* Symbolicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Symbolicator.swift; sourceTree = "<group>"; };
 		B5EC56D127759AE5007EB567 /* ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigTests.swift; sourceTree = "<group>"; };
 		B5F2732425691658001BDE21 /* DeviceSidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceSidebarViewController.swift; sourceTree = "<group>"; };
 		B5F3577D22C0878800111FF3 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
@@ -190,6 +199,9 @@
 		B5F357B422C5E90C00111FF3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B5F357B622C5E92000111FF3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		B5F357BC22C6062400111FF3 /* LineNumberRulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineNumberRulerView.swift; sourceTree = "<group>"; };
+		B5F935F427E4827C00C2D0C6 /* AppleJson.ips */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AppleJson.ips; sourceTree = "<group>"; };
+		B5F935F527E4827C00C2D0C6 /* AppleConverted.log */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AppleConverted.log; sourceTree = "<group>"; };
+		B5F935F827E482A000C2D0C6 /* ConvertorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertorTests.swift; sourceTree = "<group>"; };
 		F400154721539E8500267818 /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
@@ -210,7 +222,6 @@
 		F49E2D46214BA704001A6A88 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymDownloader.swift; sourceTree = "<group>"; };
 		F4A679731E21319D009F93E7 /* BundleDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BundleDocument.swift; sourceTree = "<group>"; };
-		F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Symbolicate.swift; sourceTree = "<group>"; };
 		F4CD14621D39D323006BAB2B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4CD14641D39D5B7006BAB2B /* file.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = file.icns; sourceTree = "<group>"; };
 		F4EFE81421242D9300E9EDA9 /* SYM-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SYM-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -290,6 +301,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F400154821539E8500267818 /* Automator.framework in Frameworks */,
+				B5F935F327E46E9800C2D0C6 /* SwiftyJSON in Frameworks */,
 				F41CD76321291AA300F7CEFB /* libssl.a in Frameworks */,
 				F41CD76221291AA300F7CEFB /* libcrypto.a in Frameworks */,
 				F4EFE90D212580CB00E9EDA9 /* libplist.a in Frameworks */,
@@ -332,9 +344,12 @@
 		51BF9C501D6C7A1C00379BFC /* SYMTests */ = {
 			isa = PBXGroup;
 			children = (
+				B5F935F527E4827C00C2D0C6 /* AppleConverted.log */,
+				B5F935F427E4827C00C2D0C6 /* AppleJson.ips */,
 				51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */,
 				510777781EFBA4C30055E8BD /* AppleDemo.ips */,
 				51C9A49F1EEFE98700F21AE4 /* ParserTests.swift */,
+				B5F935F827E482A000C2D0C6 /* ConvertorTests.swift */,
 				B5EC56D127759AE5007EB567 /* ConfigTests.swift */,
 				51BF9C531D6C7A1C00379BFC /* Info.plist */,
 			);
@@ -509,8 +524,10 @@
 			isa = PBXGroup;
 			children = (
 				F45320FA1D30A33C00639917 /* Crash.swift */,
+				B56FBA1B27D72E200065E78F /* Parser.swift */,
+				B5D0512227D77335009E95B0 /* Symbolicator.swift */,
+				B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */,
 				51C9A4A11EEFF78500F21AE4 /* Doctor.swift */,
-				F4A8DC0F1D525DAC00ACC4E5 /* Symbolicate.swift */,
 			);
 			name = Crash;
 			sourceTree = "<group>";
@@ -651,6 +668,9 @@
 			dependencies = (
 			);
 			name = SYM;
+			packageProductDependencies = (
+				B5F935F227E46E9800C2D0C6 /* SwiftyJSON */,
+			);
 			productName = SYM;
 			productReference = F49BD1EC1D2FF46300024AAE /* SYM.app */;
 			productType = "com.apple.product-type.application";
@@ -699,6 +719,9 @@
 				"zh-Hans",
 			);
 			mainGroup = F49BD1E31D2FF46300024AAE;
+			packageReferences = (
+				B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+			);
 			productRefGroup = F49BD1ED1D2FF46300024AAE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -718,6 +741,8 @@
 			files = (
 				510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */,
 				51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */,
+				B5F935F727E4827C00C2D0C6 /* AppleConverted.log in Resources */,
+				B5F935F627E4827C00C2D0C6 /* AppleJson.ips in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -792,6 +817,7 @@
 				B59B326E22E0112E00013B67 /* MDAfcClient.m in Sources */,
 				51C9A4A01EEFE98700F21AE4 /* ParserTests.swift in Sources */,
 				B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */,
+				B5F935F927E482A000C2D0C6 /* ConvertorTests.swift in Sources */,
 				B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -815,11 +841,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5C4EA5827D77C6500D0F8A5 /* Convertor.swift in Sources */,
 				B535D7362576223800502711 /* MDSBServices.m in Sources */,
 				B53E2F8622D48383003BC45C /* MDHouseArrest.m in Sources */,
 				F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */,
 				B5F3578922C3121200111FF3 /* Image.swift in Sources */,
-				F4A8DC101D525DAC00ACC4E5 /* Symbolicate.swift in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */,
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
@@ -847,10 +873,12 @@
 				F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */,
 				B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */,
 				B5089463258C838D0074254E /* MDScreenShotr.m in Sources */,
+				B56FBA1C27D72E200065E78F /* Parser.swift in Sources */,
 				B53E2F7722D44838003BC45C /* MDLockdown.m in Sources */,
 				F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */,
 				F4A679741E21319D009F93E7 /* BundleDocument.swift in Sources */,
 				B597FE1522DC8A9400BE439A /* FileBrowserViewController.swift in Sources */,
+				B5D0512327D77335009E95B0 /* Symbolicator.swift in Sources */,
 				51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */,
 				51C9A4A21EEFF78500F21AE4 /* Doctor.swift in Sources */,
 				B5F3578722C30B7C00111FF3 /* Color.swift in Sources */,
@@ -936,7 +964,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = SYMTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -954,11 +986,16 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = SYMTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
@@ -1023,8 +1060,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/icp/ICP-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
 			};
@@ -1163,7 +1201,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 91;
+				CURRENT_PROJECT_VERSION = 92;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -1172,7 +1210,10 @@
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
 				);
 				INFOPLIST_FILE = SYM/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
@@ -1181,7 +1222,7 @@
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -1202,7 +1243,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 91;
+				CURRENT_PROJECT_VERSION = 92;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1211,7 +1252,10 @@
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
 				);
 				INFOPLIST_FILE = SYM/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
@@ -1220,13 +1264,14 @@
 					"$(PROJECT_DIR)/SYM/Device/plist",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYM;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/SYM/SYM-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 5.0;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
@@ -1283,6 +1328,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B5F935F227E46E9800C2D0C6 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F49BD1E41D2FF46300024AAE /* Project object */;
 }

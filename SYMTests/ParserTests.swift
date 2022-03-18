@@ -58,21 +58,45 @@ class ParserTests: XCTestCase {
 
     func testAppleParser() {
         let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let crash = CrashInfo.parse(content)
         
-        XCTAssertEqual(crash.appName, "demo")
-        
-        XCTAssertEqual(crash.device, "iPhone9,2")
+        let parser = AppleParser()
+        let crash: Crash! = parser.parse(content)
+
+        XCTAssertNotNil(crash)
+
         XCTAssertEqual(crash.uuid, "42fd89f730be3ac5a40a4c1a99438dfb".uuidFormat())
+        XCTAssertEqual(crash.appName, "demo")
+        XCTAssertEqual(crash.device, "iPhone9,2")
+        XCTAssertEqual(crash.arch, "arm64")
+        XCTAssertEqual(crash.osVersion, "iPhone OS 10.1.1 (14B100)")
+        XCTAssertEqual(crash.appVersion, "3.5.5.2 (3.5.5)")
+        XCTAssertEqual(crash.bundleID, "im.zorro.demo")
+        XCTAssertEqual(crash.symbolicateMethod, .symbolicatecrash)
+
+        let embedded = crash.embeddedBinaries
+        XCTAssertEqual(embedded.count, 16)
+        
+        XCTAssertTrue(crash.appBacktraceRanges.count > 0)
+        XCTAssertNotNil(crash.crashedThreadRange)
     }
     
     func testUmengParser() {
         let content = self.crashContent(fromFile: "UmengDemo", ofType: "crash")
-        let crash = CrashInfo.parse(content)
+        let parser = UmengParser()
+        let crash: Crash! = parser.parse(content)
         
+        XCTAssertNotNil(crash)
+
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNil(crash.device)
-
         XCTAssertEqual(crash.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
+        
+        XCTAssertTrue(crash.appBacktraceRanges.count > 0)
+        
+        let binary: Binary! = crash.binaryImages.first
+        XCTAssertNotNil(binary)
+        XCTAssertEqual(binary.name, "DemoApp")
+        XCTAssertEqual(binary.loadAddress, "0x0000000100000000")
+
     }
 }
