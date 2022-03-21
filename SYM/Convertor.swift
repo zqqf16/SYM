@@ -129,6 +129,9 @@ struct AppleJsonConvertor: Convertor {
             //"Exception Note:      %@".format()
             "Termination Reason: %@ %@".format(payload["termination"]["namespace"].stringValue, payload["termination"]["code"].stringValue)
             payload["termination"]["details"][0].stringValue
+            if payload["vmSummary"].string != nil {
+                "VM Region Info: \(payload["vmSummary"].stringValue)"
+            }
             ""
             "Triggered by Thread:  %@".format(_P("faultingThread"))
             ""
