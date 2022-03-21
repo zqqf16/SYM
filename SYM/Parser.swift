@@ -250,22 +250,14 @@ struct CPUUsageParser: CrashParser {
     private func parseAppVersion(_ content: String) -> String? {
         if let app = Regex.appVersion.value(in: content),
            let build = Regex.buildVersion.value(in: content) {
-            return "\(build) (\(app))"
+            return "\(app) (\(build))"
         }
         
         guard let versionString = Regex.version.value(in: content) else {
             return nil
         }
         
-        // 1.1.1 (123) to 123 (1.1.1)
-        let components = versionString.components(separatedBy: " ")
-        if components.count != 2 {
-            return versionString;
-        }
-        
-        let app = components[0]
-        let build = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
-        return "\(build) (\(app))"
+        return versionString
     }
 }
 

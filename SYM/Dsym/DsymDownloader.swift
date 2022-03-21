@@ -161,7 +161,21 @@ class DsymDownloadTask {
         env["APP_NAME"] = crashInfo.appName ?? ""
         env["UUID"] = crashInfo.uuid ?? ""
         env["BUNDLE_ID"] = crashInfo.bundleID ?? ""
-        env["APP_VERSION"] = crashInfo.appVersion ?? ""
+        
+        let versionString = crashInfo.appVersion ?? ""
+        env["APP_VERSION"] = versionString
+
+        // compatible with older versions
+        // convert 1.1.1 (123) to 123 (1.1.1)
+        let components = versionString.components(separatedBy: " ")
+        if components.count == 2 {
+            let part1 = components[0]
+            let part2 = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
+            if part1.contains(".") && !part2.contains(".") {
+                env["APP_VERSION"] = "\(part2) (\(part1))"
+            }
+        }
+        
         return env
     }
     
