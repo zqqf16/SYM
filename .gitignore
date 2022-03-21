@@ -80,6 +80,8 @@ xcuserdata/
 *.moved-aside
 *.xcuserstate
 
+Package.resolved
+
 ## Obj-C/Swift specific
 *.hmap
 *.ipa
