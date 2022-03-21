@@ -1,0 +1,152 @@
+
+Incident Identifier: 4904A8AF-6173-4A1B-B354-0A9C4FB1F673
+CrashReporter Key:   d7abd7c61291b3e610c5095b565fd5fdc5e83b6b
+Hardware Model:      iPhone13,4
+Process:             Demo [6209]
+Path:                /private/var/containers/Bundle/Application/CA1090A6-A0E0-41FF-A314-9FE69476EEAB/Demo.app/Demo
+Identifier:          im.zorro.demo
+Version:             1.0 (4)
+Code Type:           ARM-64 (Native)
+Role:                Foreground
+Parent Process:      launchd [1]
+Coalition:           im.zorro.demo [2211]
+
+Date/Time:           2022-03-16 11:45:14.2121 +0800
+Launch Time:         2022-03-16 11:45:12.3458 +0800
+OS Version:          iPhone OS 15.2.1 (19C63)
+Release Type:        User
+Baseband Version:    2.23.02
+Report Version:      104
+
+Exception Type:  EXC_CRASH (SIGABRT)
+Exception Codes: 0x0000000000000000, 0x0000000000000000
+Exception Note:  EXC_CORPSE_NOTIFY
+Termination Reason: TCC 0 
+This app has crashed because it attempted to access privacy-sensitive data without a usage description. The app's Info.plist must contain an NSCameraUsageDescription key with a string value explaining to the user how the app uses this data.
+
+Triggered by Thread:  1
+
+Thread 0 name:   Dispatch queue: com.apple.main-thread
+Thread 0:
+0   Foundation                    	       0x182348144 NSKeyValueWillChangeWithPerThreadPendingNotifications + 200
+1   Foundation                    	       0x1823480f8 NSKeyValueWillChangeWithPerThreadPendingNotifications + 124
+2   QuartzCore                    	       0x1848b4b00 CA::Layer::begin_change(CA::Transaction*, unsigned int, objc_object*, objc_object*&) + 252
+3   QuartzCore                    	       0x1848b7efc CA::Layer::setter(unsigned int, _CAValueType, void const*) + 352
+4   QuartzCore                    	       0x1848c6c9c -[CALayer setBackgroundColor:] + 56
+5   UIKitCore                     	       0x1833f6d50 -[UIView _setBackgroundCGColor:withSystemColorName:] + 1224
+6   UIKitCore                     	       0x183442f24 -[UIView(Hierarchy) _setBackgroundColor:] + 564
+7   UIKitCore                     	       0x18366a604 -[_UIParallaxDimmingView initWithFrame:overrideDimmingColor:] + 292
+8   UIKitCore                     	       0x1830dc080 -[_UIParallaxDimmingView initViewWrappingView:withLeftBorder:shouldReverseLayoutDirection:] + 68
+9   UIKitCore                     	       0x18333177c __53-[_UINavigationParallaxTransition animateTransition:]_block_invoke_2 + 1088
+10  UIKitCore                     	       0x183126a9c +[UIView(Animation) performWithoutAnimation:] + 104
+11  UIKitCore                     	       0x183269778 __53-[_UINavigationParallaxTransition animateTransition:]_block_invoke + 260
+12  UIKitCore                     	       0x18333d080 +[UIView _performBlockDelayingTriggeringResponderEvents:forScene:] + 252
+13  UIKitCore                     	       0x183345e2c -[_UINavigationParallaxTransition animateTransition:] + 1092
+14  UIKitCore                     	       0x18346d210 ___UIViewControllerTransitioningRunCustomTransition_block_invoke_2 + 76
+15  UIKitCore                     	       0x183298114 +[UIKeyboardSceneDelegate _pinInputViewsForKeyboardSceneDelegate:onBehalfOfResponder:duringBlock:] + 116
+16  UIKitCore                     	       0x18396571c ___UIViewControllerTransitioningRunCustomTransition_block_invoke.663 + 204
+17  UIKitCore                     	       0x18339c2dc +[UIView(Animation) _setAlongsideAnimations:toRunByEndOfBlock:] + 204
+18  UIKitCore                     	       0x183230508 _UIViewControllerTransitioningRunCustomTransition + 628
+19  UIKitCore                     	       0x18332ef48 -[UINavigationController _startCustomTransition:] + 3600
+20  UIKitCore                     	       0x18348ce54 -[UINavigationController _startDeferredTransitionIfNeeded:] + 696
+21  UIKitCore                     	       0x183361ea4 -[UINavigationController __viewWillLayoutSubviews] + 168
+22  UIKitCore                     	       0x1832884a4 -[UILayoutContainerView layoutSubviews] + 228
+23  UIKitCore                     	       0x183140798 -[UIView(CALayerDelegate) layoutSublayersOfLayer:] + 2620
+24  QuartzCore                    	       0x1848a3138 CA::Layer::layout_if_needed(CA::Transaction*) + 536
+25  QuartzCore                    	       0x184895958 CA::Layer::layout_and_display_if_needed(CA::Transaction*) + 144
+26  QuartzCore                    	       0x1848a9f80 CA::Context::commit_transaction(CA::Transaction*, double, double*) + 524
+27  QuartzCore                    	       0x1848b2874 CA::Transaction::commit() + 680
+28  QuartzCore                    	       0x1848950bc CA::Transaction::flush_as_runloop_observer(bool) + 100
+29  UIKitCore                     	       0x1834f6cc0 _UIApplicationFlushCATransaction + 76
+30  UIKitCore                     	       0x1837915fc _UIUpdateSequenceRun + 84
+31  UIKitCore                     	       0x183e0d5b0 schedulerStepScheduledMainSection + 144
+32  UIKitCore                     	       0x183e0cba0 runloopSourceCallback + 60
+33  CoreFoundation                	       0x180bc70d0 __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 28
+34  CoreFoundation                	       0x180bd7d90 __CFRunLoopDoSource0 + 208
+35  CoreFoundation                	       0x180b12098 __CFRunLoopDoSources0 + 268
+36  CoreFoundation                	       0x180b178a4 __CFRunLoopRun + 820
+37  CoreFoundation                	       0x180b2b468 CFRunLoopRunSpecific + 600
+38  GraphicsServices              	       0x19c6b638c GSEventRunModal + 164
+39  UIKitCore                     	       0x1834cd088 -[UIApplication _run] + 1100
+40  UIKitCore                     	       0x18324b958 UIApplicationMain + 2092
+41  libswiftUIKit.dylib           	       0x1983fcfa0 UIApplicationMain(_:_:_:_:) + 104
+42  Demo                       	           0x100f4c4b4 0x100e88000 + 804020
+43  Demo                       	           0x100f4c42c 0x100e88000 + 803884
+44  Demo                       	           0x100f4c54c 0x100e88000 + 804172
+45  dyld                          	       0x102625aa4 start + 520
+
+Thread 1 name:   Dispatch queue: com.apple.root.default-qos
+Thread 1 Crashed:
+0   libsystem_kernel.dylib        	       0x1b8264cf8 __abort_with_payload + 8
+1   libsystem_kernel.dylib        	       0x1b82675b8 abort_with_payload_wrapper_internal + 104
+2   libsystem_kernel.dylib        	       0x1b82675ec abort_with_payload + 16
+3   TCC                           	       0x1e8f0e2d0 __TCC_CRASHING_DUE_TO_PRIVACY_VIOLATION__ + 172
+4   TCC                           	       0x1e8f0eaac __TCCAccessRequest_block_invoke.231 + 600
+5   TCC                           	       0x1e8f0b8d0 __tccd_send_message_block_invoke + 624
+6   libxpc.dylib                  	       0x1f1ead32c _xpc_connection_reply_callout + 116
+7   libxpc.dylib                  	       0x1f1ea085c _xpc_connection_call_reply_async + 88
+8   libdispatch.dylib             	       0x1808176f0 _dispatch_client_callout3 + 20
+9   libdispatch.dylib             	       0x180834ed8 _dispatch_mach_msg_async_reply_invoke + 348
+10  libdispatch.dylib             	       0x180829b70 _dispatch_kevent_worker_thread + 1316
+11  libsystem_pthread.dylib       	       0x1f1e7712c _pthread_wqthread + 344
+12  libsystem_pthread.dylib       	       0x1f1e76e94 start_wqthread + 8
+
+Thread 2:
+0   libsystem_pthread.dylib       	       0x1f1e76e8c start_wqthread + 0
+
+Thread 3:
+0   libsystem_pthread.dylib       	       0x1f1e76e8c start_wqthread + 0
+
+Thread 4:
+0   libsystem_pthread.dylib       	       0x1f1e76e8c start_wqthread + 0
+
+Thread 5 name:  com.apple.uikit.eventfetch-thread
+Thread 5:
+0   libsystem_kernel.dylib        	       0x1b823b504 mach_msg_trap + 8
+1   libsystem_kernel.dylib        	       0x1b823bb9c mach_msg + 76
+2   CoreFoundation                	       0x180b13738 __CFRunLoopServiceMachPort + 372
+3   CoreFoundation                	       0x180b17a2c __CFRunLoopRun + 1212
+4   CoreFoundation                	       0x180b2b468 CFRunLoopRunSpecific + 600
+5   Foundation                    	       0x182347c94 -[NSRunLoop(NSRunLoop) runMode:beforeDate:] + 236
+6   Foundation                    	       0x182388dc8 -[NSRunLoop(NSRunLoop) runUntilDate:] + 92
+7   UIKitCore                     	       0x183446230 -[UIEventFetcher threadMain] + 524
+8   Foundation                    	       0x18239740c __NSThread__start__ + 808
+9   libsystem_pthread.dylib       	       0x1f1e779a4 _pthread_start + 148
+10  libsystem_pthread.dylib       	       0x1f1e76ea0 thread_start + 8
+
+Thread 6:
+0   libsystem_pthread.dylib       	       0x1f1e76e8c start_wqthread + 0
+
+Thread 7:
+0   libsystem_pthread.dylib       	       0x1f1e76e8c start_wqthread + 0
+
+
+Thread 1 crashed with ARM Thread State (64-bit):
+    x0: 0x000000000000000b   x1: 0x0000000000000000   x2: 0x0000000104308448   x3: 0x0000000000000019
+    x4: 0x0000000104308474   x5: 0x0000000000000000   x6: 0x00f2000004220122   x7: 0x000000000000003e
+    x8: 0x0000000000000020   x9: 0xeb1a636bd19c00ae  x10: 0x0100000100000000  x11: 0x00000000001b9d69
+   x12: 0x0000001002a099f0  x13: 0x0000000000000000  x14: 0x0000020000011000  x15: 0x0200000110000fd8
+   x16: 0x0000000000000209  x17: 0x00000002074d0d90  x18: 0x0000000000000000  x19: 0x0000000000000000
+   x20: 0x0000000104308474  x21: 0x0000000000000019  x22: 0x0000000104308448  x23: 0x0000000000000000
+   x24: 0x000000000000000b  x25: 0x0000000283fc8a40  x26: 0x0000000000000000  x27: 0x0000000000000000
+   x28: 0x0000000000000000   fp: 0x000000016effe660   lr: 0x00000001b82675b8
+    sp: 0x000000016effe620   pc: 0x00000001b8264cf8 cpsr: 0x40001000
+   far: 0x0000000102e1c050  esr: 0x56000080  Address size fault
+
+Binary Images:
+       0x18232f000 -        0x182635fff Foundation arm64e  <9618b2f2a4c23e07b7eed8d9e1bdeaec> /System/Library/Frameworks/Foundation.framework/Foundation
+       0x184863000 -        0x184b49fff QuartzCore arm64e  <0594369d11dd39d9a98174984f490c0c> /System/Library/Frameworks/QuartzCore.framework/QuartzCore
+       0x182fb3000 -        0x18483dfff UIKitCore arm64e  <cd7f7ba2a2c63727aff69baab60cc6ab> /System/Library/PrivateFrameworks/UIKitCore.framework/UIKitCore
+       0x180b0c000 -        0x180f5ffff CoreFoundation arm64e  <16faa70c278c3561859ecec407c2dc7c> /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
+       0x19c6b5000 -        0x19c6bdfff GraphicsServices arm64e  <064a1bb60e413ad2a402fb563fc141f5> /System/Library/PrivateFrameworks/GraphicsServices.framework/GraphicsServices
+       0x1983cc000 -        0x198438fff libswiftUIKit.dylib arm64e  <101fe0968d8b33d5913bc31c5d26c5f2> /usr/lib/swift/libswiftUIKit.dylib
+       0x100e88000 -        0x101e2bfff Demo arm64  <db2fd9ec8dd1302198df93db16cf4863> /private/var/containers/Bundle/Application/CA1090A6-A0E0-41FF-A314-9FE69476EEAB/Demo.app/Demo
+       0x10260c000 -        0x102663fff dyld arm64e  <f94ccc7a6d1a33c7997ff611a6caa7e0> /usr/lib/dyld
+       0x1b823a000 -        0x1b826dfff libsystem_kernel.dylib arm64e  <eb3e47f3395335839feefb6cff8a8d7a> /usr/lib/system/libsystem_kernel.dylib
+       0x1e8f07000 -        0x1e8f18fff TCC arm64e  <5b4c4ea9876338ecb4479b9169c542df> /System/Library/PrivateFrameworks/TCC.framework/TCC
+       0x1f1e91000 -        0x1f1ec8fff libxpc.dylib arm64e  <4a0071bc1b1f3cbb960272663b72e875> /usr/lib/system/libxpc.dylib
+       0x180813000 -        0x180859fff libdispatch.dylib arm64e  <edd169e1d0db3808a19e99c1cd5a1c4c> /usr/lib/system/libdispatch.dylib
+       0x1f1e76000 -        0x1f1e81fff libsystem_pthread.dylib arm64e  <c5c27e9d955739c9b9c65f6e7323ee1c> /usr/lib/system/libsystem_pthread.dylib
+
+EOF
+
