@@ -98,5 +98,6 @@ class ParserTests: XCTestCase {
         XCTAssertEqual(binary.name, "DemoApp")
         XCTAssertEqual(binary.loadAddress, "0x0000000100000000")
 
+        XCTAssertEqual(crash.embeddedBinaries.first?.name, binary.name)
     }
 }

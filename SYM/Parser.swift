@@ -359,7 +359,7 @@ struct UmengParser: CrashParser {
                             uuid: crash.uuid,
                             arch: crash.arch,
                             loadAddress: loadAddress,
-                            path: "")
+                            path: "/var/containers/Bundle/Application/\(appName)") //fake path
         binary.backtrace = backtrace
         crash.binaryImages.append(binary)
         
