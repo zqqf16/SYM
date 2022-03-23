@@ -22,8 +22,8 @@
 
 #import "MDDeviceMonitor.h"
 #import <libimobiledevice/libimobiledevice.h>
-#import <usbmuxd/usbmuxd-proto.h>
-#import <usbmuxd/usbmuxd.h>
+#import <usbmuxd-proto.h>
+#import <usbmuxd.h>
 
 NSString * const MDDeviceMonitorNotification = @"sym.deviceMonitoring";
 

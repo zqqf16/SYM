@@ -1,0 +1,5 @@
+module libimobiledevicec {
+    umbrella header "libimobiledevicec.h"
+    export *
+    module * { export * }
+}
