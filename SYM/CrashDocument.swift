@@ -84,7 +84,7 @@ class CrashDocument: NSDocument {
             content = AppleJsonConvertor().convert(content)
         }
         self.update(content: content)
-        self.parseCrashInfo(content)
+        //self.parseCrashInfo(content)
     }
     
     private func readPlist(from data: Data) throws {

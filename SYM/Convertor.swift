@@ -70,7 +70,14 @@ struct CrashInlineBuilder {
 struct AppleJsonConvertor: Convertor {
     static func match(_ content: String) -> Bool {
         let components = self.split(content)
-        return components.header != nil && components.payload != nil
+        guard components.header != nil,
+              let payload = components.payload
+        else {
+            return false
+        }
+        
+        return payload["coalitionName"].string != nil
+        || payload["crashReporterKey"].string != nil
     }
     
     private static func split(_ content: String) -> (header: JSON?, payload: JSON?) {

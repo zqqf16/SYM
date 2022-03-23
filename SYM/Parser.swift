@@ -182,7 +182,7 @@ extension Regex {
     // Path: /private/var/containers/Bundle/Application/xxx
     static let path = try! Regex("^Path:\\s*([^\\s]+)\\s*", options: .anchorsMatchLines)
     
-    // 0x100874000 -   ???  com.yourapp 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/demo.app/demo
+    // 0x100874000 -   ???  com.your.app 5.8.0 (5044) <425D7866-BFF0-3D9C-B354-07057F9A903A> /private/var/containers/Bundle/Application/DACCA9B7-C6CD-4FBF-A2A2-2C78701748AA/demo.app/demo
     static func image(withPath path: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
         return try? Regex("\\s*(0[xX][A-Fa-f0-9]+)\\s+-.*<(.*)>\\s+\(path)", options: options)
     }
@@ -223,19 +223,24 @@ struct CPUUsageParser: CrashParser {
         RegexHelper.parseBaseInfo(content, crash: &crash, map: regexMap)
         
         crash.appVersion = self.parseAppVersion(content)
-        
-        if let path = Regex.path.value(in: content),
-           let regex = Regex.image(withPath: path),
+        let path = Regex.path.value(in: content)
+        if path != nil,
+           let regex = Regex.image(withPath: path!),
            let captures = regex.firstMatch(in: content)?.captures {
             crash.uuid = captures[2].uuidFormat()
         }
         
-        RegexHelper.parseBinaries(content, crash: &crash, regex: .image) { captures in
-            return Binary(name: captures[2],
+        RegexHelper.parseBinaries(content, crash: &crash, regex: .cpuUsageImage) { captures in
+            var name: String = captures[2]
+            let binaryPath = captures[4].strip()
+            if path != nil && path == binaryPath {
+                name = path!.components(separatedBy: "/").last!
+            }
+            return Binary(name: name,
                           uuid: captures[3].uuidFormat(),
                           arch: nil,
                           loadAddress: captures[1],
-                          path: captures[4])
+                          path: binaryPath)
         }
         
         // backtrace
