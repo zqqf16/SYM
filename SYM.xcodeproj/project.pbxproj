@@ -49,6 +49,18 @@
 		B53E2F9522D49473003BC45C /* MDAfcClient.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7F22D477A3003BC45C /* MDAfcClient.m */; };
 		B53E2F9622D49476003BC45C /* MDHouseArrest.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F8522D48383003BC45C /* MDHouseArrest.m */; };
 		B53E2F9722D49479003BC45C /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
+		B546910D27EB35D8002D189A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05427EAF2CF00E80A74 /* libcrypto.a */; };
+		B546910E27EB35D8002D189A /* libimobiledevice-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05727EAF2CF00E80A74 /* libimobiledevice-1.0.a */; };
+		B546910F27EB35D8002D189A /* libplist-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05527EAF2CF00E80A74 /* libplist-2.0.a */; };
+		B546911027EB35D8002D189A /* libusbmuxd-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05C27EAF2CF00E80A74 /* libusbmuxd-2.0.a */; };
+		B546911127EB35D8002D189A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05D27EAF2CF00E80A74 /* libssl.a */; };
+		B546911227EB35D8002D189A /* libimobiledevice-glue-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05927EAF2CF00E80A74 /* libimobiledevice-glue-1.0.a */; };
+		B546911327EB35D9002D189A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05427EAF2CF00E80A74 /* libcrypto.a */; };
+		B546911427EB35D9002D189A /* libimobiledevice-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05727EAF2CF00E80A74 /* libimobiledevice-1.0.a */; };
+		B546911527EB35D9002D189A /* libplist-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05527EAF2CF00E80A74 /* libplist-2.0.a */; };
+		B546911627EB35D9002D189A /* libusbmuxd-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05C27EAF2CF00E80A74 /* libusbmuxd-2.0.a */; };
+		B546911727EB35D9002D189A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05D27EAF2CF00E80A74 /* libssl.a */; };
+		B546911827EB35D9002D189A /* libimobiledevice-glue-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05927EAF2CF00E80A74 /* libimobiledevice-glue-1.0.a */; };
 		B56B9B8923A379CE00049491 /* Dsym.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B56B9B8723A379CE00049491 /* Dsym.storyboard */; };
 		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
 		B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA4F23A8E8EB00049491 /* DsymManager.swift */; };
@@ -270,7 +282,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B546910D27EB35D8002D189A /* libcrypto.a in Frameworks */,
+				B546911027EB35D8002D189A /* libusbmuxd-2.0.a in Frameworks */,
+				B546911127EB35D8002D189A /* libssl.a in Frameworks */,
+				B546910F27EB35D8002D189A /* libplist-2.0.a in Frameworks */,
+				B546911227EB35D8002D189A /* libimobiledevice-glue-1.0.a in Frameworks */,
 				514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */,
+				B546910E27EB35D8002D189A /* libimobiledevice-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +296,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B546911827EB35D9002D189A /* libimobiledevice-glue-1.0.a in Frameworks */,
+				B546911727EB35D9002D189A /* libssl.a in Frameworks */,
+				B546911327EB35D9002D189A /* libcrypto.a in Frameworks */,
+				B546911427EB35D9002D189A /* libimobiledevice-1.0.a in Frameworks */,
+				B546911527EB35D9002D189A /* libplist-2.0.a in Frameworks */,
+				B546911627EB35D9002D189A /* libusbmuxd-2.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -941,14 +965,17 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device/libimobiledevice";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
-				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -963,6 +990,10 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SYM/Device/libimobiledevice",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				PRODUCT_BUNDLE_IDENTIFIER = im.zorro.SYMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -970,9 +1001,8 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/SYM/Device/libimobiledevice";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SYM.app/Contents/MacOS/SYM";
-				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};
