@@ -30,6 +30,8 @@ iPad11,3:iPad Air (3rd generation)
 iPad11,4:iPad Air (3rd generation)
 iPad13,1:iPad Air (4th generation)
 iPad13,2:iPad Air (4th generation)
+iPad13,16:iPad Air (5th generation)
+iPad13,17:iPad Air (5th generation)
 iPad6,7:iPad Pro (12.9-inch)
 iPad6,8:iPad Pro (12.9-inch)
 iPad6,3:iPad Pro (9.7-inch)
@@ -125,6 +127,7 @@ iPhone14,4:iPhone 13 mini
 iPhone14,5:iPhone 13
 iPhone14,2:iPhone 13 Pro
 iPhone14,3:iPhone 13 Pro Max
+iPhone14,6:iPhone SE (3rd generation)
 iPod1,1:iPod touch
 iPod2,1:iPod touch (2nd generation)
 iPod3,1:iPod touch (3rd generation)
