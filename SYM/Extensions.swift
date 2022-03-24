@@ -34,10 +34,6 @@ extension NSRange {
 
 // MARK: - String
 extension String {
-    func format(_ args: CVarArg...) -> String {
-        return String(format: self, arguments: args)
-    }
-    
     var hexaToDecimal: Int {
         var hex = self
         if hex.hasPrefix("0x") {

@@ -61,6 +61,7 @@
 		B546911627EB35D9002D189A /* libusbmuxd-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05C27EAF2CF00E80A74 /* libusbmuxd-2.0.a */; };
 		B546911727EB35D9002D189A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05D27EAF2CF00E80A74 /* libssl.a */; };
 		B546911827EB35D9002D189A /* libimobiledevice-glue-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05927EAF2CF00E80A74 /* libimobiledevice-glue-1.0.a */; };
+		B546911A27EC22DE002D189A /* ContentBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B546911927EC22DE002D189A /* ContentBuilder.swift */; };
 		B56B9B8923A379CE00049491 /* Dsym.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B56B9B8723A379CE00049491 /* Dsym.storyboard */; };
 		B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56B9B8C23A3869100049491 /* DsymViewController.swift */; };
 		B56BAA5023A8E8EB00049491 /* DsymManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56BAA4F23A8E8EB00049491 /* DsymManager.swift */; };
@@ -179,6 +180,7 @@
 		B53E2F8B22D48E28003BC45C /* icp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = icp; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53E2F8D22D48E28003BC45C /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		B53E2F9222D48EEB003BC45C /* ICP-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ICP-Bridging-Header.h"; sourceTree = "<group>"; };
+		B546911927EC22DE002D189A /* ContentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBuilder.swift; sourceTree = "<group>"; };
 		B569D8FC23ACA29E00ACEB6C /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Dsym.strings"; sourceTree = "<group>"; };
 		B56B9B8823A379CE00049491 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Dsym.storyboard; sourceTree = "<group>"; };
 		B56B9B8C23A3869100049491 /* DsymViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DsymViewController.swift; sourceTree = "<group>"; };
@@ -597,6 +599,7 @@
 				F45320FA1D30A33C00639917 /* Crash.swift */,
 				B56FBA1B27D72E200065E78F /* Parser.swift */,
 				B5D0512227D77335009E95B0 /* Symbolicator.swift */,
+				B546911927EC22DE002D189A /* ContentBuilder.swift */,
 				B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */,
 				51C9A4A11EEFF78500F21AE4 /* Doctor.swift */,
 			);
@@ -853,6 +856,7 @@
 				F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */,
 				F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */,
 				B5847A8D2569419600B674CA /* DeviceContentViewController.swift in Sources */,
+				B546911A27EC22DE002D189A /* ContentBuilder.swift in Sources */,
 				F45321041D30CC4600639917 /* Extensions.swift in Sources */,
 				F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */,
 				F49E2D47214BA704001A6A88 /* Config.swift in Sources */,

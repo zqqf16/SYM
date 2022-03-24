@@ -34,7 +34,6 @@ class ConvertorTests: XCTestCase {
         let content = self.loadFile()
         let convertor = AppleJsonConvertor()
         let converted = convertor.convert(content)
-        
         let bundle = Bundle(for: type(of: self))
         let path = bundle.path(forResource: "AppleConverted", ofType: "log")!
         let target = try! String(contentsOfFile: path)
