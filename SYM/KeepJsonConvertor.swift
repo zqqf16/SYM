@@ -90,7 +90,7 @@ struct KeepJsonConvertor: Convertor {
                         .format(thread["dispatch_queue"])
                 }
                 
-                Line("Thread \(index):")
+                Line("Thread \(index) \(thread["thread_type"].stringValue):")
                 for (frameIndex, frame) in thread["thread_stack"].arrayValue.enumerated() {
                     Frame(frame, index: frameIndex)
                 }
@@ -155,15 +155,6 @@ struct KeepJsonConvertor: Convertor {
             Line("Baseband Version:    2.23.02")
             Line("Report Version:      104")
             Line.empty
-            /*
-             Exception Type:  EXC_CRASH (SIGABRT)
-             Exception Codes: 0x0000000000000000, 0x0000000000000000
-             Exception Note:  EXC_CORPSE_NOTIFY
-             Termination Reason: TCC 0
-             This app has crashed because it attempted to access privacy-sensitive data without a usage description. The app's Info.plist must contain an NSCameraUsageDescription key with a string value explaining to the user how the app uses this data.
-             
-             Triggered by Thread:  1
-             */
             Line("Exception Type:  %@ (%@)")
                 .format(trace["errorMsg"]["mach"]["exception_name"], trace["errorMsg"]["signal"]["name"])
             Line("Exception Codes: %@ %@")
@@ -171,7 +162,9 @@ struct KeepJsonConvertor: Convertor {
             Line("Termination Reason: %@").format(trace["crash_info_message"])
             Line(trace["diagnosis"].stringValue)
             Line.empty
-            //Line("Triggered by Thread:  %@".format(_P("faultingThread")))
+            if let index = self.parseCrashedThread(from: payload) {
+                Line("Triggered by Thread:  \(index)")
+            }
             Line.empty
             
             Line("Last Exception Backtrace")
@@ -193,6 +186,16 @@ struct KeepJsonConvertor: Convertor {
             Line("EOF")
             Line.empty
         })
+    }
+    
+    private func parseCrashedThread(from payload: JSON) -> String? {
+        let threads = payload["trace"]["threads"].arrayValue
+        for thread in threads {
+            if thread["thread_type"] == "Crashed" {
+                return thread["index"].stringValue
+            }
+        }
+        return nil
     }
     
     private func parseImages(from payload: JSON) -> [JSON] {
