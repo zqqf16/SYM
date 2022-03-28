@@ -28,6 +28,29 @@ protocol Convertor {
     func convert(_ content: String) -> String
 }
 
+func convertor(for content: String) -> Convertor? {
+    if AppleJsonConvertor.match(content) {
+        return AppleJsonConvertor()
+    }
+    if KeepJsonConvertor.match(content) {
+        return KeepJsonConvertor()
+    }
+    return nil
+}
+
+extension String {
+    func format(_ json: JSON...) -> Self {
+        return String(format: self, arguments: json.map({ $0.stringValue }))
+    }
+}
+
+extension Line {
+    func format(_ json: JSON...) -> Self {
+        let value = String(format: self.value, arguments: json.map({ $0.stringValue }))
+        return Line(value)
+    }
+}
+
 struct AppleJsonConvertor: Convertor {
     static func match(_ content: String) -> Bool {
         let components = self.split(content)

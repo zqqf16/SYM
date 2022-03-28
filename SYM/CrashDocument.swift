@@ -80,8 +80,8 @@ class CrashDocument: NSDocument {
     
     private func readCrash(from data: Data) throws {
         var content = String(data: data, encoding: .utf8) ?? ""
-        if AppleJsonConvertor.match(content) {
-            content = AppleJsonConvertor().convert(content)
+        if let convertor = convertor(for: content) {
+            content = convertor.convert(content)
         }
         self.update(content: content)
         //self.parseCrashInfo(content)

@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Foundation
+import SwiftyJSON
 
 protocol ContentComponent {
     var string: String { get }
@@ -51,7 +52,7 @@ extension String: ContentComponent {
     }
     
     func format(_ args: CVarArg...) -> Self {
-        return String(format: self.string, arguments: args)
+        return String(format: self, arguments: args)
     }
     
     init(@ContentBuilder builder: () -> String) {

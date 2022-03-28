@@ -102,13 +102,13 @@ extension SubProcess {
     static func dwarfdump(_ paths: [String]) -> [(String, String)]? {
         let cmd = "/usr/bin/dwarfdump"
         let args = ["--uuid"] + paths
-        let re = try! RE("UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ", options: [.anchorsMatchLines, .caseInsensitive])
+        let re = try! Regex("UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ", options: [.anchorsMatchLines, .caseInsensitive])
         
         let process = SubProcess(cmd: cmd, args: args)
         process.run()
         let output = process.output
-        if let uuids = re.findAll(output) {
-            return uuids.map { ($0[0], $0[1]) }
+        if let matchs = re.matches(in: output) {
+            return matchs.map { ($0.captures![0], $0.captures![1]) }
         }
         
         return nil

@@ -36,7 +36,7 @@ sub usage();
 
 # read and parse command line
 my $opt_help = 0;
-my $opt_verbose = 0;
+my $opt_verbose = 1;
 my $opt_output = "-";
 my @opt_dsyms = ();
 my $opt_spotlight = 1;
@@ -786,6 +786,8 @@ sub parse_backtrace {
         my $is_first = 1;
         
         for my $line (@lines) {
+            print STDERR "Parse_bt - : $line\n" if ($opt_verbose);
+            
             if( $line =~ m{
                 ^\d+ \s+                     # stack frame number
                 (\S.*?) \s+                  # bundle [1]
@@ -799,7 +801,7 @@ sub parse_backtrace {
                 $                            # end of line
             }x ) {
                 my($bundle,$replace,$address,$offset) = ($1,$2,$3,$4);
-                #print STDERR "Parse_bt: $bundle,$replace,$address\n" if ($opt_verbose);
+                print STDERR "Parse_bt: $bundle,$replace,$address\n" if ($opt_verbose);
                 
                 # disambiguate within our hash of binaries
                 $bundle = findImageByNameAndAddress($images, $bundle, $address);

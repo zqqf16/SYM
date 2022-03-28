@@ -180,7 +180,7 @@ class DsymDownloadTask {
     }
     
     private func parse(output: String) {
-        guard let matches = RE.dwarfdump.findAll(output) else {
+        guard let matches = Regex.dwarfdump.matches(in: output) else {
             return
         }
         
@@ -192,12 +192,12 @@ class DsymDownloadTask {
         }
 
         var dsymFiles: [DsymFile] = []
-        for group in matches {
-            let uuid = group[0]
+        for match in matches {
+            let uuid = match.captures![0]
             if !uuids.contains(uuid) {
                 continue
             }
-            let path = group[1]
+            let path = match.captures![1]
             var name = ""
             for component in path.components(separatedBy: "/") {
                 if component.hasSuffix(".dSYM") {
