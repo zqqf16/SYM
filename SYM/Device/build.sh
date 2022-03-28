@@ -91,12 +91,12 @@ END
 git clone --depth 1 https://github.com/openssl/openssl.git openssl
 cd openssl
 
-./Configure darwin64-arm64-cc --prefix="/tmp/openssl-arm" no-asm
+./Configure darwin64-arm64-cc --prefix="/tmp/openssl-arm" no-asm  -mmacosx-version-min=10.11
 make build_generated libssl.a libcrypto.a
 make install_sw
 make clean
 
-./Configure darwin64-x86_64-cc --prefix="/tmp/openssl-x86"
+./Configure darwin64-x86_64-cc --prefix="/tmp/openssl-x86"  -mmacosx-version-min=10.11
 make build_generated libssl.a libcrypto.a
 make install_sw
 
