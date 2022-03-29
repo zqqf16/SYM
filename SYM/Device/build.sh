@@ -11,7 +11,7 @@ cd "${BUILD_DIR}"
 git clone --depth 1 https://github.com/libimobiledevice/libplist.git
 
 cd libplist
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64" --without-cython
+./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11" --without-cython
 make
 
 cd "${BUILD_DIR}"
@@ -39,7 +39,7 @@ export PKG_CONFIG_PATH="${BUILD_DIR}"
 git clone --depth 1 https://github.com/libimobiledevice/libimobiledevice-glue.git
 
 cd libimobiledevice-glue
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64"
+./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11"
 make
 
 cd "${BUILD_DIR}"
@@ -65,7 +65,7 @@ END
 
 git clone --depth 1 https://github.com/libimobiledevice/libusbmuxd.git
 cd libusbmuxd
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64"
+./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11"
 make
 
 cd "${BUILD_DIR}"
@@ -100,7 +100,7 @@ make clean
 make build_generated libssl.a libcrypto.a
 make install_sw
 
-mkdir libs
+mkdir -p libs
 
 lipo /tmp/openssl-arm/lib/libssl.a /tmp/openssl-x86/lib/libssl.a -create -output libs/libssl.a
 lipo /tmp/openssl-arm/lib/libcrypto.a /tmp/openssl-x86/lib/libcrypto.a -create -output libs/libcrypto.a
@@ -133,14 +133,13 @@ sed -i -e 's/\$(libplist_CFLAGS) \\/\$(libplist_CFLAGS) \$(limd_glue_CFLAGS) \\/
 sed -i -e 's/tools docs//g' Makefile.am
 
 
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64" --without-cython
+./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11" --without-cython
 make
 
 cd "${BUILD_DIR}"
 
 # copy files
-mkdir headers
-mkdir headers/plist
+mkdir -p headers/plist
 cp libplist/include/plist/plist.h headers/plist
 cp libusbmuxd/include/*.h headers 
 cp libimobiledevice/include/*.h headers
@@ -177,5 +176,4 @@ cp openssl/libs/libcrypto.a headers
 cp openssl/libs/libssl.a headers
 cp libimobiledevice/src/.libs/libimobiledevice-1.0.a headers
 
-rm -rf "${PWD}"/libimobiledevice
-mv headers "${PWD}"/libimobiledevice
+mv headers "${PWD}"/libs
