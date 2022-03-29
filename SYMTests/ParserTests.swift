@@ -52,7 +52,7 @@ class ParserTests: XCTestCase {
             asaewwqs
         """
 
-        let uuid = RE.uuid.findAll(content)
+        let uuid = Regex.uuid.matches(in: content)
         XCTAssertEqual(uuid?.count, 4)
     }
 
