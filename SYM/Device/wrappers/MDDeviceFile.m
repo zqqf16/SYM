@@ -43,6 +43,10 @@
     return [self.path lastPathComponent];
 }
 
+- (NSString *)lowercaseName {
+    return self.name.lowercaseString;
+}
+
 - (NSString *)extension {
     return [self.path pathExtension];
 }

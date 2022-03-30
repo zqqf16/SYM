@@ -78,7 +78,7 @@ class CrashImporterViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.name, ascending: true)
+        let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.lowercaseName, ascending: true)
         let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
         self.tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
         self.tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
