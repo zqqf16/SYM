@@ -1,5 +1,2 @@
-SYM/Device/libimobiledevice/* linguist-vendored
-SYM/Device/openssl/* linguist-vendored
-SYM/Device/plist/* linguist-vendored
-SYM/Device/usbmuxd/* linguist-vendored
+SYM/Device/libimobiledevice/** linguist-vendored
 SYM/Tools/symbolicatecrash linguist-vendored
