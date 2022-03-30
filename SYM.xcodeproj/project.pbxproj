@@ -82,6 +82,7 @@
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5C4EA5827D77C6500D0F8A5 /* Convertor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */; };
 		B5D0512327D77335009E95B0 /* Symbolicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D0512227D77335009E95B0 /* Symbolicator.swift */; };
+		B5D551EC27F4436600862C48 /* TextStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D551EB27F4436600862C48 /* TextStorage.swift */; };
 		B5EC56D227759AE5007EB567 /* ConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EC56D127759AE5007EB567 /* ConfigTests.swift */; };
 		B5ECE05F27EAF2CF00E80A74 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05427EAF2CF00E80A74 /* libcrypto.a */; };
 		B5ECE06027EAF2CF00E80A74 /* libplist-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B5ECE05527EAF2CF00E80A74 /* libplist-2.0.a */; };
@@ -196,6 +197,7 @@
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
 		B5C4EA5727D77C6500D0F8A5 /* Convertor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Convertor.swift; sourceTree = "<group>"; };
 		B5D0512227D77335009E95B0 /* Symbolicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Symbolicator.swift; sourceTree = "<group>"; };
+		B5D551EB27F4436600862C48 /* TextStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStorage.swift; sourceTree = "<group>"; };
 		B5EC56D127759AE5007EB567 /* ConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigTests.swift; sourceTree = "<group>"; };
 		B5ECE03527EAF2CF00E80A74 /* plist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plist.h; sourceTree = "<group>"; };
 		B5ECE03927EAF2CF00E80A74 /* installation_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = installation_proxy.h; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 				51B8D7041D4F620100F2C24C /* CrashDocument.swift */,
 				F4A679731E21319D009F93E7 /* BundleDocument.swift */,
 				F49030FE20F769ED00249832 /* DocumentController.swift */,
+				B5D551EB27F4436600862C48 /* TextStorage.swift */,
 			);
 			name = Document;
 			sourceTree = "<group>";
@@ -859,6 +862,7 @@
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */,
 				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
+				B5D551EC27F4436600862C48 /* TextStorage.swift in Sources */,
 				B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
@@ -1221,7 +1225,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 101;
+				CURRENT_PROJECT_VERSION = 102;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -1256,7 +1260,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 101;
+				CURRENT_PROJECT_VERSION = 102;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";

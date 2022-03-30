@@ -104,14 +104,14 @@ class ContentViewController: NSViewController {
     }
     
     private func updateHighlighting(_ crashInfo: Crash?) {
-        guard let textStorage = self.textView.textStorage else {
+        guard let textStorage = self.textView.textStorage,
+              let ranges = crashInfo?.appBacktraceRanges
+        else {
             return
         }
-        self.textView.font = self.font
         textStorage.beginEditing()
         textStorage.font = self.font
-        let ranges = crashInfo?.appBacktraceRanges ?? []
-        textStorage.processHighlighting(ranges)
+        textStorage.highlight(at: ranges)
         textStorage.endEditing()
     }
     
@@ -171,32 +171,5 @@ extension ContentViewController {
         let size = max(self.font.pointSize - 1, 10.0)
         self.font = NSFont(name: self.font.fontName, size: size)!
         self.update(crashInfo: self.document?.crashInfo)
-    }
-}
-
-// Mark: Highlight
-extension NSTextStorage {
-    func processHighlighting(_ ranges:[NSRange]) {
-        let style: NSMutableParagraphStyle = NSMutableParagraphStyle()
-        style.lineBreakMode = .byCharWrapping
-        var defaultAttrs: [NSAttributedString.Key: AnyObject] = [
-            .foregroundColor: NSColor.textColor,
-            .paragraphStyle: style,
-        ]
-        
-        if let font = self.font {
-            defaultAttrs[.font] = font
-        }
-        self.setAttributes(defaultAttrs, range: self.string.nsRange)
-        
-        var attrs = defaultAttrs
-        attrs[.foregroundColor] = NSColor(hexString: Config.highlightColor)!
-        if let font = self.font, let familyName = font.familyName {
-            //.font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
-            attrs[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)
-        }
-        for range in ranges {
-            self.setAttributes(attrs, range: range)
-        }
     }
 }

@@ -75,6 +75,7 @@ class CrashDocument: NSDocument {
     private func update(content: String) {
         self.textStorage.beginEditing()
         self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
+        self.textStorage.applyStyle()
         self.textStorage.endEditing()
     }
     
