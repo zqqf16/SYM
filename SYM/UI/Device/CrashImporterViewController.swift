@@ -62,18 +62,19 @@ class DeviceFileProvider: NSFilePromiseProvider {
     var file: MDDeviceFile?
 }
 
-class CrashImporterViewController: NSViewController {
+class CrashImporterViewController: NSViewController, LoadingAble {
     private var fileList: [MDDeviceFile] = []
     private var afcClient: MDAfcClient? {
         // Always create a new one
         let lockdown = MDLockdown(udid: self.deviceID)
         return MDAfcClient.crash(with: lockdown)
     }
-        
+
     private var deviceID: String?
     
     @IBOutlet var tableView: NSTableView!
     @IBOutlet weak var openButton: NSButton!
+    var loadingIndicator: NSProgressIndicator!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,6 +102,7 @@ class CrashImporterViewController: NSViewController {
             return
         }
         
+        self.showLoading()
         DispatchQueue.global().async {
             let lockdown = MDLockdown(udid: self.deviceID)
             if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
@@ -113,6 +115,7 @@ class CrashImporterViewController: NSViewController {
                     return file1.date > file2.date
                 })
                 self.tableView.reloadData()
+                self.hideLoading()
             }
         }
     }
@@ -121,9 +124,13 @@ class CrashImporterViewController: NSViewController {
         if index < 0 || index > self.fileList.count - 1 {
             return
         }
+
+        self.showLoading()
+
         let file = self.fileList[index]
         DispatchQueue.global().async {
             guard let udid = self.deviceID else {
+                self.hideLoading()
                 return
             }
             
@@ -132,7 +139,7 @@ class CrashImporterViewController: NSViewController {
             if let _ =  self.afcClient?.copyCrashFile(file, to: url) {
                 DispatchQueue.main.async {
                     DocumentController.shared.openDocument(withContentsOf: url, display: true, completionHandler: { (document, success, error) in
-                        //
+                        self.hideLoading()
                     })
                 }
             }
@@ -153,6 +160,30 @@ class CrashImporterViewController: NSViewController {
         let deviceID = self.deviceID
         self.deviceID = nil
         self.reloadData(withDeviceID: deviceID)
+    }
+    
+    @IBAction func removeFile(_ sender: AnyObject?) {
+        guard let afcClient = afcClient else {
+            return
+        }
+
+        let selectedIndexes = self.tableView.selectedRowIndexes
+        if selectedIndexes.isEmpty {
+            return
+        }
+        
+        let files = selectedIndexes.map { index in
+            self.fileList[index]
+        }
+        
+        self.showLoading()
+        DispatchQueue.global().async {
+            files.forEach { file in
+                afcClient.remove(file.path)
+            }
+            self.reloadFiles(nil)
+            self.hideLoading()
+        }
     }
 }
 

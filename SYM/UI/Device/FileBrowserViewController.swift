@@ -32,24 +32,20 @@ extension NSPopUpButton {
     }
 }
 
-class FileBrowserViewController: NSViewController {
+class FileBrowserViewController: NSViewController, LoadingAble {
 
     @IBOutlet weak var exportButton: NSButton!
     @IBOutlet weak var exportIndicator: NSProgressIndicator!
     @IBOutlet weak var outlineView: NSOutlineView!
     
+    var loadingIndicator: NSProgressIndicator!
+    
     private var deviceID: String?
     private var appID: String?
     
     private var rootDir: MDDeviceFile!
-    private var afcClient: MDAfcClient! {
-        didSet {
-            self.rootDir = MDDeviceFile(afcClient: self.afcClient)
-            self.rootDir.path = "."
-            self.rootDir.isDirectory = true
-        }
-    }
-    
+    private var afcClient: MDAfcClient!
+
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -58,34 +54,33 @@ class FileBrowserViewController: NSViewController {
         if deviceID == self.deviceID && appID == self.appID {
             return
         }
-        
+
         self.deviceID = deviceID
         self.appID = appID
         
         if deviceID == nil || appID == nil {
             self.rootDir = nil
-        } else {
-            let lockdown = MDLockdown(udid: deviceID!)
-            let houseArrest = MDHouseArrest(lockdown: lockdown, appID: appID!)
-
-            self.afcClient = MDAfcClient.fileClient(with: houseArrest)
-            self.rootDir = MDDeviceFile(afcClient: self.afcClient)
-            self.rootDir.path = "."
-            self.rootDir.isDirectory = true
+            self.outlineView.reloadData()
+            return
         }
         
-        self.outlineView.reloadData()
-    }
-
-    func loadFiles(_ app: MDAppInfo?) {
-        if let appInfo = app {
-            let lockdown = MDLockdown()
-            let houseArrest = MDHouseArrest(lockdown: lockdown, appID: appInfo.identifier)
-            self.afcClient = MDAfcClient.fileClient(with: houseArrest)
-        } else {
-            self.rootDir = nil
+        self.showLoading()
+        DispatchQueue.global().async {
+            let lockdown = MDLockdown(udid: deviceID!)
+            let houseArrest = MDHouseArrest(lockdown: lockdown, appID: appID!)
+            let afcClient = MDAfcClient.fileClient(with: houseArrest)
+            let rootDir = MDDeviceFile(afcClient: afcClient)
+            rootDir.path = "."
+            rootDir.isDirectory = true
+            let _ = rootDir.children // preload children
+            
+            DispatchQueue.main.async {
+                self.afcClient = afcClient
+                self.rootDir = rootDir
+                self.outlineView.reloadData()
+                self.hideLoading()
+            }
         }
-        self.outlineView.reloadData()
     }
     
     @IBAction func didClickExportButton(_ sender: NSButton) {
@@ -119,11 +114,12 @@ class FileBrowserViewController: NSViewController {
             // TODO: root dir?
             return
         }
-        
+        self.showLoading()
         if parent.removeChild(file) {
             let index = self.outlineView.childIndex(forItem: file)
             self.outlineView.removeItems(at: IndexSet(integer: index), inParent: parent, withAnimation: .effectFade)
         }
+        self.hideLoading()
     }
 
     private func exportFile(atIndex index: Int) {
@@ -171,8 +167,10 @@ class FileBrowserViewController: NSViewController {
             self.exportFile(atIndex: index)
             return
         }
+        self.showLoading()
         DispatchQueue.global().async {
             guard let udid = self.deviceID else {
+                self.hideLoading()
                 return
             }
             
@@ -180,6 +178,7 @@ class FileBrowserViewController: NSViewController {
             let url = URL(fileURLWithPath: path)
             file.copy(url.path)
             DispatchQueue.main.async {
+                self.hideLoading()
                 NSWorkspace.shared.open(url)
             }
         }

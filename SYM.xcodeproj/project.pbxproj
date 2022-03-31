@@ -33,6 +33,8 @@
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
 		B5089463258C838D0074254E /* MDScreenShotr.m in Sources */ = {isa = PBXBuildFile; fileRef = B5089462258C838D0074254E /* MDScreenShotr.m */; };
 		B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */; };
+		B51E68C127F58FB4007B228B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B51E68C027F58FB4007B228B /* SnapKit */; };
+		B51E68C427F58FE8007B228B /* Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51E68C327F58FE8007B228B /* Loading.swift */; };
 		B51F9B22256CE51200E52FAF /* DownloadToolbarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */; };
 		B51F9B28256CF06F00E52FAF /* DownloadStatusViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */; };
 		B51F9B80256CF29D00E52FAF /* DsymStatusBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F9B7F256CF29D00E52FAF /* DsymStatusBarItem.swift */; };
@@ -164,6 +166,7 @@
 		B5089461258C838D0074254E /* MDScreenShotr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDScreenShotr.h; sourceTree = "<group>"; };
 		B5089462258C838D0074254E /* MDScreenShotr.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDScreenShotr.m; sourceTree = "<group>"; };
 		B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHomeViewController.swift; sourceTree = "<group>"; };
+		B51E68C327F58FE8007B228B /* Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loading.swift; sourceTree = "<group>"; };
 		B51F9B21256CE51200E52FAF /* DownloadToolbarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadToolbarItem.swift; sourceTree = "<group>"; };
 		B51F9B27256CF06F00E52FAF /* DownloadStatusViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStatusViewController.swift; sourceTree = "<group>"; };
 		B51F9B7F256CF29D00E52FAF /* DsymStatusBarItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DsymStatusBarItem.swift; sourceTree = "<group>"; };
@@ -321,6 +324,7 @@
 				F400154821539E8500267818 /* Automator.framework in Frameworks */,
 				B5ECE06027EAF2CF00E80A74 /* libplist-2.0.a in Frameworks */,
 				B5F935F327E46E9800C2D0C6 /* SwiftyJSON in Frameworks */,
+				B51E68C127F58FB4007B228B /* SnapKit in Frameworks */,
 				B5ECE05F27EAF2CF00E80A74 /* libcrypto.a in Frameworks */,
 				B5ECE06127EAF2CF00E80A74 /* libimobiledevice-1.0.a in Frameworks */,
 			);
@@ -383,6 +387,14 @@
 				B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */,
 			);
 			path = Device;
+			sourceTree = "<group>";
+		};
+		B51E68C227F58FDA007B228B /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B51E68C327F58FE8007B228B /* Loading.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		B53E2F8C22D48E28003BC45C /* icp */ = {
@@ -547,6 +559,7 @@
 		F45321071D30CC6E00639917 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				B51E68C227F58FDA007B228B /* Utils */,
 				B50FE45425693C760031E62E /* Device */,
 				B5F357A222C5E54A00111FF3 /* Resources */,
 				F49E2D46214BA704001A6A88 /* Config.swift */,
@@ -683,6 +696,7 @@
 			name = SYM;
 			packageProductDependencies = (
 				B5F935F227E46E9800C2D0C6 /* SwiftyJSON */,
+				B51E68C027F58FB4007B228B /* SnapKit */,
 			);
 			productName = SYM;
 			productReference = F49BD1EC1D2FF46300024AAE /* SYM.app */;
@@ -734,6 +748,7 @@
 			mainGroup = F49BD1E31D2FF46300024AAE;
 			packageReferences = (
 				B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				B51E68BF27F58FB4007B228B /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = F49BD1ED1D2FF46300024AAE /* Products */;
 			projectDirPath = "";
@@ -866,6 +881,7 @@
 				B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */,
 				F45320FB1D30A33C00639917 /* Crash.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
+				B51E68C427F58FE8007B228B /* Loading.swift in Sources */,
 				B5F357BD22C6062400111FF3 /* LineNumberRulerView.swift in Sources */,
 				51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */,
 				F49E2D4A214BB2D6001A6A88 /* DsymDownloader.swift in Sources */,
@@ -1225,7 +1241,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 102;
+				CURRENT_PROJECT_VERSION = 103;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
@@ -1260,7 +1276,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 102;
+				CURRENT_PROJECT_VERSION = 103;
 				DEVELOPMENT_TEAM = BPL95996PK;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1340,6 +1356,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B51E68BF27F58FB4007B228B /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 		B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
@@ -1351,6 +1375,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B51E68C027F58FB4007B228B /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B51E68BF27F58FB4007B228B /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
 		B5F935F227E46E9800C2D0C6 /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B5F935F127E46E9800C2D0C6 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;

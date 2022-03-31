@@ -47,24 +47,15 @@ extension NSToolbar {
 
 class DeviceContentViewController: NSTabViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do view setup here.
-    }
-    
     private func updateToolbar() {
-        guard let item = self.tabView.selectedTabViewItem,
-              let toolbar = self.view.window?.toolbar
-        else {
+        guard let item = self.tabView.selectedTabViewItem else {
             return
         }
         
         let index = self.tabView.indexOfTabViewItem(item)
         if index == .fileBrowserIndex {
-            toolbar.toggleRemoveItem(visiable: true)
             self.view.window?.title = NSLocalizedString("File Browser", comment: "")
         } else {
-            toolbar.toggleRemoveItem(visiable: false)
             self.view.window?.title = NSLocalizedString("Crash Log", comment: "")
         }
     }
