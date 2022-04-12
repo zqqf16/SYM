@@ -57,7 +57,7 @@ class DownloadScriptViewController: NSViewController {
     
     func loadContent() {
         let userImportedScript = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
-        if userImportedScript == nil && userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
+        if userImportedScript != nil && userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
             self.textView.string = userImportedScript!
             return
         }
