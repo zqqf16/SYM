@@ -108,10 +108,14 @@ struct AppleJsonConvertor: Convertor {
         init(_ thread: JSON, index: Int, binaryImages: JSON) {
             self.string = String(builder: {
                 if thread["name"].string != nil {
-                    Line("Thread %d name:  %@").format(index, thread["name"].stringValue)
-                } else if thread["queue"].string != nil {
-                    Line("Thread %d name:   Dispatch queue: %@")
-                        .format(index, thread["queue"].stringValue)
+                    Line {
+                        "Thread \(index) name:  \(thread["name"].stringValue)"
+                        if let queue = thread["queue"].string {
+                            " Dispatch queue: \(queue)"
+                        }
+                    }
+                } else if let queue = thread["queue"].string {
+                    Line("Thread \(index) name:   Dispatch queue: \(queue)")
                 }
                 if thread["triggered"].boolValue {
                     Line("Thread \(index) Crashed:")
@@ -225,15 +229,29 @@ struct AppleJsonConvertor: Convertor {
             Line("Exception Type:  %@ (%@)")
                 .format(payload["exception"]["type"].stringValue, payload["exception"]["signal"].stringValue)
             Line("Exception Codes: %@").format(payload["exception"]["codes"].stringValue)
-            //"Exception Note:      %@".format()
+            if payload["isCorpse"].boolValue {
+                Line("Exception Note:  EXC_CORPSE_NOTIFY")
+            }
             Line("Termination Reason: %@ %@")
                 .format(payload["termination"]["namespace"].stringValue, payload["termination"]["code"].stringValue)
             Line(payload["termination"]["details"][0].stringValue)
-            if payload["vmSummary"].string != nil {
-                Line("VM Region Info: \(_P("vmSummary"))")
-            }
-            Line.empty
             Line("Triggered by Thread:  %@".format(_P("faultingThread")))
+            
+            if let asi = payload["asi"].dictionary {
+                Line.empty
+                Line("Application Specific Information:")
+                for (_, value) in asi {
+                    for item in value.arrayValue {
+                        Line(item.stringValue)
+                    }
+                }
+            }
+            
+            if let ktriageinfo = payload["ktriageinfo"].string {
+                Line.empty
+                Line("Kernel Triage: \n\(ktriageinfo)")
+            }
+
             Line.empty
             
             let binaryImages = payload["usedImages"]
@@ -244,6 +262,11 @@ struct AppleJsonConvertor: Convertor {
 
             Line.empty
             Registers(payload)
+            Line.empty
+            if payload["vmSummary"].string != nil {
+                Line.empty
+                Line("VM Region Info: \n\(_P("vmSummary"))")
+            }
             Line.empty
             Line("Binary Images:")
             for image in binaryImages.arrayValue {
