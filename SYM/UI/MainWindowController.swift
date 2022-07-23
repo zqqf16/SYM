@@ -99,7 +99,6 @@ class MainWindowController: NSWindowController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        self.dsymManager.stop()
     }
     
     override var document: AnyObject? {

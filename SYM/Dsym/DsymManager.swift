@@ -68,6 +68,10 @@ class DsymManager {
         return mdfind
     }()
     
+    deinit {
+        self.monitor.stop()
+    }
+    
     func update(_ crash: Crash?) {
         self.crash = crash
         self.binaries = crash?.embeddedBinaries ?? []
