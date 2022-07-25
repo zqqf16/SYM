@@ -61,7 +61,7 @@ struct KeepJsonConvertor: Convertor {
                 }
             }
             var symbol: String = ""
-            if frame["log_symbol_name"].string != nil {
+            if frame["log_symbol_name"].string != nil, frame["log_symbol_name"].stringValue.lengthOfBytes(using: .utf8) > 0 {
                 if frame["log_symbol_name"].stringValue == "<redacted>" {
                     symbol = "0x%llx + %ld".format(loadAddress, offset)
                 } else {
