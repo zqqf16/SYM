@@ -34,7 +34,7 @@
     if (self = [super init]) {
         _appID = appID;
         _lockdown = lockdown ?: [[MDLockdown alloc] initWithUDID:nil];
-        _service = [lockdown startServiceWithIdentifier:@(HOUSE_ARREST_SERVICE_NAME)];
+        _service = [_lockdown startServiceWithIdentifier:@(HOUSE_ARREST_SERVICE_NAME)];
         house_arrest_error_t err = house_arrest_client_new(_lockdown.device, _service.service, &_houseArrest);
         if (err == HOUSE_ARREST_E_SUCCESS) {
             [self prepare];

@@ -68,7 +68,7 @@
             break;
         }
     }
-    err = service_client_free(serviceClient);
+    service_client_free(serviceClient);
     free(ping);
 
     if (attempts > 10) {
