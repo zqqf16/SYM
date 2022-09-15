@@ -128,6 +128,10 @@ iPhone14,5:iPhone 13
 iPhone14,2:iPhone 13 Pro
 iPhone14,3:iPhone 13 Pro Max
 iPhone14,6:iPhone SE (3rd generation)
+iPhone14,7:iPhone 14
+iPhone14,8:iPhone 14 Plus
+iPhone15,2:iPhone 14 Pro
+iPhone15,3:iPhone 14 Pro Max
 iPod1,1:iPod touch
 iPod2,1:iPod touch (2nd generation)
 iPod3,1:iPod touch (3rd generation)
@@ -153,10 +157,10 @@ Watch5,1:Apple Watch Series 5
 Watch5,2:Apple Watch Series 5
 Watch5,3:Apple Watch Series 5
 Watch5,4:Apple Watch Series 5
-Watch5,9:Apple Watch SE
-Watch5,10:Apple Watch SE
-Watch5,11:Apple Watch SE
-Watch5,12:Apple Watch SE
+Watch5,9:Apple Watch SE (1st generation)
+Watch5,10:Apple Watch SE (1st generation)
+Watch5,11:Apple Watch SE (1st generation)
+Watch5,12:Apple Watch SE (1st generation)
 Watch6,1:Apple Watch Series 6
 Watch6,2:Apple Watch Series 6
 Watch6,3:Apple Watch Series 6
