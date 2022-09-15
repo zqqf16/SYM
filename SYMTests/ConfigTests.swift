@@ -20,11 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import XCTest
 @testable import SYM
+import XCTest
 
 class ConfigTests: XCTestCase {
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -48,7 +47,7 @@ class ConfigTests: XCTestCase {
         var isDirectory = ObjCBool(false)
         XCTAssertTrue(FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory))
         XCTAssertTrue(isDirectory.boolValue)
-        
+
         // relative path
         let home = NSHomeDirectory()
         let relative = target.replacingOccurrences(of: home, with: "~")

@@ -30,12 +30,12 @@ protocol DownloadStatusViewControllerDelegate: AnyObject {
 }
 
 class DownloadStatusViewController: NSViewController {
-    @IBOutlet weak var titleLabel: NSTextField!
-    @IBOutlet weak var progressIndicator: NSProgressIndicator!
-    @IBOutlet weak var infoLabel: NSTextField!
-    @IBOutlet weak var cancelButton: NSButton!
-    @IBOutlet weak var downloadButton: NSButton!
-    
+    @IBOutlet var titleLabel: NSTextField!
+    @IBOutlet var progressIndicator: NSProgressIndicator!
+    @IBOutlet var infoLabel: NSTextField!
+    @IBOutlet var cancelButton: NSButton!
+    @IBOutlet var downloadButton: NSButton!
+
     weak var delegate: DownloadStatusViewControllerDelegate?
 
     private var taskCancellable: AnyCancellable?
@@ -43,95 +43,95 @@ class DownloadStatusViewController: NSViewController {
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
-        self.taskCancellable?.cancel()
+        taskCancellable?.cancel()
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.bind(task: self.delegate?.currentDownloadTask())
+        bind(task: delegate?.currentDownloadTask())
     }
-    
+
     func bind(task: DsymDownloadTask?) {
-        if !self.isViewLoaded {
+        if !isViewLoaded {
             return
         }
 
-        self.taskCancellable?.cancel()
+        taskCancellable?.cancel()
 
         guard let downloadTask = task else {
-            self.titleLabel.stringValue = ""
-            self.infoLabel.stringValue = ""
-            self.progressIndicator.isHidden = true
-            self.cancelButton.isHidden = true
-            self.downloadButton.isHidden = false
+            titleLabel.stringValue = ""
+            infoLabel.stringValue = ""
+            progressIndicator.isHidden = true
+            cancelButton.isHidden = true
+            downloadButton.isHidden = false
             return
         }
 
-        self.downloadButton.isHidden = true
-        self.taskCancellable = Publishers
+        downloadButton.isHidden = true
+        taskCancellable = Publishers
             .CombineLatest(downloadTask.$status, downloadTask.$progress)
             .receive(on: DispatchQueue.main)
-            .sink { (status, progress) in
+            .sink { status, progress in
                 self.update(status: status, progress: progress)
             }
     }
-    
+
     func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         self.status = status
         switch status {
         case .running:
-            self.cancelButton.isHidden = false
-            self.progressIndicator.isHidden = false
-            self.cancelButton.image = NSImage(named: NSImage.stopProgressFreestandingTemplateName)
-            
+            cancelButton.isHidden = false
+            progressIndicator.isHidden = false
+            cancelButton.image = NSImage(named: NSImage.stopProgressFreestandingTemplateName)
+
             var title = NSLocalizedString("download_prefix", comment: "Downloading ...")
             if progress.percentage > 0 {
                 title += " \(progress.percentage)%"
-                self.progressIndicator.isIndeterminate = false
-                self.progressIndicator.doubleValue = Double(progress.percentage)
+                progressIndicator.isIndeterminate = false
+                progressIndicator.doubleValue = Double(progress.percentage)
             } else {
-                self.progressIndicator.isIndeterminate = true
+                progressIndicator.isIndeterminate = true
             }
-            self.infoLabel.stringValue = "\(progress.downloadedSize)/\(progress.totalSize) \(progress.timeLeft) \(progress.speed)/s"
-            self.titleLabel.stringValue = title
+            infoLabel.stringValue = "\(progress.downloadedSize)/\(progress.totalSize) \(progress.timeLeft) \(progress.speed)/s"
+            titleLabel.stringValue = title
         case .canceled:
-            self.titleLabel.stringValue = NSLocalizedString("Canceled", comment: "Canceled")
-            self.infoLabel.stringValue = ""
-            self.cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
-        case .failed(let code, let message):
+            titleLabel.stringValue = NSLocalizedString("Canceled", comment: "Canceled")
+            infoLabel.stringValue = ""
+            cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
+        case let .failed(code, message):
             let prefix = NSLocalizedString("Failed", comment: "Failed")
-            self.titleLabel.stringValue = "\(prefix) (\(code))"
-            self.infoLabel.stringValue = message ?? ""
-            self.cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
+            titleLabel.stringValue = "\(prefix) (\(code))"
+            infoLabel.stringValue = message ?? ""
+            cancelButton.image = NSImage(named: NSImage.refreshFreestandingTemplateName)
         case .success:
-            self.titleLabel.stringValue = NSLocalizedString("Success", comment: "Success")
-            self.infoLabel.stringValue = ""
-            self.cancelButton.isHidden = true
+            titleLabel.stringValue = NSLocalizedString("Success", comment: "Success")
+            infoLabel.stringValue = ""
+            cancelButton.isHidden = true
         case .waiting:
-            self.titleLabel.stringValue = NSLocalizedString("Waiting", comment: "Waiting ...")
-            self.titleLabel.stringValue = "Waiting ..."
-            self.infoLabel.stringValue = ""
-            self.progressIndicator.isIndeterminate = true
-            self.progressIndicator.isHidden = false
-            self.cancelButton.image = NSImage(named: NSImage.stopProgressFreestandingTemplateName)
-            self.cancelButton.isHidden = false
+            titleLabel.stringValue = NSLocalizedString("Waiting", comment: "Waiting ...")
+            titleLabel.stringValue = "Waiting ..."
+            infoLabel.stringValue = ""
+            progressIndicator.isIndeterminate = true
+            progressIndicator.isHidden = false
+            cancelButton.image = NSImage(named: NSImage.stopProgressFreestandingTemplateName)
+            cancelButton.isHidden = false
         }
     }
-    
-    @IBAction func startDownloading(_ sender: Any?) {
-        self.delegate?.startDownloading()
+
+    @IBAction func startDownloading(_: Any?) {
+        delegate?.startDownloading()
     }
-    
-    @IBAction func cancelDownload(_ sender: Any?) {
-        guard let status = self.status else {
+
+    @IBAction func cancelDownload(_: Any?) {
+        guard let status = status else {
             return
         }
-        
+
         switch status {
-        case .canceled, .failed(_, _):
-            self.delegate?.startDownloading()
+        case .canceled, .failed:
+            delegate?.startDownloading()
         case .running, .waiting:
-            self.delegate?.cancelDownload()
+            delegate?.cancelDownload()
         case .success:
             break
         }

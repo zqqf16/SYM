@@ -28,24 +28,25 @@ class DsymToolBarButton: NSPopUpButton {
 
     var dsymManager: DsymManager? {
         didSet {
-            self.cancellable?.cancel()
-            self.cancellable = dsymManager?.$dsymFiles
+            cancellable?.cancel()
+            cancellable = dsymManager?.$dsymFiles
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] (dsymFiles) in
+                .sink { [weak self] dsymFiles in
                     self?.update(withDsymFiles: dsymFiles)
                 }
         }
     }
-    
+
     private func update(withDsymFiles dsymFiles: [String: DsymFile]) {
-        if let crash = self.dsymManager?.crash,
-            let uuid = crash.uuid,
-            let dsym = dsymFiles[uuid] {
-            self.title = dsym.name
-            self.image = .symbol
+        if let crash = dsymManager?.crash,
+           let uuid = crash.uuid,
+           let dsym = dsymFiles[uuid]
+        {
+            title = dsym.name
+            image = .symbol
         } else {
-            self.title = NSLocalizedString("dsym_file_not_found", comment: "")
-            self.image = .alert
+            title = NSLocalizedString("dsym_file_not_found", comment: "")
+            image = .alert
         }
     }
 }

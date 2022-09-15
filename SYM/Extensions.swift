@@ -20,39 +20,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import Cocoa
+import Foundation
 
 // MARK: - NSRange
+
 extension NSRange {
-    init(range:Range <Int>) {
+    init(range: Range<Int>) {
         self.init()
-        self.location = range.startIndex
-        self.length = range.endIndex - range.startIndex
+        location = range.startIndex
+        length = range.endIndex - range.startIndex
     }
 }
 
 // MARK: - String
+
 extension String {
     var hexaToDecimal: Int {
         var hex = self
         if hex.hasPrefix("0x") {
-            let startIndex = self.index(self.startIndex, offsetBy: 2)
+            let startIndex = index(self.startIndex, offsetBy: 2)
             hex = String(self[startIndex...])
         }
-        
-        return Int(hex, radix:16) ?? 0
+
+        return Int(hex, radix: 16) ?? 0
     }
-    
-    subscript (r: Range<Int>) -> String? {
-        get {
-            let nsRange = NSRange(r)
-            return self.substring(with: nsRange)
-        }
+
+    subscript(r: Range<Int>) -> String? {
+        let nsRange = NSRange(r)
+        return substring(with: nsRange)
     }
 
     func strip() -> String {
-        return self.trimmingCharacters(
+        return trimmingCharacters(
             in: CharacterSet.whitespacesAndNewlines
         )
     }
@@ -60,108 +60,108 @@ extension String {
     func matchGroups(fromResult result: NSTextCheckingResult) -> [String] {
         let number = result.numberOfRanges
         if number == 1 {
-            if let range = Range(result.range(at:0)) {
+            if let range = Range(result.range(at: 0)) {
                 if let subString = self[range] {
                     return [subString]
                 }
             }
             return []
         }
-        
+
         var groups = [String]()
-        
-        for index in 1..<number {
+
+        for index in 1 ..< number {
             if let range = Range(result.range(at: index)) {
                 groups.append(self[range] ?? "")
             }
         }
-        
+
         return groups
     }
 
     func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = self.count
+        let newLength = count
         if newLength < toLength {
             return String(repeatElement(character, count: toLength - newLength)) + self
         } else {
-            return self[0..<newLength-toLength]!
-            //return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
+            return self[0 ..< newLength - toLength]!
+            // return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
         }
     }
-    
+
     func padding(length: Int, atLeft: Bool = false) -> String {
         if atLeft {
-            return String(repeatElement(" ", count: length - self.count)) + self
+            return String(repeatElement(" ", count: length - count)) + self
         }
-        return self.padding(toLength: length, withPad: " ", startingAt: 0)
+        return padding(toLength: length, withPad: " ", startingAt: 0)
     }
-    
-    func extendToLength(_ length: Int, withString padString: String=" ", atRight: Bool=true) -> String {
-        return self.padding(toLength: length, withPad: padString, startingAt: 0)
+
+    func extendToLength(_ length: Int, withString padString: String = " ", atRight _: Bool = true) -> String {
+        return padding(toLength: length, withPad: padString, startingAt: 0)
     }
 
     func uuidFormat() -> String {
-        if self.contains("-") {
-            return self.uppercased()
+        if contains("-") {
+            return uppercased()
         }
 
         var uuid = ""
-        for (index, char) in self.enumerated() {
+        for (index, char) in enumerated() {
             if [8, 12, 16, 20].contains(index) {
                 uuid.append("-" as Character)
             }
             uuid.append(char)
         }
-        
+
         return uuid.uppercased()
     }
-    
+
     func parseKeyValue(separatedBy: String) -> (String, String)? {
-        let list = self.components(separatedBy: separatedBy)
+        let list = components(separatedBy: separatedBy)
         if list.count != 2 {
             return nil
         }
-        
+
         let name = list[0].strip()
         let value = list[1].strip()
         if value.count == 0 {
             return nil
         }
-        
+
         return (name, value)
     }
-    
+
     func separatedValue() -> String? {
-        let list = self.components(separatedBy: ":")
+        let list = components(separatedBy: ":")
         if list.count != 2 {
             return nil
         }
-        
+
         let value = list[1].strip()
         if value.count == 0 {
             return nil
         }
-        
+
         return value
     }
-    
-    func separate(by: String = ":") -> (String, String)? {
-        let list = self.components(separatedBy: ":")
+
+    func separate(by _: String = ":") -> (String, String)? {
+        let list = components(separatedBy: ":")
         if list.count != 2 {
             return nil
         }
-        
+
         return (list[0].strip(), list[1].strip())
     }
-    
-    func rangeFromNSRange(nsRange : NSRange) -> Range<String.Index>? {
+
+    func rangeFromNSRange(nsRange: NSRange) -> Range<String.Index>? {
         return Range(nsRange, in: self)
     }
-    
+
     var nsRange: NSRange {
-        return NSRange(self.startIndex..<self.endIndex, in: self)
+        return NSRange(startIndex ..< endIndex, in: self)
     }
-    
+
     func substring(with nsrange: NSRange) -> String? {
         guard let range = Range(nsrange, in: self) else { return nil }
         return String(self[range])
@@ -169,10 +169,11 @@ extension String {
 }
 
 // MARK: - Dictionary
+
 extension Dictionary {
     init(keys: [Key], values: [Value]) {
         self.init()
-        
+
         for (key, value) in zip(keys, values) {
             self[key] = value
         }
@@ -180,6 +181,7 @@ extension Dictionary {
 }
 
 // MARK: - NSFileManager
+
 enum FileError: Error {
     case directoryNotExist
     case createFailed
@@ -188,98 +190,98 @@ enum FileError: Error {
 extension FileManager {
     func findOrCreateDirectory(searchPathDirectory directory: FileManager.SearchPathDirectory, inDomain domain: FileManager.SearchPathDomainMask, appendPathComponent component: String?) throws -> String {
         let paths = NSSearchPathForDirectoriesInDomains(directory, domain, true)
-        
+
         if paths.count == 0 {
             throw FileError.directoryNotExist
         }
-    
+
         var path = paths[0]
         if component != nil {
             path = (path as NSString).appendingPathComponent(component!)
         }
-        
+
         do {
-            try self.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+            try createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
         } catch {
             throw FileError.createFailed
         }
-        
+
         return path
     }
-    
+
     func appSupportDirectory() -> String? {
         let app = Bundle.main.infoDictionary!["CFBundleExecutable"] as! String
-        
+
         let path: String
         do {
-            path = try self.findOrCreateDirectory(searchPathDirectory: .applicationSupportDirectory, inDomain: .userDomainMask, appendPathComponent: app)
+            path = try findOrCreateDirectory(searchPathDirectory: .applicationSupportDirectory, inDomain: .userDomainMask, appendPathComponent: app)
         } catch {
             return nil
         }
-        
+
         return path
     }
-    
+
     func temporaryPath() -> String {
         let uuid = ProcessInfo.processInfo.globallyUniqueString
         return (NSTemporaryDirectory() as NSString).appendingPathComponent(uuid)
     }
-    
+
     @discardableResult
     func createDirectory(_ path: String) -> Bool {
-        var isDir : ObjCBool = false
-        if self.fileExists(atPath: path, isDirectory: &isDir) {
+        var isDir: ObjCBool = false
+        if fileExists(atPath: path, isDirectory: &isDir) {
             return true
         }
-        
+
         do {
-            try self.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+            try createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
         } catch {
             return false
         }
-        
+
         return true
     }
-    
+
     func localCrashDirectory(_ udid: String) -> String {
-        guard let directory = self.appSupportDirectory() else {
-            return self.temporaryPath()
+        guard let directory = appSupportDirectory() else {
+            return temporaryPath()
         }
-        
+
         var path = (directory as NSString).appendingPathComponent("crashes")
-        if !self.createDirectory(path) {
-            return self.temporaryPath()
+        if !createDirectory(path) {
+            return temporaryPath()
         }
-        
+
         path = (path as NSString).appendingPathComponent(udid)
-        if !self.createDirectory(path) {
-            return self.temporaryPath()
+        if !createDirectory(path) {
+            return temporaryPath()
         }
-        
+
         return path
     }
-    
+
     @discardableResult
     func chmod(_ path: String, permissions: Int) -> Bool {
         do {
-            try self.setAttributes([.posixPermissions : permissions], ofItemAtPath: path)
+            try setAttributes([.posixPermissions: permissions], ofItemAtPath: path)
         } catch {
             Swift.print("Set permissions \(permissions) to \(path) failed")
             return false
         }
-        
+
         return true
     }
-    
+
     @discardableResult
     func cp(fromPath: String, toPath: String) -> Bool {
         do {
-            try self.copyItem(atPath: fromPath, toPath: toPath)
+            try copyItem(atPath: fromPath, toPath: toPath)
         } catch {
             Swift.print("Copy \(fromPath) to \(toPath) failed")
             return false
         }
-        
+
         return true
     }
 }
@@ -291,7 +293,7 @@ extension NSPasteboard.PasteboardType {
         } else {
             return NSPasteboard.PasteboardType(kUTTypeFileURL as String)
         }
-    } ()
+    }()
 }
 
 extension DateFormatter {
@@ -316,22 +318,22 @@ extension UInt {
         var value = Double(self) / 1024.0
         let units = ["K", "M", "G", "T"]
         var index = 0
-        while value > 1024 && index < units.count - 1 {
+        while value > 1024, index < units.count - 1 {
             index += 1
             value /= 1024
         }
-        
+
         return "\(String(format: "%.2f", value))\(units[index])"
     }
 }
 
-extension NSToolbar {
-    public func removeItem(with identifier: NSToolbarItem.Identifier) {
-        let index = self.items.firstIndex { (item) -> Bool in
-            return item.itemIdentifier == identifier
+public extension NSToolbar {
+    func removeItem(with identifier: NSToolbarItem.Identifier) {
+        let index = items.firstIndex { item -> Bool in
+            item.itemIdentifier == identifier
         }
         if index != nil {
-            self.removeItem(at: index!)
+            removeItem(at: index!)
         }
     }
 }

@@ -24,37 +24,37 @@ import Foundation
 
 extension Frame {
     func fixed(withLoadAddress loadAddress: String) -> Frame {
-        guard self.address.hexaToDecimal == loadAddress.hexaToDecimal,
-            self.symbol != nil,
-            self.symbol!.hasPrefix("+")
-            else {
-                return self
+        guard address.hexaToDecimal == loadAddress.hexaToDecimal,
+              symbol != nil,
+              symbol!.hasPrefix("+")
+        else {
+            return self
         }
-        
-        let list = self.symbol!.components(separatedBy: " ")
+
+        let list = symbol!.components(separatedBy: " ")
         if list.count < 2 {
             return self
         }
-        
+
         guard let offset = Int(list[1]) else {
             return self
         }
-        
+
         var newFrame = self
-        let newAddress = String(self.address.hexaToDecimal + offset, radix: 16)
+        let newAddress = String(address.hexaToDecimal + offset, radix: 16)
         newFrame.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
         newFrame.symbol = "+ 0"
-        
+
         return newFrame
     }
 }
 
 extension Binary {
     func fix() {
-        guard let loadAddress = self.loadAddress, let backtrace = self.backtrace else {
+        guard let loadAddress = loadAddress, let backtrace = backtrace else {
             return
         }
-        
+
         var newBacktrace: [Frame] = []
         for frame in backtrace {
             let newFrame = frame.fixed(withLoadAddress: loadAddress)

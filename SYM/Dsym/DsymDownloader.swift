@@ -25,14 +25,14 @@ import Combine
 
 class DsymDownloadTask {
     var crashInfo: Crash
-    
+
     enum Status {
         case waiting
         case running
         case canceled
         case failed(code: Int, message: String?)
         case success
-        
+
         func shouldRetry() -> Bool {
             switch self {
             case .waiting, .running:
@@ -42,14 +42,14 @@ class DsymDownloadTask {
             }
         }
     }
-    
+
     struct Progress {
         var percentage: Int = 0
         var totalSize: String = "0"
         var downloadedSize: String = "0"
         var timeLeft: String = "Unknow"
         var speed: String = "0"
-        
+
         mutating func update(fromConsoleOutput output: String) {
             /*
              curl
@@ -61,40 +61,40 @@ class DsymDownloadTask {
             guard let range = output.range(of: title) else {
                 return
             }
-            
+
             let content = output[range.upperBound...]
             let lines = content.components(separatedBy: "\r")
             let count = lines.count
             if count < 3 {
-                return;
+                return
             }
-            
+
             var items: [String] = []
-            for index in (count-2..<count).reversed() {
+            for index in (count - 2 ..< count).reversed() {
                 let lastLine = lines[index]
-                items = lastLine.components(separatedBy: " ").filter({ (string) -> Bool in
+                items = lastLine.components(separatedBy: " ").filter { string -> Bool in
                     string != ""
-                })
+                }
                 if items.count >= 12 {
                     break
                 }
             }
-            
+
             if items.count != 12 || !items[10].contains(":") {
                 return
             }
-            
-            self.percentage = Int(items[0]) ?? 0
-            self.totalSize = items[1]
-            self.downloadedSize = items[3]
-            self.timeLeft = items[10]
-            self.speed = items[11]
-            //print(self)
+
+            percentage = Int(items[0]) ?? 0
+            totalSize = items[1]
+            downloadedSize = items[3]
+            timeLeft = items[10]
+            speed = items[11]
+            // print(self)
         }
     }
-    
+
     @Published var status: Status = .waiting
-    @Published var progress: Progress = Progress()
+    @Published var progress: Progress = .init()
 
     var statusCode: Int = 0
     var message: String?
@@ -103,11 +103,11 @@ class DsymDownloadTask {
     private var process: SubProcess!
     private var fileURL: URL?
     private var scriptURL: URL
-    
+
     init(crashInfo: Crash, scriptURL: URL, fileURL: URL?) {
         self.crashInfo = crashInfo
-        self.fileURL = fileURL;
-        self.scriptURL = scriptURL;
+        self.fileURL = fileURL
+        self.scriptURL = scriptURL
     }
 
     func run() {
@@ -115,53 +115,53 @@ class DsymDownloadTask {
             self.process = nil
         }
 
-        if self.process != nil {
-            self.process?.terminate()
-            self.process = nil
+        if process != nil {
+            process?.terminate()
+            process = nil
         }
-        
-        let crashPath = self.fileURL?.path ?? FileManager.default.temporaryPath()
+
+        let crashPath = fileURL?.path ?? FileManager.default.temporaryPath()
         do {
-            try self.crashInfo.content.write(toFile: crashPath, atomically: true, encoding: .utf8)
+            try crashInfo.content.write(toFile: crashPath, atomically: true, encoding: .utf8)
         } catch {
-            self.statusCode = -1001
-            self.status = .failed(code: self.statusCode, message: "Failed to save file")
+            statusCode = -1001
+            status = .failed(code: statusCode, message: "Failed to save file")
             return
         }
-        
+
         let dir = Config.dsymDownloadDirectory
-        let env = self.crashInfoToEnv(crashInfo)
-        self.process = SubProcess(cmd: self.scriptURL.path, args: [crashPath, dir], env: env)
-        self.process.errorHandler = { [weak self] (_) in
+        let env = crashInfoToEnv(crashInfo)
+        process = SubProcess(cmd: scriptURL.path, args: [crashPath, dir], env: env)
+        process.errorHandler = { [weak self] _ in
             if let this = self {
                 this.progress.update(fromConsoleOutput: this.process.error)
             }
         }
-        self.status = .running
-        self.process.run()
-        
-        self.parse(output: self.process.output)
-        self.statusCode = self.process.exitCode
-        self.message = self.process.output
-        
-        if self.statusCode != 0 {
-            self.status = .failed(code: self.statusCode, message: self.message)
+        status = .running
+        process.run()
+
+        parse(output: process.output)
+        statusCode = process.exitCode
+        message = process.output
+
+        if statusCode != 0 {
+            status = .failed(code: statusCode, message: message)
         } else {
-            self.status = .success
+            status = .success
         }
     }
 
     func cancel() {
-        self.process?.terminate()
-        self.status = .canceled
+        process?.terminate()
+        status = .canceled
     }
-        
+
     private func crashInfoToEnv(_ crashInfo: Crash) -> [String: String] {
         var env: [String: String] = [:]
         env["APP_NAME"] = crashInfo.appName ?? ""
         env["UUID"] = crashInfo.uuid ?? ""
         env["BUNDLE_ID"] = crashInfo.bundleID ?? ""
-        
+
         let versionString = crashInfo.appVersion ?? ""
         env["APP_VERSION"] = versionString
 
@@ -171,23 +171,23 @@ class DsymDownloadTask {
         if components.count == 2 {
             let part1 = components[0]
             let part2 = components[1].replacingOccurrences(of: "(", with: "").replacingOccurrences(of: ")", with: "")
-            if part1.contains(".") && !part2.contains(".") {
+            if part1.contains("."), !part2.contains(".") {
                 env["APP_VERSION"] = "\(part2) (\(part1))"
             }
         }
-        
+
         return env
     }
-    
+
     private func parse(output: String) {
         guard let matches = Regex.dwarfdump.matches(in: output) else {
             return
         }
-        
-        var uuids: [String] = [self.crashInfo.uuid ?? ""]
-        if self.crashInfo.embeddedBinaries.count > 0 {
-            uuids = self.crashInfo.embeddedBinaries.compactMap { (binary) -> String? in
-                return binary.uuid
+
+        var uuids: [String] = [crashInfo.uuid ?? ""]
+        if crashInfo.embeddedBinaries.count > 0 {
+            uuids = crashInfo.embeddedBinaries.compactMap { binary -> String? in
+                binary.uuid
             }
         }
 
@@ -206,7 +206,7 @@ class DsymDownloadTask {
                 }
             }
             let file = DsymFile(name: name, path: path, binaryPath: path,
-                                uuids: [uuid], isApp: uuid == self.crashInfo.uuid)
+                                uuids: [uuid], isApp: uuid == crashInfo.uuid)
             dsymFiles.append(file)
         }
         self.dsymFiles = dsymFiles
@@ -215,59 +215,59 @@ class DsymDownloadTask {
 
 class DsymDownloader {
     static let shared = DsymDownloader()
-    
-    @Published var tasks:[String: DsymDownloadTask] = [:]
+
+    @Published var tasks: [String: DsymDownloadTask] = [:]
     let scriptURL = Config.downloadScriptURL
-    
+
     init() {
-        self.prepareDownloadScript()
+        prepareDownloadScript()
     }
-    
+
     func prepareDownloadScript() {
         let scriptPath = scriptURL.path
         let fileManager = FileManager.default
-        
+
         defer {
             if fileManager.fileExists(atPath: scriptPath) {
                 fileManager.chmod(scriptPath, permissions: 0o777)
             }
         }
-        
+
         // check user imported script
         if fileManager.fileExists(atPath: scriptPath) {
             let script = try? String(contentsOf: scriptURL, encoding: .utf8)
-            if script != nil && script!.count > 0 {
+            if script != nil, script!.count > 0 {
                 return
             }
         }
-        
+
         // check buildin script
         if let buildinPath = Bundle.main.path(forResource: "download", ofType: "sh") {
             fileManager.cp(fromPath: buildinPath, toPath: scriptPath)
         }
     }
-    
+
     func canDownload() -> Bool {
-        let script = try? String(contentsOf: self.scriptURL, encoding: .utf8)
+        let script = try? String(contentsOf: scriptURL, encoding: .utf8)
         if script == nil || script!.count == 0 {
             return false
         }
-        
-        return FileManager.default.chmod(self.scriptURL.path, permissions: 0o777)
+
+        return FileManager.default.chmod(scriptURL.path, permissions: 0o777)
     }
-    
+
     @discardableResult
     func download(crashInfo: Crash, fileURL: URL?) -> DsymDownloadTask? {
-        guard let uuid = crashInfo.uuid, self.canDownload() else {
+        guard let uuid = crashInfo.uuid, canDownload() else {
             return nil
         }
-        
-        if let task = self.tasks[uuid], !task.status.shouldRetry() {
+
+        if let task = tasks[uuid], !task.status.shouldRetry() {
             return task
         }
-        
-        let task = DsymDownloadTask(crashInfo: crashInfo, scriptURL: self.scriptURL, fileURL: fileURL)
-        self.tasks[uuid] = task
+
+        let task = DsymDownloadTask(crashInfo: crashInfo, scriptURL: scriptURL, fileURL: fileURL)
+        tasks[uuid] = task
         DispatchQueue.global().async {
             task.run()
         }

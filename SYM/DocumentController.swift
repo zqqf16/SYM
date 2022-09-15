@@ -24,16 +24,16 @@ import Cocoa
 
 class DocumentController: NSDocumentController {
     override func openDocument(withContentsOf url: URL, display displayDocument: Bool, completionHandler: @escaping (NSDocument?, Bool, Error?) -> Void) {
-        guard let doc = self.documents.first as? CrashDocument,
-            doc.isReplaceable
+        guard let doc = documents.first as? CrashDocument,
+              doc.isReplaceable
         else {
             super.openDocument(withContentsOf: url, display: displayDocument, completionHandler: completionHandler)
             return
         }
-        let type = (try? self.typeForContents(of: url)) ?? url.pathExtension
+        let type = (try? typeForContents(of: url)) ?? url.pathExtension
         try? doc.read(from: url, ofType: type)
         doc.fileURL = url
-        if (displayDocument) {
+        if displayDocument {
             doc.showWindows()
         }
         completionHandler(doc, true, nil)

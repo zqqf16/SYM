@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Darwin
 import Foundation
 import SwiftyJSON
-import Darwin
 
 struct KeepJsonConvertor: Convertor {
     static func match(_ content: String) -> Bool {
@@ -31,36 +31,36 @@ struct KeepJsonConvertor: Convertor {
         else {
             return false
         }
-        
+
         return payload["trace"].dictionary != nil
-        && payload["app_package_name"].string != nil
-        && payload["trace"]["threads"].array != nil
+            && payload["app_package_name"].string != nil
+            && payload["trace"]["threads"].array != nil
     }
-    
+
     struct Frame: ContentComponent {
         var string: String = ""
-        
+
         init(_ frame: JSON, index: Int) {
             let address = frame["load_address"].int64Value
-            self.string = ""
-            self.string.append("\(index)".padding(length: 4))
-            self.string.append(frame["image_name"].stringValue.padding(length: 38))
-            self.string.append("0x%llx ".format(address))
-            self.string.append(self.parseSymbol(frame))
-            self.string.append("\n")
+            string = ""
+            string.append("\(index)".padding(length: 4))
+            string.append(frame["image_name"].stringValue.padding(length: 38))
+            string.append("0x%llx ".format(address))
+            string.append(parseSymbol(frame))
+            string.append("\n")
         }
-        
+
         func parseSymbol(_ frame: JSON) -> String {
             let loadAddress = frame["address"].int64Value
             let offset = frame["address"].intValue
             if let lineShowStr = frame["line_show_str"].string {
                 let re = try! Regex("\\d+ \\d+ \\+ \\d+")
-                //5417385984 5430273043 + 12887059
+                // 5417385984 5430273043 + 12887059
                 if re.matches(in: lineShowStr) == nil {
                     return lineShowStr
                 }
             }
-            var symbol: String = ""
+            var symbol = ""
             if frame["log_symbol_name"].string != nil, frame["log_symbol_name"].stringValue.lengthOfBytes(using: .utf8) > 0 {
                 if frame["log_symbol_name"].stringValue == "<redacted>" {
                     symbol = "0x%llx + %ld".format(loadAddress, offset)
@@ -76,20 +76,20 @@ struct KeepJsonConvertor: Convertor {
             return symbol
         }
     }
-    
+
     struct Thread: ContentComponent {
         var string: String
         init(_ thread: JSON) {
             let index = thread["index"].intValue
 
-            self.string = String(builder: {
+            string = String(builder: {
                 if thread["thread_name"].string != nil {
                     Line("Thread \(index) name:  %@").format(thread["name"])
                 } else if thread["dispatch_queue"].string != nil {
                     Line("Thread \(index) name:   Dispatch queue: %@")
                         .format(thread["dispatch_queue"])
                 }
-                
+
                 Line("Thread \(index) \(thread["thread_type"].stringValue):")
                 for (frameIndex, frame) in thread["thread_stack"].arrayValue.enumerated() {
                     Frame(frame, index: frameIndex)
@@ -98,14 +98,14 @@ struct KeepJsonConvertor: Convertor {
             })
         }
     }
-    
+
     struct Image: ContentComponent {
         var string: String
-        
+
         init(_ image: JSON, arch: String = "arm64") {
-            self.string = Line {
+            string = Line {
                 "0x%llx - 0x%llx "
-                    .format(image["address"].int64Value, "0xffffffffff") //fake
+                    .format(image["address"].int64Value, "0xffffffffff") // fake
                 "%@ \(arch) "
                     .format(image["image_name"])
                 "<%@> "
@@ -120,21 +120,21 @@ struct KeepJsonConvertor: Convertor {
             }.string
         }
     }
-    
+
     func convert(_ content: String) -> String {
         guard let data = content.data(using: .utf8),
               let payload = try? JSON(data: data)
         else {
             return content
         }
-        
+
         let trace = payload["trace"]
         let system = trace["systemMsg"]
         return String(builder: {
             Line("Incident Identifier: %@").format(trace["uuid"])
             Line("Hardware Model:      %@").format(system["machine"])
             Line("Process:             %@").format(system["CFBundleExecutable"])
-            //Line("Path:                %@").format(_P("procPath"))
+            // Line("Path:                %@").format(_P("procPath"))
             Line("Identifier:          %@").format(system["CFBundleIdentifier"])
             Line("Version:             %@ (%@)")
                 .format(system["CFBundleShortVersionString"], system["CFBundleVersion"])
@@ -146,9 +146,9 @@ struct KeepJsonConvertor: Convertor {
             }
             Line("Coalition:           %@").format(system["CFBundleIdentifier"])
             Line.empty
-            Line("Date/Time:           %@").format(system["app_start_time"]) //TODO
+            Line("Date/Time:           %@").format(system["app_start_time"]) // TODO:
             Line("Launch Time:         %@").format(system["boot_time"])
-            //iPhone OS 15.2.1 (19C63)
+            // iPhone OS 15.2.1 (19C63)
             Line("OS Version:          iPhone OS %@ (%@)")
                 .format(system["system_version"], system["os_version"])
             Line("Release Type:        User")
@@ -166,17 +166,17 @@ struct KeepJsonConvertor: Convertor {
                 Line("Triggered by Thread:  \(index)")
             }
             Line.empty
-            
+
             Line("Last Exception Backtrace")
             for (index, frame) in payload["key_stack"].arrayValue.enumerated() {
                 Frame(frame, index: index)
             }
-            
+
             Line.empty
             for thread in trace["threads"].arrayValue {
                 Thread(thread)
             }
-            
+
             Line("Binary Images:")
             let arch = self.parseArch(from: payload)
             for image in self.parseImages(from: payload) {
@@ -187,7 +187,7 @@ struct KeepJsonConvertor: Convertor {
             Line.empty
         })
     }
-    
+
     private func parseCrashedThread(from payload: JSON) -> String? {
         let threads = payload["trace"]["threads"].arrayValue
         for thread in threads {
@@ -197,7 +197,7 @@ struct KeepJsonConvertor: Convertor {
         }
         return nil
     }
-    
+
     private func parseImages(from payload: JSON) -> [JSON] {
         let threads = payload["trace"]["threads"].arrayValue
         var map: [String: JSON] = [:]
@@ -208,7 +208,7 @@ struct KeepJsonConvertor: Convertor {
         }
         return Array(map.values)
     }
-    
+
     private func parseArch(from payload: JSON) -> String {
         let arch = payload["trace"]["systemMsg"]["cpu_arch"].stringValue
         if arch.contains("armv7") {

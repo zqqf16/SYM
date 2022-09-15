@@ -25,39 +25,38 @@ import Cocoa
 class AboutWindow: BaseWindow {
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
-        self.titlebarAppearsTransparent = true
-        self.titleVisibility = .visible
-        //self.backgroundColor = NSColor.white
-        //self.center()
+        titlebarAppearsTransparent = true
+        titleVisibility = .visible
+        // self.backgroundColor = NSColor.white
+        // self.center()
     }
 }
 
 class AboutViewController: NSViewController {
-
-    @IBOutlet weak var icon: NSImageView!
-    @IBOutlet weak var name: NSTextField!
-    @IBOutlet weak var version: NSTextField!
-    @IBOutlet weak var copyright: NSTextField!
+    @IBOutlet var icon: NSImageView!
+    @IBOutlet var name: NSTextField!
+    @IBOutlet var version: NSTextField!
+    @IBOutlet var copyright: NSTextField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.icon.image = NSApp.applicationIconImage
+        icon.image = NSApp.applicationIconImage
         let infoDict = Bundle.main.infoDictionary!
-        
+
         let shortVersion = infoDict["CFBundleShortVersionString"] as! String
         let buildVersion = infoDict["CFBundleVersion"] as! String
-        self.version.stringValue = "\(shortVersion) (\(buildVersion))"
+        version.stringValue = "\(shortVersion) (\(buildVersion))"
 
-        self.copyright.stringValue = infoDict["NSHumanReadableCopyright"] as! String
+        copyright.stringValue = infoDict["NSHumanReadableCopyright"] as! String
     }
-    
-    @IBAction func gotoWebsite(sender: AnyObject) {
+
+    @IBAction func gotoWebsite(sender _: AnyObject) {
         let url = URL(string: "https://zorro.im?utm_source=sym&utm_medium=referral")!
         NSWorkspace.shared.open(url)
     }
-    
-    @IBAction func gotoGithub(_ sender: AnyObject) {
+
+    @IBAction func gotoGithub(_: AnyObject) {
         let url = URL(string: "https://github.com/zqqf16/SYM")!
         NSWorkspace.shared.open(url)
     }

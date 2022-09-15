@@ -20,15 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import AppKit
+import Foundation
 
-// Mark: Highlight
+// MARK: Highlight
+
 extension NSTextStorage {
     func applyStyle(textFont: NSFont? = Config.editorFont,
-                    textColor: NSColor = .textColor) {
-        let font = textFont ?? self.font ?? self.layoutManagers.first?.firstTextView?.font
-        let style: NSMutableParagraphStyle = NSMutableParagraphStyle()
+                    textColor: NSColor = .textColor)
+    {
+        let font = textFont ?? self.font ?? layoutManagers.first?.firstTextView?.font
+        let style = NSMutableParagraphStyle()
         style.lineBreakMode = .byCharWrapping
         var attributes: [NSAttributedString.Key: AnyObject] = [
             .foregroundColor: textColor,
@@ -37,22 +39,22 @@ extension NSTextStorage {
         if font != nil {
             attributes[.font] = font!
         }
-        
-        self.setAttributes(attributes, range: self.string.nsRange)
+
+        setAttributes(attributes, range: string.nsRange)
     }
-    
+
     func highlight(at ranges: [NSRange]) {
         var attributes: [NSAttributedString.Key: AnyObject] = [:]
         attributes[.foregroundColor] = NSColor(hexString: Config.highlightColor)!
-        let style: NSMutableParagraphStyle = NSMutableParagraphStyle()
+        let style = NSMutableParagraphStyle()
         style.lineBreakMode = .byCharWrapping
         attributes[.paragraphStyle] = style
-        if let font = self.font, let familyName = font.familyName {
-            //.font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
+        if let font = font, let familyName = font.familyName {
+            // .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
             attributes[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)
         }
         for range in ranges {
-            self.setAttributes(attributes, range: range)
+            setAttributes(attributes, range: range)
         }
     }
 }

@@ -28,19 +28,23 @@ protocol ContentComponent {
 }
 
 @resultBuilder
-struct ContentBuilder {
+enum ContentBuilder {
     static func buildBlock(_ components: ContentComponent...) -> String {
-        return components.compactMap({$0.string}).joined(separator: "")
+        return components.compactMap { $0.string }.joined(separator: "")
     }
+
     static func buildArray(_ components: [ContentComponent]) -> String {
-        return components.compactMap({$0.string}).joined(separator: "")
+        return components.compactMap { $0.string }.joined(separator: "")
     }
+
     static func buildEither(first component: ContentComponent) -> String {
         component.string
     }
+
     static func buildEither(second component: ContentComponent) -> String {
         component.string
     }
+
     static func buildOptional(_ component: ContentComponent?) -> String {
         return component?.string ?? ""
     }
@@ -50,11 +54,11 @@ extension String: ContentComponent {
     var string: String {
         return self
     }
-    
+
     func format(_ args: CVarArg...) -> Self {
         return String(format: self, arguments: args)
     }
-    
+
     init(@ContentBuilder builder: () -> String) {
         self = builder()
     }
@@ -62,22 +66,22 @@ extension String: ContentComponent {
 
 struct Line: ContentComponent {
     var value: String
-    
+
     var string: String {
         return value + "\n"
     }
-    
-    static let empty: Line = Line("")
-    
+
+    static let empty: Line = .init("")
+
     init(_ value: String) {
         self.value = value
     }
-    
+
     init(@ContentBuilder builder: () -> String) {
-        self.value = builder()
+        value = builder()
     }
-    
+
     func format(_ args: CVarArg...) -> Line {
-        return Line(self.value.format(args))
+        return Line(value.format(args))
     }
 }

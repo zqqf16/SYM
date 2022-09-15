@@ -20,31 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import Cocoa
+import Foundation
 
 class FileFinder {
     var observer: AnyObject?
     var query = NSMetadataQuery()
-    
+
     var isRunning: Bool {
-        return self.query.isGathering
+        return query.isGathering
     }
-    
-    func search(_ condition: String, completion: @escaping ([NSMetadataItem]?)->Void) {
+
+    func search(_ condition: String, completion: @escaping ([NSMetadataItem]?) -> Void) {
         query.predicate = NSPredicate(fromMetadataQueryString: condition)
-        
-        self.observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: nil, queue: nil) { (notification) in
+
+        observer = NotificationCenter.default.addObserver(forName: .NSMetadataQueryDidFinishGathering, object: nil, queue: nil) { _ in
             self.query.stop()
             if let observer = self.observer {
                 NotificationCenter.default.removeObserver(observer)
                 self.observer = nil
             }
-            
+
             let result = self.query.results as! [NSMetadataItem]
             completion(result)
         }
-        
+
         query.start()
     }
 }

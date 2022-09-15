@@ -42,16 +42,16 @@ protocol DeviceSidebarViewControllerDelegate: AnyObject {
 }
 
 class DeviceSidebarViewController: NSViewController {
-    @IBOutlet weak var outlineView: NSOutlineView!
-    
+    @IBOutlet var outlineView: NSOutlineView!
+
     weak var delegate: DeviceSidebarViewControllerDelegate?
     var nodes: [SidebarNode] = [] {
         didSet {
-            self.outlineView.reloadData()
-            self.outlineView.expandItem(nil, expandChildren: true)
+            outlineView.reloadData()
+            outlineView.expandItem(nil, expandChildren: true)
         }
     }
-    
+
     var selectedNode: SidebarNode? {
         get {
             let row = self.outlineView.selectedRow
@@ -63,26 +63,27 @@ class DeviceSidebarViewController: NSViewController {
             self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: true)
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.outlineView.dataSource = self
-        self.outlineView.delegate = self
+        outlineView.dataSource = self
+        outlineView.delegate = self
     }
-    
+
     override func viewWillAppear() {
         super.viewWillAppear()
-        self.outlineView.expandItem(nil, expandChildren: true)
+        outlineView.expandItem(nil, expandChildren: true)
     }
 }
 
-extension DeviceSidebarViewController : NSOutlineViewDelegate {
-    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+extension DeviceSidebarViewController: NSOutlineViewDelegate {
+    func outlineView(_ outlineView: NSOutlineView, viewFor _: NSTableColumn?, item: Any) -> NSView? {
         guard let node = item as? SidebarNode,
-              let cell = outlineView.makeView(withIdentifier: node.cellIdentifier, owner: self) as? NSTableCellView else {
+              let cell = outlineView.makeView(withIdentifier: node.cellIdentifier, owner: self) as? NSTableCellView
+        else {
             return nil
         }
-        
+
         cell.textField?.stringValue = node.title
         cell.imageView?.image = node.image
         cell.toolTip = node.toolTip
@@ -91,54 +92,54 @@ extension DeviceSidebarViewController : NSOutlineViewDelegate {
     }
 }
 
-extension DeviceSidebarViewController : NSOutlineViewDataSource {
-    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+extension DeviceSidebarViewController: NSOutlineViewDataSource {
+    func outlineView(_: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         if let node = item as? SidebarNode {
             return node.children?.count ?? 0
         }
 
-        return self.nodes.count
+        return nodes.count
     }
-    
-    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+
+    func outlineView(_: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
         if let node = item as? SidebarNode, node.children != nil {
             return node.children![index]
         }
-        
-        return self.nodes[index]
+
+        return nodes[index]
     }
 
-    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+    func outlineView(_: NSOutlineView, isItemExpandable item: Any) -> Bool {
         if let node = item as? SidebarNode, node.children != nil {
             return node.children!.count > 0
         }
-        
+
         return false
     }
-        
-    func outlineView(_ outlineView: NSOutlineView, isGroupItem item: Any) -> Bool {
+
+    func outlineView(_: NSOutlineView, isGroupItem item: Any) -> Bool {
         if let node = item as? SidebarNode {
             return node.isGroup
         }
-        
+
         return false
     }
-    
-    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
+
+    func outlineView(_: NSOutlineView, shouldSelectItem item: Any) -> Bool {
         if let node = item as? SidebarNode {
             return node.isSelectable
         }
 
         return false
     }
-    
-    func outlineViewSelectionDidChange(_ notification: Notification) {
-        guard let delegate = self.delegate else {
+
+    func outlineViewSelectionDidChange(_: Notification) {
+        guard let delegate = delegate else {
             return
         }
-        
-        let row = self.outlineView.selectedRow
-        if let node = self.outlineView.item(atRow: row) as? SidebarNode {
+
+        let row = outlineView.selectedRow
+        if let node = outlineView.item(atRow: row) as? SidebarNode {
             delegate.sidebar(self, didSelectNode: node)
         }
     }

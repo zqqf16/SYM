@@ -24,31 +24,31 @@ import Cocoa
 
 extension MDDeviceFile {
     var isCrash: Bool {
-        return !self.isDirectory && (self.name.contains(".ips") || self.name.contains(".crash"))
+        return !isDirectory && (name.contains(".ips") || name.contains(".crash"))
     }
-    
+
     var localCrashFileName: String {
         let name = self.name.components(separatedBy: ".ips")[0]
         return "\(name).crash"
     }
-    
+
     var crashFileDisplayName: String {
-        var components = self.name.components(separatedBy: ".")
+        var components = name.components(separatedBy: ".")
         if components.last == "synced" {
             components.removeLast()
             return components.joined(separator: ".")
         }
-        
-        return self.name
+
+        return name
     }
 }
 
 extension MDAfcClient {
     func copyCrashFile(_ file: MDDeviceFile, to url: URL) -> String? {
-        guard let content = self.read(file.path) else {
+        guard let content = read(file.path) else {
             return nil
         }
-        
+
         do {
             try content.write(to: url, options: .atomic)
         } catch {
@@ -66,26 +66,26 @@ class CrashImporterViewController: NSViewController, LoadingAble {
     private var fileList: [MDDeviceFile] = []
     private var afcClient: MDAfcClient? {
         // Always create a new one
-        let lockdown = MDLockdown(udid: self.deviceID)
+        let lockdown = MDLockdown(udid: deviceID)
         return MDAfcClient.crash(with: lockdown)
     }
 
     private var deviceID: String?
-    
+
     @IBOutlet var tableView: NSTableView!
-    @IBOutlet weak var openButton: NSButton!
+    @IBOutlet var openButton: NSButton!
     var loadingIndicator: NSProgressIndicator!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.lowercaseName, ascending: true)
         let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
-        self.tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
-        self.tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
-        
-        self.tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
-        self.tableView.setDraggingSourceOperationMask(.copy, forLocal: false)        
+        tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
+        tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
+
+        tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
+        tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
 
     func reloadData(withDeviceID deviceID: String?) {
@@ -93,7 +93,7 @@ class CrashImporterViewController: NSViewController, LoadingAble {
             return
         }
         self.deviceID = deviceID
-    
+
         if self.deviceID == nil {
             DispatchQueue.main.async {
                 self.fileList = []
@@ -101,8 +101,8 @@ class CrashImporterViewController: NSViewController, LoadingAble {
             }
             return
         }
-        
-        self.showLoading()
+
+        showLoading()
         DispatchQueue.global().async {
             let lockdown = MDLockdown(udid: self.deviceID)
             if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
@@ -111,72 +111,72 @@ class CrashImporterViewController: NSViewController, LoadingAble {
             }
             let crashList = self.afcClient?.crashFiles() ?? []
             DispatchQueue.main.async {
-                self.fileList = crashList.filter { $0.isCrash }.sorted(by: { (file1, file2) -> Bool in
-                    return file1.date > file2.date
+                self.fileList = crashList.filter { $0.isCrash }.sorted(by: { file1, file2 -> Bool in
+                    file1.date > file2.date
                 })
                 self.tableView.reloadData()
                 self.hideLoading()
             }
         }
     }
-    
+
     func openCrash(atIndex index: Int) {
-        if index < 0 || index > self.fileList.count - 1 {
+        if index < 0 || index > fileList.count - 1 {
             return
         }
 
-        self.showLoading()
+        showLoading()
 
-        let file = self.fileList[index]
+        let file = fileList[index]
         DispatchQueue.global().async {
             guard let udid = self.deviceID else {
                 self.hideLoading()
                 return
             }
-            
+
             let path = FileManager.default.localCrashDirectory(udid) + "/\(file.localCrashFileName)"
             let url = URL(fileURLWithPath: path)
-            if let _ =  self.afcClient?.copyCrashFile(file, to: url) {
+            if let _ = self.afcClient?.copyCrashFile(file, to: url) {
                 DispatchQueue.main.async {
-                    DocumentController.shared.openDocument(withContentsOf: url, display: true, completionHandler: { (document, success, error) in
+                    DocumentController.shared.openDocument(withContentsOf: url, display: true, completionHandler: { _, _, _ in
                         self.hideLoading()
                     })
                 }
             }
         }
     }
-    
-    @IBAction func didDoubleClickCell(_ sender: AnyObject?) {
-        let row = self.tableView.clickedRow
-        self.openCrash(atIndex: row)
+
+    @IBAction func didDoubleClickCell(_: AnyObject?) {
+        let row = tableView.clickedRow
+        openCrash(atIndex: row)
     }
 
-    @IBAction func openFile(_ sender: AnyObject?) {
-        let row = self.tableView.selectedRow
-        self.openCrash(atIndex: row)
+    @IBAction func openFile(_: AnyObject?) {
+        let row = tableView.selectedRow
+        openCrash(atIndex: row)
     }
-    
-    @IBAction func reloadFiles(_ sender: AnyObject?) {
+
+    @IBAction func reloadFiles(_: AnyObject?) {
         let deviceID = self.deviceID
         self.deviceID = nil
-        self.reloadData(withDeviceID: deviceID)
+        reloadData(withDeviceID: deviceID)
     }
-    
-    @IBAction func removeFile(_ sender: AnyObject?) {
+
+    @IBAction func removeFile(_: AnyObject?) {
         guard let afcClient = afcClient else {
             return
         }
 
-        let selectedIndexes = self.tableView.selectedRowIndexes
+        let selectedIndexes = tableView.selectedRowIndexes
         if selectedIndexes.isEmpty {
             return
         }
-        
+
         let files = selectedIndexes.map { index in
             self.fileList[index]
         }
-        
-        self.showLoading()
+
+        showLoading()
         DispatchQueue.global().async {
             files.forEach { file in
                 afcClient.remove(file.path)
@@ -193,13 +193,13 @@ extension NSUserInterfaceItemIdentifier {
 }
 
 extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSource {
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return self.fileList.count
+    func numberOfRows(in _: NSTableView) -> Int {
+        return fileList.count
     }
-    
+
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         var cell: NSTableCellView?
-        let file = self.fileList[row]
+        let file = fileList[row]
         if tableColumn == tableView.tableColumns[0] {
             cell = tableView.makeView(withIdentifier: .cellProcess, owner: nil) as? NSTableCellView
             cell?.textField?.stringValue = file.crashFileDisplayName
@@ -209,45 +209,45 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
         }
         return cell
     }
-    
-    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-        self.fileList = (self.fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
+
+    func tableView(_ tableView: NSTableView, sortDescriptorsDidChange _: [NSSortDescriptor]) {
+        fileList = (fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
         self.tableView.reloadData()
     }
 
-    func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+    func tableView(_: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
-        provider.file = self.fileList[row]
+        provider.file = fileList[row]
         return provider
     }
-    
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        //self.openButton.isEnabled = self.tableView.selectedRow >= 0
+
+    func tableViewSelectionDidChange(_: Notification) {
+        // self.openButton.isEnabled = self.tableView.selectedRow >= 0
     }
 }
 
 extension CrashImporterViewController: NSFilePromiseProviderDelegate {
-    func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
+    func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType _: String) -> String {
         guard let privider = filePromiseProvider as? DeviceFileProvider else {
             return ""
         }
         return privider.file?.localCrashFileName ?? ""
     }
-    
+
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
         guard let privider = filePromiseProvider as? DeviceFileProvider,
-            let file = privider.file,
-            let afcClient = self.afcClient
-            else {
-                completionHandler(FileError.createFailed)
-                return
+              let file = privider.file,
+              let afcClient = afcClient
+        else {
+            completionHandler(FileError.createFailed)
+            return
         }
-        
-        let _ = afcClient.copyCrashFile(file, to: url)
+
+        _ = afcClient.copyCrashFile(file, to: url)
         completionHandler(nil)
     }
-    
-    func operationQueue(for filePromiseProvider: NSFilePromiseProvider) -> OperationQueue {
+
+    func operationQueue(for _: NSFilePromiseProvider) -> OperationQueue {
         return OperationQueue()
     }
 }

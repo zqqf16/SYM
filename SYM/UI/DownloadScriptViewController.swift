@@ -23,20 +23,19 @@
 import Cocoa
 
 class DownloadScriptViewController: NSViewController {
-
     @IBOutlet var textView: NSTextView!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.textView.font = NSFont(name: "Menlo", size: 11)!
-        self.textView.textContainerInset = CGSize(width: 10, height: 10)
-        
+
+        textView.font = NSFont(name: "Menlo", size: 11)!
+        textView.textContainerInset = CGSize(width: 10, height: 10)
+
         Config.prepareDsymDownloadDirectory()
-        self.loadContent()
+        loadContent()
     }
-    
+
     @IBAction func didClickDoneButton(_ sender: Any) {
-        var script = self.textView.string
+        var script = textView.string
         if script.lengthOfBytes(using: .utf8) > 0 {
             if !script.hasPrefix("#!") {
                 script = "#!/bin/bash\n" + script
@@ -47,22 +46,22 @@ class DownloadScriptViewController: NSViewController {
         } catch {
             // TODO: error handling
         }
-        
-        self.close(sender)
+
+        close(sender)
     }
-    
-    @IBAction func close(_ sender: Any) {
-        self.view.window?.windowController?.close()
+
+    @IBAction func close(_: Any) {
+        view.window?.windowController?.close()
     }
-    
+
     func loadContent() {
         let userImportedScript = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
-        if userImportedScript != nil && userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
-            self.textView.string = userImportedScript!
+        if userImportedScript != nil, userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
+            textView.string = userImportedScript!
             return
         }
 
         let template = try! String(contentsOf: Bundle.main.url(forResource: "template", withExtension: "sh")!, encoding: .utf8)
-        self.textView.string = template
+        textView.string = template
     }
 }

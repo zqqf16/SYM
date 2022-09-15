@@ -23,26 +23,25 @@
 import Cocoa
 
 class PreferencesViewController: NSViewController {
-
-    @IBOutlet weak var fontNameButton: NSButton!
-    @IBOutlet weak var colorButton: NSPopUpButton!
-    @IBOutlet weak var colorMenu: NSMenu!
+    @IBOutlet var fontNameButton: NSButton!
+    @IBOutlet var colorButton: NSPopUpButton!
+    @IBOutlet var colorMenu: NSMenu!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Font
         let font = Config.editorFont
-        self.fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
-        
+        fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
+
         NotificationCenter.default.addObserver(self, selector: #selector(fontDidChanged(_:)), name: .configFontChanged, object: nil)
-        
+
         // Color
-        self.setupColors()
+        setupColors()
     }
-    
+
     private func setupColors() {
-        self.colorMenu.removeAllItems()
+        colorMenu.removeAllItems()
         let currentColor = Config.highlightColor
         for colorCode in Config.highlightColors {
             guard let color = NSColor(hexString: colorCode) else {
@@ -51,15 +50,15 @@ class PreferencesViewController: NSViewController {
             let menuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
             menuItem.image = NSImage(color: color, size: NSSize(width: 20, height: 10))
             menuItem.toolTip = colorCode
-            self.colorMenu.addItem(menuItem)
-            
+            colorMenu.addItem(menuItem)
+
             if colorCode == currentColor {
-                self.colorButton.select(menuItem)
+                colorButton.select(menuItem)
             }
         }
     }
-    
-    @IBAction func showFontPanel(_ sender: AnyObject?) {
+
+    @IBAction func showFontPanel(_: AnyObject?) {
         let fontManager = NSFontManager.shared
         fontManager.setSelectedFont(Config.editorFont, isMultiple: false)
         let panel = fontManager.fontPanel(true)
@@ -67,17 +66,17 @@ class PreferencesViewController: NSViewController {
         panel?.reloadDefaultFontFamilies()
         panel?.makeKeyAndOrderFront(self)
     }
-    
-    @objc func fontDidChanged(_ notification: Notification?) {
+
+    @objc func fontDidChanged(_: Notification?) {
         let font = Config.editorFont
-        self.fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
+        fontNameButton.title = "\(font.fontName) \(Int(font.pointSize))"
     }
-    
+
     @IBAction func colorDidChanged(_ sender: NSPopUpButton) {
         guard let selectedItem = sender.selectedItem, let index = sender.menu?.index(of: selectedItem) else {
             return
         }
-        
+
         Config.highlightColor = Config.highlightColors[index]
     }
 }

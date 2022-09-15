@@ -20,9 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 import Foundation
-
 
 func parseModels() -> [String: String] {
     let filePath = Bundle.main.path(forResource: "models", ofType: "txt")
@@ -32,13 +30,13 @@ func parseModels() -> [String: String] {
         if line.hasPrefix("#") {
             continue
         }
-        
+
         let tuple = line.components(separatedBy: ":")
         if tuple.count == 2 {
             result[tuple[0].strip()] = tuple[1].strip()
         }
     }
-    
+
     return result
 }
 

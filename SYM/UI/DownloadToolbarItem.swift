@@ -31,7 +31,7 @@ class DownloadToolbarItem: NSToolbarItem {
     var running: Bool = false {
         didSet {
             self.indicator.isHidden = !running
-            //self.view?.isHidden = running
+            // self.view?.isHidden = running
             if running {
                 self.indicator.startAnimation(nil)
             } else {
@@ -39,52 +39,52 @@ class DownloadToolbarItem: NSToolbarItem {
             }
         }
     }
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
-        
-        self.indicator = NSProgressIndicator()
-        self.indicator.isIndeterminate = true
-        self.indicator.isHidden = true
-        self.view?.superview?.addSubview(self.indicator)
+
+        indicator = NSProgressIndicator()
+        indicator.isIndeterminate = true
+        indicator.isHidden = true
+        view?.superview?.addSubview(indicator)
     }
-    
+
     func bind(task: DsymDownloadTask?) {
-        self.cancellable?.cancel()
+        cancellable?.cancel()
         if task != nil {
-            self.cancellable = Publishers
+            cancellable = Publishers
                 .CombineLatest(task!.$status, task!.$progress)
                 .receive(on: DispatchQueue.main)
-                .sink { [weak self] (status, progress) in
+                .sink { [weak self] status, progress in
                     self?.update(status: status, progress: progress)
                 }
         } else {
-            self.running = false
+            running = false
         }
     }
-    
+
     private func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         switch status {
         case .running:
-            self.running = true
-            self.updateFrame()
+            running = true
+            updateFrame()
         default:
-            self.running = false
+            running = false
         }
-        
+
         if progress.percentage == 0 {
-            self.indicator.isIndeterminate = true
+            indicator.isIndeterminate = true
         } else {
-            self.indicator.isIndeterminate = false
-            self.indicator.doubleValue = Double(progress.percentage)
+            indicator.isIndeterminate = false
+            indicator.doubleValue = Double(progress.percentage)
         }
     }
-    
+
     private func updateFrame() {
-        let imageFrame = self.view!.frame
-        self.indicator.frame = CGRect(x: imageFrame.origin.x,
-                                      y: imageFrame.origin.y - 2,
-                                      width: imageFrame.width,
-                                      height: 4.0)
+        let imageFrame = view!.frame
+        indicator.frame = CGRect(x: imageFrame.origin.x,
+                                 y: imageFrame.origin.y - 2,
+                                 width: imageFrame.width,
+                                 height: 4.0)
     }
 }

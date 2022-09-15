@@ -24,8 +24,8 @@ import Cocoa
 extension NSImage {
     convenience init(color: NSColor, size: NSSize) {
         self.init(size: size)
-        self.lockFocus()
+        lockFocus()
         color.drawSwatch(in: NSRect(origin: .zero, size: size))
-        self.unlockFocus()
+        unlockFocus()
     }
 }

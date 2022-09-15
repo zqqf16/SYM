@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
 import AppKit
+import Foundation
 import SnapKit
 
 protocol LoadingAble: AnyObject {
@@ -37,11 +37,11 @@ extension LoadingAble where Self: NSViewController {
                 self.loadingIndicator.startAnimation(nil)
                 self.loadingIndicator.isHidden = false
             }
-            
+
             if self.loadingIndicator != nil {
                 return
             }
-            
+
             self.loadingIndicator = NSProgressIndicator()
             self.loadingIndicator.style = .spinning
             self.loadingIndicator.isDisplayedWhenStopped = false
@@ -50,14 +50,12 @@ extension LoadingAble where Self: NSViewController {
                 make.width.height.equalTo(48)
                 make.center.equalTo(self.view)
             }
-
         }
     }
-    
+
     func hideLoading() {
         DispatchQueue.main.async {
             self.loadingIndicator.stopAnimation(nil)
         }
     }
 }
-

@@ -21,63 +21,62 @@
 // SOFTWARE.
 /*
 
-import Cocoa
+ import Cocoa
 
+ class BundleDocument: CrashDocument {
+     var info: [String: Any]?
 
-class BundleDocument: CrashDocument {
-    var info: [String: Any]?
-    
-    override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws {
-        if typeName != "com.apple.dt.document.xccrashpoint" {
-            return
-        }
-        
-        self.crashFile.children = []
+     override func read(from fileWrapper: FileWrapper, ofType typeName: String) throws {
+         if typeName != "com.apple.dt.document.xccrashpoint" {
+             return
+         }
 
-        if let wrapper = fileWrapper.fileWrappers {
-            if let info = wrapper["Info.json"] {
-                self.readInfo(from: info)
-            }
-            
-            if let logs = wrapper["DistributionInfos"]?.fileWrappers?["all"]?.fileWrappers?["Logs"] {
-                self.readCrashes(from: logs)
-            }
-        }
-        
-        //self.openCrash(file: self.crashFile)
-    }
-    
-    func readInfo(from fileWrapper: FileWrapper) {
-        guard let data = fileWrapper.regularFileContents else {
-            return
-        }
-        
-        if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-            self.info = json
-            if let name = json?["DefaultName"] as? String {
-                self.crashFile.name = name
-            }
-        }
-    }
-    
-    func readCrashes(from dirWrapper: FileWrapper) {
-        guard let fileWrappers = dirWrapper.fileWrappers else {
-            return
-        }
-        for (_, f) in fileWrappers {
-            let cf = CrashFile.init(from: f)
-            self.crashFile.children?.append(cf)
-        }
-    }
+         self.crashFile.children = []
 
-    override class var autosavesInPlace: Bool {
-        return false
-    }
-    
-    /*
-    override func fileWrapper(ofType typeName: String) throws -> FileWrapper {
-        return FileWrapper()
-    }
-    */
-}
-*/
+         if let wrapper = fileWrapper.fileWrappers {
+             if let info = wrapper["Info.json"] {
+                 self.readInfo(from: info)
+             }
+
+             if let logs = wrapper["DistributionInfos"]?.fileWrappers?["all"]?.fileWrappers?["Logs"] {
+                 self.readCrashes(from: logs)
+             }
+         }
+
+         //self.openCrash(file: self.crashFile)
+     }
+
+     func readInfo(from fileWrapper: FileWrapper) {
+         guard let data = fileWrapper.regularFileContents else {
+             return
+         }
+
+         if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+             self.info = json
+             if let name = json?["DefaultName"] as? String {
+                 self.crashFile.name = name
+             }
+         }
+     }
+
+     func readCrashes(from dirWrapper: FileWrapper) {
+         guard let fileWrappers = dirWrapper.fileWrappers else {
+             return
+         }
+         for (_, f) in fileWrappers {
+             let cf = CrashFile.init(from: f)
+             self.crashFile.children?.append(cf)
+         }
+     }
+
+     override class var autosavesInPlace: Bool {
+         return false
+     }
+
+     /*
+     override func fileWrapper(ofType typeName: String) throws -> FileWrapper {
+         return FileWrapper()
+     }
+     */
+ }
+ */

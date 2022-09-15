@@ -40,30 +40,30 @@ func convertor(for content: String) -> Convertor? {
 
 extension String {
     func format(_ json: JSON...) -> Self {
-        return String(format: self, arguments: json.map({ $0.stringValue }))
+        return String(format: self, arguments: json.map { $0.stringValue })
     }
 }
 
 extension Line {
     func format(_ json: JSON...) -> Self {
-        let value = String(format: self.value, arguments: json.map({ $0.stringValue }))
+        let value = String(format: self.value, arguments: json.map { $0.stringValue })
         return Line(value)
     }
 }
 
 struct AppleJsonConvertor: Convertor {
     static func match(_ content: String) -> Bool {
-        let components = self.split(content)
+        let components = split(content)
         guard components.header != nil,
               let payload = components.payload
         else {
             return false
         }
-        
+
         return payload["coalitionName"].string != nil
-        || payload["crashReporterKey"].string != nil
+            || payload["crashReporterKey"].string != nil
     }
-    
+
     private static func split(_ content: String) -> (header: JSON?, payload: JSON?) {
         var header: JSON?
         var payload: JSON?
@@ -75,19 +75,19 @@ struct AppleJsonConvertor: Convertor {
         if let payloadData = lines.joined(separator: "\n").data(using: .utf8) {
             payload = try? JSON(data: payloadData)
         }
-        
+
         return (header, payload)
     }
-    
+
     struct Frame: ContentComponent {
         var string: String
-    
+
         init(_ frame: JSON, index: Int, binaryImages: JSON) {
             let image = binaryImages[frame["imageIndex"].intValue]
             let address = frame["imageOffset"].intValue + image["base"].intValue
-            //0   Foundation                               0x182348144 xxx + 200
-            
-            self.string = Line {
+            // 0   Foundation                               0x182348144 xxx + 200
+
+            string = Line {
                 String(index).padding(length: 4)
                 image["name"].stringValue.padding(length: 39)
                 "0x%llx ".format(address)
@@ -102,11 +102,11 @@ struct AppleJsonConvertor: Convertor {
             }.string
         }
     }
-    
+
     struct Thread: ContentComponent {
         var string: String
         init(_ thread: JSON, index: Int, binaryImages: JSON) {
-            self.string = String(builder: {
+            string = String(builder: {
                 if thread["name"].string != nil {
                     Line {
                         "Thread \(index) name:  \(thread["name"].stringValue)"
@@ -129,12 +129,12 @@ struct AppleJsonConvertor: Convertor {
             })
         }
     }
-    
+
     struct Image: ContentComponent {
         var string: String
-        
+
         init(_ image: JSON) {
-            self.string = Line {
+            string = Line {
                 "0x%llx - 0x%llx "
                     .format(image["base"].intValue, image["base"].intValue + image["size"].intValue - 1)
                 "%@ %@ "
@@ -144,24 +144,24 @@ struct AppleJsonConvertor: Convertor {
             }.string
         }
     }
-    
+
     struct Registers: ContentComponent {
         var string: String
-        
+
         init(_ payload: JSON) {
             let threads = payload["threads"].arrayValue
             let triggeredThread = threads.first { thread in
                 thread["triggered"].boolValue
             }
             if triggeredThread == nil {
-                self.string = ""
+                string = ""
                 return
             }
-            
+
             let triggeredIndex = payload["faultingThread"].intValue
             let cpu = payload["cpuType"].stringValue
             var content = "Thread \(triggeredIndex) crashed with ARM Thread State (\(cpu)):\n"
-            
+
             let threadState = triggeredThread!["threadState"]
             let x = threadState["x"].arrayValue
             for (index, reg) in x.enumerated() {
@@ -186,10 +186,10 @@ struct AppleJsonConvertor: Convertor {
                 index += 1
             }
             content.append("\n")
-            self.string = content
+            string = content
         }
     }
-    
+
     func convert(_ content: String) -> String {
         let components = Self.split(content)
         guard let header = components.header,
@@ -197,15 +197,15 @@ struct AppleJsonConvertor: Convertor {
         else {
             return content
         }
-        
+
         let _P: (String) -> String = { key in
-            return payload[key].stringValue
+            payload[key].stringValue
         }
-        
+
         let _H: (String) -> String = { key in
-            return header[key].stringValue
+            header[key].stringValue
         }
-        
+
         return String(builder: {
             Line("Incident Identifier: %@").format(_H("incident_id"))
             Line("CrashReporter Key:   %@").format(_P("crashReporterKey"))
@@ -236,7 +236,7 @@ struct AppleJsonConvertor: Convertor {
                 .format(payload["termination"]["namespace"].stringValue, payload["termination"]["code"].stringValue)
             Line(payload["termination"]["details"][0].stringValue)
             Line("Triggered by Thread:  %@".format(_P("faultingThread")))
-            
+
             if let asi = payload["asi"].dictionary {
                 Line.empty
                 Line("Application Specific Information:")
@@ -246,14 +246,14 @@ struct AppleJsonConvertor: Convertor {
                     }
                 }
             }
-            
+
             if let ktriageinfo = payload["ktriageinfo"].string {
                 Line.empty
                 Line("Kernel Triage: \n\(ktriageinfo)")
             }
 
             Line.empty
-            
+
             let binaryImages = payload["usedImages"]
             let threads = payload["threads"].arrayValue
             for (index, thread) in threads.enumerated() {

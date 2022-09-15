@@ -28,7 +28,7 @@ struct Frame {
     var image: String
     var address: String
     var symbol: String?
-    
+
     var description: String {
         let index = self.index.extendToLength(2)
         let image = self.image.extendToLength(26)
@@ -45,10 +45,10 @@ class Binary {
     var loadAddress: String?
     var path: String?
     var executable: Bool = false
-    var backtrace: [Frame]? = nil
-    
+    var backtrace: [Frame]?
+
     var relativePath: String? {
-        guard let path = self.path else {
+        guard let path = path else {
             return nil
         }
 
@@ -61,20 +61,20 @@ class Binary {
         }
         return components.reversed().joined(separator: "/")
     }
-    
+
     var inApp: Bool {
-        guard let path = self.path else {
+        guard let path = path else {
             return false
         }
-        
+
         return path.contains("/var/containers/Bundle/Application")
             || path.hasPrefix("/var/mobile/Containers/Bundle/Application") // iOS8
     }
-    
+
     var isValid: Bool {
-        return self.uuid != nil && self.loadAddress != nil
+        return uuid != nil && loadAddress != nil
     }
-    
+
     init(name: String, uuid: String?, arch: String?, loadAddress: String?, path: String?) {
         self.name = name
         self.uuid = uuid
@@ -86,7 +86,7 @@ class Binary {
 
 class Crash {
     let content: String
-    
+
     var appName: String?
     var device: String?
     var bundleID: String?
@@ -95,22 +95,22 @@ class Crash {
     var osVersion: String?
     var appVersion: String?
     var binaryImages: [Binary] = []
-    
+
     var crashedThreadRange: NSRange?
     var appBacktraceRanges: [NSRange] = []
-    
+
     var embeddedBinaries: [Binary] {
         // executable, embedded dynamic libraries
         return binaryImages.filter { $0.inApp }
     }
-    
+
     enum SymbolicateMethod {
         case atos
         case symbolicatecrash // buildin symbolicatecrash
     }
-    
+
     var symbolicateMethod: SymbolicateMethod = .symbolicatecrash
-    
+
     init(_ content: String) {
         self.content = content
     }

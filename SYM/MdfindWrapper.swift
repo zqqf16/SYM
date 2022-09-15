@@ -29,31 +29,31 @@ protocol MdfindWrapperDelegate: AnyObject {
 class MdfindWrapper {
     let query = NSMetadataQuery()
     weak var delegate: MdfindWrapperDelegate?
-    
+
     init() {
         let nc = NotificationCenter.default
         nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidFinishGathering, object: nil)
         nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidUpdate, object: nil)
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
+
     func start(withCondition condition: String) {
-        self.stop()
-        
-        self.query.predicate = NSPredicate(fromMetadataQueryString: condition)
-        self.query.start()
+        stop()
+
+        query.predicate = NSPredicate(fromMetadataQueryString: condition)
+        query.start()
     }
-    
+
     func stop() {
-        self.query.stop()
+        query.stop()
     }
-    
+
     @objc func handleResult(_ notification: NSNotification) {
         if let query = notification.object as? NSMetadataQuery, query == self.query {
-            self.delegate?.mdfindWrapper(self, didFindResult: query.results as? [NSMetadataItem])
+            delegate?.mdfindWrapper(self, didFindResult: query.results as? [NSMetadataItem])
         }
     }
 }

@@ -26,20 +26,18 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
     override init() {
         super.init()
-        let _ = DocumentController()
+        _ = DocumentController()
     }
 
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         // Insert code here to initialize your application
-        //DsymManager.sharedInstance.findAllDsyms()
+        // DsymManager.sharedInstance.findAllDsyms()
         MDDeviceMonitor.shared().start()
     }
-    
-    func applicationWillFinishLaunching(_ notification: Notification) {
-    }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
+    func applicationWillFinishLaunching(_: Notification) {}
+
+    func applicationWillTerminate(_: Notification) {
         // Insert code here to tear down your application
     }
 }
-

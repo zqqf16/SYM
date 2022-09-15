@@ -34,19 +34,19 @@ extension Notification.Name {
     static let configColorChanged = Notification.Name("sym.config.colorChanged")
 }
 
-struct Config {
+enum Config {
     static var downloadScriptURL: URL {
         let dir = FileManager.default.appSupportDirectory() ?? NSTemporaryDirectory()
         var url = URL(fileURLWithPath: dir)
         url.appendPathComponent("download.sh")
         return url
     }
-    
+
     static func prepareDsymDownloadDirectory() {
-        let path = self.dsymDownloadDirectory
+        let path = dsymDownloadDirectory
         UserDefaults.standard.set(path, forKey: .downloadFolderKey)
     }
-    
+
     static var dsymDownloadDirectory: String {
         let home = NSHomeDirectory()
         var path: String!
@@ -57,33 +57,33 @@ struct Config {
                 path = stored
             }
         }
-        
+
         if path == nil {
             let urls = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
             path = urls.first?.path ?? home
         }
-        
+
         if !FileManager.default.fileExists(atPath: path) {
             FileManager.default.createDirectory(path)
         }
 
         return path
     }
-    
+
     static var editorFont: NSFont {
         get {
             var fontSize: CGFloat = NSFont.systemFontSize
-            
+
             let size = UserDefaults.standard.integer(forKey: .editorFontSizeKey)
             if size > 0 {
                 fontSize = CGFloat(size)
             }
-            
+
             var font: NSFont?
             if let name = UserDefaults.standard.string(forKey: .editorFontNameKey) {
                 font = NSFont(name: name, size: fontSize)
             }
-            
+
             return font ?? NSFont.userFixedPitchFont(ofSize: fontSize) ?? NSFont.systemFont(ofSize: fontSize)
         }
         set(newFont) {
@@ -94,7 +94,7 @@ struct Config {
             NotificationCenter.default.post(name: .configFontChanged, object: newFont)
         }
     }
-    
+
     static let highlightColors: [String] = [
         "#F44336",
         "#E91E63",
@@ -116,10 +116,10 @@ struct Config {
         "#9E9E9E",
         "#607D8B",
     ]
-    
+
     static var highlightColor: String {
         get {
-            return UserDefaults.standard.string(forKey: .editorHighlightColorKey) ?? self.highlightColors[0]
+            return UserDefaults.standard.string(forKey: .editorHighlightColorKey) ?? highlightColors[0]
         }
         set(newColor) {
             UserDefaults.standard.set(newColor, forKey: .editorHighlightColorKey)

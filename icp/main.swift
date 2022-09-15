@@ -22,11 +22,11 @@
 
 import Foundation
 
-//file:///private/var/mobile/Containers/Data/Application/F53C16D2-5D61-4028-A606-8C6D9DEB44F4/tmp/5fbd0d34068e78cb3042a0676dc44d5e-846930886.zip
+// file:///private/var/mobile/Containers/Data/Application/F53C16D2-5D61-4028-A606-8C6D9DEB44F4/tmp/5fbd0d34068e78cb3042a0676dc44d5e-846930886.zip
 
 let arguments = CommandLine.arguments
 if arguments.count < 4 {
-    print("Usage: icp app.id file:///path/to/file destnation");
+    print("Usage: icp app.id file:///path/to/file destnation")
     exit(1)
 }
 

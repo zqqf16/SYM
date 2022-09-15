@@ -33,7 +33,7 @@ class DeviceSidebarNode: SidebarNode {
 
     init(title: String, imageName: String = "") {
         self.title = title
-        self.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
+        image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
     }
 }
 
@@ -45,9 +45,9 @@ class DeviceSidebarFileNode: DeviceSidebarNode {
         self.deviceID = deviceID
         self.appID = appID
         super.init(title: title, imageName: "folder")
-        self.isGroup = false
-        self.isSelectable = true
-        self.toolTip = appID
+        isGroup = false
+        isSelectable = true
+        toolTip = appID
     }
 }
 
@@ -57,20 +57,20 @@ class DeviceSidebarCrashNode: DeviceSidebarNode {
     init(deviceID: String) {
         self.deviceID = deviceID
         super.init(title: NSLocalizedString("Crash Log", comment: "Crash Log"), imageName: "ladybug")
-        self.isGroup = false
-        self.isSelectable = true
+        isGroup = false
+        isSelectable = true
     }
 }
 
 extension DeviceSidebarNode {
-    static func deviceHeaderNode(_ title: String?,  children: [DeviceSidebarNode]) -> DeviceSidebarNode {
+    static func deviceHeaderNode(_ title: String?, children: [DeviceSidebarNode]) -> DeviceSidebarNode {
         let node = DeviceSidebarNode(title: title ?? "Unnamed device")
         node.children = children
         node.isGroup = true
         node.isSelectable = true
         return node
     }
-    
+
     static func fileHeaderNode(_ children: [DeviceSidebarNode]) -> DeviceSidebarNode {
         let title = NSLocalizedString("File Browser", comment: "File Browser")
         let node = DeviceSidebarNode(title: title, imageName: "folder")
@@ -84,28 +84,28 @@ extension DeviceSidebarNode {
 class DeviceDataSource {
     @Published
     var nodes: [DeviceSidebarNode] = []
-    
+
     private var storage = Set<AnyCancellable>()
 
     init() {
         NotificationCenter.default.publisher(for: .MDDeviceMonitor)
-            .sink { [weak self] (notification) in
+            .sink { [weak self] _ in
                 self?.prepareDevices()
             }.store(in: &storage)
-        self.prepareDevices()
+        prepareDevices()
     }
-    
+
     func prepareDevices() {
         DispatchQueue.global().async {
             let udids = MDDeviceMonitor.shared().connectedDevices
-            let nodes = udids.map { (udid) -> DeviceSidebarNode in
+            let nodes = udids.map { udid -> DeviceSidebarNode in
                 let lockdown = MDLockdown(udid: udid)
                 let instproxy = MDInstProxy(lockdown: lockdown)
-                let sbServices = MDSBServices(lockdown: lockdown);
+                let sbServices = MDSBServices(lockdown: lockdown)
                 let appInfoList = instproxy.listApps().filter { $0.isDeveloping }
-                
+
                 let appNodes = appInfoList.map { info -> DeviceSidebarFileNode in
-                    let app = DeviceSidebarFileNode(deviceID: udid, appID: info.identifier , title: info.name)
+                    let app = DeviceSidebarFileNode(deviceID: udid, appID: info.identifier, title: info.name)
                     if let icon = sbServices.requestIconImage(info.identifier) {
                         app.image = icon
                     }
@@ -118,7 +118,7 @@ class DeviceDataSource {
                 children.append(DeviceSidebarCrashNode(deviceID: udid))
                 return DeviceSidebarNode.deviceHeaderNode(lockdown.deviceName, children: children)
             }
-            
+
             DispatchQueue.main.async {
                 self.nodes = nodes
             }
@@ -126,50 +126,48 @@ class DeviceDataSource {
     }
 }
 
-
 class DeviceHomeViewController: NSSplitViewController {
-
     fileprivate var sidebar: DeviceSidebarViewController! {
-        return self.splitViewItems.first?.viewController as? DeviceSidebarViewController
+        return splitViewItems.first?.viewController as? DeviceSidebarViewController
     }
-    
+
     fileprivate var content: DeviceContentViewController! {
-        return self.splitViewItems.last?.viewController as? DeviceContentViewController
+        return splitViewItems.last?.viewController as? DeviceContentViewController
     }
-    
+
     let dataSource = DeviceDataSource()
     var storage = Set<AnyCancellable>()
-    
+
     var nodes: [DeviceSidebarNode] = [] {
         didSet {
             self.reloadData()
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.setupSidebar()
-        
-        self.dataSource.$nodes.assign(to: \.nodes, on: self).store(in: &storage)
+        setupSidebar()
+
+        dataSource.$nodes.assign(to: \.nodes, on: self).store(in: &storage)
     }
-    
+
     private func setupSidebar() {
-        self.sidebar.delegate = self
+        sidebar.delegate = self
     }
-    
+
     private func reloadData() {
-        self.sidebar.nodes = self.nodes
+        sidebar.nodes = nodes
     }
 }
 
 extension DeviceHomeViewController: DeviceSidebarViewControllerDelegate {
-    func sidebar(_ sidebar: DeviceSidebarViewController, didSelectNode node: SidebarNode) {
+    func sidebar(_: DeviceSidebarViewController, didSelectNode node: SidebarNode) {
         if node is DeviceSidebarFileNode {
             let fileNode = node as! DeviceSidebarFileNode
-            self.content.showFileList(fileNode.deviceID, appID: fileNode.appID)
+            content.showFileList(fileNode.deviceID, appID: fileNode.appID)
         } else if node is DeviceSidebarCrashNode {
             let crashNode = node as! DeviceSidebarCrashNode
-            self.content.showCrashList(crashNode.deviceID)
+            content.showCrashList(crashNode.deviceID)
         }
     }
 }

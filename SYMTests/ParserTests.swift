@@ -20,30 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
-import XCTest
 @testable import SYM
+import XCTest
 
 class ParserTests: XCTestCase {
-
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
-    
+
     func crashContent(fromFile file: String, ofType ftype: String) -> String {
         let bundle = Bundle(for: type(of: self))
         let path = bundle.path(forResource: file, ofType: ftype)!
         return try! String(contentsOfFile: path)
     }
-    
+
     func testRE() {
-        let content: String = """
+        let content = """
             E5B0A378-6816-3D90-86FD-2AEF15894A85
             E5B0A378-6816-3D90-86FD-2AEF15894A85
             E5B0A378-6816-3D90-86FD-2AEF15894A85
@@ -57,8 +55,8 @@ class ParserTests: XCTestCase {
     }
 
     func testAppleParser() {
-        let content = self.crashContent(fromFile: "AppleDemo", ofType: "ips")
-        
+        let content = crashContent(fromFile: "AppleDemo", ofType: "ips")
+
         let parser = AppleParser()
         let crash: Crash! = parser.parse(content)
 
@@ -75,24 +73,24 @@ class ParserTests: XCTestCase {
 
         let embedded = crash.embeddedBinaries
         XCTAssertEqual(embedded.count, 16)
-        
+
         XCTAssertTrue(crash.appBacktraceRanges.count > 0)
         XCTAssertNotNil(crash.crashedThreadRange)
     }
-    
+
     func testUmengParser() {
-        let content = self.crashContent(fromFile: "UmengDemo", ofType: "crash")
+        let content = crashContent(fromFile: "UmengDemo", ofType: "crash")
         let parser = UmengParser()
         let crash: Crash! = parser.parse(content)
-        
+
         XCTAssertNotNil(crash)
 
         XCTAssertEqual(crash.appName, "DemoApp")
         XCTAssertNil(crash.device)
         XCTAssertEqual(crash.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
-        
+
         XCTAssertTrue(crash.appBacktraceRanges.count > 0)
-        
+
         let binary: Binary! = crash.binaryImages.first
         XCTAssertNotNil(binary)
         XCTAssertEqual(binary.name, "DemoApp")

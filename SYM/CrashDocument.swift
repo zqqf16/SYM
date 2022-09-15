@@ -29,83 +29,83 @@ struct CrashFileType {
 }
 
 class CrashDocument: NSDocument {
-    let textStorage =  NSTextStorage()
-    
+    let textStorage = NSTextStorage()
+
     @Published
     var crashInfo: Crash?
-    
+
     @Published
     var isSymbolicating: Bool = false
-    
+
     var isReplaceable: Bool {
-        return self.fileURL == nil && self.textStorage.string.count == 0
+        return fileURL == nil && textStorage.string.count == 0
     }
-    
+
     private var contentPublisher = PassthroughSubject<String, Never>()
     private var cancellable: AnyCancellable?
-    
+
     override init() {
         super.init()
-        self.textStorage.delegate = self
-        self.cancellable = self.contentPublisher
+        textStorage.delegate = self
+        cancellable = contentPublisher
             .debounce(for: 0.5, scheduler: DispatchQueue.global())
-            .sink { [weak self] (content) in
+            .sink { [weak self] content in
                 self?.parseCrashInfo(content)
             }
     }
-    
+
     override func makeWindowControllers() {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
         let windowController = storyboard.instantiateController(withIdentifier: "Main Window Controller") as! NSWindowController
-        self.addWindowController(windowController)
+        addWindowController(windowController)
     }
 
-    override func data(ofType typeName: String) throws -> Data {
-        return self.textStorage.string.data(using: String.Encoding.utf8)!
+    override func data(ofType _: String) throws -> Data {
+        return textStorage.string.data(using: String.Encoding.utf8)!
     }
 
     override func read(from data: Data, ofType typeName: String) throws {
         if typeName == CrashFileType.plist {
-            try self.readPlist(from: data)
+            try readPlist(from: data)
         } else {
-            try self.readCrash(from: data)
+            try readCrash(from: data)
         }
     }
-    
+
     private func update(content: String) {
-        self.textStorage.beginEditing()
-        self.textStorage.replaceCharacters(in: self.textStorage.string.nsRange, with: content)
-        self.textStorage.applyStyle()
-        self.textStorage.endEditing()
+        textStorage.beginEditing()
+        textStorage.replaceCharacters(in: textStorage.string.nsRange, with: content)
+        textStorage.applyStyle()
+        textStorage.endEditing()
     }
-    
+
     private func readCrash(from data: Data) throws {
         var content = String(data: data, encoding: .utf8) ?? ""
         if let convertor = convertor(for: content) {
             content = convertor.convert(content)
         }
-        self.update(content: content)
-        //self.parseCrashInfo(content)
+        update(content: content)
+        // self.parseCrashInfo(content)
     }
-    
+
     private func readPlist(from data: Data) throws {
         guard let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: AnyObject] else {
             return
         }
-        
+
         guard let content = plist["description"] as? String,
-            let data = content.data(using: .utf8)
-            else {
-                return
+              let data = content.data(using: .utf8)
+        else {
+            return
         }
-        
-        try self.readCrash(from: data)
+
+        try readCrash(from: data)
     }
-    
+
     override class var autosavesInPlace: Bool {
         return false
     }
-    
+
     override class var autosavesDrafts: Bool {
         return false
     }
@@ -118,21 +118,22 @@ extension CrashDocument: NSTextStorageDelegate {
             self.crashInfo = crashInfo
         }
     }
-    
-    func textStorage(_ textStorage: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range editedRange: NSRange, changeInLength delta: Int) {
+
+    func textStorage(_: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range _: NSRange, changeInLength _: Int) {
         if editedMask.contains(.editedCharacters) {
-            self.contentPublisher.send(self.textStorage.string)
+            contentPublisher.send(textStorage.string)
         }
     }
 }
 
 // MARK: Symbolicate
+
 extension CrashDocument {
     func symbolicate(withDsymPaths dsyms: [String]?) {
-        guard let crash = self.crashInfo else {
+        guard let crash = crashInfo else {
             return
         }
-        
+
         DispatchQueue.global().async {
             self.isSymbolicating = true
             let content = crash.symbolicate(dsymPaths: dsyms)

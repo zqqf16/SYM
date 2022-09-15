@@ -25,12 +25,12 @@ import Cocoa
 class BaseWindow: NSWindow {
     override init(contentRect: NSRect, styleMask style: NSWindow.StyleMask, backing backingStoreType: NSWindow.BackingStoreType, defer flag: Bool) {
         super.init(contentRect: contentRect, styleMask: style, backing: backingStoreType, defer: flag)
-        self.titleVisibility = .hidden
-        //self.titlebarAppearsTransparent = true
-        self.isMovableByWindowBackground = true
-        self.styleMask.insert(.fullSizeContentView)
-        self.styleMask.insert(.unifiedTitleAndToolbar)
-        //self.backgroundColor = NSColor.white
-        //self.center()
+        titleVisibility = .hidden
+        // self.titlebarAppearsTransparent = true
+        isMovableByWindowBackground = true
+        styleMask.insert(.fullSizeContentView)
+        styleMask.insert(.unifiedTitleAndToolbar)
+        // self.backgroundColor = NSColor.white
+        // self.center()
     }
 }
