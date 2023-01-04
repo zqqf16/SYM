@@ -6,6 +6,7 @@ NAME = SYM_$(BUILD_VER)
 ARCHIVE_PATH = build/$(NAME).xcarchive
 EXPORT_PATH = build/$(NAME)
 APP_PATH = $(EXPORT_PATH)/SYM.app
+ZIP_PATH = $(APP_PATH).zip
 DMG_DIR = $(EXPORT_PATH)/SYM
 DIST_DIR = dist
 DMG_PATH = $(DIST_DIR)/$(NAME).dmg
@@ -34,6 +35,12 @@ else
 	xcodebuild -project SYM.xcodeproj -config Release -scheme SYM -archivePath $(ARCHIVE_PATH) archive
 endif
 	xcodebuild -exportArchive -archivePath $(ARCHIVE_PATH) -exportOptionsPlist exportOptions.plist -exportPath $(EXPORT_PATH)
+
+notarize:
+	/usr/bin/ditto -c -k --keepParent $(APP_PATH) $(ZIP_PATH)
+	xcrun notarytool submit $(ZIP_PATH) --keychain-profile "Notarization" --wait
+	xcrun stapler staple $(APP_PATH)
+	spctl --assess -vv --type install $(APP_PATH)
 
 dmg:
 	if [ -f ${DMG_PATH} ]; then rm $(DMG_PATH); fi;
