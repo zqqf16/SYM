@@ -255,6 +255,16 @@ struct AppleJsonConvertor: Convertor {
             Line.empty
 
             let binaryImages = payload["usedImages"]
+
+            if let lastExceptionBacktrace = payload["lastExceptionBacktrace"].array {
+                Line.empty
+                Line("Last Exception Backtrace:")
+                for (frameIndex, frame) in lastExceptionBacktrace.enumerated() {
+                    Frame(frame, index: frameIndex, binaryImages: binaryImages)
+                }
+                Line.empty
+            }
+
             let threads = payload["threads"].arrayValue
             for (index, thread) in threads.enumerated() {
                 Thread(thread, index: index, binaryImages: binaryImages)
