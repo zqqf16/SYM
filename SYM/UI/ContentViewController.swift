@@ -17,6 +17,7 @@ class ContentViewController: NSViewController {
 
     private var font: NSFont = Config.editorFont
     private var cancellable: AnyCancellable?
+    private var gutterWidthConstraint: Constraint?
 
     var document: CrashDocument? {
         didSet {
@@ -94,7 +95,7 @@ class ContentViewController: NSViewController {
         gutterView.snp.makeConstraints { make in
             make.leading.top.equalToSuperview()
             make.bottom.equalTo(bottomBar.snp.top)
-            make.width.equalTo(LineNumberGutterView.defaultWidth)
+            gutterWidthConstraint = make.width.equalTo(LineNumberGutterView.defaultWidth).constraint
         }
         scrollView.snp.makeConstraints { make in
             make.top.trailing.equalToSuperview()
@@ -107,8 +108,11 @@ class ContentViewController: NSViewController {
         super.viewDidLoad()
         toggleBottomBar(false)
         setupTextView()
+        applyLineNumbersPreference()
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configFontChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(lineNumbersPreferenceDidChange(_:)), name: .configLineNumbersChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(crashSummaryPreferenceDidChange(_:)), name: .configCrashSummaryChanged, object: nil)
     }
 
     override func viewDidLayout() {
@@ -208,12 +212,29 @@ class ContentViewController: NSViewController {
     }
 
     private func updateSummary(_ crashInfo: CrashReport?) {
-        guard let info = crashInfo else {
+        guard Config.showCrashSummary, let info = crashInfo else {
             toggleBottomBar(false)
             return
         }
         infoLabel.stringValue = infoString(fromCrash: info)
         toggleBottomBar(true)
+    }
+
+    private func applyLineNumbersPreference() {
+        let show = Config.showLineNumbers
+        gutterView.isHidden = !show
+        gutterWidthConstraint?.update(offset: show ? LineNumberGutterView.defaultWidth : 0)
+        view.layoutSubtreeIfNeeded()
+        syncTextViewWidthToClipView(forceLayout: true)
+        gutterView.needsDisplay = true
+    }
+
+    @objc private func lineNumbersPreferenceDidChange(_: Notification) {
+        applyLineNumbersPreference()
+    }
+
+    @objc private func crashSummaryPreferenceDidChange(_: Notification) {
+        updateSummary(document?.crashInfo)
     }
 
     @objc func configFontDidChanged(_: Notification) {

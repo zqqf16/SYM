@@ -68,8 +68,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let vc = PreferencesViewController()
             let window = NSWindow(contentViewController: vc)
             window.title = NSLocalizedString("Settings", comment: "Settings")
-            window.styleMask = [.titled, .closable]
-            window.setContentSize(NSSize(width: 420, height: 160))
+            window.styleMask = [.titled, .closable, .resizable, .miniaturizable]
+            window.setContentSize(NSSize(width: 760, height: 520))
+            window.minSize = NSSize(width: 640, height: 420)
             window.center()
             preferencesWindow = window
         }
