@@ -6,20 +6,6 @@
 	objectVersion = 52;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		B5F357B722C5FDD900111FF3 /* UpdateModel */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = B5F357BA22C5FDDA00111FF3 /* Build configuration list for PBXAggregateTarget "UpdateModel" */;
-			buildPhases = (
-				B5F357BB22C5FDE300111FF3 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = UpdateModel;
-			productName = Model;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		B5CR001127F200010000001 /* CrashReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000127F200010000001 /* CrashReport.swift */; };
 		B5CR001227F200010000002 /* String+Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000227F200010000002 /* String+Crash.swift */; };
@@ -39,6 +25,7 @@
 		B5SY002327F300010000003 /* AtosSymbolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5SY001327F300010000003 /* AtosSymbolEngine.swift */; };
 		B5SY002427F300010000004 /* DsymLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5SY001427F300010000004 /* DsymLocator.swift */; };
 		B5MK001327F300010000003 /* MachOKit in Frameworks */ = {isa = PBXBuildFile; productRef = B5MK001227F300010000002 /* MachOKit */; };
+		B5HW001327F300010000003 /* hardware-models.json in Resources */ = {isa = PBXBuildFile; fileRef = B5HW001227F300010000002 /* hardware-models.json */; };
 		510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */ = {isa = PBXBuildFile; fileRef = 510777781EFBA4C30055E8BD /* AppleDemo.ips */; };
 		514B4F6B1E30AC9100171990 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 514B4F6A1E30AC9100171990 /* Foundation.framework */; };
 		51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* CrashDocument.swift */; };
@@ -116,7 +103,6 @@
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
-		F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */ = {isa = PBXBuildFile; fileRef = F40B9DBC2123E32D000DF7C6 /* models.txt */; };
 		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
@@ -186,6 +172,7 @@
 		51BF9C531D6C7A1C00379BFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UmengDemo.crash; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
+		B5HW001227F300010000002 /* hardware-models.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "hardware-models.json"; sourceTree = "<group>"; };
 		B5089461258C838D0074254E /* MDScreenShotr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDScreenShotr.h; sourceTree = "<group>"; };
 		B5089462258C838D0074254E /* MDScreenShotr.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDScreenShotr.m; sourceTree = "<group>"; };
 		B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHomeViewController.swift; sourceTree = "<group>"; };
@@ -271,8 +258,6 @@
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A31D3FBB7200F3B00C /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
-		F40B9DBC2123E32D000DF7C6 /* models.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = models.txt; sourceTree = "<group>"; };
-		F40B9DBD2123E32D000DF7C6 /* models.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = models.py; sourceTree = "<group>"; };
 		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
@@ -524,15 +509,6 @@
 			path = Dsym;
 			sourceTree = "<group>";
 		};
-		F40B9DBB2123E31A000DF7C6 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F40B9DBD2123E32D000DF7C6 /* models.py */,
-				F40B9DBC2123E32D000DF7C6 /* models.txt */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		F43C129D1D39CEE0004952B4 /* images */ = {
 			isa = PBXGroup;
 			children = (
@@ -601,11 +577,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		B5HW001127F300010000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B5HW001227F300010000002 /* hardware-models.json */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		F49BD1EE1D2FF46300024AAE /* SYM */ = {
 			isa = PBXGroup;
 			children = (
 				F4EFE7DE21242C0900E9EDA9 /* Device */,
-				F40B9DBB2123E31A000DF7C6 /* Models */,
+				B5HW001127F300010000001 /* Models */,
 				51B5D2981D52166000B979C8 /* Tools */,
 				F45321061D30CC5F00639917 /* Utils */,
 				51B8D7031D4F60EB00F2C24C /* Document */,
@@ -762,11 +746,6 @@
 						DevelopmentTeam = BPL95996PK;
 						ProvisioningStyle = Automatic;
 					};
-					B5F357B722C5FDD900111FF3 = {
-						CreatedOnToolsVersion = 10.2.1;
-						DevelopmentTeam = BPL95996PK;
-						ProvisioningStyle = Automatic;
-					};
 					F49BD1EB1D2FF46300024AAE = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = BPL95996PK;
@@ -795,7 +774,6 @@
 			targets = (
 				F49BD1EB1D2FF46300024AAE /* SYM */,
 				51BF9C4E1D6C7A1C00379BFC /* SYMTests */,
-				B5F357B722C5FDD900111FF3 /* UpdateModel */,
 				B53E2F8A22D48E28003BC45C /* icp */,
 			);
 		};
@@ -818,7 +796,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F4CD14651D39D5B7006BAB2B /* file.icns in Resources */,
-				F40B9DBE2123E32D000DF7C6 /* models.txt in Resources */,
+				B5HW001327F300010000003 /* hardware-models.json in Resources */,
 				F4CD14631D39D323006BAB2B /* Assets.xcassets in Resources */,
 				B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */,
 				B5MENU0227F600010000002 /* MainMenu.xib in Resources */,
@@ -846,23 +824,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if test -n \"${BUILDIN_DOWNLOAD_SCRIPT_PATH}\"; then\n    echo \"Copy buildin download script ${BUILDIN_DOWNLOAD_SCRIPT_PATH}\"\n    cp ${BUILDIN_DOWNLOAD_SCRIPT_PATH} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/download.sh\"\nelse\n    echo \"Without buildin download script\"\nfi\n";
-		};
-		B5F357BB22C5FDE300111FF3 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\npython3 \"$PROJECT_DIR\"/SYM/Models/models.py > \"$PROJECT_DIR\"/SYM/Models/models.txt\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1118,26 +1079,6 @@
 			};
 			name = Release;
 		};
-		B5F357B822C5FDDA00111FF3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = BPL95996PK;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		B5F357B922C5FDDA00111FF3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = BPL95996PK;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		F49BD20F1D2FF46400024AAE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1342,15 +1283,6 @@
 			buildConfigurations = (
 				B53E2F9022D48E28003BC45C /* Debug */,
 				B53E2F9122D48E28003BC45C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B5F357BA22C5FDDA00111FF3 /* Build configuration list for PBXAggregateTarget "UpdateModel" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B5F357B822C5FDDA00111FF3 /* Debug */,
-				B5F357B922C5FDDA00111FF3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

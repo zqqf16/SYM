@@ -113,6 +113,7 @@ class ContentViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(lineNumbersPreferenceDidChange(_:)), name: .configLineNumbersChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(crashSummaryPreferenceDidChange(_:)), name: .configCrashSummaryChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hardwareModelsDidUpdate(_:)), name: .hardwareModelsDidUpdate, object: nil)
     }
 
     override func viewDidLayout() {
@@ -234,6 +235,10 @@ class ContentViewController: NSViewController {
     }
 
     @objc private func crashSummaryPreferenceDidChange(_: Notification) {
+        updateSummary(document?.crashInfo)
+    }
+
+    @objc private func hardwareModelsDidUpdate(_: Notification) {
         updateSummary(document?.crashInfo)
     }
 

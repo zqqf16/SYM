@@ -95,6 +95,11 @@ struct SYMSettingsRootView: View {
 // MARK: - Panes
 
 private struct GeneralSettingsPane: View {
+    @State private var modelEntryCount = HardwareModelStore.shared.entryCount
+    @State private var modelLastUpdated = HardwareModelStore.shared.lastUpdated
+    @State private var isCheckingModels = false
+    @State private var modelUpdateMessage: String?
+
     var body: some View {
         Form {
             Section {
@@ -111,6 +116,35 @@ private struct GeneralSettingsPane: View {
             }
 
             Section {
+                LabeledContent(NSLocalizedString("Database", comment: "Hardware models database")) {
+                    Text(modelDatabaseSummary)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.trailing)
+                }
+
+                LabeledContent(NSLocalizedString("Update", comment: "Hardware models update")) {
+                    Button(NSLocalizedString("Check for Updates", comment: "Hardware models")) {
+                        checkHardwareModels()
+                    }
+                    .disabled(isCheckingModels)
+                }
+                Text(NSLocalizedString("Download the latest Apple device identifier → name mapping used in the crash summary.", comment: "Settings help"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                if isCheckingModels {
+                    ProgressView()
+                        .controlSize(.small)
+                } else if let modelUpdateMessage {
+                    Text(modelUpdateMessage)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text(NSLocalizedString("Hardware Models", comment: "Settings section"))
+            }
+
+            Section {
                 LabeledContent("SYM") {
                     Text(appVersionString)
                         .foregroundStyle(.secondary)
@@ -122,12 +156,63 @@ private struct GeneralSettingsPane: View {
         .formStyle(.grouped)
         .padding(.top, 8)
         .navigationTitle(SettingsPane.general.title)
+        .onReceive(NotificationCenter.default.publisher(for: .hardwareModelsDidUpdate)) { _ in
+            refreshModelStatus()
+        }
+    }
+
+    private var modelDatabaseSummary: String {
+        let count = String(format: NSLocalizedString("%lld models", comment: "Hardware model count"), Int64(modelEntryCount))
+        if let modelLastUpdated {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            let date = formatter.string(from: modelLastUpdated)
+            return String(format: NSLocalizedString("%@ · Updated %@", comment: "Hardware models status"), count, date)
+        }
+        return String(format: NSLocalizedString("%@ · Bundled", comment: "Hardware models using app bundle"), count)
     }
 
     private var appVersionString: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
         return String(format: NSLocalizedString("Version %@ (%@)", comment: "App version"), version, build)
+    }
+
+    private func refreshModelStatus() {
+        modelEntryCount = HardwareModelStore.shared.entryCount
+        modelLastUpdated = HardwareModelStore.shared.lastUpdated
+    }
+
+    private func checkHardwareModels() {
+        isCheckingModels = true
+        modelUpdateMessage = nil
+        Task {
+            do {
+                let outcome = try await HardwareModelStore.shared.checkForUpdates()
+                await MainActor.run {
+                    refreshModelStatus()
+                    switch outcome {
+                    case .updated(let count):
+                        modelUpdateMessage = String(
+                            format: NSLocalizedString("Updated to %lld models.", comment: "Hardware models update success"),
+                            Int64(count)
+                        )
+                    case .unchanged(let count):
+                        modelUpdateMessage = String(
+                            format: NSLocalizedString("Already up to date (%lld models).", comment: "Hardware models unchanged"),
+                            Int64(count)
+                        )
+                    }
+                    isCheckingModels = false
+                }
+            } catch {
+                await MainActor.run {
+                    modelUpdateMessage = error.localizedDescription
+                    isCheckingModels = false
+                }
+            }
+        }
     }
 }
 
