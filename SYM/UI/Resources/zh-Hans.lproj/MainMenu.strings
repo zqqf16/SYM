@@ -58,6 +58,12 @@
 "window-menu.title" = "窗口";
 "minimize-item.title" = "最小化";
 "zoom-item.title" = "缩放";
+"next-tab.title" = "显示下一个标签页";
+"prev-tab.title" = "显示上一个标签页";
+"move-tab.title" = "将标签页移到新窗口";
+"merge-tabs.title" = "合并所有窗口";
+"toggle-tabbar.title" = "显示标签栏";
+"tab-overview.title" = "显示所有标签页";
 "devices-item.title" = "设备";
 "front-item.title" = "前置全部窗口";
 

@@ -71,12 +71,25 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
         window.minSize = NSSize(width: 560, height: 360)
         window.center()
         window.toolbarStyle = .unified
+        // Same identifier for all crash-document windows so AppKit can tab them
+        // together according to System Settings → Prefer tabs when opening documents.
+        window.tabbingIdentifier = Self.documentTabbingIdentifier
+        window.tabbingMode = .automatic
 
         super.init(window: window)
 
         // Programmatic windows do not call windowDidLoad — configure here.
         configureToolbar()
         configureBindings()
+    }
+
+    /// Shared by every main crash editor window.
+    static let documentTabbingIdentifier = "im.zorro.SYM.CrashDocument"
+
+    /// Tab-bar "+" creates another untitled document (respects user tabbing preference).
+    @objc
+    override func newWindowForTab(_ sender: Any?) {
+        NSDocumentController.shared.newDocument(sender)
     }
 
     @available(*, unavailable)

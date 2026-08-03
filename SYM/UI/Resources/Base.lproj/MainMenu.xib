@@ -238,12 +238,48 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="window-sep1"/>
+                            <menuItem title="Show Next Tab" keyEquivalent="}" id="next-tab">
+                                <connections>
+                                    <action selector="selectNextTab:" target="-1" id="next-tab-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Previous Tab" keyEquivalent="{" id="prev-tab">
+                                <connections>
+                                    <action selector="selectPreviousTab:" target="-1" id="prev-tab-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Move Tab to New Window" id="move-tab">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="moveTabToNewWindow:" target="-1" id="move-tab-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Merge All Windows" id="merge-tabs">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="mergeAllWindows:" target="-1" id="merge-tabs-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="window-sep2"/>
+                            <menuItem title="Show Tab Bar" id="toggle-tabbar">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleTabBar:" target="-1" id="toggle-tabbar-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All Tabs" keyEquivalent="\\" id="tab-overview">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleTabOverview:" target="-1" id="tab-overview-act"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="window-sep3"/>
                             <menuItem title="Devices" keyEquivalent="d" id="devices-item">
                                 <connections>
                                     <action selector="showDevices:" target="app-delegate" id="devices-act"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="window-sep2"/>
+                            <menuItem isSeparatorItem="YES" id="window-sep4"/>
                             <menuItem title="Bring All to Front" id="front-item">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>

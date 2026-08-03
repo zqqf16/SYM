@@ -35,6 +35,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_: Notification) {
         _ = NSApp.setActivationPolicy(.regular)
+        // Participate in system “Prefer tabs when opening documents”.
+        NSWindow.allowsAutomaticWindowTabbing = true
         // MainMenu.xib (NSMainNibFile) should already be loaded; rebuild if missing.
         ensureMainMenu()
     }

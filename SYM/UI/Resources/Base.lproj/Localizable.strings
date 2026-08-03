@@ -45,6 +45,12 @@
 "Window" = "Window";
 "Minimize" = "Minimize";
 "Zoom" = "Zoom";
+"Show Next Tab" = "Show Next Tab";
+"Show Previous Tab" = "Show Previous Tab";
+"Move Tab to New Window" = "Move Tab to New Window";
+"Merge All Windows" = "Merge All Windows";
+"Show Tab Bar" = "Show Tab Bar";
+"Show All Tabs" = "Show All Tabs";
 "Devices" = "Devices";
 "Bring All to Front" = "Bring All to Front";
 "Help" = "Help";

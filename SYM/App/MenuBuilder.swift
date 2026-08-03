@@ -185,6 +185,19 @@ enum MenuBuilder {
         windowMenu.addItem(withTitle: L("Minimize"), action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m")
         windowMenu.addItem(withTitle: L("Zoom"), action: #selector(NSWindow.performZoom(_:)), keyEquivalent: "")
         windowMenu.addItem(.separator())
+        windowMenu.addItem(withTitle: L("Show Next Tab"), action: #selector(NSWindow.selectNextTab(_:)), keyEquivalent: "}")
+        windowMenu.addItem(withTitle: L("Show Previous Tab"), action: #selector(NSWindow.selectPreviousTab(_:)), keyEquivalent: "{")
+        windowMenu.addItem(withTitle: L("Move Tab to New Window"), action: #selector(NSWindow.moveTabToNewWindow(_:)), keyEquivalent: "")
+        windowMenu.addItem(withTitle: L("Merge All Windows"), action: #selector(NSWindow.mergeAllWindows(_:)), keyEquivalent: "")
+        windowMenu.addItem(.separator())
+        windowMenu.addItem(withTitle: L("Show Tab Bar"), action: #selector(NSWindow.toggleTabBar(_:)), keyEquivalent: "")
+        let tabOverview = windowMenu.addItem(
+            withTitle: L("Show All Tabs"),
+            action: #selector(NSWindow.toggleTabOverview(_:)),
+            keyEquivalent: "\\"
+        )
+        tabOverview.keyEquivalentModifierMask = [.command, .shift]
+        windowMenu.addItem(.separator())
         let devices = windowMenu.addItem(
             withTitle: L("Devices"),
             action: #selector(AppDelegate.showDevices(_:)),

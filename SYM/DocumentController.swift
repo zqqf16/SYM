@@ -38,4 +38,10 @@ class DocumentController: NSDocumentController {
         }
         completionHandler(doc, true, nil)
     }
+
+    /// Enables the tab bar "+" button when the document controller is in the responder chain.
+    @objc
+    func newWindowForTab(_ sender: Any?) {
+        newDocument(sender)
+    }
 }

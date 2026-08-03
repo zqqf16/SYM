@@ -69,6 +69,12 @@
 "Window" = "窗口";
 "Minimize" = "最小化";
 "Zoom" = "缩放";
+"Show Next Tab" = "显示下一个标签页";
+"Show Previous Tab" = "显示上一个标签页";
+"Move Tab to New Window" = "将标签页移到新窗口";
+"Merge All Windows" = "合并所有窗口";
+"Show Tab Bar" = "显示标签栏";
+"Show All Tabs" = "显示所有标签页";
 "Devices" = "设备";
 "Bring All to Front" = "前置全部窗口";
 "Help" = "帮助";
