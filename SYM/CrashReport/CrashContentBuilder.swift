@@ -21,67 +21,64 @@
 // SOFTWARE.
 
 import Foundation
-import SwiftyJSON
 
-protocol ContentComponent {
+protocol CrashContentComponent {
     var string: String { get }
 }
 
 @resultBuilder
-enum ContentBuilder {
-    static func buildBlock(_ components: ContentComponent...) -> String {
-        return components.compactMap { $0.string }.joined(separator: "")
+enum CrashContentBuilder {
+    static func buildBlock(_ components: CrashContentComponent...) -> String {
+        components.compactMap { $0.string }.joined(separator: "")
     }
 
-    static func buildArray(_ components: [ContentComponent]) -> String {
-        return components.compactMap { $0.string }.joined(separator: "")
+    static func buildArray(_ components: [CrashContentComponent]) -> String {
+        components.compactMap { $0.string }.joined(separator: "")
     }
 
-    static func buildEither(first component: ContentComponent) -> String {
+    static func buildEither(first component: CrashContentComponent) -> String {
         component.string
     }
 
-    static func buildEither(second component: ContentComponent) -> String {
+    static func buildEither(second component: CrashContentComponent) -> String {
         component.string
     }
 
-    static func buildOptional(_ component: ContentComponent?) -> String {
-        return component?.string ?? ""
+    static func buildOptional(_ component: CrashContentComponent?) -> String {
+        component?.string ?? ""
     }
 }
 
-extension String: ContentComponent {
-    var string: String {
-        return self
-    }
-
-    func format(_ args: CVarArg...) -> Self {
-        return String(format: self, arguments: args)
-    }
-
-    init(@ContentBuilder builder: () -> String) {
-        self = builder()
-    }
-}
-
-struct Line: ContentComponent {
+struct CrashLine: CrashContentComponent {
     var value: String
 
     var string: String {
-        return value + "\n"
+        value + "\n"
     }
 
-    static let empty: Line = .init("")
+    static let empty: CrashLine = .init("")
 
     init(_ value: String) {
         self.value = value
     }
 
-    init(@ContentBuilder builder: () -> String) {
+    init(@CrashContentBuilder builder: () -> String) {
         value = builder()
     }
 
-    func format(_ args: CVarArg...) -> Line {
-        return Line(value.format(args))
+    func format(_ args: CVarArg...) -> CrashLine {
+        CrashLine(String(format: value, arguments: args))
+    }
+}
+
+func crashString(@CrashContentBuilder builder: () -> String) -> String {
+    builder()
+}
+
+struct CrashText: CrashContentComponent {
+    let string: String
+
+    init(_ string: String) {
+        self.string = string
     }
 }

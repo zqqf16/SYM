@@ -23,7 +23,8 @@
 import Cocoa
 import Combine
 
-class DsymToolBarButton: NSPopUpButton {
+/// Toolbar control that shows dSYM match status and opens the dSYM panel.
+final class DsymToolbarButton: NSButton {
     private var cancellable: AnyCancellable?
 
     var dsymManager: DsymManager? {
@@ -34,19 +35,39 @@ class DsymToolBarButton: NSPopUpButton {
                 .sink { [weak self] dsymFiles in
                     self?.update(withDsymFiles: dsymFiles)
                 }
+            update(withDsymFiles: dsymManager?.dsymFiles ?? [:])
         }
+    }
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        commonInit()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+
+    private func commonInit() {
+        bezelStyle = .toolbar
+        isBordered = true
+        imagePosition = .imageOnly
+        setButtonType(.momentaryPushIn)
+        toolTip = NSLocalizedString("dSYM files", comment: "")
+        image = .symDsymMissing
     }
 
     private func update(withDsymFiles dsymFiles: [String: DsymFile]) {
         if let crash = dsymManager?.crash,
            let uuid = crash.uuid,
-           let dsym = dsymFiles[uuid]
+           dsymFiles[uuid] != nil
         {
-            title = dsym.name
-            image = .symbol
+            image = .symDsymFound
+            toolTip = NSLocalizedString("dSYM file found", comment: "")
         } else {
-            title = NSLocalizedString("dsym_file_not_found", comment: "")
-            image = .alert
+            image = .symDsymMissing
+            toolTip = NSLocalizedString("dsym_file_not_found", comment: "")
         }
     }
 }

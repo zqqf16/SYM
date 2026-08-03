@@ -1,67 +1,84 @@
-// The MIT License (MIT)
-//
-// Copyright (c) 2017 - present zqqf16
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 import Cocoa
+import SnapKit
 
 class DownloadScriptViewController: NSViewController {
-    @IBOutlet var textView: NSTextView!
+    private let textView = NSTextView()
+    private let scrollView = NSScrollView()
+
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 640, height: 480))
+
+        scrollView.hasVerticalScroller = true
+        scrollView.borderType = .bezelBorder
+        scrollView.documentView = textView
+
+        let doneButton = NSButton(title: NSLocalizedString("Done", comment: ""), target: self, action: #selector(didClickDoneButton(_:)))
+        doneButton.bezelStyle = .rounded
+        let cancelButton = NSButton(title: NSLocalizedString("Cancel", comment: ""), target: self, action: #selector(close(_:)))
+        cancelButton.bezelStyle = .rounded
+
+        view.addSubview(scrollView)
+        view.addSubview(doneButton)
+        view.addSubview(cancelButton)
+
+        scrollView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalTo(doneButton.snp.top).offset(-12)
+        }
+        cancelButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-16)
+            make.bottom.equalToSuperview().offset(-16)
+        }
+        doneButton.snp.makeConstraints { make in
+            make.trailing.equalTo(cancelButton.snp.leading).offset(-8)
+            make.centerY.equalTo(cancelButton)
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
         textView.font = NSFont(name: "Menlo", size: 11)!
+        textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.textContainerInset = CGSize(width: 10, height: 10)
-
         Config.prepareDsymDownloadDirectory()
         loadContent()
     }
 
-    @IBAction func didClickDoneButton(_ sender: Any) {
+    @objc func didClickDoneButton(_ sender: Any) {
         var script = textView.string
-        if script.lengthOfBytes(using: .utf8) > 0 {
-            if !script.hasPrefix("#!") {
-                script = "#!/bin/bash\n" + script
-            }
+        if script.lengthOfBytes(using: .utf8) > 0, !script.hasPrefix("#!") {
+            script = "#!/bin/bash\n" + script
         }
         do {
             try script.write(to: Config.downloadScriptURL, atomically: true, encoding: .utf8)
-        } catch {
-            // TODO: error handling
-        }
-
+        } catch {}
         close(sender)
     }
 
-    @IBAction func close(_: Any) {
-        view.window?.windowController?.close()
+    @objc func close(_: Any) {
+        view.window?.close()
     }
 
     func loadContent() {
-        let userImportedScript = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8)
-        if userImportedScript != nil, userImportedScript!.lengthOfBytes(using: .utf8) > 0 {
-            textView.string = userImportedScript!
+        if let userImportedScript = try? String(contentsOf: Config.downloadScriptURL, encoding: .utf8),
+           userImportedScript.lengthOfBytes(using: .utf8) > 0
+        {
+            textView.string = userImportedScript
             return
         }
-
-        let template = try! String(contentsOf: Bundle.main.url(forResource: "template", withExtension: "sh")!, encoding: .utf8)
-        textView.string = template
+        if let url = Bundle.main.url(forResource: "template", withExtension: "sh"),
+           let template = try? String(contentsOf: url, encoding: .utf8)
+        {
+            textView.string = template
+        }
     }
 }

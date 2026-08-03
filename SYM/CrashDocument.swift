@@ -32,7 +32,7 @@ class CrashDocument: NSDocument {
     let textStorage = NSTextStorage()
 
     @Published
-    var crashInfo: Crash?
+    var crashInfo: CrashReport?
 
     @Published
     var isSymbolicating: Bool = false
@@ -55,8 +55,7 @@ class CrashDocument: NSDocument {
     }
 
     override func makeWindowControllers() {
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Main"), bundle: nil)
-        let windowController = storyboard.instantiateController(withIdentifier: "Main Window Controller") as! NSWindowController
+        let windowController = MainWindowController()
         addWindowController(windowController)
     }
 
@@ -80,12 +79,8 @@ class CrashDocument: NSDocument {
     }
 
     private func readCrash(from data: Data) throws {
-        var content = String(data: data, encoding: .utf8) ?? ""
-        if let convertor = convertor(for: content) {
-            content = convertor.convert(content)
-        }
+        let content = String(data: data, encoding: .utf8) ?? ""
         update(content: content)
-        // self.parseCrashInfo(content)
     }
 
     private func readPlist(from data: Data) throws {
@@ -113,9 +108,9 @@ class CrashDocument: NSDocument {
 
 extension CrashDocument: NSTextStorageDelegate {
     func parseCrashInfo(_ content: String) {
-        let crashInfo = Crash.parse(content)
+        let report = CrashFormatter.format(CrashDecoding.decode(content))
         DispatchQueue.main.async {
-            self.crashInfo = crashInfo
+            self.crashInfo = report
         }
     }
 
@@ -126,19 +121,23 @@ extension CrashDocument: NSTextStorageDelegate {
     }
 }
 
-// MARK: Symbolicate
-
 extension CrashDocument {
-    func symbolicate(withDsymPaths dsyms: [String]?) {
+    func symbolicate(withDsymPaths dsyms: [String: String]?) {
         guard let crash = crashInfo else {
             return
         }
 
-        DispatchQueue.global().async {
-            self.isSymbolicating = true
-            let content = crash.symbolicate(dsymPaths: dsyms)
-            DispatchQueue.main.async {
-                self.update(content: content)
+        Task {
+            await MainActor.run {
+                self.isSymbolicating = true
+            }
+
+            let engine = CompositeSymbolEngine()
+            let symbolicated = await crash.symbolicated(using: engine, dsyms: dsyms ?? [:])
+
+            await MainActor.run {
+                self.crashInfo = symbolicated
+                self.update(content: symbolicated.formattedContent)
                 self.undoManager?.removeAllActions()
                 self.updateChangeCount(.changeDone)
                 self.isSymbolicating = false

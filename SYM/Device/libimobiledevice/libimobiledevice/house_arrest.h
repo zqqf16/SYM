@@ -32,6 +32,7 @@ extern "C" {
 #include <libimobiledevice/lockdown.h>
 #include <libimobiledevice/afc.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the house arrest service */
 #define HOUSE_ARREST_SERVICE_NAME "com.apple.mobile.house_arrest"
 
 /** Error Codes */
@@ -44,7 +45,7 @@ typedef enum {
 	HOUSE_ARREST_E_UNKNOWN_ERROR = -256
 } house_arrest_error_t;
 
-typedef struct house_arrest_client_private house_arrest_client_private;
+typedef struct house_arrest_client_private house_arrest_client_private; /**< \private */
 typedef house_arrest_client_private *house_arrest_client_t; /**< The client handle. */
 
 /* Interface */
@@ -60,7 +61,7 @@ typedef house_arrest_client_private *house_arrest_client_t; /**< The client hand
  * @return HOUSE_ARREST_E_SUCCESS on success, HOUSE_ARREST_E_INVALID_ARG when
  *     client is NULL, or an HOUSE_ARREST_E_* error code otherwise.
  */
-house_arrest_error_t house_arrest_client_new(idevice_t device, lockdownd_service_descriptor_t service, house_arrest_client_t *client);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_client_new(idevice_t device, lockdownd_service_descriptor_t service, house_arrest_client_t *client);
 
 /**
  * Starts a new house_arrest service on the specified device and connects to it.
@@ -75,7 +76,7 @@ house_arrest_error_t house_arrest_client_new(idevice_t device, lockdownd_service
  * @return HOUSE_ARREST_E_SUCCESS on success, or an HOUSE_ARREST_E_* error
  *     code otherwise.
  */
-house_arrest_error_t house_arrest_client_start_service(idevice_t device, house_arrest_client_t* client, const char* label);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_client_start_service(idevice_t device, house_arrest_client_t* client, const char* label);
 
 /**
  * Disconnects an house_arrest client from the device and frees up the
@@ -91,7 +92,7 @@ house_arrest_error_t house_arrest_client_start_service(idevice_t device, house_a
  * @return HOUSE_ARREST_E_SUCCESS on success, HOUSE_ARREST_E_INVALID_ARG when
  *     client is NULL, or an HOUSE_ARREST_E_* error code otherwise.
  */
-house_arrest_error_t house_arrest_client_free(house_arrest_client_t client);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_client_free(house_arrest_client_t client);
 
 
 /**
@@ -111,7 +112,7 @@ house_arrest_error_t house_arrest_client_free(house_arrest_client_t client);
  *     HOUSE_ARREST_E_INVALID_MODE if the client is not in the correct mode,
  *     or HOUSE_ARREST_E_CONN_FAILED if a connection error occurred.
  */
-house_arrest_error_t house_arrest_send_request(house_arrest_client_t client, plist_t dict);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_send_request(house_arrest_client_t client, plist_t dict);
 
 /**
  * Send a command to the connected house_arrest service.
@@ -132,7 +133,7 @@ house_arrest_error_t house_arrest_send_request(house_arrest_client_t client, pli
  *     HOUSE_ARREST_E_INVALID_MODE if the client is not in the correct mode,
  *     or HOUSE_ARREST_E_CONN_FAILED if a connection error occurred.
  */
-house_arrest_error_t house_arrest_send_command(house_arrest_client_t client, const char *command, const char *appid);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_send_command(house_arrest_client_t client, const char *command, const char *appid);
 
 /**
  * Retrieves the result of a previously sent house_arrest_request_* request.
@@ -148,7 +149,7 @@ house_arrest_error_t house_arrest_send_command(house_arrest_client_t client, con
  *     HOUSE_ARREST_E_INVALID_MODE if the client is not in the correct mode,
  *     or HOUSE_ARREST_E_CONN_FAILED if a connection error occurred.
  */
-house_arrest_error_t house_arrest_get_result(house_arrest_client_t client, plist_t *dict);
+LIBIMOBILEDEVICE_API house_arrest_error_t house_arrest_get_result(house_arrest_client_t client, plist_t *dict);
 
 
 /**
@@ -170,7 +171,7 @@ house_arrest_error_t house_arrest_get_result(house_arrest_client_t client, plist
  *     an afc client, or an AFC_E_* error code returned by
  *     afc_client_new_with_service_client().
  */
-afc_error_t afc_client_new_from_house_arrest_client(house_arrest_client_t client, afc_client_t *afc_client);
+LIBIMOBILEDEVICE_API afc_error_t afc_client_new_from_house_arrest_client(house_arrest_client_t client, afc_client_t *afc_client);
 
 #ifdef __cplusplus
 }

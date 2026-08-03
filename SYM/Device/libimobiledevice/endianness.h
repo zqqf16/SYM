@@ -19,6 +19,13 @@
 #endif
 #endif
 
+#ifndef __BYTE_ORDER
+#ifndef _WIN32
+#warning __BYTE_ORDER is not defined, assuming little endian
+#endif
+#define __BYTE_ORDER __LITTLE_ENDIAN
+#endif
+
 #ifndef be16toh
 #if __BYTE_ORDER == __BIG_ENDIAN
 #define be16toh(x) (x)
@@ -113,8 +120,8 @@
      && !defined(__FLOAT_WORD_ORDER__)) \
  || (defined(__FLOAT_WORD_ORDER__) \
      && __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define float_bswap64(x) bswap64(x)
-#define float_bswap32(x) bswap32(x)
+#define float_bswap64(x) __bswap_64(x)
+#define float_bswap32(x) __bswap_32(x)
 #else
 #define float_bswap64(x) (x)
 #define float_bswap32(x) (x)

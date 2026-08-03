@@ -23,19 +23,13 @@
 import Cocoa
 import Combine
 
-extension NSImage {
-    static let alert: NSImage = #imageLiteral(resourceName: "alert")
-    static let symbol: NSImage = #imageLiteral(resourceName: "symbol")
-}
-
-class MainWindowController: NSWindowController {
-    // Toolbar items
-    @IBOutlet var symButton: NSButton!
-
-    @IBOutlet var downloadItem: DownloadToolbarItem!
-    @IBOutlet var deviceItem: NSToolbarItem!
-    @IBOutlet var indicator: NSProgressIndicator!
-    @IBOutlet var dsymPopUpButton: DsymToolBarButton!
+class MainWindowController: NSWindowController, NSToolbarDelegate {
+    private let dsymButton = DsymToolbarButton()
+    private let downloadItem: DownloadToolbarItem
+    private var deviceToolbarItem: NSToolbarItem?
+    private let indicator = NSProgressIndicator()
+    private let toolbar = NSToolbar(identifier: "MainToolbar")
+    private var didConfigure = false
 
     var isSymbolicating: Bool = false {
         didSet {
@@ -52,34 +46,66 @@ class MainWindowController: NSWindowController {
     }
 
     private var crashCancellable = Set<AnyCancellable>()
-
-    // Dsym
     private var dsymManager = DsymManager()
     private weak var dsymViewController: DsymViewController?
-
     private var downloaderCancellable: AnyCancellable?
     private var downloadTask: DsymDownloadTask?
     private weak var downloadStatusViewController: DownloadStatusViewController?
 
-    // Crash
-    var crashContentViewController: ContentViewController! {
-        if let vc = contentViewController as? ContentViewController {
-            return vc
-        }
-        return nil
+    var crashContentViewController: ContentViewController? {
+        contentViewController as? ContentViewController
     }
 
     var crashDocument: CrashDocument? {
-        return self.document as? CrashDocument
+        document as? CrashDocument
     }
 
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        windowFrameAutosaveName = "MainWindow"
-        deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
-        dsymPopUpButton.dsymManager = dsymManager
+    init() {
+        downloadItem = DownloadToolbarItem(itemIdentifier: .download)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(updateDeviceButton(_:)), name: NSNotification.Name.MDDeviceMonitor, object: nil)
+        let contentVC = ContentViewController()
+        let window = NSWindow(contentViewController: contentVC)
+        window.title = "SYM"
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+        window.setContentSize(NSSize(width: 960, height: 680))
+        window.minSize = NSSize(width: 560, height: 360)
+        window.center()
+        window.toolbarStyle = .unified
+
+        super.init(window: window)
+
+        // Programmatic windows do not call windowDidLoad — configure here.
+        configureToolbar()
+        configureBindings()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func configureToolbar() {
+        guard !didConfigure else { return }
+        didConfigure = true
+
+        toolbar.delegate = self
+        toolbar.displayMode = .iconOnly
+        toolbar.allowsUserCustomization = true
+        toolbar.autosavesConfiguration = true
+        window?.toolbar = toolbar
+    }
+
+    private func configureBindings() {
+        windowFrameAutosaveName = "MainWindow"
+        dsymButton.dsymManager = dsymManager
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateDeviceButton(_:)),
+            name: NSNotification.Name.MDDeviceMonitor,
+            object: nil
+        )
+        updateDeviceEnabled(MDDeviceMonitor.shared().deviceConnected)
 
         downloaderCancellable = DsymDownloader.shared.$tasks
             .receive(on: DispatchQueue.main)
@@ -88,13 +114,10 @@ class MainWindowController: NSWindowController {
                     return tasks[uuid]
                 }
                 return nil
-            }.sink { [weak self] task in
+            }
+            .sink { [weak self] task in
                 self?.bind(task: task)
             }
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
     }
 
     deinit {
@@ -103,21 +126,22 @@ class MainWindowController: NSWindowController {
 
     override var document: AnyObject? {
         didSet {
-            crashCancellable.forEach { cancellable in
-                cancellable.cancel()
-            }
+            crashCancellable.forEach { $0.cancel() }
+            crashCancellable.removeAll()
 
             guard let document = document as? CrashDocument else {
-                crashContentViewController.document = nil
+                crashContentViewController?.document = nil
                 return
             }
-            crashContentViewController.document = document
+            crashContentViewController?.document = document
 
             document.$crashInfo
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] crashInfo in
                     if let crash = crashInfo {
                         self?.dsymManager.update(crash)
+                    } else {
+                        self?.dsymManager.update(nil)
                     }
                 }
                 .store(in: &crashCancellable)
@@ -129,58 +153,165 @@ class MainWindowController: NSWindowController {
         }
     }
 
-    // MARK: Notifications
-
     @objc func updateDeviceButton(_: Notification) {
-        deviceItem.isEnabled = MDDeviceMonitor.shared().deviceConnected
+        updateDeviceEnabled(MDDeviceMonitor.shared().deviceConnected)
     }
 
-    @objc func crashDidSymbolicated(_: Notification) {
-        isSymbolicating = false
+    private func updateDeviceEnabled(_ enabled: Bool) {
+        deviceToolbarItem?.isEnabled = enabled
     }
 
-    // MARK: IBActions
-
-    @IBAction func symbolicate(_: AnyObject?) {
+    @objc func symbolicate(_: AnyObject?) {
         let content = crashDocument?.textStorage.string ?? ""
         if content.strip().isEmpty {
             return
         }
-
         isSymbolicating = true
-        let dsyms = dsymManager.dsymFiles.values.compactMap { $0.binaryPath }
-        crashDocument?.symbolicate(withDsymPaths: dsyms)
+        crashDocument?.symbolicate(withDsymPaths: dsymManager.dsymPathMap)
     }
 
-    @IBAction func showDsymInfo(_: Any) {
-        guard dsymManager.crash != nil else {
-            return
-        }
-        let storyboard = NSStoryboard(name: NSStoryboard.Name("Dsym"), bundle: nil)
-        let vc = storyboard.instantiateController(withIdentifier: "DsymViewController") as! DsymViewController
+    @objc func showDsymInfo(_: Any?) {
+        guard dsymManager.crash != nil else { return }
+        let vc = DsymViewController()
         vc.dsymManager = dsymManager
         vc.bind(task: downloadTask)
         dsymViewController = vc
         contentViewController?.presentAsSheet(vc)
     }
 
-    @IBAction func downloadDsym(_: AnyObject?) {
-        startDownloading()
+    @objc func showDevices(_: Any?) {
+        (NSApp.delegate as? AppDelegate)?.showDevices(nil)
     }
 
-    override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
+    // MARK: - NSToolbarDelegate
 
-        if let vc = segue.destinationController as? DownloadStatusViewController {
+    func toolbar(
+        _: NSToolbar,
+        itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+        willBeInsertedIntoToolbar _: Bool
+    ) -> NSToolbarItem? {
+        switch itemIdentifier {
+        case .symbolicate:
+            return .systemSymbolItem(
+                identifier: itemIdentifier,
+                symbolName: "wand.and.stars",
+                label: "Symbolicate",
+                toolTip: NSLocalizedString("Symbolicate crash log", comment: ""),
+                target: self,
+                action: #selector(symbolicate(_:))
+            )
+
+        case .dsym:
+            let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+            item.label = "dSYM"
+            item.paletteLabel = "dSYM"
+            item.toolTip = NSLocalizedString("dSYM files", comment: "")
+            item.isBordered = true
+            dsymButton.target = self
+            dsymButton.action = #selector(showDsymInfo(_:))
+            item.view = dsymButton
+            return item
+
+        case .download:
+            downloadItem.target = self
+            downloadItem.action = #selector(toggleDownloadPopover(_:))
+            return downloadItem
+
+        case .device:
+            let item = NSToolbarItem.systemSymbolItem(
+                identifier: itemIdentifier,
+                symbolName: "iphone",
+                label: "Device",
+                toolTip: NSLocalizedString("Connected devices", comment: ""),
+                target: self,
+                action: #selector(showDevices(_:))
+            )
+            item.isEnabled = MDDeviceMonitor.shared().deviceConnected
+            deviceToolbarItem = item
+            return item
+
+        case .progress:
+            let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+            item.label = "Progress"
+            item.paletteLabel = "Progress"
+            indicator.style = .spinning
+            indicator.controlSize = .small
+            indicator.isDisplayedWhenStopped = false
+            indicator.isHidden = true
+            item.view = indicator
+            return item
+
+        default:
+            return nil
+        }
+    }
+
+    func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.symbolicate, .flexibleSpace, .dsym, .download, .device, .progress]
+    }
+
+    func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.symbolicate, .dsym, .download, .device, .progress, .flexibleSpace, .space]
+    }
+
+    @objc private func toggleDownloadPopover(_ sender: Any?) {
+        let shouldStart: Bool = {
+            guard let status = downloadTask?.status else { return true }
+            switch status {
+            case .canceled, .failed, .success:
+                return true
+            case .waiting, .running:
+                return false
+            }
+        }()
+        if shouldStart {
+            startDownloading()
+        }
+
+        if downloadStatusViewController == nil {
+            let vc = DownloadStatusViewController()
             vc.delegate = self
             downloadStatusViewController = vc
+        }
+        guard let vc = downloadStatusViewController else { return }
+        vc.bind(task: downloadTask)
+
+        let anchorView: NSView?
+        if let button = sender as? NSView {
+            anchorView = button
+        } else if let item = sender as? NSToolbarItem {
+            anchorView = item.view
+        } else {
+            anchorView = downloadItem.view
+        }
+
+        if let view = anchorView {
+            contentViewController?.present(
+                vc,
+                asPopoverRelativeTo: view.bounds,
+                of: view,
+                preferredEdge: .maxY,
+                behavior: .transient
+            )
         }
     }
 }
 
 extension MainWindowController: NSToolbarItemValidation {
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
-        return item.isEnabled
+        switch item.itemIdentifier {
+        case .symbolicate:
+            let content = crashDocument?.textStorage.string ?? ""
+            return !content.strip().isEmpty
+        case .dsym:
+            return dsymManager.crash != nil
+        case .download:
+            return dsymManager.crash != nil
+        case .device:
+            return MDDeviceMonitor.shared().deviceConnected
+        default:
+            return true
+        }
     }
 }
 
@@ -206,6 +337,6 @@ extension MainWindowController: DownloadStatusViewControllerDelegate {
     }
 
     func currentDownloadTask() -> DsymDownloadTask? {
-        return downloadTask
+        downloadTask
     }
 }

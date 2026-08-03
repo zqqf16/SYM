@@ -282,3 +282,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# libimobiledevice rebuild workspace
+SYM/Device/build/

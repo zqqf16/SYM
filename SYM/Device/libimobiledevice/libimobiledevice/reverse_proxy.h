@@ -2,6 +2,7 @@
  * @file libimobiledevice/reverse_proxy.h
  * @brief Provide a reverse proxy to allow the device to communicate through,
  *     which is used during firmware restore.
+ * \internal
  *
  * Copyright (c) 2021 Nikias Bassen, All Rights Reserved.
  *
@@ -29,7 +30,7 @@ extern "C" {
 
 #include <libimobiledevice/libimobiledevice.h>
 
-#define REVERSE_PROXY_DEFAULT_PORT 1082
+#define REVERSE_PROXY_DEFAULT_PORT 1082 /**< default port the reverse proxy is listening on */
 
 /** Error Codes */
 typedef enum {
@@ -43,14 +44,16 @@ typedef enum {
 	REVERSE_PROXY_E_UNKNOWN_ERROR   = -256
 } reverse_proxy_error_t;
 
-typedef struct reverse_proxy_client_private reverse_proxy_client_private;
+typedef struct reverse_proxy_client_private reverse_proxy_client_private; /**< \private */
 typedef reverse_proxy_client_private *reverse_proxy_client_t; /**< The client handle. */
 
+/** reverse proxy client type */
 typedef enum {
 	RP_TYPE_CTRL = 1, /**< control connection */
 	RP_TYPE_CONN      /**< proxy connection */
 } reverse_proxy_client_type_t;
 
+/** reverse proxy status for reverse_proxy_status_cb_t callback */
 typedef enum {
 	RP_STATUS_READY = 1,    /**< proxy is ready */
 	RP_STATUS_TERMINATE,    /**< proxy terminated */
@@ -60,6 +63,7 @@ typedef enum {
 	RP_STATUS_DISCONNECTED, /**< connection closed (only RP_TYPE_CONN) */
 } reverse_proxy_status_t;
 
+/** reverse proxy data direction passed to reverse_proxy_data_cb_t callback */
 typedef enum {
 	RP_DATA_DIRECTION_OUT = 1, /**< data going out to remote host */
 	RP_DATA_DIRECTION_IN       /**< data coming in from remote host */
@@ -114,7 +118,7 @@ typedef void (*reverse_proxy_status_cb_t) (reverse_proxy_client_t client, revers
  * @return REVERSE_PROXY_E_SUCCESS on success,
  *    or a REVERSE_PROXY_E_* error code otherwise.
  */
-reverse_proxy_error_t reverse_proxy_client_create_with_service(idevice_t device, reverse_proxy_client_t* client, const char* label);
+LIBIMOBILEDEVICE_API reverse_proxy_error_t reverse_proxy_client_create_with_service(idevice_t device, reverse_proxy_client_t* client, const char* label);
 
 /**
  * Create a reverse proxy client using an open port on the device. This is
@@ -132,14 +136,14 @@ reverse_proxy_error_t reverse_proxy_client_create_with_service(idevice_t device,
  * @return REVERSE_PROXY_E_SUCCESS on success,
  *    or a REVERSE_PROXY_E_* error code otherwise.
  */
-reverse_proxy_error_t reverse_proxy_client_create_with_port(idevice_t device, reverse_proxy_client_t* client, uint16_t device_port);
+LIBIMOBILEDEVICE_API reverse_proxy_error_t reverse_proxy_client_create_with_port(idevice_t device, reverse_proxy_client_t* client, uint16_t device_port);
 
 /**
  * Disconnects a reverse proxy client and frees up the client data.
  *
  * @param client The reverse proxy client to disconnect and free.
  */
-reverse_proxy_error_t reverse_proxy_client_free(reverse_proxy_client_t client);
+LIBIMOBILEDEVICE_API reverse_proxy_error_t reverse_proxy_client_free(reverse_proxy_client_t client);
 
 /**
  * Make an initialized reverse proxy client operational, i.e. start the actual proxy.
@@ -151,7 +155,7 @@ reverse_proxy_error_t reverse_proxy_client_free(reverse_proxy_client_t client);
  * @return REVERSE_PROXY_E_SUCCESS on success,
  *    or a REVERSE_PROXY_E_* error code otherwise.
  */
-reverse_proxy_error_t reverse_proxy_client_start_proxy(reverse_proxy_client_t client, int control_protocol_version);
+LIBIMOBILEDEVICE_API reverse_proxy_error_t reverse_proxy_client_start_proxy(reverse_proxy_client_t client, int control_protocol_version);
 
 /**
  * Set a status callback function. This allows to report the status of the
@@ -164,7 +168,7 @@ reverse_proxy_error_t reverse_proxy_client_start_proxy(reverse_proxy_client_t cl
  *    when the status of the reverse proxy changes.
  * @param user_data A pointer that will be passed to the callback function.
  */
-void reverse_proxy_client_set_status_callback(reverse_proxy_client_t client, reverse_proxy_status_cb_t callback, void* user_data);
+LIBIMOBILEDEVICE_API void reverse_proxy_client_set_status_callback(reverse_proxy_client_t client, reverse_proxy_status_cb_t callback, void* user_data);
 
 /**
  * Set a log callback function. Useful for debugging or verbosity.
@@ -176,7 +180,7 @@ void reverse_proxy_client_set_status_callback(reverse_proxy_client_t client, rev
  *    when the reverse proxy logs something.
  * @param user_data A pointer that will be passed to the callback function.
  */
-void reverse_proxy_client_set_log_callback(reverse_proxy_client_t client, reverse_proxy_log_cb_t callback, void* user_data);
+LIBIMOBILEDEVICE_API void reverse_proxy_client_set_log_callback(reverse_proxy_client_t client, reverse_proxy_log_cb_t callback, void* user_data);
 
 /**
  * Set a data callback function. Useful for debugging or extra verbosity.
@@ -189,7 +193,7 @@ void reverse_proxy_client_set_log_callback(reverse_proxy_client_t client, revers
  * @param user_data A pointer that will be passed to the callback function.
  */
 
-void reverse_proxy_client_set_data_callback(reverse_proxy_client_t client, reverse_proxy_data_cb_t callback, void* user_data);
+LIBIMOBILEDEVICE_API void reverse_proxy_client_set_data_callback(reverse_proxy_client_t client, reverse_proxy_data_cb_t callback, void* user_data);
 
 /**
  * Helper function to return the type of a given reverse proxy client, which
@@ -200,7 +204,7 @@ void reverse_proxy_client_set_data_callback(reverse_proxy_client_t client, rever
  *
  * @return The type of the rerverse proxy client
  */
-reverse_proxy_client_type_t reverse_proxy_get_type(reverse_proxy_client_t client);
+LIBIMOBILEDEVICE_API reverse_proxy_client_type_t reverse_proxy_get_type(reverse_proxy_client_t client);
 
 #ifdef __cplusplus
 }

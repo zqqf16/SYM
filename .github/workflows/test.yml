@@ -1,18 +1,20 @@
-name: Xcode - Build and Analyze
+name: Xcode - Build and Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, refactor/modern-rewrite ]
   pull_request:
     branches: [ master ]
 
 jobs:
   build:
-    name: Build and analyse default scheme using xcodebuild command
-    runs-on: macos-latest
+    name: Build and test
+    runs-on: macos-15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Run Test
-        run: xcodebuild clean build test -project SYM.xcodeproj -scheme SYM
+        uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+      - name: Build and Test
+        run: xcodebuild clean build test -project SYM.xcodeproj -scheme SYM -destination 'platform=macOS'

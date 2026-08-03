@@ -3,6 +3,7 @@
 #include "usbmuxd.h"
 #include "plist/plist.h"
 #include "libimobiledevice/afc.h"
+#include "libimobiledevice/bt_packet_logger.h"
 #include "libimobiledevice/companion_proxy.h"
 #include "libimobiledevice/debugserver.h"
 #include "libimobiledevice/diagnostics_relay.h"
@@ -19,6 +20,7 @@
 #include "libimobiledevice/mobilebackup2.h"
 #include "libimobiledevice/mobilesync.h"
 #include "libimobiledevice/notification_proxy.h"
+#include "libimobiledevice/ostrace.h"
 #include "libimobiledevice/preboard.h"
 #include "libimobiledevice/property_list_service.h"
 #include "libimobiledevice/restore.h"
@@ -28,4 +30,3 @@
 #include "libimobiledevice/service.h"
 #include "libimobiledevice/syslog_relay.h"
 #include "libimobiledevice/webinspector.h"
-

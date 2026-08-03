@@ -24,52 +24,94 @@ import Cocoa
 import Combine
 
 class DownloadToolbarItem: NSToolbarItem {
-    @IBOutlet var indicator: NSProgressIndicator!
-
+    private let button = NSButton()
+    private let indicator = NSProgressIndicator()
     private var cancellable: AnyCancellable?
 
     var running: Bool = false {
         didSet {
-            self.indicator.isHidden = !running
-            // self.view?.isHidden = running
+            indicator.isHidden = !running
             if running {
-                self.indicator.startAnimation(nil)
+                indicator.startAnimation(nil)
             } else {
-                self.indicator.stopAnimation(nil)
+                indicator.stopAnimation(nil)
             }
         }
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
+    override var target: AnyObject? {
+        get { button.target }
+        set { button.target = newValue }
+    }
 
-        indicator = NSProgressIndicator()
-        indicator.isIndeterminate = true
+    override var action: Selector? {
+        get { button.action }
+        set { button.action = newValue }
+    }
+
+    override init(itemIdentifier: NSToolbarItem.Identifier) {
+        super.init(itemIdentifier: itemIdentifier)
+        setupView()
+    }
+
+    private func setupView() {
+        label = "Download"
+        paletteLabel = "Download"
+        toolTip = NSLocalizedString("Download dSYM file", comment: "")
+        isBordered = true
+
+        button.image = NSImage.sfSymbol("arrow.down.circle", accessibilityDescription: "Download")
+        button.imagePosition = .imageOnly
+        button.bezelStyle = .toolbar
+        button.isBordered = true
+        button.setButtonType(.momentaryPushIn)
+
+        indicator.style = .spinning
+        indicator.controlSize = .small
+        indicator.isDisplayedWhenStopped = false
         indicator.isHidden = true
-        view?.superview?.addSubview(indicator)
+
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: 36, height: 28))
+        container.addSubview(button)
+        container.addSubview(indicator)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            button.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            button.topAnchor.constraint(equalTo: container.topAnchor),
+            button.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            indicator.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+        ])
+
+        view = container
+        minSize = NSSize(width: 36, height: 28)
+        maxSize = NSSize(width: 40, height: 32)
     }
 
     func bind(task: DsymDownloadTask?) {
         cancellable?.cancel()
-        if task != nil {
-            cancellable = Publishers
-                .CombineLatest(task!.$status, task!.$progress)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] status, progress in
-                    self?.update(status: status, progress: progress)
-                }
-        } else {
+        guard let task else {
             running = false
+            return
         }
+        cancellable = Publishers
+            .CombineLatest(task.$status, task.$progress)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status, progress in
+                self?.update(status: status, progress: progress)
+            }
     }
 
     private func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         switch status {
-        case .running:
+        case .running, .waiting:
             running = true
-            updateFrame()
+            button.isHidden = true
         default:
             running = false
+            button.isHidden = false
         }
 
         if progress.percentage == 0 {
@@ -77,14 +119,7 @@ class DownloadToolbarItem: NSToolbarItem {
         } else {
             indicator.isIndeterminate = false
             indicator.doubleValue = Double(progress.percentage)
+            indicator.maxValue = 100
         }
-    }
-
-    private func updateFrame() {
-        let imageFrame = view!.frame
-        indicator.frame = CGRect(x: imageFrame.origin.x,
-                                 y: imageFrame.origin.y - 2,
-                                 width: imageFrame.width,
-                                 height: 4.0)
     }
 }

@@ -24,7 +24,7 @@ import Cocoa
 import Combine
 
 class DsymDownloadTask {
-    var crashInfo: Crash
+    var crashInfo: CrashReport
 
     enum Status {
         case waiting
@@ -104,7 +104,7 @@ class DsymDownloadTask {
     private var fileURL: URL?
     private var scriptURL: URL
 
-    init(crashInfo: Crash, scriptURL: URL, fileURL: URL?) {
+    init(crashInfo: CrashReport, scriptURL: URL, fileURL: URL?) {
         self.crashInfo = crashInfo
         self.fileURL = fileURL
         self.scriptURL = scriptURL
@@ -122,7 +122,7 @@ class DsymDownloadTask {
 
         let crashPath = fileURL?.path ?? FileManager.default.temporaryPath()
         do {
-            try crashInfo.content.write(toFile: crashPath, atomically: true, encoding: .utf8)
+            try crashInfo.formattedContent.write(toFile: crashPath, atomically: true, encoding: .utf8)
         } catch {
             statusCode = -1001
             status = .failed(code: statusCode, message: "Failed to save file")
@@ -156,7 +156,7 @@ class DsymDownloadTask {
         status = .canceled
     }
 
-    private func crashInfoToEnv(_ crashInfo: Crash) -> [String: String] {
+    private func crashInfoToEnv(_ crashInfo: CrashReport) -> [String: String] {
         var env: [String: String] = [:]
         env["APP_NAME"] = crashInfo.appName ?? ""
         env["UUID"] = crashInfo.uuid ?? ""
@@ -257,7 +257,7 @@ class DsymDownloader {
     }
 
     @discardableResult
-    func download(crashInfo: Crash, fileURL: URL?) -> DsymDownloadTask? {
+    func download(crashInfo: CrashReport, fileURL: URL?) -> DsymDownloadTask? {
         guard let uuid = crashInfo.uuid, canDownload() else {
             return nil
         }

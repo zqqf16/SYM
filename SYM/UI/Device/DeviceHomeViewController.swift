@@ -127,47 +127,46 @@ class DeviceDataSource {
 }
 
 class DeviceHomeViewController: NSSplitViewController {
-    fileprivate var sidebar: DeviceSidebarViewController! {
-        return splitViewItems.first?.viewController as? DeviceSidebarViewController
-    }
-
-    fileprivate var content: DeviceContentViewController! {
-        return splitViewItems.last?.viewController as? DeviceContentViewController
-    }
+    private let sidebarVC = DeviceSidebarViewController()
+    private let contentVC = DeviceContentViewController()
 
     let dataSource = DeviceDataSource()
     var storage = Set<AnyCancellable>()
 
     var nodes: [DeviceSidebarNode] = [] {
-        didSet {
-            self.reloadData()
-        }
+        didSet { reloadData() }
+    }
+
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSidebar()
-
+        addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarVC))
+        addSplitViewItem(NSSplitViewItem(contentListWithViewController: contentVC))
+        sidebarVC.delegate = self
+        splitViewItems.first?.minimumThickness = 180
+        splitViewItems.first?.maximumThickness = 320
         dataSource.$nodes.assign(to: \.nodes, on: self).store(in: &storage)
     }
 
-    private func setupSidebar() {
-        sidebar.delegate = self
-    }
-
     private func reloadData() {
-        sidebar.nodes = nodes
+        sidebarVC.nodes = nodes
     }
 }
 
 extension DeviceHomeViewController: DeviceSidebarViewControllerDelegate {
     func sidebar(_: DeviceSidebarViewController, didSelectNode node: SidebarNode) {
-        if node is DeviceSidebarFileNode {
-            let fileNode = node as! DeviceSidebarFileNode
-            content.showFileList(fileNode.deviceID, appID: fileNode.appID)
-        } else if node is DeviceSidebarCrashNode {
-            let crashNode = node as! DeviceSidebarCrashNode
-            content.showCrashList(crashNode.deviceID)
+        if let fileNode = node as? DeviceSidebarFileNode {
+            contentVC.showFileList(fileNode.deviceID, appID: fileNode.appID)
+        } else if let crashNode = node as? DeviceSidebarCrashNode {
+            contentVC.showCrashList(crashNode.deviceID)
         }
     }
 }

@@ -31,6 +31,7 @@ extern "C" {
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the AFC service */
 #define AFC_SERVICE_NAME "com.apple.afc"
 
 /** Error Codes */
@@ -63,6 +64,7 @@ typedef enum {
 	AFC_E_NO_MEM                = 31,
 	AFC_E_NOT_ENOUGH_DATA       = 32,
 	AFC_E_DIR_NOT_EMPTY         = 33,
+	AFC_E_SSL_ERROR             = 34,
 	AFC_E_FORCE_SIGNED_TYPE     = -1
 } afc_error_t;
 
@@ -89,7 +91,7 @@ typedef enum {
 	AFC_LOCK_UN = 8 | 4  /**< unlock */
 } afc_lock_op_t;
 
-typedef struct afc_client_private afc_client_private;
+typedef struct afc_client_private afc_client_private; /**< \private */
 typedef afc_client_private *afc_client_t; /**< The client handle. */
 
 /* Interface */
@@ -106,7 +108,7 @@ typedef afc_client_private *afc_client_t; /**< The client handle. */
  *         invalid, AFC_E_MUX_ERROR if the connection cannot be established,
  *         or AFC_E_NO_MEM if there is a memory allocation problem.
  */
-afc_error_t afc_client_new(idevice_t device, lockdownd_service_descriptor_t service, afc_client_t *client);
+LIBIMOBILEDEVICE_API afc_error_t afc_client_new(idevice_t device, lockdownd_service_descriptor_t service, afc_client_t *client);
 
 /**
  * Starts a new AFC service on the specified device and connects to it.
@@ -119,7 +121,7 @@ afc_error_t afc_client_new(idevice_t device, lockdownd_service_descriptor_t serv
  *
  * @return AFC_E_SUCCESS on success, or an AFC_E_* error code otherwise.
  */
-afc_error_t afc_client_start_service(idevice_t device, afc_client_t* client, const char* label);
+LIBIMOBILEDEVICE_API afc_error_t afc_client_start_service(idevice_t device, afc_client_t* client, const char* label);
 
 /**
  * Frees up an AFC client. If the connection was created by the client itself,
@@ -127,7 +129,7 @@ afc_error_t afc_client_start_service(idevice_t device, afc_client_t* client, con
  *
  * @param client The client to free.
  */
-afc_error_t afc_client_free(afc_client_t client);
+LIBIMOBILEDEVICE_API afc_error_t afc_client_free(afc_client_t client);
 
 /**
  * Get device information for a connected client. The device information
@@ -141,7 +143,21 @@ afc_error_t afc_client_free(afc_client_t client);
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_get_device_info(afc_client_t client, char ***device_information);
+LIBIMOBILEDEVICE_API afc_error_t afc_get_device_info(afc_client_t client, char ***device_information);
+
+/**
+ * Get device information for a connected client. The device information
+ * returned is the device model as well as the free space, the total capacity
+ * and blocksize on the accessed disk partition.
+ *
+ * @param client The client to get device info for.
+ * @param device_information A pointer to a plist_t that will be populated
+ *        with key-value pairs (dictionary) representing the device’s
+ *        storage and model information. Free with plist_free().
+ *
+ * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
+ */
+LIBIMOBILEDEVICE_API afc_error_t afc_get_device_info_plist(afc_client_t client, plist_t *device_information);
 
 /**
  * Gets a directory listing of the directory requested.
@@ -154,7 +170,7 @@ afc_error_t afc_get_device_info(afc_client_t client, char ***device_information)
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_read_directory(afc_client_t client, const char *path, char ***directory_information);
+LIBIMOBILEDEVICE_API afc_error_t afc_read_directory(afc_client_t client, const char *path, char ***directory_information);
 
 /**
  * Gets information about a specific file.
@@ -162,12 +178,25 @@ afc_error_t afc_read_directory(afc_client_t client, const char *path, char ***di
  * @param client The client to use to get the information of the file.
  * @param path The fully-qualified path to the file.
  * @param file_information Pointer to a buffer that will be filled with a
- *        NULL-terminated list of strings with the file information. Set to NULL
+ *        NULL-terminated list of strings with the file attributes. Set to NULL
  *        before calling this function. Free with afc_dictionary_free().
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_get_file_info(afc_client_t client, const char *path, char ***file_information);
+LIBIMOBILEDEVICE_API afc_error_t afc_get_file_info(afc_client_t client, const char *path, char ***file_information);
+
+/**
+ * Gets information about a specific file.
+ *
+ * @param client The client to use to get the information of the file.
+ * @param path The fully-qualified path to the file.
+ * @param file_information A pointer to a plist_t that will be populated
+ *        with key-value pairs (dictionary) representing the file attributes.
+ *        Free with plist_free().
+ *
+ * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
+ */
+LIBIMOBILEDEVICE_API afc_error_t afc_get_file_info_plist(afc_client_t client, const char *path, plist_t *file_information);
 
 /**
  * Opens a file on the device.
@@ -179,7 +208,7 @@ afc_error_t afc_get_file_info(afc_client_t client, const char *path, char ***fil
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_file_open(afc_client_t client, const char *filename, afc_file_mode_t file_mode, uint64_t *handle);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_open(afc_client_t client, const char *filename, afc_file_mode_t file_mode, uint64_t *handle);
 
 /**
  * Closes a file on the device.
@@ -187,7 +216,7 @@ afc_error_t afc_file_open(afc_client_t client, const char *filename, afc_file_mo
  * @param client The client to close the file with.
  * @param handle File handle of a previously opened file.
  */
-afc_error_t afc_file_close(afc_client_t client, uint64_t handle);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_close(afc_client_t client, uint64_t handle);
 
 /**
  * Locks or unlocks a file on the device.
@@ -201,7 +230,7 @@ afc_error_t afc_file_close(afc_client_t client, uint64_t handle);
  *        AFC_LOCK_SH (shared lock), AFC_LOCK_EX (exclusive lock), or
  *        AFC_LOCK_UN (unlock).
  */
-afc_error_t afc_file_lock(afc_client_t client, uint64_t handle, afc_lock_op_t operation);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_lock(afc_client_t client, uint64_t handle, afc_lock_op_t operation);
 
 /**
  * Attempts to the read the given number of bytes from the given file.
@@ -214,7 +243,7 @@ afc_error_t afc_file_lock(afc_client_t client, uint64_t handle, afc_lock_op_t op
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint32_t length, uint32_t *bytes_read);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint32_t length, uint32_t *bytes_read);
 
 /**
  * Writes a given number of bytes to a file.
@@ -227,7 +256,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_file_write(afc_client_t client, uint64_t handle, const char *data, uint32_t length, uint32_t *bytes_written);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_write(afc_client_t client, uint64_t handle, const char *data, uint32_t length, uint32_t *bytes_written);
 
 /**
  * Seeks to a given position of a pre-opened file on the device.
@@ -239,7 +268,7 @@ afc_error_t afc_file_write(afc_client_t client, uint64_t handle, const char *dat
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_file_seek(afc_client_t client, uint64_t handle, int64_t offset, int whence);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_seek(afc_client_t client, uint64_t handle, int64_t offset, int whence);
 
 /**
  * Returns current position in a pre-opened file on the device.
@@ -250,7 +279,7 @@ afc_error_t afc_file_seek(afc_client_t client, uint64_t handle, int64_t offset, 
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_file_tell(afc_client_t client, uint64_t handle, uint64_t *position);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_tell(afc_client_t client, uint64_t handle, uint64_t *position);
 
 /**
  * Sets the size of a file on the device.
@@ -264,7 +293,7 @@ afc_error_t afc_file_tell(afc_client_t client, uint64_t handle, uint64_t *positi
  * @note This function is more akin to ftruncate than truncate, and truncate
  *       calls would have to open the file before calling this, sadly.
  */
-afc_error_t afc_file_truncate(afc_client_t client, uint64_t handle, uint64_t newsize);
+LIBIMOBILEDEVICE_API afc_error_t afc_file_truncate(afc_client_t client, uint64_t handle, uint64_t newsize);
 
 /**
  * Deletes a file or directory.
@@ -274,7 +303,7 @@ afc_error_t afc_file_truncate(afc_client_t client, uint64_t handle, uint64_t new
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_remove_path(afc_client_t client, const char *path);
+LIBIMOBILEDEVICE_API afc_error_t afc_remove_path(afc_client_t client, const char *path);
 
 /**
  * Renames a file or directory on the device.
@@ -285,7 +314,7 @@ afc_error_t afc_remove_path(afc_client_t client, const char *path);
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_rename_path(afc_client_t client, const char *from, const char *to);
+LIBIMOBILEDEVICE_API afc_error_t afc_rename_path(afc_client_t client, const char *from, const char *to);
 
 /**
  * Creates a directory on the device.
@@ -296,7 +325,7 @@ afc_error_t afc_rename_path(afc_client_t client, const char *from, const char *t
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_make_directory(afc_client_t client, const char *path);
+LIBIMOBILEDEVICE_API afc_error_t afc_make_directory(afc_client_t client, const char *path);
 
 /**
  * Sets the size of a file on the device without prior opening it.
@@ -307,7 +336,7 @@ afc_error_t afc_make_directory(afc_client_t client, const char *path);
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_truncate(afc_client_t client, const char *path, uint64_t newsize);
+LIBIMOBILEDEVICE_API afc_error_t afc_truncate(afc_client_t client, const char *path, uint64_t newsize);
 
 /**
  * Creates a hard link or symbolic link on the device.
@@ -319,7 +348,7 @@ afc_error_t afc_truncate(afc_client_t client, const char *path, uint64_t newsize
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_make_link(afc_client_t client, afc_link_type_t linktype, const char *target, const char *linkname);
+LIBIMOBILEDEVICE_API afc_error_t afc_make_link(afc_client_t client, afc_link_type_t linktype, const char *target, const char *linkname);
 
 /**
  * Sets the modification time of a file on the device.
@@ -330,7 +359,7 @@ afc_error_t afc_make_link(afc_client_t client, afc_link_type_t linktype, const c
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_set_file_time(afc_client_t client, const char *path, uint64_t mtime);
+LIBIMOBILEDEVICE_API afc_error_t afc_set_file_time(afc_client_t client, const char *path, uint64_t mtime);
 
 /**
  * Deletes a file or directory including possible contents.
@@ -342,7 +371,7 @@ afc_error_t afc_set_file_time(afc_client_t client, const char *path, uint64_t mt
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_remove_path_and_contents(afc_client_t client, const char *path);
+LIBIMOBILEDEVICE_API afc_error_t afc_remove_path_and_contents(afc_client_t client, const char *path);
 
 /* Helper functions */
 
@@ -357,7 +386,7 @@ afc_error_t afc_remove_path_and_contents(afc_client_t client, const char *path);
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_get_device_info_key(afc_client_t client, const char *key, char **value);
+LIBIMOBILEDEVICE_API afc_error_t afc_get_device_info_key(afc_client_t client, const char *key, char **value);
 
 /**
  * Frees up a char dictionary as returned by some AFC functions.
@@ -366,7 +395,16 @@ afc_error_t afc_get_device_info_key(afc_client_t client, const char *key, char *
  *
  * @return AFC_E_SUCCESS on success or an AFC_E_* error value.
  */
-afc_error_t afc_dictionary_free(char **dictionary);
+LIBIMOBILEDEVICE_API afc_error_t afc_dictionary_free(char **dictionary);
+
+/**
+ * Gets a readable error string for a given AFC error code.
+ *
+ * @param err An AFC error code
+ *
+ * @returns A readable error string
+ */
+LIBIMOBILEDEVICE_API const char* afc_strerror(afc_error_t err);
 
 #ifdef __cplusplus
 }

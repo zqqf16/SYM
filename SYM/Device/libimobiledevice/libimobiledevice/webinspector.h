@@ -31,6 +31,7 @@ extern "C" {
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the webinspector service */
 #define WEBINSPECTOR_SERVICE_NAME "com.apple.webinspector"
 
 /** Error Codes */
@@ -45,7 +46,7 @@ typedef enum {
 	WEBINSPECTOR_E_UNKNOWN_ERROR   = -256
 } webinspector_error_t;
 
-typedef struct webinspector_client_private webinspector_client_private;
+typedef struct webinspector_client_private webinspector_client_private; /**< \private */
 typedef webinspector_client_private *webinspector_client_t; /**< The client handle. */
 
 
@@ -61,7 +62,7 @@ typedef webinspector_client_private *webinspector_client_t; /**< The client hand
  * @return WEBINSPECTOR_E_SUCCESS on success, WEBINSPECTOR_E_INVALID_ARG when
  *     client is NULL, or an WEBINSPECTOR_E_* error code otherwise.
  */
-webinspector_error_t webinspector_client_new(idevice_t device, lockdownd_service_descriptor_t service, webinspector_client_t * client);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_client_new(idevice_t device, lockdownd_service_descriptor_t service, webinspector_client_t * client);
 
 /**
  * Starts a new webinspector service on the specified device and connects to it.
@@ -76,7 +77,7 @@ webinspector_error_t webinspector_client_new(idevice_t device, lockdownd_service
  * @return WEBINSPECTOR_E_SUCCESS on success, or an WEBINSPECTOR_E_* error
  *     code otherwise.
  */
-webinspector_error_t webinspector_client_start_service(idevice_t device, webinspector_client_t * client, const char* label);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_client_start_service(idevice_t device, webinspector_client_t * client, const char* label);
 
 /**
  * Disconnects a webinspector client from the device and frees up the
@@ -87,7 +88,7 @@ webinspector_error_t webinspector_client_start_service(idevice_t device, webinsp
  * @return WEBINSPECTOR_E_SUCCESS on success, WEBINSPECTOR_E_INVALID_ARG when
  *     client is NULL, or an WEBINSPECTOR_E_* error code otherwise.
  */
-webinspector_error_t webinspector_client_free(webinspector_client_t client);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_client_free(webinspector_client_t client);
 
 
 /**
@@ -99,7 +100,7 @@ webinspector_error_t webinspector_client_free(webinspector_client_t client);
  * @return DIAGNOSTICS_RELAY_E_SUCCESS on success,
  *  DIAGNOSTICS_RELAY_E_INVALID_ARG when client or plist is NULL
  */
-webinspector_error_t webinspector_send(webinspector_client_t client, plist_t plist);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_send(webinspector_client_t client, plist_t plist);
 
 /**
  * Receives a plist from the service.
@@ -110,7 +111,7 @@ webinspector_error_t webinspector_send(webinspector_client_t client, plist_t pli
  * @return DIAGNOSTICS_RELAY_E_SUCCESS on success,
  *  DIAGNOSTICS_RELAY_E_INVALID_ARG when client or plist is NULL
  */
-webinspector_error_t webinspector_receive(webinspector_client_t client, plist_t * plist);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_receive(webinspector_client_t client, plist_t * plist);
 
 /**
  * Receives a plist using the given webinspector client.
@@ -118,7 +119,7 @@ webinspector_error_t webinspector_receive(webinspector_client_t client, plist_t 
  * @param client The webinspector client to use for receiving
  * @param plist pointer to a plist_t that will point to the received plist
  *      upon successful return
- * @param timeout Maximum time in milliseconds to wait for data.
+ * @param timeout_ms Maximum time in milliseconds to wait for data.
  *
  * @return WEBINSPECTOR_E_SUCCESS on success,
  *      WEBINSPECTOR_E_INVALID_ARG when client or *plist is NULL,
@@ -127,7 +128,7 @@ webinspector_error_t webinspector_receive(webinspector_client_t client, plist_t 
  *      communication error occurs, or WEBINSPECTOR_E_UNKNOWN_ERROR
  *      when an unspecified error occurs.
  */
-webinspector_error_t webinspector_receive_with_timeout(webinspector_client_t client, plist_t * plist, uint32_t timeout_ms);
+LIBIMOBILEDEVICE_API webinspector_error_t webinspector_receive_with_timeout(webinspector_client_t client, plist_t * plist, uint32_t timeout_ms);
 
 #ifdef __cplusplus
 }

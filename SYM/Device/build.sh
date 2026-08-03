@@ -1,179 +1,173 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-BUILD_DIR="`pwd`/build"
-PWD="`pwd`"
+# Rebuild static libimobiledevice stack for SYM (universal arm64 + x86_64).
+# Run from SYM/Device: ./build.sh
+# Output is copied into ./libimobiledevice/
+
+MIN_OS="13.0"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+BUILD_DIR="${SCRIPT_DIR}/build"
+OUT_DIR="${SCRIPT_DIR}/libimobiledevice"
+CFLAGS_UNIVERSAL="-arch arm64 -arch x86_64 -mmacosx-version-min=${MIN_OS}"
 
 rm -rf "${BUILD_DIR}"
-mkdir "${BUILD_DIR}"
-
-# build libplist
-cd "${BUILD_DIR}"
-git clone --depth 1 https://github.com/libimobiledevice/libplist.git
-
-cd libplist
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11" --without-cython
-make
-
-cd "${BUILD_DIR}"
-
-tee -a libplist-2.0.pc << END
-prefix="${BUILD_DIR}/libplist"
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/src/.libs
-sharedlibdir=\${libdir}
-includedir=\${prefix}/include
-
-Name: libplist-2.0
-Description: libplist
-Version: 2.2.0
-
-Requires:
-Libs: -L\${libdir} -lplist-2.0
-Cflags: -I\${includedir}
-END
+mkdir -p "${BUILD_DIR}"
 
 export PKG_CONFIG_PATH="${BUILD_DIR}"
 
-# build glue
-
-git clone --depth 1 https://github.com/libimobiledevice/libimobiledevice-glue.git
-
-cd libimobiledevice-glue
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11"
-make
-
-cd "${BUILD_DIR}"
-
-tee -a libimobiledevice-glue-1.0.pc << END
-prefix="${BUILD_DIR}/libimobiledevice-glue"
+write_pc() {
+  local name="$1"
+  local version="$2"
+  local prefix="$3"
+  local libname="$4"
+  cat > "${BUILD_DIR}/${name}.pc" <<EOF
+prefix=${prefix}
 exec_prefix=\${prefix}
-libdir=\${exec_prefix}/src/.libs
-sharedlibdir=\${libdir}
+libdir=\${prefix}/src/.libs
 includedir=\${prefix}/include
 
-Name: libimobiledevice-glue-1.0
-Description: libimobiledevice-glue-1.0
-Version: 2.2.0
+Name: ${name}
+Description: ${name}
+Version: ${version}
 
 Requires:
-Libs: -L\${libdir} -limobiledevice-glue-1.0
+Libs: -L\${libdir} -l${libname}
 Cflags: -I\${includedir}
-END
+EOF
+}
 
+# --- libplist ---
+cd "${BUILD_DIR}"
+git clone --depth 1 https://github.com/libimobiledevice/libplist.git
+cd libplist
+./autogen.sh CFLAGS="${CFLAGS_UNIVERSAL}" --without-cython --disable-shared --enable-static
+make -j"$(sysctl -n hw.ncpu)"
+write_pc "libplist-2.0" "2.6.0" "${BUILD_DIR}/libplist" "plist-2.0"
 
-# build libusbmuxd
+# --- libimobiledevice-glue ---
+cd "${BUILD_DIR}"
+git clone --depth 1 https://github.com/libimobiledevice/libimobiledevice-glue.git
+cd libimobiledevice-glue
+./autogen.sh CFLAGS="${CFLAGS_UNIVERSAL}" --disable-shared --enable-static
+make -j"$(sysctl -n hw.ncpu)"
+write_pc "libimobiledevice-glue-1.0" "1.3.0" "${BUILD_DIR}/libimobiledevice-glue" "imobiledevice-glue-1.0"
 
+# --- libusbmuxd ---
+cd "${BUILD_DIR}"
 git clone --depth 1 https://github.com/libimobiledevice/libusbmuxd.git
 cd libusbmuxd
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11"
-make
+./autogen.sh CFLAGS="${CFLAGS_UNIVERSAL}" --disable-shared --enable-static
+make -j"$(sysctl -n hw.ncpu)"
+write_pc "libusbmuxd-2.0" "2.1.0" "${BUILD_DIR}/libusbmuxd" "usbmuxd-2.0"
 
+# --- openssl (static universal, libs only) ---
 cd "${BUILD_DIR}"
-
-tee -a libusbmuxd-2.0.pc << END
-prefix="${BUILD_DIR}/libusbmuxd"
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/src/.libs
-sharedlibdir=\${libdir}
-includedir=\${prefix}/include
-
-Name: libusbmuxd-2.0
-Description: libusbmuxd-2.0
-Version: 2.0.2
-
-Requires:
-Libs: -L\${libdir} -lusbmuxd-2.0
-Cflags: -I\${includedir}
-END
-
-
-# openssl
-git clone --depth 1 https://github.com/openssl/openssl.git openssl
+git clone --depth 1 --branch openssl-3.3.2 https://github.com/openssl/openssl.git openssl 2>/dev/null \
+  || git clone --depth 1 https://github.com/openssl/openssl.git openssl
 cd openssl
 
-./Configure darwin64-arm64-cc --prefix="/tmp/openssl-arm" no-asm  -mmacosx-version-min=10.11
-make build_generated libssl.a libcrypto.a
-make install_sw
-make clean
+JOBS="$(sysctl -n hw.ncpu)"
+ARM_PREFIX="/tmp/openssl-arm-sym"
+X86_PREFIX="/tmp/openssl-x86-sym"
+rm -rf "${ARM_PREFIX}" "${X86_PREFIX}"
 
-./Configure darwin64-x86_64-cc --prefix="/tmp/openssl-x86"  -mmacosx-version-min=10.11
-make build_generated libssl.a libcrypto.a
-make install_sw
+./Configure darwin64-arm64-cc --prefix="${ARM_PREFIX}" no-shared no-tests no-ui-console no-apps -mmacosx-version-min="${MIN_OS}"
+make -j"${JOBS}" build_libs
+make install_dev
+make distclean || make clean || true
 
-mkdir -p libs
+./Configure darwin64-x86_64-cc --prefix="${X86_PREFIX}" no-shared no-tests no-ui-console no-apps -mmacosx-version-min="${MIN_OS}"
+make -j"${JOBS}" build_libs
+make install_dev
 
-lipo /tmp/openssl-arm/lib/libssl.a /tmp/openssl-x86/lib/libssl.a -create -output libs/libssl.a
-lipo /tmp/openssl-arm/lib/libcrypto.a /tmp/openssl-x86/lib/libcrypto.a -create -output libs/libcrypto.a
+mkdir -p libs include
+lipo "${ARM_PREFIX}/lib/libssl.a" "${X86_PREFIX}/lib/libssl.a" -create -output libs/libssl.a
+lipo "${ARM_PREFIX}/lib/libcrypto.a" "${X86_PREFIX}/lib/libcrypto.a" -create -output libs/libcrypto.a
+cp -R "${ARM_PREFIX}/include/"* include/
 
-
-cd "${BUILD_DIR}"
-
-tee -a openssl.pc << END
-prefix="${BUILD_DIR}/openssl"
+cat > "${BUILD_DIR}/openssl.pc" <<EOF
+prefix=${BUILD_DIR}/openssl
 exec_prefix=\${prefix}
-libdir=\${exec_prefix}/libs
-sharedlibdir=\${libdir}
+libdir=\${prefix}/libs
 includedir=\${prefix}/include
 
 Name: openssl
 Description: openssl
-Version: 3.0.2
+Version: 3.3.0
 
 Requires:
 Libs: -L\${libdir} -lssl -lcrypto
 Cflags: -I\${includedir}
-END
+EOF
 
-# libimobiledevice
-git clone --depth 1 https://github.com/libimobiledevice/libimobiledevice
+# --- libtatsu (required by modern libimobiledevice) ---
+cd "${BUILD_DIR}"
+git clone --depth 1 https://github.com/libimobiledevice/libtatsu.git
+cd libtatsu
+./autogen.sh CFLAGS="${CFLAGS_UNIVERSAL}" --disable-shared --enable-static
+make -j"$(sysctl -n hw.ncpu)"
+write_pc "libtatsu-1.0" "1.0.3" "${BUILD_DIR}/libtatsu" "tatsu-1.0"
+
+# --- libimobiledevice ---
+cd "${BUILD_DIR}"
+git clone --depth 1 https://github.com/libimobiledevice/libimobiledevice.git
 cd libimobiledevice
 
-# there are some errors in these files
-sed -i -e 's/\$(libplist_CFLAGS) \\/\$(libplist_CFLAGS) \$(limd_glue_CFLAGS) \\/g' common/Makefile.am
-sed -i -e 's/tools docs//g' Makefile.am
+# Compatibility shims for older Makefile assumptions (safe if patterns absent)
+sed -i.bak -e 's/\$(libplist_CFLAGS) \\/\$(libplist_CFLAGS) \$(limd_glue_CFLAGS) \\/g' common/Makefile.am || true
+sed -i.bak -e 's/tools docs//g' Makefile.am || true
 
+./autogen.sh CFLAGS="${CFLAGS_UNIVERSAL}" --without-cython --disable-shared --enable-static
+make -j"$(sysctl -n hw.ncpu)"
 
-./autogen.sh CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.11" --without-cython
-make
+# --- stage headers + libs into OUT_DIR ---
+STAGE="${BUILD_DIR}/stage"
+rm -rf "${STAGE}"
+mkdir -p "${STAGE}/plist" "${STAGE}/libimobiledevice"
 
-cd "${BUILD_DIR}"
+cp "${BUILD_DIR}/libplist/include/plist/plist.h" "${STAGE}/plist/"
+cp "${BUILD_DIR}/libusbmuxd/include/"*.h "${STAGE}/" 2>/dev/null || true
+cp -R "${BUILD_DIR}/libimobiledevice/include/libimobiledevice/"* "${STAGE}/libimobiledevice/"
+cp "${BUILD_DIR}/libimobiledevice/include/"*.h "${STAGE}/" 2>/dev/null || true
 
-# copy files
-mkdir -p headers/plist
-cp libplist/include/plist/plist.h headers/plist
-cp libusbmuxd/include/*.h headers 
-cp libimobiledevice/include/*.h headers
-cp -R libimobiledevice/include/libimobiledevice headers/
+{
+  for header in "${STAGE}"/*.h; do
+    [ -f "$header" ] || continue
+    base="$(basename "$header")"
+    [ "$base" = "asprintf.h" ] && continue
+    [ "$base" = "libimobiledevicec.h" ] && continue
+    echo "#include \"${base}\""
+  done
+  echo '#include "plist/plist.h"'
+  for header in "${STAGE}"/libimobiledevice/*.h; do
+    [ -f "$header" ] || continue
+    echo "#include \"libimobiledevice/$(basename "$header")\""
+  done
+} > "${STAGE}/libimobiledevicec.h"
+rm -f "${STAGE}/asprintf.h"
 
-cd headers
-rm asprintf.h
-for header in *.h
-do
-    echo "#include \"${header}\"" >> libimobiledevicec.h
-done
-
-echo "#include \"plist/plist.h\"" >> libimobiledevicec.h
-
-for header in libimobiledevice/*.h
-do
-    echo "#include \"${header}\"" >> libimobiledevicec.h
-done
-cd ..
-
-mv libimobiledevicec.h headers
-tee -a headers/module.modulemap << END
+cat > "${STAGE}/module.modulemap" <<'EOF'
 module libimobiledevicec {
     umbrella header "libimobiledevicec.h"
     export *
     module * { export * }
 }
-END
+EOF
 
-cp libplist/src/.libs/libplist-2.0.a headers
-cp libimobiledevice-glue/src/.libs/libimobiledevice-glue-1.0.a headers
-cp libusbmuxd/src/.libs/libusbmuxd-2.0.a headers
-cp openssl/libs/libcrypto.a headers
-cp openssl/libs/libssl.a headers
-cp libimobiledevice/src/.libs/libimobiledevice-1.0.a headers
+cp "${BUILD_DIR}/libplist/src/.libs/libplist-2.0.a" "${STAGE}/"
+cp "${BUILD_DIR}/libimobiledevice-glue/src/.libs/libimobiledevice-glue-1.0.a" "${STAGE}/"
+cp "${BUILD_DIR}/libusbmuxd/src/.libs/libusbmuxd-2.0.a" "${STAGE}/"
+cp "${BUILD_DIR}/libtatsu/src/.libs/libtatsu.a" "${STAGE}/libtatsu-1.0.a"
+cp "${BUILD_DIR}/openssl/libs/libcrypto.a" "${STAGE}/"
+cp "${BUILD_DIR}/openssl/libs/libssl.a" "${STAGE}/"
+cp "${BUILD_DIR}/libimobiledevice/src/.libs/libimobiledevice-1.0.a" "${STAGE}/"
 
-mv headers "${PWD}"/libs
+# Preserve any existing non-generated files, then replace libs/headers
+mkdir -p "${OUT_DIR}"
+rsync -a --delete \
+  --exclude '.DS_Store' \
+  "${STAGE}/" "${OUT_DIR}/"
+
+echo "Built libimobiledevice stack into ${OUT_DIR}"
+ls -la "${OUT_DIR}"/*.a

@@ -22,22 +22,92 @@
 
 import Cocoa
 
-@NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private var preferencesWindow: NSWindow?
+    private var downloadScriptWindow: NSWindow?
+    private var aboutWindow: NSWindow?
+    var deviceWindowController: DeviceWindowController?
+
     override init() {
         super.init()
         _ = DocumentController()
     }
 
-    func applicationDidFinishLaunching(_: Notification) {
-        // Insert code here to initialize your application
-        // DsymManager.sharedInstance.findAllDsyms()
-        MDDeviceMonitor.shared().start()
+    func applicationWillFinishLaunching(_: Notification) {
+        _ = NSApp.setActivationPolicy(.regular)
+        // MainMenu.xib (NSMainNibFile) should already be loaded; rebuild if missing.
+        ensureMainMenu()
     }
 
-    func applicationWillFinishLaunching(_: Notification) {}
+    func applicationDidFinishLaunching(_: Notification) {
+        ensureMainMenu()
+        MDDeviceMonitor.shared().start()
+        NSApp.activate(ignoringOtherApps: true)
 
-    func applicationWillTerminate(_: Notification) {
-        // Insert code here to tear down your application
+        if NSDocumentController.shared.documents.isEmpty {
+            _ = try? NSDocumentController.shared.openUntitledDocumentAndDisplay(true)
+        }
+    }
+
+    private func ensureMainMenu() {
+        if NSApp.mainMenu == nil || NSApp.mainMenu?.numberOfItems == 0 {
+            MenuBuilder.installMainMenu(appDelegate: self)
+        }
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
+        false
+    }
+
+    func applicationWillTerminate(_: Notification) {}
+
+    @objc func showPreferences(_: Any?) {
+        if preferencesWindow == nil {
+            let vc = PreferencesViewController()
+            let window = NSWindow(contentViewController: vc)
+            window.title = NSLocalizedString("Settings", comment: "Settings")
+            window.styleMask = [.titled, .closable]
+            window.setContentSize(NSSize(width: 420, height: 160))
+            window.center()
+            preferencesWindow = window
+        }
+        preferencesWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc func showDownloadScript(_: Any?) {
+        if downloadScriptWindow == nil {
+            let vc = DownloadScriptViewController()
+            let window = NSWindow(contentViewController: vc)
+            window.title = NSLocalizedString("Download Script", comment: "Download Script")
+            window.styleMask = [.titled, .closable, .resizable]
+            window.setContentSize(NSSize(width: 640, height: 480))
+            window.center()
+            downloadScriptWindow = window
+        }
+        downloadScriptWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc func showAboutPanel(_: Any?) {
+        if aboutWindow == nil {
+            let vc = AboutViewController()
+            let window = AboutWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            window.contentViewController = vc
+            window.title = NSLocalizedString("About SYM", comment: "About")
+            window.setContentSize(NSSize(width: 360, height: 280))
+            window.center()
+            aboutWindow = window
+        }
+        aboutWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc func showDevices(_: Any?) {
+        if deviceWindowController == nil {
+            deviceWindowController = DeviceWindowController()
+        }
+        deviceWindowController?.showWindow(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }

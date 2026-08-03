@@ -1,82 +1,108 @@
-// The MIT License (MIT)
-//
-// Copyright (c) 2017 - present zqqf16
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 import Cocoa
 import Combine
+import SnapKit
 
-protocol DsymTableCellViewDelegate: AnyObject {
-    func didClickSelectButton(_ cell: DsymTableCellView, sender: NSButton)
-    func didClickRevealButton(_ cell: DsymTableCellView, sender: NSButton)
-}
+private class DsymTableRowView: NSTableCellView {
+    let statusImage = NSImageView()
+    let titleField = NSTextField(labelWithString: "")
+    let uuidField = NSTextField(labelWithString: "")
+    let pathField = NSTextField(labelWithString: "")
+    let actionButton = NSButton(title: "", target: nil, action: nil)
 
-class DsymTableCellView: NSTableCellView {
-    @IBOutlet var image: NSImageView!
-    @IBOutlet var title: NSTextField!
-    @IBOutlet var uuid: NSTextField!
-    @IBOutlet var path: NSTextField!
-    @IBOutlet var actionButton: NSButton!
-
-    weak var delegate: DsymTableCellViewDelegate?
-
-    var binary: Binary!
+    var binary: BinaryImage?
     var dsym: DsymFile?
+    weak var rowDelegate: DsymViewController?
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        setup()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup()
+    }
+
+    private func setup() {
+        titleField.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
+        uuidField.font = .monospacedSystemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+        pathField.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        pathField.lineBreakMode = .byTruncatingMiddle
+        actionButton.bezelStyle = .rounded
+        actionButton.target = self
+        actionButton.action = #selector(didClickAction)
+
+        addSubview(statusImage)
+        addSubview(titleField)
+        addSubview(uuidField)
+        addSubview(pathField)
+        addSubview(actionButton)
+
+        statusImage.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(8)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(20)
+        }
+        titleField.snp.makeConstraints { make in
+            make.leading.equalTo(statusImage.snp.trailing).offset(8)
+            make.top.equalToSuperview().offset(6)
+            make.trailing.equalTo(actionButton.snp.leading).offset(-8)
+        }
+        uuidField.snp.makeConstraints { make in
+            make.leading.equalTo(titleField)
+            make.top.equalTo(titleField.snp.bottom).offset(2)
+            make.trailing.equalTo(titleField)
+        }
+        pathField.snp.makeConstraints { make in
+            make.leading.equalTo(titleField)
+            make.top.equalTo(uuidField.snp.bottom).offset(2)
+            make.trailing.equalTo(titleField)
+            make.bottom.equalToSuperview().offset(-6)
+        }
+        actionButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-8)
+            make.centerY.equalToSuperview()
+            make.width.greaterThanOrEqualTo(72)
+        }
+    }
 
     func updateUI() {
-        title.stringValue = binary.name
-        uuid.stringValue = binary.uuid ?? ""
+        guard let binary else { return }
+        titleField.stringValue = binary.name
+        uuidField.stringValue = binary.uuid ?? ""
         if let path = dsym?.path {
-            self.path.stringValue = path
+            pathField.stringValue = path
+            statusImage.image = .symDsymFound
             actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
         } else {
-            path.stringValue = NSLocalizedString("dsym_file_not_found", comment: "Dsym file not found")
+            pathField.stringValue = NSLocalizedString("dsym_file_not_found", comment: "Dsym file not found")
+            statusImage.image = .symDsymMissing
             actionButton.title = NSLocalizedString("Import", comment: "Import a dSYM file")
         }
     }
 
-    @IBAction func didClickActionButton(_ sender: NSButton) {
+    @objc private func didClickAction(_ sender: NSButton) {
+        guard let binary else { return }
         if dsym?.path != nil {
-            delegate?.didClickRevealButton(self, sender: sender)
+            rowDelegate?.revealDsym(for: binary)
         } else {
-            delegate?.didClickSelectButton(self, sender: sender)
+            rowDelegate?.importDsym(for: binary)
         }
     }
 }
 
 class DsymViewController: NSViewController {
-    @IBOutlet var tableView: NSTableView!
-    @IBOutlet var tableViewHeight: NSLayoutConstraint!
-    @IBOutlet var downloadButton: NSButton!
-    @IBOutlet var progressBar: NSProgressIndicator!
+    private let tableView = NSTableView()
+    private let scrollView = NSScrollView()
+    private let downloadButton = NSButton(title: NSLocalizedString("Download", comment: ""), target: nil, action: nil)
+    private let progressBar = NSProgressIndicator()
 
-    private var binaries: [Binary] = [] {
-        didSet {
-            reloadData()
-        }
+    private var binaries: [BinaryImage] = [] {
+        didSet { reloadData() }
     }
 
     private var dsymFiles: [String: DsymFile] = [:] {
-        didSet {
-            reloadData()
-        }
+        didSet { reloadData() }
     }
 
     private var dsymStorage = Set<AnyCancellable>()
@@ -84,9 +110,7 @@ class DsymViewController: NSViewController {
 
     var dsymManager: DsymManager? {
         didSet {
-            dsymStorage.forEach { cancellable in
-                cancellable.cancel()
-            }
+            dsymStorage.forEach { $0.cancel() }
             dsymManager?.$binaries
                 .receive(on: DispatchQueue.main)
                 .assign(to: \.binaries, on: self)
@@ -99,116 +123,118 @@ class DsymViewController: NSViewController {
         }
     }
 
-    private func reloadData() {
-        guard tableView != nil else {
-            return
-        }
-
-        tableView.reloadData()
-        updateViewHeight()
+    init() {
+        super.init(nibName: nil, bundle: nil)
     }
 
-    private func dsymFile(forBinary binary: Binary) -> DsymFile? {
-        if let uuid = binary.uuid {
-            return dsymManager?.dsymFile(withUuid: uuid)
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 560, height: 360))
+
+        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("main"))
+        column.title = "Binary Images"
+        tableView.addTableColumn(column)
+        tableView.headerView = nil
+        tableView.rowHeight = 72
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.usesAutomaticRowHeights = false
+
+        scrollView.documentView = tableView
+        scrollView.hasVerticalScroller = true
+        scrollView.borderType = .bezelBorder
+
+        progressBar.isIndeterminate = true
+        progressBar.isHidden = true
+
+        downloadButton.target = self
+        downloadButton.action = #selector(didClickDownloadButton(_:))
+
+        view.addSubview(scrollView)
+        view.addSubview(downloadButton)
+        view.addSubview(progressBar)
+
+        scrollView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalTo(downloadButton.snp.top).offset(-12)
         }
-        return nil
+        downloadButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.bottom.equalToSuperview().offset(-16)
+        }
+        progressBar.snp.makeConstraints { make in
+            make.leading.equalTo(downloadButton.snp.trailing).offset(12)
+            make.centerY.equalTo(downloadButton)
+            make.width.equalTo(200)
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateViewHeight()
         downloadButton.isEnabled = dsymManager?.crash != nil
     }
 
     override func viewDidDisappear() {
         super.viewDidDisappear()
         taskCancellable?.cancel()
-        dsymStorage.forEach { cancellable in
-            cancellable.cancel()
-        }
+        dsymStorage.forEach { $0.cancel() }
     }
 
     func bind(task: DsymDownloadTask?) {
         taskCancellable?.cancel()
-        guard let downloadTask = task else {
-            return
-        }
+        guard let downloadTask = task else { return }
         taskCancellable = Publishers
             .CombineLatest(downloadTask.$status, downloadTask.$progress)
             .receive(on: DispatchQueue.main)
-            .sink { status, progress in
-                self.update(status: status, progress: progress)
+            .sink { [weak self] status, progress in
+                self?.update(status: status, progress: progress)
             }
     }
 
-    // MARK: UI
-
-    private func updateViewHeight() {
-        tableViewHeight.constant = min(CGFloat(70 * binaries.count), 520.0)
+    private func reloadData() {
+        guard isViewLoaded else { return }
+        tableView.reloadData()
     }
 
-    @IBAction func didClickDownloadButton(_: NSButton) {
+    private func dsymFile(forBinary binary: BinaryImage) -> DsymFile? {
+        guard let uuid = binary.uuid else { return nil }
+        return dsymManager?.dsymFile(withUuid: uuid)
+    }
+
+    @objc private func didClickDownloadButton(_: NSButton) {
         if let crashInfo = dsymManager?.crash {
             DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
         }
     }
-}
 
-extension DsymViewController: NSTableViewDelegate, NSTableViewDataSource {
-    func numberOfRows(in _: NSTableView) -> Int {
-        return binaries.count
-    }
-
-    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
-        let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "cell"), owner: nil) as? DsymTableCellView
-        cell?.delegate = self
-        let binary = binaries[row]
-        cell?.binary = binary
-        cell?.dsym = dsymFile(forBinary: binary)
-        cell?.updateUI()
-        return cell
-    }
-
-    func tableView(_: NSTableView, shouldSelectRow _: Int) -> Bool {
-        return false
-    }
-}
-
-extension DsymViewController: DsymTableCellViewDelegate {
-    func didClickSelectButton(_ cell: DsymTableCellView, sender _: NSButton) {
+    func importDsym(for binary: BinaryImage) {
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = false
         openPanel.canCreateDirectories = false
         openPanel.canChooseFiles = true
-
-        openPanel.begin { [weak openPanel] result in
-            guard result == .OK, let url = openPanel?.url else {
-                return
-            }
-            self.dsymManager?.assign(cell.binary!, dsymFileURL: url)
+        openPanel.begin { [weak self] result in
+            guard result == .OK, let url = openPanel.url else { return }
+            self?.dsymManager?.assign(binary, dsymFileURL: url)
         }
     }
 
-    func didClickRevealButton(_ cell: DsymTableCellView, sender _: NSButton) {
-        if let path = cell.dsym?.path {
-            let url = URL(fileURLWithPath: path)
-            NSWorkspace.shared.activateFileViewerSelecting([url])
-        }
+    func revealDsym(for binary: BinaryImage) {
+        guard let dsym = dsymFile(forBinary: binary) else { return }
+        let path = dsym.path
+        NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
     }
-}
 
-extension DsymViewController {
-    func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
+    private func update(status: DsymDownloadTask.Status, progress: DsymDownloadTask.Progress) {
         switch status {
         case .running:
             downloadButton.isEnabled = false
             progressBar.isHidden = false
-        case .canceled:
-            progressBar.isHidden = true
-            downloadButton.isEnabled = true
-        case .failed:
+        case .canceled, .failed:
             progressBar.isHidden = true
             downloadButton.isEnabled = true
         case .success:
@@ -225,5 +251,31 @@ extension DsymViewController {
             progressBar.isIndeterminate = false
             progressBar.doubleValue = Double(progress.percentage)
         }
+    }
+}
+
+extension DsymViewController: NSTableViewDataSource, NSTableViewDelegate {
+    func numberOfRows(in _: NSTableView) -> Int {
+        binaries.count
+    }
+
+    func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
+        let cell: DsymTableRowView
+        if let existing = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("DsymRow"), owner: self) as? DsymTableRowView {
+            cell = existing
+        } else {
+            cell = DsymTableRowView()
+            cell.identifier = NSUserInterfaceItemIdentifier("DsymRow")
+        }
+        let binary = binaries[row]
+        cell.binary = binary
+        cell.dsym = dsymFile(forBinary: binary)
+        cell.rowDelegate = self
+        cell.updateUI()
+        return cell
+    }
+
+    func tableView(_: NSTableView, shouldSelectRow _: Int) -> Bool {
+        false
     }
 }

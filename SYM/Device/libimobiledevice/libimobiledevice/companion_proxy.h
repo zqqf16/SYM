@@ -30,6 +30,7 @@ extern "C" {
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the companion proxy service */
 #define COMPANION_PROXY_SERVICE_NAME "com.apple.companion_proxy"
 
 /** Error Codes */
@@ -48,9 +49,10 @@ typedef enum {
 	COMPANION_PROXY_E_UNKNOWN_ERROR   = -256
 } companion_proxy_error_t;
 
-typedef struct companion_proxy_client_private companion_proxy_client_private;
+typedef struct companion_proxy_client_private companion_proxy_client_private; /**< \private */
 typedef companion_proxy_client_private *companion_proxy_client_t; /**< The client handle. */
 
+/** Callback for companion device events */
 typedef void (*companion_proxy_device_event_cb_t) (plist_t event, void* userdata);
 
 /**
@@ -65,7 +67,7 @@ typedef void (*companion_proxy_device_event_cb_t) (plist_t event, void* userdata
  * @return COMPANION_PROXY_E_SUCCESS on success, COMPANION_PROXY_E_INVALID_ARG when
  *     the arguments are invalid, or an COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_client_new(idevice_t device, lockdownd_service_descriptor_t service, companion_proxy_client_t* client);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_client_new(idevice_t device, lockdownd_service_descriptor_t service, companion_proxy_client_t* client);
 
 /**
  * Starts a new companion_proxy service on the specified device and connects to it.
@@ -80,7 +82,7 @@ companion_proxy_error_t companion_proxy_client_new(idevice_t device, lockdownd_s
  * @return COMPANION_PROXY_E_SUCCESS on success, or an COMPANION_PROXY_E_* error
  *     code otherwise.
  */
-companion_proxy_error_t companion_proxy_client_start_service(idevice_t device, companion_proxy_client_t* client, const char* label);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_client_start_service(idevice_t device, companion_proxy_client_t* client, const char* label);
 
 /**
  * Disconnects a companion_proxy client from the device and frees up the
@@ -91,7 +93,7 @@ companion_proxy_error_t companion_proxy_client_start_service(idevice_t device, c
  * @return COMPANION_PROXY_E_SUCCESS on success, COMPANION_PROXY_E_INVALID_ARG when
  *     client is NULL, or an COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_client_free(companion_proxy_client_t client);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_client_free(companion_proxy_client_t client);
 
 /**
  * Sends a plist to the service.
@@ -102,7 +104,7 @@ companion_proxy_error_t companion_proxy_client_free(companion_proxy_client_t cli
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  COMPANION_PROXY_E_INVALID_ARG when client or plist is NULL
  */
-companion_proxy_error_t companion_proxy_send(companion_proxy_client_t client, plist_t plist);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_send(companion_proxy_client_t client, plist_t plist);
 
 /**
  * Receives a plist from the service.
@@ -113,13 +115,13 @@ companion_proxy_error_t companion_proxy_send(companion_proxy_client_t client, pl
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  COMPANION_PROXY_E_INVALID_ARG when client or plist is NULL
  */
-companion_proxy_error_t companion_proxy_receive(companion_proxy_client_t client, plist_t * plist);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_receive(companion_proxy_client_t client, plist_t * plist);
 
 /**
  * Retrieves a list of paired devices.
  *
  * @param client The companion_proxy client
- * @param devices Point that will receive a PLIST_ARRAY with paired device UDIDs
+ * @param paired_devices Point that will receive a PLIST_ARRAY with paired device UDIDs
  *
  * @note The device closes the connection after sending the reply.
  *
@@ -127,7 +129,7 @@ companion_proxy_error_t companion_proxy_receive(companion_proxy_client_t client,
  *  COMPANION_PROXY_E_NO_DEVICES if no devices are paired,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_get_device_registry(companion_proxy_client_t client, plist_t* paired_devices);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_get_device_registry(companion_proxy_client_t client, plist_t* paired_devices);
 
 /**
  * Starts listening for paired devices.
@@ -143,7 +145,7 @@ companion_proxy_error_t companion_proxy_get_device_registry(companion_proxy_clie
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_start_listening_for_devices(companion_proxy_client_t client, companion_proxy_device_event_cb_t callback, void* userdata);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_start_listening_for_devices(companion_proxy_client_t client, companion_proxy_device_event_cb_t callback, void* userdata);
 
 /**
  * Stops listening for paired devices
@@ -153,7 +155,7 @@ companion_proxy_error_t companion_proxy_start_listening_for_devices(companion_pr
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_stop_listening_for_devices(companion_proxy_client_t client);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_stop_listening_for_devices(companion_proxy_client_t client);
 
 /**
  * Returns a value for the given key.
@@ -161,6 +163,8 @@ companion_proxy_error_t companion_proxy_stop_listening_for_devices(companion_pro
  * @param client The companion_proxy client
  * @param companion_udid UDID of the (paired) companion device
  * @param key The key to retrieve the value for
+ * @param value A pointer to a plist_t that will receive the value for the given key.
+ *   The consumer is responsible for freeing the value with plist_free() when no longer needed.
  *
  * @note The device closes the connection after sending the reply.
  *
@@ -169,7 +173,7 @@ companion_proxy_error_t companion_proxy_stop_listening_for_devices(companion_pro
  *  COMPANION_PROXY_E_UNSUPPORTED_KEY if the companion device doesn't support the given key,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_get_value_from_registry(companion_proxy_client_t client, const char* companion_udid, const char* key, plist_t* value);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_get_value_from_registry(companion_proxy_client_t client, const char* companion_udid, const char* key, plist_t* value);
 
 /**
  * Start forwarding a service port on the companion device to a port on the idevice.
@@ -186,7 +190,7 @@ companion_proxy_error_t companion_proxy_get_value_from_registry(companion_proxy_
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_start_forwarding_service_port(companion_proxy_client_t client, uint16_t remote_port, const char* service_name, uint16_t* forward_port, plist_t options);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_start_forwarding_service_port(companion_proxy_client_t client, uint16_t remote_port, const char* service_name, uint16_t* forward_port, plist_t options);
 
 /**
  * Stop forwarding a service port between companion device and idevice.
@@ -199,7 +203,7 @@ companion_proxy_error_t companion_proxy_start_forwarding_service_port(companion_
  * @return COMPANION_PROXY_E_SUCCESS on success,
  *  or a COMPANION_PROXY_E_* error code otherwise.
  */
-companion_proxy_error_t companion_proxy_stop_forwarding_service_port(companion_proxy_client_t client, uint16_t remote_port);
+LIBIMOBILEDEVICE_API companion_proxy_error_t companion_proxy_stop_forwarding_service_port(companion_proxy_client_t client, uint16_t remote_port);
 
 #ifdef __cplusplus
 }

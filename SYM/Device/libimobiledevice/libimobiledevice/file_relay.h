@@ -32,6 +32,7 @@ extern "C" {
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the file relay service */
 #define FILE_RELAY_SERVICE_NAME "com.apple.mobile.file_relay"
 
 /** Error Codes */
@@ -46,7 +47,7 @@ typedef enum {
 	FILE_RELAY_E_UNKNOWN_ERROR     = -256
 } file_relay_error_t;
 
-typedef struct file_relay_client_private file_relay_client_private;
+typedef struct file_relay_client_private file_relay_client_private; /**< \private */
 typedef file_relay_client_private *file_relay_client_t; /**< The client handle. */
 
 /**
@@ -61,7 +62,7 @@ typedef file_relay_client_private *file_relay_client_t; /**< The client handle. 
  *     FILE_RELAY_E_INVALID_ARG when one of the parameters is invalid,
  *     or FILE_RELAY_E_MUX_ERROR when the connection failed.
  */
-file_relay_error_t file_relay_client_new(idevice_t device, lockdownd_service_descriptor_t service, file_relay_client_t *client);
+LIBIMOBILEDEVICE_API file_relay_error_t file_relay_client_new(idevice_t device, lockdownd_service_descriptor_t service, file_relay_client_t *client);
 
 /**
  * Starts a new file_relay service on the specified device and connects to it.
@@ -76,7 +77,7 @@ file_relay_error_t file_relay_client_new(idevice_t device, lockdownd_service_des
  * @return FILE_RELAY_E_SUCCESS on success, or an FILE_RELAY_E_* error
  *     code otherwise.
  */
-file_relay_error_t file_relay_client_start_service(idevice_t device, file_relay_client_t* client, const char* label);
+LIBIMOBILEDEVICE_API file_relay_error_t file_relay_client_start_service(idevice_t device, file_relay_client_t* client, const char* label);
 
 /**
  * Disconnects a file_relay client from the device and frees up the file_relay
@@ -89,11 +90,44 @@ file_relay_error_t file_relay_client_start_service(idevice_t device, file_relay_
  *     is invalid, or FILE_RELAY_E_UNKNOWN_ERROR when the was an error
  *     freeing the parent property_list_service client.
  */
-file_relay_error_t file_relay_client_free(file_relay_client_t client);
+LIBIMOBILEDEVICE_API file_relay_error_t file_relay_client_free(file_relay_client_t client);
 
 
 /**
  * Request data for the given sources.
+ *
+ * @param client The connected file_relay client.
+ * @param sources A NULL-terminated list of sources to retrieve.
+ *     Valid sources are:
+ *     - AppleSupport
+ *     - Network
+ *     - VPN
+ *     - WiFi
+ *     - UserDatabases
+ *     - CrashReporter
+ *     - tmp
+ *     - SystemConfiguration
+ * @param connection The connection that has to be used for receiving the
+ *     data using idevice_connection_receive(). The connection will be closed
+ *     automatically by the device, but use file_relay_client_free() to clean
+ *     up properly.
+  *
+ * @note WARNING: Don't call this function without reading the data afterwards.
+ *     A directory mobile_file_relay.XXXX used for creating the archive will
+ *     remain in the /tmp directory otherwise.
+ *
+ * @return FILE_RELAY_E_SUCCESS on succes, FILE_RELAY_E_INVALID_ARG when one or
+ *     more parameters are invalid, FILE_RELAY_E_MUX_ERROR if a communication
+ *     error occurs, FILE_RELAY_E_PLIST_ERROR when the received result is NULL
+ *     or is not a valid plist, FILE_RELAY_E_INVALID_SOURCE if one or more
+ *     sources are invalid, FILE_RELAY_E_STAGING_EMPTY if no data is available
+ *     for the given sources, or FILE_RELAY_E_UNKNOWN_ERROR otherwise.
+ */
+LIBIMOBILEDEVICE_API file_relay_error_t file_relay_request_sources(file_relay_client_t client, const char **sources, idevice_connection_t *connection);
+
+/**
+ * Request data for the given sources. Calls file_relay_request_sources_timeout() with
+ * a timeout of 60000 milliseconds (60 seconds).
  *
  * @param client The connected file_relay client.
  * @param sources A NULL-terminated list of sources to retrieve.
@@ -123,40 +157,7 @@ file_relay_error_t file_relay_client_free(file_relay_client_t client);
  *     sources are invalid, FILE_RELAY_E_STAGING_EMPTY if no data is available
  *     for the given sources, or FILE_RELAY_E_UNKNOWN_ERROR otherwise.
  */
-file_relay_error_t file_relay_request_sources(file_relay_client_t client, const char **sources, idevice_connection_t *connection);
-
-/**
- * Request data for the given sources. Calls file_relay_request_sources_timeout() with
- * a timeout of 60000 milliseconds (60 seconds).
- *
- * @param client The connected file_relay client.
- * @param sources A NULL-terminated list of sources to retrieve.
- *     Valid sources are:
- *     - AppleSupport
- *     - Network
- *     - VPN
- *     - WiFi
- *     - UserDatabases
- *     - CrashReporter
- *     - tmp
- *     - SystemConfiguration
- * @param connection The connection that has to be used for receiving the
- *     data using idevice_connection_receive(). The connection will be closed
- *     automatically by the device, but use file_relay_client_free() to clean
- *     up properly.
- *
- * @note WARNING: Don't call this function without reading the data afterwards.
- *     A directory mobile_file_relay.XXXX used for creating the archive will
- *     remain in the /tmp directory otherwise.
- *
- * @return FILE_RELAY_E_SUCCESS on succes, FILE_RELAY_E_INVALID_ARG when one or
- *     more parameters are invalid, FILE_RELAY_E_MUX_ERROR if a communication
- *     error occurs, FILE_RELAY_E_PLIST_ERROR when the received result is NULL
- *     or is not a valid plist, FILE_RELAY_E_INVALID_SOURCE if one or more
- *     sources are invalid, FILE_RELAY_E_STAGING_EMPTY if no data is available
- *     for the given sources, or FILE_RELAY_E_UNKNOWN_ERROR otherwise.
- */
-file_relay_error_t file_relay_request_sources_timeout(file_relay_client_t client, const char **sources, idevice_connection_t *connection, unsigned int timeout);
+LIBIMOBILEDEVICE_API file_relay_error_t file_relay_request_sources_timeout(file_relay_client_t client, const char **sources, idevice_connection_t *connection, unsigned int timeout);
 
 #ifdef __cplusplus
 }

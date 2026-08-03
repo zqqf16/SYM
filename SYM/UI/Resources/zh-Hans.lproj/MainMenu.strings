@@ -1,0 +1,59 @@
+/* MainMenu.xib — Simplified Chinese */
+
+/* Application */
+"about-item.title" = "关于 SYM";
+"settings-item.title" = "设置…";
+"services-item.title" = "服务";
+"services-menu.title" = "服务";
+"hide-item.title" = "隐藏 SYM";
+"hide-others.title" = "隐藏其他";
+"show-all.title" = "全部显示";
+"quit-item.title" = "退出 SYM";
+
+/* File */
+"file-item.title" = "文件";
+"file-menu.title" = "文件";
+"new-item.title" = "新建";
+"open-item.title" = "打开…";
+"recent-item.title" = "打开最近使用";
+"recent-menu.title" = "打开最近使用";
+"clear-recent.title" = "清除菜单";
+"close-item.title" = "关闭";
+"save-item.title" = "存储…";
+"saveas-item.title" = "存储为…";
+
+/* Edit */
+"edit-item.title" = "编辑";
+"edit-menu.title" = "编辑";
+"undo-item.title" = "撤销";
+"redo-item.title" = "重做";
+"cut-item.title" = "剪切";
+"copy-item.title" = "拷贝";
+"paste-item.title" = "粘贴";
+"selectall-item.title" = "全选";
+
+/* Symbol */
+"symbol-item.title" = "符号化";
+"symbol-menu.title" = "符号化";
+"symbolicate-item.title" = "符号化";
+"script-item.title" = "下载脚本…";
+
+/* View */
+"view-item.title" = "显示";
+"view-menu.title" = "显示";
+"zoomin-item.title" = "放大";
+"zoomout-item.title" = "缩小";
+"scroll-item.title" = "滚动到崩溃线程";
+
+/* Window */
+"window-item.title" = "窗口";
+"window-menu.title" = "窗口";
+"minimize-item.title" = "最小化";
+"zoom-item.title" = "缩放";
+"devices-item.title" = "设备";
+"front-item.title" = "前置全部窗口";
+
+/* Help */
+"help-item.title" = "帮助";
+"help-menu.title" = "帮助";
+"help-sym.title" = "SYM 帮助";

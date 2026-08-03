@@ -29,28 +29,32 @@ extension TableViewItemIndex {
     static let fileBrowserIndex = 1
 }
 
-extension NSToolbarItem.Identifier {
-    static let remove = NSToolbarItem.Identifier("ToolbarItemRemove")
-}
-
-extension NSToolbar {
-    func toggleRemoveItem(visiable: Bool) {
-        if visiable {
-            if !items.contains(where: { $0.itemIdentifier == .remove }) {
-                insertItem(withItemIdentifier: .remove, at: 1)
-            }
-        } else {
-            removeItem(with: .remove)
-        }
-    }
-}
-
 class DeviceContentViewController: NSTabViewController {
-    private func updateToolbar() {
-        guard let item = tabView.selectedTabViewItem else {
-            return
-        }
+    private let crashVC = CrashImporterViewController()
+    private let fileVC = FileBrowserViewController()
 
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        let crashItem = NSTabViewItem(viewController: crashVC)
+        crashItem.label = NSLocalizedString("Crash Log", comment: "")
+        let fileItem = NSTabViewItem(viewController: fileVC)
+        fileItem.label = NSLocalizedString("File Browser", comment: "")
+        addTabViewItem(crashItem)
+        addTabViewItem(fileItem)
+        tabStyle = .toolbar
+    }
+
+    private func updateToolbar() {
+        guard let item = tabView.selectedTabViewItem else { return }
         let index = tabView.indexOfTabViewItem(item)
         if index == .fileBrowserIndex {
             view.window?.title = NSLocalizedString("File Browser", comment: "")
@@ -59,23 +63,15 @@ class DeviceContentViewController: NSTabViewController {
         }
     }
 
-    private var crashViewController: CrashImporterViewController! {
-        return tabView.tabViewItem(at: .crashImporterIndex).viewController as? CrashImporterViewController
-    }
-
-    private var fileViewController: FileBrowserViewController! {
-        return tabView.tabViewItem(at: .fileBrowserIndex).viewController as? FileBrowserViewController
-    }
-
     func showCrashList(_ deviceID: String?) {
         tabView.selectTabViewItem(at: .crashImporterIndex)
-        crashViewController.reloadData(withDeviceID: deviceID)
+        crashVC.reloadData(withDeviceID: deviceID)
         updateToolbar()
     }
 
     func showFileList(_ deviceID: String?, appID: String?) {
         tabView.selectTabViewItem(at: .fileBrowserIndex)
-        fileViewController.reloadData(withDeviceID: deviceID, appID: appID)
+        fileVC.reloadData(withDeviceID: deviceID, appID: appID)
         updateToolbar()
     }
 }

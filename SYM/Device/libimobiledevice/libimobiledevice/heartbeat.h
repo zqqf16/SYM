@@ -30,6 +30,7 @@ extern "C" {
 #include <libimobiledevice/libimobiledevice.h>
 #include <libimobiledevice/lockdown.h>
 
+/** Service identifier passed to lockdownd_start_service() to start the heartbeat service */
 #define HEARTBEAT_SERVICE_NAME "com.apple.mobile.heartbeat"
 
 /** Error Codes */
@@ -44,7 +45,7 @@ typedef enum {
 	HEARTBEAT_E_UNKNOWN_ERROR   = -256
 } heartbeat_error_t;
 
-typedef struct heartbeat_client_private heartbeat_client_private;
+typedef struct heartbeat_client_private heartbeat_client_private; /**< \private */
 typedef heartbeat_client_private *heartbeat_client_t; /**< The client handle. */
 
 /**
@@ -59,7 +60,7 @@ typedef heartbeat_client_private *heartbeat_client_t; /**< The client handle. */
  * @return HEARTBEAT_E_SUCCESS on success, HEARTBEAT_E_INVALID_ARG when
  *     client is NULL, or an HEARTBEAT_E_* error code otherwise.
  */
-heartbeat_error_t heartbeat_client_new(idevice_t device, lockdownd_service_descriptor_t service, heartbeat_client_t * client);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_client_new(idevice_t device, lockdownd_service_descriptor_t service, heartbeat_client_t * client);
 
 /**
  * Starts a new heartbeat service on the specified device and connects to it.
@@ -74,7 +75,7 @@ heartbeat_error_t heartbeat_client_new(idevice_t device, lockdownd_service_descr
  * @return HEARTBEAT_E_SUCCESS on success, or an HEARTBEAT_E_* error
  *     code otherwise.
  */
-heartbeat_error_t heartbeat_client_start_service(idevice_t device, heartbeat_client_t * client, const char* label);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_client_start_service(idevice_t device, heartbeat_client_t * client, const char* label);
 
 /**
  * Disconnects a heartbeat client from the device and frees up the
@@ -85,7 +86,7 @@ heartbeat_error_t heartbeat_client_start_service(idevice_t device, heartbeat_cli
  * @return HEARTBEAT_E_SUCCESS on success, HEARTBEAT_E_INVALID_ARG when
  *     client is NULL, or an HEARTBEAT_E_* error code otherwise.
  */
-heartbeat_error_t heartbeat_client_free(heartbeat_client_t client);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_client_free(heartbeat_client_t client);
 
 
 /**
@@ -97,7 +98,7 @@ heartbeat_error_t heartbeat_client_free(heartbeat_client_t client);
  * @return HEARTBEAT_E_SUCCESS on success,
  *  HEARTBEAT_E_INVALID_ARG when client or plist is NULL
  */
-heartbeat_error_t heartbeat_send(heartbeat_client_t client, plist_t plist);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_send(heartbeat_client_t client, plist_t plist);
 
 /**
  * Receives a plist from the service.
@@ -108,7 +109,7 @@ heartbeat_error_t heartbeat_send(heartbeat_client_t client, plist_t plist);
  * @return HEARTBEAT_E_SUCCESS on success,
  *  HEARTBEAT_E_INVALID_ARG when client or plist is NULL
  */
-heartbeat_error_t heartbeat_receive(heartbeat_client_t client, plist_t * plist);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_receive(heartbeat_client_t client, plist_t * plist);
 
 /**
  * Receives a plist using the given heartbeat client.
@@ -116,7 +117,7 @@ heartbeat_error_t heartbeat_receive(heartbeat_client_t client, plist_t * plist);
  * @param client The heartbeat client to use for receiving
  * @param plist pointer to a plist_t that will point to the received plist
  *      upon successful return
- * @param timeout Maximum time in milliseconds to wait for data.
+ * @param timeout_ms Maximum time in milliseconds to wait for data.
  *
  * @return HEARTBEAT_E_SUCCESS on success,
  *      HEARTBEAT_E_INVALID_ARG when client or *plist is NULL,
@@ -127,7 +128,7 @@ heartbeat_error_t heartbeat_receive(heartbeat_client_t client, plist_t * plist);
  *      communication error occurs, or HEARTBEAT_E_UNKNOWN_ERROR
  *      when an unspecified error occurs.
  */
-heartbeat_error_t heartbeat_receive_with_timeout(heartbeat_client_t client, plist_t * plist, uint32_t timeout_ms);
+LIBIMOBILEDEVICE_API heartbeat_error_t heartbeat_receive_with_timeout(heartbeat_client_t client, plist_t * plist, uint32_t timeout_ms);
 
 #ifdef __cplusplus
 }

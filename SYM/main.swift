@@ -20,47 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Foundation
+import AppKit
 
-extension Frame {
-    func fixed(withLoadAddress loadAddress: String) -> Frame {
-        guard address.hexaToDecimal == loadAddress.hexaToDecimal,
-              symbol != nil,
-              symbol!.hasPrefix("+")
-        else {
-            return self
-        }
-
-        let list = symbol!.components(separatedBy: " ")
-        if list.count < 2 {
-            return self
-        }
-
-        guard let offset = Int(list[1]) else {
-            return self
-        }
-
-        var newFrame = self
-        let newAddress = String(address.hexaToDecimal + offset, radix: 16)
-        newFrame.address = "0x" + newAddress.leftPadding(toLength: 16, withPad: "0")
-        newFrame.symbol = "+ 0"
-
-        return newFrame
-    }
-}
-
-extension Binary {
-    func fix() {
-        guard let loadAddress = loadAddress, let backtrace = backtrace else {
-            return
-        }
-
-        var newBacktrace: [Frame] = []
-        for frame in backtrace {
-            let newFrame = frame.fixed(withLoadAddress: loadAddress)
-            newBacktrace.append(newFrame)
-        }
-
-        self.backtrace = newBacktrace
-    }
-}
+// Classic AppKit entry: loads NSMainNibFile (MainMenu.xib) which installs the menu bar
+// and wires AppDelegate as NSApplication.delegate.
+_ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)

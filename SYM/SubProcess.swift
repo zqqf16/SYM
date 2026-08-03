@@ -49,47 +49,48 @@ class SubProcess {
         let outputPipe = Pipe()
         let errorPipe = Pipe()
         outputPipe.fileHandleForReading.readabilityHandler = { handle in
-            guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
+            guard let string = String(data: handle.availableData, encoding: .utf8) else {
                 return
             }
             self.output += string
-            if let outputHandler = self.outputHandler {
-                outputHandler(string)
-            }
+            self.outputHandler?(string)
         }
         errorPipe.fileHandleForReading.readabilityHandler = { handle in
-            guard let string = String(data: handle.availableData, encoding: String.Encoding.utf8) else {
+            guard let string = String(data: handle.availableData, encoding: .utf8) else {
                 return
             }
             self.error += string
-            if let errorHandler = self.errorHandler {
-                errorHandler(string)
-            }
+            self.errorHandler?(string)
         }
 
         let task = Process()
-        task.launchPath = cmd
+        task.executableURL = URL(fileURLWithPath: cmd)
         task.arguments = args
         if let customEnv = env {
-            var env = task.environment ?? [:]
-            customEnv.forEach { k, v in env[k] = v }
-            task.environment = env
+            var environment = task.environment ?? [:]
+            customEnv.forEach { key, value in
+                environment[key] = value
+            }
+            task.environment = environment
         }
 
         task.standardOutput = outputPipe
         task.standardError = errorPipe
-        task.terminationHandler = { _ in
-        }
 
         self.task = task
-        task.launch()
+        do {
+            try task.run()
+        } catch {
+            exitCode = -1
+            return false
+        }
         task.waitUntilExit()
 
         outputPipe.fileHandleForReading.readabilityHandler = nil
         errorPipe.fileHandleForReading.readabilityHandler = nil
 
         exitCode = Int(task.terminationStatus)
-        return (exitCode == 0)
+        return exitCode == 0
     }
 
     func terminate() {
@@ -106,10 +107,29 @@ extension SubProcess {
         let process = SubProcess(cmd: cmd, args: args)
         process.run()
         let output = process.output
-        if let matchs = re.matches(in: output) {
-            return matchs.map { ($0.captures![0], $0.captures![1]) }
+        if let matches = re.matches(in: output) {
+            return matches.map { ($0.captures![0], $0.captures![1]) }
         }
 
+        return nil
+    }
+
+    static func atos(
+        loadAddress: String,
+        addresses: [String],
+        dsym: String,
+        arch: String = "arm64"
+    ) -> [String]? {
+        let cmd = "/usr/bin/atos"
+        let args = ["-arch", arch, "-o", dsym, "-l", loadAddress] + addresses
+        let process = SubProcess(cmd: cmd, args: args)
+        process.run()
+        let result = process.output
+        if !result.isEmpty {
+            return result
+                .components(separatedBy: "\n")
+                .filter { !$0.isEmpty }
+        }
         return nil
     }
 }

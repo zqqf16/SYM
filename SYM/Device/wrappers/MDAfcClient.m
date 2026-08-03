@@ -25,6 +25,9 @@
 #import "MDLockdown.h"
 #import <libimobiledevice/afc.h>
 #import <libimobiledevice/house_arrest.h>
+#import <sys/stat.h>
+#import <stdlib.h>
+#import <string.h>
 
 @interface MDAfcClient ()
 @property (nonatomic, assign) afc_client_t afc;
@@ -148,8 +151,9 @@
         }
         
         char **fileinfo = NULL;
-        struct stat stbuf;
-        stbuf.st_size = 0;
+        off_t fileSize = 0;
+        mode_t fileMode = 0;
+        time_t fileMTime = 0;
         MDDeviceFile *file = [[MDDeviceFile alloc] initWithAfcClient:self];
         
         /* assemble absolute source filename */
@@ -169,30 +173,29 @@
         int i;
         for (i = 0; fileinfo[i]; i+=2) {
             if (!strcmp(fileinfo[i], "st_size")) {
-                stbuf.st_size = atoll(fileinfo[i+1]);
-                file.size = stbuf.st_size;
+                fileSize = atoll(fileinfo[i+1]);
+                file.size = fileSize;
             } else if (!strcmp(fileinfo[i], "st_ifmt")) {
                 if (!strcmp(fileinfo[i+1], "S_IFREG")) {
-                    stbuf.st_mode = S_IFREG;
+                    fileMode = S_IFREG;
                 } else if (!strcmp(fileinfo[i+1], "S_IFDIR")) {
-                    stbuf.st_mode = S_IFDIR;
+                    fileMode = S_IFDIR;
                     file.isDirectory = YES;
                 } else if (!strcmp(fileinfo[i+1], "S_IFLNK")) {
-                    stbuf.st_mode = S_IFLNK;
+                    fileMode = S_IFLNK;
                 } else if (!strcmp(fileinfo[i+1], "S_IFBLK")) {
-                    stbuf.st_mode = S_IFBLK;
+                    fileMode = S_IFBLK;
                 } else if (!strcmp(fileinfo[i+1], "S_IFCHR")) {
-                    stbuf.st_mode = S_IFCHR;
+                    fileMode = S_IFCHR;
                 } else if (!strcmp(fileinfo[i+1], "S_IFIFO")) {
-                    stbuf.st_mode = S_IFIFO;
+                    fileMode = S_IFIFO;
                 } else if (!strcmp(fileinfo[i+1], "S_IFSOCK")) {
-                    stbuf.st_mode = S_IFSOCK;
+                    fileMode = S_IFSOCK;
                 }
-            } else if (!strcmp(fileinfo[i], "st_nlink")) {
-                stbuf.st_nlink = atoi(fileinfo[i+1]);
+                (void)fileMode;
             } else if (!strcmp(fileinfo[i], "st_mtime")) {
-                stbuf.st_mtime = (time_t)(atoll(fileinfo[i+1]) / 1000000000);
-                file.date = [NSDate dateWithTimeIntervalSince1970:stbuf.st_mtime];
+                fileMTime = (time_t)(atoll(fileinfo[i+1]) / 1000000000);
+                file.date = [NSDate dateWithTimeIntervalSince1970:fileMTime];
             } else if (!strcmp(fileinfo[i], "LinkTarget")) {
                 /*
                  if (!keep_crash_reports)

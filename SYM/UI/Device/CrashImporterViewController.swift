@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import Cocoa
+import SnapKit
 
 extension MDDeviceFile {
     var isCrash: Bool {
@@ -38,17 +39,13 @@ extension MDDeviceFile {
             components.removeLast()
             return components.joined(separator: ".")
         }
-
         return name
     }
 }
 
 extension MDAfcClient {
     func copyCrashFile(_ file: MDDeviceFile, to url: URL) -> String? {
-        guard let content = read(file.path) else {
-            return nil
-        }
-
+        guard let content = read(file.path) else { return nil }
         do {
             try content.write(to: url, options: .atomic)
         } catch {
@@ -63,191 +60,253 @@ class DeviceFileProvider: NSFilePromiseProvider {
 }
 
 class CrashImporterViewController: NSViewController, LoadingAble {
+    private let searchField = NSSearchField()
+    private let tableView = NSTableView()
+    private let scrollView = NSScrollView()
+    private let emptyLabel = NSTextField(labelWithString: "")
+    private let errorLabel = NSTextField(labelWithString: "")
+
     private var fileList: [MDDeviceFile] = []
+    private var filteredList: [MDDeviceFile] = []
+    private var deviceID: String?
+    private var errorMessage: String?
+
+    var loadingIndicator: NSProgressIndicator!
+
     private var afcClient: MDAfcClient? {
-        // Always create a new one
+        guard let deviceID = deviceID else { return nil }
         let lockdown = MDLockdown(udid: deviceID)
         return MDAfcClient.crash(with: lockdown)
     }
 
-    private var deviceID: String?
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
 
-    @IBOutlet var tableView: NSTableView!
-    @IBOutlet var openButton: NSButton!
-    var loadingIndicator: NSProgressIndicator!
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func loadView() {
+        view = NSView()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let descriptorProcess = NSSortDescriptor(keyPath: \MDDeviceFile.lowercaseName, ascending: true)
-        let descriptorDate = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: true)
-        tableView.tableColumns[0].sortDescriptorPrototype = descriptorProcess
-        tableView.tableColumns[1].sortDescriptorPrototype = descriptorDate
-
+        setupUI()
+        tableView.doubleAction = #selector(didDoubleClickCell(_:))
+        tableView.target = self
+        tableView.allowsMultipleSelection = true
+        tableView.allowsColumnReordering = false
         tableView.registerForDraggedTypes([.backwardsCompatibleFileURL])
         tableView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
 
-    func reloadData(withDeviceID deviceID: String?) {
-        if self.deviceID == deviceID {
-            return
-        }
-        self.deviceID = deviceID
+    private func setupUI() {
+        searchField.placeholderString = NSLocalizedString("Search crashes", comment: "")
+        searchField.target = self
+        searchField.action = #selector(searchChanged(_:))
 
-        if self.deviceID == nil {
-            DispatchQueue.main.async {
-                self.fileList = []
-                self.tableView.reloadData()
-            }
+        let nameColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("Process"))
+        nameColumn.title = NSLocalizedString("Name", comment: "")
+        nameColumn.sortDescriptorPrototype = NSSortDescriptor(keyPath: \MDDeviceFile.lowercaseName, ascending: true)
+        let dateColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("Date"))
+        dateColumn.title = NSLocalizedString("Date", comment: "")
+        dateColumn.sortDescriptorPrototype = NSSortDescriptor(keyPath: \MDDeviceFile.date, ascending: false)
+        tableView.addTableColumn(nameColumn)
+        tableView.addTableColumn(dateColumn)
+        tableView.columnAutoresizingStyle = .uniformColumnAutoresizingStyle
+        tableView.dataSource = self
+        tableView.delegate = self
+
+        scrollView.documentView = tableView
+        scrollView.hasVerticalScroller = true
+        scrollView.borderType = .bezelBorder
+
+        emptyLabel.stringValue = NSLocalizedString("No crash logs found", comment: "")
+        emptyLabel.textColor = .secondaryLabelColor
+        emptyLabel.alignment = .center
+        emptyLabel.isHidden = true
+        errorLabel.textColor = .systemRed
+        errorLabel.alignment = .center
+        errorLabel.isHidden = true
+
+        view.addSubview(searchField)
+        view.addSubview(scrollView)
+        view.addSubview(emptyLabel)
+        view.addSubview(errorLabel)
+
+        searchField.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(12)
+        }
+        scrollView.snp.makeConstraints { make in
+            make.top.equalTo(searchField.snp.bottom).offset(8)
+            make.leading.trailing.bottom.equalToSuperview().inset(12)
+        }
+        emptyLabel.snp.makeConstraints { make in
+            make.center.equalTo(scrollView)
+        }
+        errorLabel.snp.makeConstraints { make in
+            make.centerX.equalTo(scrollView)
+            make.bottom.equalTo(emptyLabel.snp.top).offset(-8)
+        }
+    }
+
+    @objc private func searchChanged(_ sender: NSSearchField) {
+        applyFilter(query: sender.stringValue)
+    }
+
+    private func applyFilter(query: String) {
+        if query.isEmpty {
+            filteredList = fileList
+        } else {
+            let q = query.lowercased()
+            filteredList = fileList.filter { $0.lowercaseName.contains(q) }
+        }
+        updateEmptyState()
+        tableView.reloadData()
+    }
+
+    private func updateEmptyState() {
+        emptyLabel.isHidden = !filteredList.isEmpty || errorMessage != nil
+        errorLabel.isHidden = errorMessage == nil
+        errorLabel.stringValue = errorMessage ?? ""
+    }
+
+    func reloadData(withDeviceID deviceID: String?) {
+        if self.deviceID == deviceID { return }
+        self.deviceID = deviceID
+        errorMessage = nil
+
+        if deviceID == nil {
+            fileList = []
+            filteredList = []
+            tableView.reloadData()
+            updateEmptyState()
             return
         }
 
         showLoading()
         DispatchQueue.global().async {
-            let lockdown = MDLockdown(udid: self.deviceID)
+            let lockdown = MDLockdown(udid: deviceID!)
             if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
-                // trigger moving
                 moveService.ping()
             }
             let crashList = self.afcClient?.crashFiles() ?? []
             DispatchQueue.main.async {
-                self.fileList = crashList.filter { $0.isCrash }.sorted(by: { file1, file2 -> Bool in
-                    file1.date > file2.date
-                })
-                self.tableView.reloadData()
+                self.fileList = crashList.filter { $0.isCrash }.sorted { $0.date > $1.date }
+                self.applyFilter(query: self.searchField.stringValue)
                 self.hideLoading()
             }
         }
     }
 
     func openCrash(atIndex index: Int) {
-        if index < 0 || index > fileList.count - 1 {
-            return
-        }
-
+        guard index >= 0, index < filteredList.count else { return }
         showLoading()
-
-        let file = fileList[index]
+        let file = filteredList[index]
         DispatchQueue.global().async {
             guard let udid = self.deviceID else {
-                self.hideLoading()
+                DispatchQueue.main.async { self.hideLoading() }
                 return
             }
-
             let path = FileManager.default.localCrashDirectory(udid) + "/\(file.localCrashFileName)"
             let url = URL(fileURLWithPath: path)
-            if let _ = self.afcClient?.copyCrashFile(file, to: url) {
+            if self.afcClient?.copyCrashFile(file, to: url) != nil {
                 DispatchQueue.main.async {
-                    DocumentController.shared.openDocument(withContentsOf: url, display: true, completionHandler: { _, _, _ in
+                    DocumentController.shared.openDocument(withContentsOf: url, display: true) { _, _, _ in
                         self.hideLoading()
-                    })
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.errorMessage = NSLocalizedString("Failed to copy crash log", comment: "")
+                    self.updateEmptyState()
+                    self.hideLoading()
                 }
             }
         }
     }
 
-    @IBAction func didDoubleClickCell(_: AnyObject?) {
-        let row = tableView.clickedRow
-        openCrash(atIndex: row)
+    @objc func didDoubleClickCell(_: AnyObject?) {
+        openCrash(atIndex: tableView.clickedRow)
     }
 
-    @IBAction func openFile(_: AnyObject?) {
-        let row = tableView.selectedRow
-        openCrash(atIndex: row)
-    }
-
-    @IBAction func reloadFiles(_: AnyObject?) {
+    @objc func reloadFiles(_: AnyObject?) {
         let deviceID = self.deviceID
         self.deviceID = nil
         reloadData(withDeviceID: deviceID)
     }
 
-    @IBAction func removeFile(_: AnyObject?) {
-        guard let afcClient = afcClient else {
-            return
-        }
-
+    @objc func removeFile(_: AnyObject?) {
+        guard let afcClient = afcClient else { return }
         let selectedIndexes = tableView.selectedRowIndexes
-        if selectedIndexes.isEmpty {
-            return
-        }
+        if selectedIndexes.isEmpty { return }
 
-        let files = selectedIndexes.map { index in
-            self.fileList[index]
-        }
-
+        let files = selectedIndexes.map { filteredList[$0] }
         showLoading()
         DispatchQueue.global().async {
-            files.forEach { file in
-                afcClient.remove(file.path)
+            files.forEach { afcClient.remove($0.path) }
+            DispatchQueue.main.async {
+                self.reloadFiles(nil)
+                self.hideLoading()
             }
-            self.reloadFiles(nil)
-            self.hideLoading()
         }
     }
-}
-
-extension NSUserInterfaceItemIdentifier {
-    static let cellProcess = NSUserInterfaceItemIdentifier("Process")
-    static let cellDate = NSUserInterfaceItemIdentifier("Date")
 }
 
 extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSource {
     func numberOfRows(in _: NSTableView) -> Int {
-        return fileList.count
+        filteredList.count
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        var cell: NSTableCellView?
-        let file = fileList[row]
-        if tableColumn == tableView.tableColumns[0] {
-            cell = tableView.makeView(withIdentifier: .cellProcess, owner: nil) as? NSTableCellView
-            cell?.textField?.stringValue = file.crashFileDisplayName
+        let file = filteredList[row]
+        let cell = tableView.makeView(withIdentifier: tableColumn!.identifier, owner: nil) as? NSTableCellView ?? NSTableCellView()
+        if cell.textField == nil {
+            cell.addSubview(NSTextField(labelWithString: ""))
+            cell.textField = cell.subviews.first as? NSTextField
+        }
+        if tableColumn?.identifier.rawValue == "Process" {
+            cell.textField?.stringValue = file.crashFileDisplayName
         } else {
-            cell = tableView.makeView(withIdentifier: .cellDate, owner: nil) as? NSTableCellView
-            cell?.textField?.stringValue = file.date.formattedString
+            cell.textField?.stringValue = file.date.formattedString
         }
         return cell
     }
 
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange _: [NSSortDescriptor]) {
-        fileList = (fileList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
-        self.tableView.reloadData()
+        filteredList = (filteredList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
+        tableView.reloadData()
     }
 
     func tableView(_: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
-        provider.file = fileList[row]
+        provider.file = filteredList[row]
         return provider
-    }
-
-    func tableViewSelectionDidChange(_: Notification) {
-        // self.openButton.isEnabled = self.tableView.selectedRow >= 0
     }
 }
 
 extension CrashImporterViewController: NSFilePromiseProviderDelegate {
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType _: String) -> String {
-        guard let privider = filePromiseProvider as? DeviceFileProvider else {
-            return ""
-        }
-        return privider.file?.localCrashFileName ?? ""
+        guard let provider = filePromiseProvider as? DeviceFileProvider else { return "" }
+        return provider.file?.localCrashFileName ?? ""
     }
 
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
-        guard let privider = filePromiseProvider as? DeviceFileProvider,
-              let file = privider.file,
+        guard let provider = filePromiseProvider as? DeviceFileProvider,
+              let file = provider.file,
               let afcClient = afcClient
         else {
             completionHandler(FileError.createFailed)
             return
         }
-
         _ = afcClient.copyCrashFile(file, to: url)
         completionHandler(nil)
     }
 
     func operationQueue(for _: NSFilePromiseProvider) -> OperationQueue {
-        return OperationQueue()
+        OperationQueue()
     }
 }
