@@ -38,8 +38,12 @@ struct StackFrame: Equatable {
         let paddedIndex = String(index).padding(length: 4)
         let paddedImage = imageName.padding(length: 39)
         var line = "\(paddedIndex)\(paddedImage)\(address.crashHexString) "
-        if let symbol = symbol, let location = symbolLocation {
-            line += "\(symbol) + \(location)"
+        if let symbol = symbol, !symbol.isEmpty {
+            if let location = symbolLocation {
+                line += "\(symbol) + \(location)"
+            } else {
+                line += symbol
+            }
         } else if let loadAddress = loadAddress, let offset = imageOffset {
             line += "\(loadAddress.crashHexString) + \(offset)"
         } else if let offset = imageOffset {
@@ -49,6 +53,13 @@ struct StackFrame: Equatable {
             line += " (\(sourceFile):\(sourceLine))"
         }
         return line
+    }
+
+    var isSymbolicated: Bool {
+        guard let symbol = symbol?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+            return false
+        }
+        return !symbol.isEmpty
     }
 }
 

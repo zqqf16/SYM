@@ -70,6 +70,28 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(report.appBacktraceRanges.count > 0)
         XCTAssertNotNil(report.crashedThreadRange)
         XCTAssertFalse(report.threads.isEmpty)
+        // Classic already-rendered text must stay intact (no lossy rebuild).
+        XCTAssertEqual(report.formattedContent, content)
+        XCTAssertTrue(report.formattedContent.contains("Binary Images:"))
+        XCTAssertTrue(report.formattedContent.contains("Incident Identifier:"))
+        let crashedThread = report.threads.first(where: \.crashed)
+        XCTAssertNotNil(crashedThread)
+        XCTAssertFalse(crashedThread?.frames.isEmpty == true)
+        XCTAssertTrue(
+            crashedThread?.frames.first?.isSymbolicated == true,
+            "AppleDemo frames are already symbolicated in the source text"
+        )
+    }
+
+    func testSymbolicateWithoutDsymsPreservesClassicContent() async {
+        let content = crashContent(fromFile: "AppleDemo", ofType: "ips")
+        let report = CrashFormatter.format(CrashDecoding.decode(content))
+        let symbolicated = await report.symbolicated(using: CompositeSymbolEngine(), dsyms: [:])
+
+        XCTAssertEqual(symbolicated.formattedContent, content)
+        XCTAssertTrue(symbolicated.formattedContent.contains("DEMOViewController.status()"))
+        XCTAssertTrue(symbolicated.formattedContent.contains("Binary Images:"))
+        XCTAssertTrue(symbolicated.formattedContent.contains("Incident Identifier:"))
     }
 
     func testUmengDecoder() {

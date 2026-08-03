@@ -140,6 +140,45 @@
                                     <action selector="selectAll:" target="-1" id="selectall-act"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="edit-sep2"/>
+                            <menuItem title="Find" id="find-item">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Find" id="find-menu">
+                                    <items>
+                                        <menuItem title="Find…" tag="1" keyEquivalent="f" id="find-show">
+                                            <connections>
+                                                <action selector="performTextFinderAction:" target="-1" id="find-show-act"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Find and Replace…" tag="12" keyEquivalent="f" id="find-replace">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="performTextFinderAction:" target="-1" id="find-replace-act"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Find Next" tag="2" keyEquivalent="g" id="find-next">
+                                            <connections>
+                                                <action selector="performTextFinderAction:" target="-1" id="find-next-act"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Find Previous" tag="3" keyEquivalent="G" id="find-prev">
+                                            <connections>
+                                                <action selector="performTextFinderAction:" target="-1" id="find-prev-act"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Use Selection for Find" tag="7" keyEquivalent="e" id="find-use-selection">
+                                            <connections>
+                                                <action selector="performTextFinderAction:" target="-1" id="find-use-selection-act"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Jump to Selection" keyEquivalent="j" id="find-jump">
+                                            <connections>
+                                                <action selector="centerSelectionInVisibleArea:" target="-1" id="find-jump-act"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>

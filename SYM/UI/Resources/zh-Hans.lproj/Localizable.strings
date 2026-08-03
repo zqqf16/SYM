@@ -50,6 +50,13 @@
 "Paste" = "粘贴";
 "Delete" = "删除";
 "Select All" = "全选";
+"Find" = "查找";
+"Find…" = "查找…";
+"Find and Replace…" = "查找和替换…";
+"Find Next" = "查找下一个";
+"Find Previous" = "查找上一个";
+"Use Selection for Find" = "使用所选内容进行查找";
+"Jump to Selection" = "跳到所选内容";
 "Symbol" = "符号化";
 "Symbolicate" = "符号化";
 "Download Script…" = "下载脚本…";

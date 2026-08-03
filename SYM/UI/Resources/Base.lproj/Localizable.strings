@@ -26,6 +26,13 @@
 "Paste" = "Paste";
 "Delete" = "Delete";
 "Select All" = "Select All";
+"Find" = "Find";
+"Find…" = "Find…";
+"Find and Replace…" = "Find and Replace…";
+"Find Next" = "Find Next";
+"Find Previous" = "Find Previous";
+"Use Selection for Find" = "Use Selection for Find";
+"Jump to Selection" = "Jump to Selection";
 "Symbol" = "Symbol";
 "Symbolicate" = "Symbolicate";
 "Download Script…" = "Download Script…";

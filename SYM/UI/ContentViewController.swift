@@ -11,6 +11,7 @@ extension NSViewController {
 class ContentViewController: NSViewController {
     private let textView = TextView()
     private let scrollView = NSScrollView()
+    private let gutterView = LineNumberGutterView()
     private let infoLabel = NSTextField(labelWithString: "")
     private let bottomBar = NSView()
 
@@ -23,6 +24,10 @@ class ContentViewController: NSViewController {
             guard let document else { return }
 
             textView.layoutManager?.replaceTextStorage(document.textStorage)
+            syncTextViewWidthToClipView(forceLayout: true)
+            textView.needsDisplay = true
+            gutterView.needsDisplay = true
+
             cancellable = document.$crashInfo
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] crashInfo in
@@ -51,11 +56,29 @@ class ContentViewController: NSViewController {
         bottomBar.addSubview(infoLabel)
 
         scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalScroller = true
+        scrollView.hasHorizontalScroller = false
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
+        scrollView.drawsBackground = true
+        scrollView.backgroundColor = .textBackgroundColor
+        scrollView.automaticallyAdjustsContentInsets = false
+
+        textView.minSize = .zero
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.containerSize = NSSize(
+            width: 0,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+        textView.drawsBackground = true
+        textView.backgroundColor = .textBackgroundColor
+
         scrollView.documentView = textView
 
+        view.addSubview(gutterView)
         view.addSubview(scrollView)
         view.addSubview(bottomBar)
 
@@ -68,8 +91,14 @@ class ContentViewController: NSViewController {
             make.trailing.equalToSuperview().offset(-8)
             make.centerY.equalToSuperview()
         }
+        gutterView.snp.makeConstraints { make in
+            make.leading.top.equalToSuperview()
+            make.bottom.equalTo(bottomBar.snp.top)
+            make.width.equalTo(LineNumberGutterView.defaultWidth)
+        }
         scrollView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
+            make.top.trailing.equalToSuperview()
+            make.leading.equalTo(gutterView.snp.trailing)
             make.bottom.equalTo(bottomBar.snp.top)
         }
     }
@@ -82,20 +111,66 @@ class ContentViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
     }
 
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        syncTextViewWidthToClipView()
+        gutterView.needsDisplay = true
+    }
+
     private func toggleBottomBar(_ show: Bool) {
         bottomBar.isHidden = !show
     }
 
     private func setupTextView() {
         textView.font = font
+        textView.textColor = .textColor
+        textView.insertionPointColor = .textColor
         textView.isEditable = true
         textView.isSelectable = true
-        textView.isRichText = false
-        textView.textContainerInset = CGSize(width: 0, height: 4)
+        textView.isRichText = true
+        textView.usesFontPanel = false
+        textView.importsGraphics = false
+        textView.textContainerInset = CGSize(width: 5, height: 4)
         textView.allowsUndo = true
         textView.delegate = self
-        textView.lnv_setUpLineNumberView()
         textView.layoutManager?.allowsNonContiguousLayout = false
+        textView.usesFindBar = true
+        gutterView.attach(textView: textView, scrollView: scrollView)
+        syncTextViewWidthToClipView(forceLayout: true)
+    }
+
+    /// Keep the text container wrapped to the clip-view width.
+    private func syncTextViewWidthToClipView(forceLayout: Bool = false) {
+        let clipView = scrollView.contentView
+        let width = max(clipView.bounds.width, 1)
+
+        var frame = textView.frame
+        var frameChanged = false
+        if abs(frame.width - width) > 0.5 {
+            frame.size.width = width
+            frameChanged = true
+        }
+        if frame.origin.x != 0 {
+            frame.origin.x = 0
+            frameChanged = true
+        }
+        if frameChanged {
+            textView.frame = frame
+        }
+
+        let container = textView.textContainer
+        let widthChanged = container?.containerSize.width != width
+        if widthChanged {
+            container?.containerSize = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+        }
+        if (forceLayout || widthChanged), let container {
+            textView.layoutManager?.ensureLayout(for: container)
+        }
+
+        if clipView.bounds.origin.x != 0 {
+            clipView.scroll(to: NSPoint(x: 0, y: clipView.bounds.origin.y))
+            scrollView.reflectScrolledClipView(clipView)
+        }
     }
 
     private func infoString(fromCrash crash: CrashReport) -> String {
@@ -117,6 +192,7 @@ class ContentViewController: NSViewController {
     func update(crashInfo: CrashReport?) {
         updateHighlighting(crashInfo)
         updateSummary(crashInfo)
+        gutterView.needsDisplay = true
     }
 
     private func updateHighlighting(_ crashInfo: CrashReport?) {

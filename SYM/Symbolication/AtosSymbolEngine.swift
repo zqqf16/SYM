@@ -35,7 +35,7 @@ struct AtosSymbolEngine: SymbolEngine {
         )
 
         var framesByUUID = [String: [StackFrame]]()
-        for frame in updated.allFrames where frame.symbol == nil {
+        for frame in updated.allFrames where !frame.isSymbolicated {
             if let uuid = CrashUUID.normalize(frame.imageUUID) {
                 framesByUUID[uuid, default: []].append(frame)
             }
@@ -77,7 +77,7 @@ struct AtosSymbolEngine: SymbolEngine {
         }
 
         updated.updateFrames { frame in
-            if frame.symbol != nil {
+            if frame.isSymbolicated {
                 return frame
             }
             return resolvedByAddress[frame.address] ?? frame

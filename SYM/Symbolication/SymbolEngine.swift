@@ -47,13 +47,20 @@ struct CompositeSymbolEngine: SymbolEngine {
     }
 
     private func hasUnresolvedFrames(in report: CrashReport) -> Bool {
-        report.allFrames.contains { $0.symbol == nil }
+        report.allFrames.contains { !$0.isSymbolicated }
     }
 }
 
 extension CrashReport {
     func symbolicated(using engine: SymbolEngine, dsyms: [String: String]) async -> CrashReport {
+        let before = self
+        let originalContent = formattedContent
         var report = await engine.symbolicate(self, dsymPaths: dsyms)
+        report.formattedContent = CrashFormatter.patchResolvedFrames(
+            in: originalContent,
+            before: before,
+            after: report
+        )
         report = CrashFormatter.format(report)
         return report
     }

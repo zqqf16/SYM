@@ -31,6 +31,14 @@
 "copy-item.title" = "拷贝";
 "paste-item.title" = "粘贴";
 "selectall-item.title" = "全选";
+"find-item.title" = "查找";
+"find-menu.title" = "查找";
+"find-show.title" = "查找…";
+"find-replace.title" = "查找和替换…";
+"find-next.title" = "查找下一个";
+"find-prev.title" = "查找上一个";
+"find-use-selection.title" = "使用所选内容进行查找";
+"find-jump.title" = "跳到所选内容";
 
 /* Symbol */
 "symbol-item.title" = "符号化";

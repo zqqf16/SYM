@@ -25,11 +25,56 @@ import Foundation
 enum CrashFormatter {
     static func format(_ report: CrashReport) -> CrashReport {
         var updated = report
-        if updated.formattedContent == updated.rawContent, !report.threads.isEmpty {
-            updated.formattedContent = formatStructured(report)
-        }
+        // Never rebuild classic / already-rendered text from the frame model —
+        // that drops headers, Binary Images, registers, and rich symbol text.
+        // JSON decoders already synthesize formattedContent at decode time.
         CrashHighlightParser.applyRanges(to: &updated, frameRegex: { CrashRegex.frame(for: $0) })
         return updated
+    }
+
+    /// Replace stack-frame lines in-place when symbolication produced new symbols.
+    static func patchResolvedFrames(
+        in content: String,
+        before: CrashReport,
+        after: CrashReport
+    ) -> String {
+        let beforeFrames = before.allFrames
+        let afterFrames = after.allFrames
+        guard beforeFrames.count == afterFrames.count else {
+            return content
+        }
+
+        var resolvedByAddress = [UInt64: StackFrame]()
+        for (old, new) in zip(beforeFrames, afterFrames) {
+            let changed = old.symbol != new.symbol
+                || old.symbolLocation != new.symbolLocation
+                || old.sourceFile != new.sourceFile
+                || old.sourceLine != new.sourceLine
+                || old.address != new.address
+            guard changed, new.isSymbolicated else {
+                continue
+            }
+            resolvedByAddress[old.address] = new
+            resolvedByAddress[new.address] = new
+        }
+
+        guard !resolvedByAddress.isEmpty else {
+            return content
+        }
+
+        var lines = content.components(separatedBy: "\n")
+        for (index, line) in lines.enumerated() {
+            guard let match = CrashRegex.stackFrame.firstMatch(in: line),
+                  let captures = match.captures,
+                  let addressString = captures.crashCapture(3),
+                  let address = addressString.crashHexAddress,
+                  let frame = resolvedByAddress[address]
+            else {
+                continue
+            }
+            lines[index] = frame.formattedLine
+        }
+        return lines.joined(separator: "\n")
     }
 
     static func formatAppleIPS(
@@ -209,61 +254,6 @@ enum CrashFormatter {
         appendLine("Binary Images:", to: &content)
         for image in report.binaryImages {
             appendLine(formatBinaryImage(image), to: &content)
-        }
-        appendLine("", to: &content)
-        appendLine("EOF", to: &content)
-        appendLine("", to: &content)
-        return content
-    }
-
-    private static func formatStructured(_ report: CrashReport) -> String {
-        var content = ""
-        if let appName = report.appName {
-            appendLine("Process:             \(appName)", to: &content)
-        }
-        if let device = report.device {
-            appendLine("Hardware Model:      \(device)", to: &content)
-        }
-        if let bundleID = report.bundleID {
-            appendLine("Identifier:          \(bundleID)", to: &content)
-        }
-        if let appVersion = report.appVersion {
-            appendLine("Version:             \(appVersion)", to: &content)
-        }
-        if let osVersion = report.osVersion {
-            appendLine("OS Version:          \(osVersion)", to: &content)
-        }
-        appendLine("", to: &content)
-
-        if let exceptionType = report.exceptionType {
-            appendLine("Exception Type:  \(exceptionType)", to: &content)
-        }
-        if let exceptionCodes = report.exceptionCodes {
-            appendLine("Exception Codes: \(exceptionCodes)", to: &content)
-        }
-        if let index = report.crashedThreadIndex {
-            appendLine("Triggered by Thread:  \(index)", to: &content)
-        }
-        appendLine("", to: &content)
-
-        if let backtrace = report.lastExceptionBacktrace, !backtrace.isEmpty {
-            appendLine("Last Exception Backtrace:", to: &content)
-            for frame in backtrace {
-                appendLine(frame.formattedLine, to: &content)
-            }
-            appendLine("", to: &content)
-        }
-
-        for thread in report.threads {
-            content.append(threadSection(thread))
-        }
-
-        if !report.binaryImages.isEmpty {
-            appendLine("", to: &content)
-            appendLine("Binary Images:", to: &content)
-            for image in report.binaryImages {
-                appendLine(formatBinaryImage(image), to: &content)
-            }
         }
         appendLine("", to: &content)
         appendLine("EOF", to: &content)

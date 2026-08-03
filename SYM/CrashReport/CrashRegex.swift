@@ -181,11 +181,13 @@ enum TextCrashParser {
                let addressString = captures.crashCapture(3),
                let address = addressString.crashHexAddress
             {
+                let symbolText = captures.crashCapture(4)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
                 let frame = StackFrame(
                     index: Int(indexString) ?? currentFrames.count,
                     imageName: imageName,
                     address: address,
-                    symbol: captures.crashCapture(4)
+                    symbol: (symbolText?.isEmpty == false) ? symbolText : nil
                 )
                 currentFrames.append(frame)
             }
@@ -197,5 +199,26 @@ enum TextCrashParser {
         }
 
         report.threads = threads
+        linkFramesToBinaryImages(&report)
+    }
+
+    static func linkFramesToBinaryImages(_ report: inout CrashReport) {
+        let imagesByName = Dictionary(grouping: report.binaryImages, by: \.name)
+        report.updateFrames { frame in
+            guard let image = imagesByName[frame.imageName]?.first else {
+                return frame
+            }
+            var updated = frame
+            if updated.imageUUID == nil {
+                updated.imageUUID = image.uuid
+            }
+            if updated.loadAddress == nil {
+                updated.loadAddress = image.loadAddress
+            }
+            if updated.imageOffset == nil, let loadAddress = updated.loadAddress {
+                updated.imageOffset = updated.address &- loadAddress
+            }
+            return updated
+        }
     }
 }

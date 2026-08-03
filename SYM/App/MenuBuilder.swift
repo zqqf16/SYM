@@ -126,6 +126,32 @@ enum MenuBuilder {
         editMenu.addItem(withTitle: L("Paste"), action: #selector(NSText.paste(_:)), keyEquivalent: "v")
         editMenu.addItem(withTitle: L("Delete"), action: #selector(NSText.delete(_:)), keyEquivalent: "")
         editMenu.addItem(withTitle: L("Select All"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        editMenu.addItem(.separator())
+
+        let findItem = editMenu.addItem(withTitle: L("Find"), action: nil, keyEquivalent: "")
+        let findMenu = NSMenu(title: L("Find"))
+        findItem.submenu = findMenu
+
+        func addFinderItem(title: String, action: NSTextFinder.Action, key: String, modifiers: NSEvent.ModifierFlags = .command) {
+            let item = findMenu.addItem(
+                withTitle: title,
+                action: #selector(NSResponder.performTextFinderAction(_:)),
+                keyEquivalent: key
+            )
+            item.tag = action.rawValue
+            item.keyEquivalentModifierMask = modifiers
+        }
+
+        addFinderItem(title: L("Find…"), action: .showFindInterface, key: "f")
+        addFinderItem(title: L("Find and Replace…"), action: .showReplaceInterface, key: "f", modifiers: [.command, .option])
+        addFinderItem(title: L("Find Next"), action: .nextMatch, key: "g")
+        addFinderItem(title: L("Find Previous"), action: .previousMatch, key: "G")
+        addFinderItem(title: L("Use Selection for Find"), action: .setSearchString, key: "e")
+        findMenu.addItem(
+            withTitle: L("Jump to Selection"),
+            action: #selector(NSResponder.centerSelectionInVisibleArea(_:)),
+            keyEquivalent: "j"
+        )
 
         let symbolMenuItem = NSMenuItem(title: L("Symbol"), action: nil, keyEquivalent: "")
         mainMenu.addItem(symbolMenuItem)

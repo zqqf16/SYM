@@ -38,7 +38,7 @@ struct MachOSymbolEngine: SymbolEngine {
         var machOCache = [String: MachOFile]()
 
         updated.updateFrames { frame in
-            guard frame.symbol == nil,
+            guard !frame.isSymbolicated,
                   let frameUUID = CrashUUID.normalize(frame.imageUUID),
                   let dsymPath = dsymPaths[frameUUID],
                   let image = imagesByUUID[frameUUID],

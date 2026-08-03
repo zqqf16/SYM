@@ -71,7 +71,7 @@ class CrashDocument: NSDocument {
         }
     }
 
-    private func update(content: String) {
+    private func replaceContent(_ content: String) {
         textStorage.beginEditing()
         textStorage.replaceCharacters(in: textStorage.string.nsRange, with: content)
         textStorage.applyStyle()
@@ -80,7 +80,7 @@ class CrashDocument: NSDocument {
 
     private func readCrash(from data: Data) throws {
         let content = String(data: data, encoding: .utf8) ?? ""
-        update(content: content)
+        replaceContent(content)
     }
 
     private func readPlist(from data: Data) throws {
@@ -136,12 +136,44 @@ extension CrashDocument {
             let symbolicated = await crash.symbolicated(using: engine, dsyms: dsyms ?? [:])
 
             await MainActor.run {
-                self.crashInfo = symbolicated
-                self.update(content: symbolicated.formattedContent)
-                self.undoManager?.removeAllActions()
-                self.updateChangeCount(.changeDone)
+                self.applySymbolicated(symbolicated)
                 self.isSymbolicating = false
             }
         }
+    }
+
+    /// Replace editor content / crash model as one undoable "Symbolicate" step.
+    private func applySymbolicated(_ report: CrashReport) {
+        let previousContent = textStorage.string
+        let previousReport = crashInfo
+        let newContent = report.formattedContent
+
+        guard previousContent != newContent || previousReport != report else {
+            return
+        }
+
+        registerSymbolicationUndo(content: previousContent, report: previousReport)
+        crashInfo = report
+        replaceContent(newContent)
+        updateChangeCount(.changeDone)
+    }
+
+    private func registerSymbolicationUndo(content: String, report: CrashReport?) {
+        guard let undoManager else {
+            return
+        }
+
+        undoManager.registerUndo(withTarget: self) { document in
+            document.restoreAfterSymbolicate(content: content, report: report)
+        }
+        undoManager.setActionName(NSLocalizedString("Symbolicate", comment: "Undo action name"))
+    }
+
+    private func restoreAfterSymbolicate(content: String, report: CrashReport?) {
+        let currentContent = textStorage.string
+        let currentReport = crashInfo
+        registerSymbolicationUndo(content: currentContent, report: currentReport)
+        crashInfo = report
+        replaceContent(content)
     }
 }
