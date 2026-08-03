@@ -7,7 +7,11 @@ private class DsymTableRowView: NSTableCellView {
     let titleField = NSTextField(labelWithString: "")
     let uuidField = NSTextField(labelWithString: "")
     let pathField = NSTextField(labelWithString: "")
-    let actionButton = NSButton(title: "", target: nil, action: nil)
+    let actionButton = NSButton(
+        title: NSLocalizedString("Import", comment: "Import a dSYM file"),
+        target: nil,
+        action: nil
+    )
 
     var binary: BinaryImage?
     var dsym: DsymFile?
@@ -25,10 +29,22 @@ private class DsymTableRowView: NSTableCellView {
 
     private func setup() {
         titleField.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
+        titleField.lineBreakMode = .byTruncatingTail
         uuidField.font = .monospacedSystemFont(ofSize: NSFont.smallSystemFontSize, weight: .regular)
+        uuidField.textColor = .secondaryLabelColor
         pathField.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        pathField.textColor = .secondaryLabelColor
         pathField.lineBreakMode = .byTruncatingMiddle
-        actionButton.bezelStyle = .rounded
+        pathField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        // Compact control like the old storyboard prototype (inline + small).
+        actionButton.bezelStyle = .inline
+        actionButton.setButtonType(.momentaryPushIn)
+        actionButton.isBordered = true
+        actionButton.controlSize = .small
+        actionButton.font = .boldSystemFont(ofSize: 10)
+        actionButton.setContentHuggingPriority(.required, for: .horizontal)
+        actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         actionButton.target = self
         actionButton.action = #selector(didClickAction)
 
@@ -45,24 +61,25 @@ private class DsymTableRowView: NSTableCellView {
         }
         titleField.snp.makeConstraints { make in
             make.leading.equalTo(statusImage.snp.trailing).offset(8)
-            make.top.equalToSuperview().offset(6)
-            make.trailing.equalTo(actionButton.snp.leading).offset(-8)
+            make.top.equalToSuperview().offset(8)
+            make.trailing.equalToSuperview().offset(-8)
         }
         uuidField.snp.makeConstraints { make in
             make.leading.equalTo(titleField)
-            make.top.equalTo(titleField.snp.bottom).offset(2)
-            make.trailing.equalTo(titleField)
+            make.top.equalTo(titleField.snp.bottom).offset(4)
+            make.trailing.lessThanOrEqualToSuperview().offset(-8)
         }
+        // Old layout: action sits on the path row, path yields width to the button.
         pathField.snp.makeConstraints { make in
             make.leading.equalTo(titleField)
             make.top.equalTo(uuidField.snp.bottom).offset(2)
-            make.trailing.equalTo(titleField)
             make.bottom.equalToSuperview().offset(-6)
         }
         actionButton.snp.makeConstraints { make in
+            make.leading.equalTo(pathField.snp.trailing).offset(6)
             make.trailing.equalToSuperview().offset(-8)
-            make.centerY.equalToSuperview()
-            make.width.greaterThanOrEqualTo(72)
+            make.firstBaseline.equalTo(pathField.snp.firstBaseline)
+            make.width.greaterThanOrEqualTo(40)
         }
     }
 
@@ -79,6 +96,9 @@ private class DsymTableRowView: NSTableCellView {
             statusImage.image = .symDsymMissing
             actionButton.title = NSLocalizedString("Import", comment: "Import a dSYM file")
         }
+        actionButton.isHidden = false
+        actionButton.sizeToFit()
+        needsLayout = true
     }
 
     @objc private func didClickAction(_ sender: NSButton) {
@@ -95,30 +115,36 @@ class DsymViewController: NSViewController {
     private let tableView = NSTableView()
     private let scrollView = NSScrollView()
     private let downloadButton = NSButton(title: NSLocalizedString("Download", comment: ""), target: nil, action: nil)
+    private let doneButton = NSButton(title: NSLocalizedString("Done", comment: ""), target: nil, action: nil)
     private let progressBar = NSProgressIndicator()
+    private let mainColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("main"))
 
-    private var binaries: [BinaryImage] = [] {
-        didSet { reloadData() }
-    }
-
-    private var dsymFiles: [String: DsymFile] = [:] {
-        didSet { reloadData() }
-    }
-
+    private var binaries: [BinaryImage] = []
+    private var dsymFiles: [String: DsymFile] = [:]
     private var dsymStorage = Set<AnyCancellable>()
     private var taskCancellable: AnyCancellable?
+    private var reloadScheduled = false
 
     var dsymManager: DsymManager? {
         didSet {
             dsymStorage.forEach { $0.cancel() }
-            dsymManager?.$binaries
-                .receive(on: DispatchQueue.main)
-                .assign(to: \.binaries, on: self)
-                .store(in: &dsymStorage)
+            dsymStorage.removeAll()
+            guard let dsymManager else {
+                binaries = []
+                dsymFiles = [:]
+                scheduleReload()
+                return
+            }
 
-            dsymManager?.$dsymFiles
+            // Single pipeline so binaries + dSYM maps don't each trigger a full reload.
+            Publishers.CombineLatest(dsymManager.$binaries, dsymManager.$dsymFiles)
                 .receive(on: DispatchQueue.main)
-                .assign(to: \.dsymFiles, on: self)
+                .sink { [weak self] binaries, dsymFiles in
+                    guard let self else { return }
+                    self.binaries = binaries
+                    self.dsymFiles = dsymFiles
+                    self.scheduleReload()
+                }
                 .store(in: &dsymStorage)
         }
     }
@@ -135,17 +161,25 @@ class DsymViewController: NSViewController {
     override func loadView() {
         view = NSView(frame: NSRect(x: 0, y: 0, width: 560, height: 360))
 
-        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("main"))
-        column.title = "Binary Images"
-        tableView.addTableColumn(column)
+        mainColumn.title = "Binary Images"
+        mainColumn.minWidth = 200
+        mainColumn.width = 520
+        mainColumn.resizingMask = [.autoresizingMask, .userResizingMask]
+        tableView.addTableColumn(mainColumn)
         tableView.headerView = nil
-        tableView.rowHeight = 72
+        tableView.rowHeight = 66
         tableView.dataSource = self
         tableView.delegate = self
         tableView.usesAutomaticRowHeights = false
+        tableView.selectionHighlightStyle = .none
+        tableView.allowsEmptySelection = true
+        tableView.backgroundColor = .clear
+        tableView.autoresizingMask = [.width, .height]
 
         scrollView.documentView = tableView
         scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = false
+        scrollView.autohidesScrollers = true
         scrollView.borderType = .bezelBorder
 
         progressBar.isIndeterminate = true
@@ -153,9 +187,16 @@ class DsymViewController: NSViewController {
 
         downloadButton.target = self
         downloadButton.action = #selector(didClickDownloadButton(_:))
+        downloadButton.setContentHuggingPriority(.required, for: .horizontal)
+
+        doneButton.target = self
+        doneButton.action = #selector(didClickDoneButton(_:))
+        doneButton.keyEquivalent = "\r"
+        doneButton.setContentHuggingPriority(.required, for: .horizontal)
 
         view.addSubview(scrollView)
         view.addSubview(downloadButton)
+        view.addSubview(doneButton)
         view.addSubview(progressBar)
 
         scrollView.snp.makeConstraints { make in
@@ -166,8 +207,13 @@ class DsymViewController: NSViewController {
             make.leading.equalToSuperview().offset(16)
             make.bottom.equalToSuperview().offset(-16)
         }
+        doneButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-16)
+            make.centerY.equalTo(downloadButton)
+        }
         progressBar.snp.makeConstraints { make in
             make.leading.equalTo(downloadButton.snp.trailing).offset(12)
+            make.trailing.lessThanOrEqualTo(doneButton.snp.leading).offset(-12)
             make.centerY.equalTo(downloadButton)
             make.width.equalTo(200)
         }
@@ -176,6 +222,11 @@ class DsymViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         downloadButton.isEnabled = dsymManager?.crash != nil
+    }
+
+    override func viewDidLayout() {
+        super.viewDidLayout()
+        tableView.sizeLastColumnToFit()
     }
 
     override func viewDidDisappear() {
@@ -195,20 +246,30 @@ class DsymViewController: NSViewController {
             }
     }
 
-    private func reloadData() {
-        guard isViewLoaded else { return }
-        tableView.reloadData()
+    private func scheduleReload() {
+        guard isViewLoaded, !reloadScheduled else { return }
+        reloadScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.reloadScheduled = false
+            self.tableView.sizeLastColumnToFit()
+            self.tableView.reloadData()
+        }
     }
 
     private func dsymFile(forBinary binary: BinaryImage) -> DsymFile? {
         guard let uuid = binary.uuid else { return nil }
-        return dsymManager?.dsymFile(withUuid: uuid)
+        return dsymFiles[uuid] ?? dsymManager?.dsymFile(withUuid: uuid)
     }
 
     @objc private func didClickDownloadButton(_: NSButton) {
         if let crashInfo = dsymManager?.crash {
             DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
         }
+    }
+
+    @objc private func didClickDoneButton(_: NSButton) {
+        dismiss(nil)
     }
 
     func importDsym(for binary: BinaryImage) {
@@ -260,12 +321,13 @@ extension DsymViewController: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
+        let identifier = NSUserInterfaceItemIdentifier("DsymRow")
         let cell: DsymTableRowView
-        if let existing = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("DsymRow"), owner: self) as? DsymTableRowView {
+        if let existing = tableView.makeView(withIdentifier: identifier, owner: self) as? DsymTableRowView {
             cell = existing
         } else {
             cell = DsymTableRowView()
-            cell.identifier = NSUserInterfaceItemIdentifier("DsymRow")
+            cell.identifier = identifier
         }
         let binary = binaries[row]
         cell.binary = binary
