@@ -39,6 +39,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAfcClient:(MDAfcClient *)afcClient;
 
+/// Drop cached directory listings so the next `children` access hits the device again.
+- (void)invalidateChildren;
+/// Recursively drop cached listings for this node and all loaded descendants.
+- (void)invalidateChildrenRecursively;
+/// Force a fresh directory listing from the device.
+- (nullable NSArray<MDDeviceFile *> *)reloadChildren;
+
 - (nullable NSData *)read;
 - (void)copy:(NSString *)path;
 

@@ -33,7 +33,9 @@ class DeviceSidebarNode: SidebarNode {
 
     init(title: String, imageName: String = "") {
         self.title = title
-        image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
+        if !imageName.isEmpty {
+            image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
+        }
     }
 }
 
@@ -44,7 +46,7 @@ class DeviceSidebarFileNode: DeviceSidebarNode {
     init(deviceID: String, appID: String, title: String) {
         self.deviceID = deviceID
         self.appID = appID
-        super.init(title: title, imageName: "folder")
+        super.init(title: title, imageName: "app.fill")
         isGroup = false
         isSelectable = true
         toolTip = appID
@@ -56,7 +58,7 @@ class DeviceSidebarCrashNode: DeviceSidebarNode {
 
     init(deviceID: String) {
         self.deviceID = deviceID
-        super.init(title: NSLocalizedString("Crash Log", comment: "Crash Log"), imageName: "ladybug")
+        super.init(title: NSLocalizedString("Crash Log", comment: "Crash Log"), imageName: "ladybug.fill")
         isGroup = false
         isSelectable = true
     }
@@ -64,19 +66,10 @@ class DeviceSidebarCrashNode: DeviceSidebarNode {
 
 extension DeviceSidebarNode {
     static func deviceHeaderNode(_ title: String?, children: [DeviceSidebarNode]) -> DeviceSidebarNode {
-        let node = DeviceSidebarNode(title: title ?? "Unnamed device")
+        let node = DeviceSidebarNode(title: title ?? NSLocalizedString("Unnamed device", comment: ""))
         node.children = children
         node.isGroup = true
-        node.isSelectable = true
-        return node
-    }
-
-    static func fileHeaderNode(_ children: [DeviceSidebarNode]) -> DeviceSidebarNode {
-        let title = NSLocalizedString("File Browser", comment: "File Browser")
-        let node = DeviceSidebarNode(title: title, imageName: "folder")
-        node.isGroup = false
         node.isSelectable = false
-        node.children = children
         return node
     }
 }
@@ -111,11 +104,14 @@ class DeviceDataSource {
                     }
                     return app
                 }
-                var children = [DeviceSidebarNode]()
-                if appNodes.count > 0 {
-                    children.append(DeviceSidebarNode.fileHeaderNode(appNodes))
+
+                // Flat, Finder-like: Crash Log + apps under the device (no duplicate tabs).
+                var children: [DeviceSidebarNode] = [
+                    DeviceSidebarCrashNode(deviceID: udid),
+                ]
+                if !appNodes.isEmpty {
+                    children.append(contentsOf: appNodes)
                 }
-                children.append(DeviceSidebarCrashNode(deviceID: udid))
                 return DeviceSidebarNode.deviceHeaderNode(lockdown.deviceName, children: children)
             }
 
@@ -132,6 +128,7 @@ class DeviceHomeViewController: NSSplitViewController {
 
     let dataSource = DeviceDataSource()
     var storage = Set<AnyCancellable>()
+    var onFileBrowserVisibilityChange: ((FileBrowserViewController?) -> Void)?
 
     var nodes: [DeviceSidebarNode] = [] {
         didSet { reloadData() }
@@ -139,6 +136,7 @@ class DeviceHomeViewController: NSSplitViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
+        splitView.autosaveName = "DeviceHomeSplitView"
     }
 
     @available(*, unavailable)
@@ -148,25 +146,38 @@ class DeviceHomeViewController: NSSplitViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        addSplitViewItem(NSSplitViewItem(sidebarWithViewController: sidebarVC))
-        addSplitViewItem(NSSplitViewItem(contentListWithViewController: contentVC))
+
+        let sidebarItem = NSSplitViewItem(sidebarWithViewController: sidebarVC)
+        sidebarItem.minimumThickness = 200
+        sidebarItem.maximumThickness = 280
+        sidebarItem.canCollapse = true
+        addSplitViewItem(sidebarItem)
+
+        let detailItem = NSSplitViewItem(viewController: contentVC)
+        detailItem.minimumThickness = 420
+        addSplitViewItem(detailItem)
+
         sidebarVC.delegate = self
-        splitViewItems.first?.minimumThickness = 180
-        splitViewItems.first?.maximumThickness = 320
+        contentVC.onFileBrowserVisibilityChange = { [weak self] browser in
+            self?.onFileBrowserVisibilityChange?(browser)
+        }
         dataSource.$nodes.assign(to: \.nodes, on: self).store(in: &storage)
     }
 
     private func reloadData() {
         sidebarVC.nodes = nodes
+        if nodes.isEmpty {
+            contentVC.showPlaceholder()
+        }
     }
 }
 
 extension DeviceHomeViewController: DeviceSidebarViewControllerDelegate {
     func sidebar(_: DeviceSidebarViewController, didSelectNode node: SidebarNode) {
         if let fileNode = node as? DeviceSidebarFileNode {
-            contentVC.showFileList(fileNode.deviceID, appID: fileNode.appID)
+            contentVC.showFileList(fileNode.deviceID, appID: fileNode.appID, title: fileNode.title)
         } else if let crashNode = node as? DeviceSidebarCrashNode {
-            contentVC.showCrashList(crashNode.deviceID)
+            contentVC.showCrashList(crashNode.deviceID, title: crashNode.title)
         }
     }
 }

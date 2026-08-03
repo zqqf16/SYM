@@ -21,17 +21,21 @@
 // SOFTWARE.
 
 import Cocoa
+import SnapKit
 
-typealias TableViewItemIndex = Int
-
-extension TableViewItemIndex {
-    static let crashImporterIndex = 0
-    static let fileBrowserIndex = 1
-}
-
-class DeviceContentViewController: NSTabViewController {
+/// Detail pane for the device window. Hosts crash / file browsers without a
+/// toolbar tab bar — navigation lives only in the sidebar.
+class DeviceContentViewController: NSViewController {
     private let crashVC = CrashImporterViewController()
     private let fileVC = FileBrowserViewController()
+    private let placeholderLabel = NSTextField(wrappingLabelWithString: "")
+
+    private var currentChild: NSViewController?
+    var onFileBrowserVisibilityChange: ((FileBrowserViewController?) -> Void)?
+
+    var contentTitle: String = NSLocalizedString("Devices", comment: "") {
+        didSet { view.window?.title = contentTitle }
+    }
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -42,36 +46,78 @@ class DeviceContentViewController: NSTabViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func loadView() {
+        view = NSView()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        let crashItem = NSTabViewItem(viewController: crashVC)
-        crashItem.label = NSLocalizedString("Crash Log", comment: "")
-        let fileItem = NSTabViewItem(viewController: fileVC)
-        fileItem.label = NSLocalizedString("File Browser", comment: "")
-        addTabViewItem(crashItem)
-        addTabViewItem(fileItem)
-        tabStyle = .toolbar
-    }
-
-    private func updateToolbar() {
-        guard let item = tabView.selectedTabViewItem else { return }
-        let index = tabView.indexOfTabViewItem(item)
-        if index == .fileBrowserIndex {
-            view.window?.title = NSLocalizedString("File Browser", comment: "")
-        } else {
-            view.window?.title = NSLocalizedString("Crash Log", comment: "")
+        placeholderLabel.stringValue = NSLocalizedString(
+            "Select a device item in the sidebar",
+            comment: "Empty device detail placeholder"
+        )
+        placeholderLabel.textColor = .secondaryLabelColor
+        placeholderLabel.alignment = .center
+        placeholderLabel.font = .systemFont(ofSize: 13)
+        view.addSubview(placeholderLabel)
+        placeholderLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.leading.greaterThanOrEqualToSuperview().offset(40)
+            make.trailing.lessThanOrEqualToSuperview().offset(-40)
         }
+        showPlaceholder()
     }
 
-    func showCrashList(_ deviceID: String?) {
-        tabView.selectTabViewItem(at: .crashImporterIndex)
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        view.window?.title = contentTitle
+        notifyFileBrowserVisibility()
+    }
+
+    func showCrashList(_ deviceID: String?, title: String? = nil) {
+        contentTitle = title ?? NSLocalizedString("Crash Log", comment: "")
+        embed(crashVC)
         crashVC.reloadData(withDeviceID: deviceID)
-        updateToolbar()
+        notifyFileBrowserVisibility()
     }
 
-    func showFileList(_ deviceID: String?, appID: String?) {
-        tabView.selectTabViewItem(at: .fileBrowserIndex)
+    func showFileList(_ deviceID: String?, appID: String?, title: String? = nil) {
+        contentTitle = title ?? NSLocalizedString("File Browser", comment: "")
+        embed(fileVC)
         fileVC.reloadData(withDeviceID: deviceID, appID: appID)
-        updateToolbar()
+        notifyFileBrowserVisibility()
+    }
+
+    func showPlaceholder() {
+        contentTitle = NSLocalizedString("Devices", comment: "")
+        removeCurrentChild()
+        placeholderLabel.isHidden = false
+        notifyFileBrowserVisibility()
+    }
+
+    private func notifyFileBrowserVisibility() {
+        onFileBrowserVisibilityChange?(currentChild === fileVC ? fileVC : nil)
+    }
+
+    private func embed(_ child: NSViewController) {
+        if currentChild === child {
+            placeholderLabel.isHidden = true
+            return
+        }
+        removeCurrentChild()
+        placeholderLabel.isHidden = true
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        currentChild = child
+    }
+
+    private func removeCurrentChild() {
+        guard let child = currentChild else { return }
+        child.view.removeFromSuperview()
+        child.removeFromParent()
+        currentChild = nil
     }
 }

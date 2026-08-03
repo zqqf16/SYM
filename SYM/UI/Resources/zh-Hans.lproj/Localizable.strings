@@ -17,6 +17,13 @@
 "Settings" = "设置";
 "Download Script" = "下载脚本";
 "About SYM" = "关于 SYM";
+"Select a device item in the sidebar" = "在边栏中选择设备项目";
+"Unnamed device" = "未命名设备";
+"No crash logs found" = "未找到崩溃日志";
+"Search crashes" = "搜索崩溃日志";
+"Back" = "后退";
+"Forward" = "前进";
+"No files" = "没有文件";
 
 /* Menu (MenuBuilder fallback) */
 "About %@" = "关于 %@";

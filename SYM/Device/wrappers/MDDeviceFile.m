@@ -64,8 +64,30 @@
         return _children;
     }
     
-    _children = [self.afcClient listDirectory:self.path];
-    return _children;
+    NSArray *listed = [self.afcClient listDirectory:self.path];
+    // Only cache successful listings. A nil result (AFC error) must be retryable.
+    if (listed) {
+        _children = listed;
+    }
+    return listed;
+}
+
+- (void)invalidateChildren {
+    _children = nil;
+}
+
+- (void)invalidateChildrenRecursively {
+    if (_children) {
+        for (MDDeviceFile *child in _children) {
+            [child invalidateChildrenRecursively];
+        }
+    }
+    _children = nil;
+}
+
+- (NSArray<MDDeviceFile *> *)reloadChildren {
+    [self invalidateChildren];
+    return self.children;
 }
 
 - (NSData *)read {

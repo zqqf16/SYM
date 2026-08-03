@@ -262,16 +262,37 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
+        guard let tableColumn else { return nil }
         let file = filteredList[row]
-        let cell = tableView.makeView(withIdentifier: tableColumn!.identifier, owner: nil) as? NSTableCellView ?? NSTableCellView()
-        if cell.textField == nil {
-            cell.addSubview(NSTextField(labelWithString: ""))
-            cell.textField = cell.subviews.first as? NSTextField
+        let identifier = tableColumn.identifier
+        let cell: NSTableCellView
+        if let reused = tableView.makeView(withIdentifier: identifier, owner: nil) as? NSTableCellView {
+            cell = reused
+        } else {
+            cell = makeTextCell(identifier: identifier)
         }
-        if tableColumn?.identifier.rawValue == "Process" {
+        if identifier.rawValue == "Process" {
             cell.textField?.stringValue = file.crashFileDisplayName
         } else {
             cell.textField?.stringValue = file.date.formattedString
+        }
+        return cell
+    }
+
+    private func makeTextCell(identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+        let cell = NSTableCellView()
+        cell.identifier = identifier
+        let textField = NSTextField(labelWithString: "")
+        textField.lineBreakMode = .byTruncatingTail
+        textField.drawsBackground = false
+        textField.isEditable = false
+        textField.isBordered = false
+        cell.addSubview(textField)
+        cell.textField = textField
+        textField.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(4)
+            make.trailing.equalToSuperview().offset(-4)
+            make.centerY.equalToSuperview()
         }
         return cell
     }
