@@ -18,6 +18,7 @@ class ContentViewController: NSViewController {
     private var font: NSFont = Config.editorFont
     private var cancellable: AnyCancellable?
     private var gutterWidthConstraint: Constraint?
+    private var bottomBarHeightConstraint: Constraint?
 
     var document: CrashDocument? {
         didSet {
@@ -85,7 +86,7 @@ class ContentViewController: NSViewController {
 
         bottomBar.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(24)
+            bottomBarHeightConstraint = make.height.equalTo(0).constraint
         }
         infoLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(8)
@@ -124,6 +125,9 @@ class ContentViewController: NSViewController {
 
     private func toggleBottomBar(_ show: Bool) {
         bottomBar.isHidden = !show
+        bottomBarHeightConstraint?.update(offset: show ? 24 : 0)
+        view.layoutSubtreeIfNeeded()
+        syncTextViewWidthToClipView()
     }
 
     private func setupTextView() {

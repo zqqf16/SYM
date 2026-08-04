@@ -108,7 +108,15 @@ extension SubProcess {
         process.run()
         let output = process.output
         if let matches = re.matches(in: output) {
-            return matches.map { ($0.captures![0], $0.captures![1]) }
+            // captures[0] is the full match; UUID/arch are groups 1 and 2.
+            return matches.compactMap { match -> (String, String)? in
+                guard let captures = match.captures,
+                      captures.count >= 3
+                else {
+                    return nil
+                }
+                return (captures[1], captures[2])
+            }
         }
 
         return nil

@@ -152,14 +152,18 @@ final class HardwareModelStore {
     }
 
     private static func loadInitialMap() -> [String: String] {
-        if let cached = loadMap(from: cachedFileURL), !cached.isEmpty {
-            return cached
+        // Start from the shipped DB so app upgrades still pick up new models,
+        // then overlay any Application Support cache from "Check for Updates".
+        var map: [String: String] = [:]
+        if let bundledURL = Bundle.main.url(forResource: bundledResourceName, withExtension: "json"),
+           let bundled = loadMap(from: bundledURL)
+        {
+            map.merge(bundled) { _, new in new }
         }
-        if let bundled = Bundle.main.url(forResource: bundledResourceName, withExtension: "json"),
-           let map = loadMap(from: bundled), !map.isEmpty {
-            return map
+        if let cached = loadMap(from: cachedFileURL) {
+            map.merge(cached) { _, new in new }
         }
-        return [:]
+        return map
     }
 
     private static func loadMap(from url: URL) -> [String: String]? {

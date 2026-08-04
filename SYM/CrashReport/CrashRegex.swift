@@ -159,15 +159,37 @@ enum TextCrashParser {
             if let match = CrashRegex.thread.firstMatch(in: line), let captures = match.captures,
                let indexString = captures.crashCapture(1)
             {
+                let index = Int(indexString) ?? threads.count
+                let crashed = captures.crashCapture(2) == "Crashed"
+                let (name, queue) = parseThreadNameFields(captures.crashCapture(3))
+
+                // Classic Apple logs often emit two headers for one thread:
+                //   Thread 0 name:  Dispatch queue: …
+                //   Thread 0 Crashed:
+                // Merge them instead of creating an empty name-only stub.
+                if let existing = currentThread,
+                   existing.index == index,
+                   currentFrames.isEmpty
+                {
+                    currentThread = CrashThread(
+                        index: index,
+                        name: name ?? existing.name,
+                        queue: queue ?? existing.queue,
+                        crashed: crashed || existing.crashed,
+                        frames: []
+                    )
+                    if crashed {
+                        report.crashedThreadIndex = index
+                    }
+                    continue
+                }
+
                 if var thread = currentThread {
                     thread.frames = currentFrames
                     threads.append(thread)
                 }
 
-                let index = Int(indexString) ?? threads.count
-                let crashed = captures.crashCapture(2) == "Crashed"
-                let name = captures.crashCapture(3)
-                currentThread = CrashThread(index: index, name: name, queue: nil, crashed: crashed, frames: [])
+                currentThread = CrashThread(index: index, name: name, queue: queue, crashed: crashed, frames: [])
                 currentFrames = []
                 if crashed {
                     report.crashedThreadIndex = index
@@ -201,6 +223,20 @@ enum TextCrashParser {
         report.threads = threads
         linkFramesToBinaryImages(&report)
     }
+
+    /// Split `Thread N name:` payload into thread name / dispatch queue when present.
+    private static func parseThreadNameFields(_ raw: String?) -> (name: String?, queue: String?) {
+        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return (nil, nil)
+        }
+        let queuePrefix = "Dispatch queue:"
+        if raw.hasPrefix(queuePrefix) {
+            let queue = raw.dropFirst(queuePrefix.count).trimmingCharacters(in: .whitespacesAndNewlines)
+            return (nil, queue.isEmpty ? nil : queue)
+        }
+        return (raw, nil)
+    }
+
 
     static func linkFramesToBinaryImages(_ report: inout CrashReport) {
         let imagesByName = Dictionary(grouping: report.binaryImages, by: \.name)

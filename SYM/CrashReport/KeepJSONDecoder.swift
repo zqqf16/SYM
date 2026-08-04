@@ -112,7 +112,7 @@ struct KeepJSONDecoder: CrashDecoder {
                 name: name,
                 uuid: CrashUUID.normalize(frame["uuid"] as? String),
                 arch: arch,
-                loadAddress: (frame["address"] as? NSNumber)?.uint64Value,
+                loadAddress: (frame["load_address"] as? NSNumber)?.uint64Value,
                 path: path,
                 isExecutable: name == appName,
                 inApp: BinaryImage.isInApp(path: path)
@@ -140,14 +140,15 @@ struct KeepJSONDecoder: CrashDecoder {
 
     private func parseThreadStack(_ frames: [[String: Any]]) -> [StackFrame] {
         frames.enumerated().map { index, frame in
+            // Keep JSON: `load_address` is the image base, `address` is the offset within it.
             let loadAddress = (frame["load_address"] as? NSNumber)?.uint64Value ?? 0
             let offset = (frame["address"] as? NSNumber)?.uint64Value ?? 0
             return StackFrame(
                 index: index,
                 imageName: frame["image_name"] as? String ?? "",
-                address: loadAddress,
+                address: loadAddress &+ offset,
                 imageOffset: offset,
-                loadAddress: (frame["address"] as? NSNumber)?.uint64Value,
+                loadAddress: loadAddress,
                 symbol: parseSymbol(frame),
                 sourceFile: frame["file_name"] as? String,
                 sourceLine: frame["line_num"] as? Int
@@ -174,8 +175,8 @@ struct KeepJSONDecoder: CrashDecoder {
             return value
         }
 
-        let loadAddress = (frame["address"] as? NSNumber)?.uint64Value ?? 0
-        let offset = frame["address"] as? Int ?? 0
+        let loadAddress = (frame["load_address"] as? NSNumber)?.uint64Value ?? 0
+        let offset = (frame["address"] as? NSNumber)?.uint64Value ?? 0
         return "\(loadAddress.crashHexString) + \(offset)"
     }
 

@@ -300,6 +300,7 @@ class DsymViewController: NSViewController {
             downloadButton.isEnabled = true
         case .success:
             progressBar.isHidden = true
+            downloadButton.isEnabled = true
         case .waiting:
             progressBar.isHidden = false
             progressBar.isIndeterminate = true

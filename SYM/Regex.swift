@@ -38,10 +38,16 @@ struct Regex {
                 return nil
             }
 
+            // Keep NSRegularExpression group indices stable: unmatched optional
+            // groups become "" so callers can use capture index == regex group number.
             var groups = [String]()
+            groups.reserveCapacity(number)
             for index in 0 ..< number {
-                if let range = Range(result.range(at: index), in: string) {
-                    groups.append(String(string[range]))
+                let range = result.range(at: index)
+                if range.location != NSNotFound, let swiftRange = Range(range, in: string) {
+                    groups.append(String(string[swiftRange]))
+                } else {
+                    groups.append("")
                 }
             }
 

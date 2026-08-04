@@ -81,6 +81,107 @@ final class CrashReportTests: XCTestCase {
             crashedThread?.frames.first?.isSymbolicated == true,
             "AppleDemo frames are already symbolicated in the source text"
         )
+        // name: + Crashed: headers must merge into one thread.
+        XCTAssertEqual(report.threads.filter { $0.index == 0 }.count, 1)
+        XCTAssertEqual(crashedThread?.index, 0)
+        XCTAssertEqual(crashedThread?.queue, "com.apple.main-thread")
+        XCTAssertFalse(crashedThread?.frames.isEmpty == true)
+    }
+
+    func testDwarfdumpRegexCapturesUUIDAndArch() {
+        // dwarfdump --uuid lines end with a trailing space before the newline.
+        let output = "UUID: 42FD89F7-30BE-3AC5-A40A-4C1A99438DFB (arm64) \n"
+            + "UUID: AABBCCDD-EEFF-0011-2233-445566778899 (x86_64) \n"
+        let re = try! Regex(
+            "UUID: ([0-9a-z\\-]{36}) \\((.*)\\) ",
+            options: [.anchorsMatchLines, .caseInsensitive]
+        )
+        let matches = re.matches(in: output) ?? []
+        XCTAssertEqual(matches.count, 2)
+        XCTAssertEqual(matches[0].captures?[1].uppercased(), "42FD89F7-30BE-3AC5-A40A-4C1A99438DFB")
+        XCTAssertEqual(matches[0].captures?[2], "arm64")
+        XCTAssertEqual(matches[1].captures?[1].uppercased(), "AABBCCDD-EEFF-0011-2233-445566778899")
+        XCTAssertEqual(matches[1].captures?[2], "x86_64")
+        // Full-match index must not be treated as the UUID.
+        XCTAssertNotEqual(matches[0].captures?[0], matches[0].captures?[1])
+    }
+
+    func testKeepJSONAddressUsesLoadBasePlusOffset() {
+        let json = """
+        {
+          "app_package_name": "im.zorro.demo",
+          "key_stack": [],
+          "trace": {
+            "systemMsg": {
+              "CFBundleExecutable": "Demo",
+              "CFBundleIdentifier": "im.zorro.demo",
+              "machine": "iPhone14,2",
+              "cpu_arch": "arm64",
+              "system_version": "17.0",
+              "os_version": "21A329"
+            },
+            "errorMsg": { "mach": {}, "signal": {} },
+            "threads": [
+              {
+                "index": 0,
+                "thread_type": "Crashed",
+                "thread_name": "main",
+                "thread_stack": [
+                  {
+                    "image_name": "Demo",
+                    "uuid": "42fd89f730be3ac5a40a4c1a99438dfb",
+                    "load_address": 4294967296,
+                    "address": 4096,
+                    "is_key": true
+                  }
+                ]
+              }
+            ]
+          }
+        }
+        """
+        XCTAssertTrue(KeepJSONDecoder.match(json))
+        let report = KeepJSONDecoder().decode(json)
+        let frame = report.threads.first?.frames.first
+        XCTAssertEqual(frame?.loadAddress, 0x1_0000_0000)
+        XCTAssertEqual(frame?.imageOffset, 4096)
+        XCTAssertEqual(frame?.address, 0x1_0000_0000 + 4096)
+        XCTAssertEqual(report.binaryImages.first?.loadAddress, 0x1_0000_0000)
+        XCTAssertFalse(frame?.isSymbolicated == true)
+    }
+
+    func testUnresolvedHexOffsetIsNotSymbolicated() {
+        let frame = StackFrame(
+            index: 0,
+            imageName: "Demo",
+            address: 0x100004000,
+            symbol: "0x100000000 + 16384"
+        )
+        XCTAssertFalse(frame.isSymbolicated)
+
+        let resolved = StackFrame(
+            index: 0,
+            imageName: "Demo",
+            address: 0x100004000,
+            symbol: "DemoApp.main",
+            symbolLocation: 32
+        )
+        XCTAssertTrue(resolved.isSymbolicated)
+    }
+
+    func testFormattedLineMatchesClassicColumns() {
+        let frame = StackFrame(
+            index: 0,
+            imageName: "demo",
+            address: 0x0000_0001_0012_5780,
+            symbol: "DEMOViewController.status()",
+            symbolLocation: 140
+        )
+        let line = frame.formattedLine
+        XCTAssertTrue(line.contains("\t"), "classic Apple frames separate image and address with a tab")
+        XCTAssertEqual(line.firstIndex(of: "\t").map { line.distance(from: line.startIndex, to: $0) }, 34)
+        XCTAssertTrue(line.hasPrefix("0   demo"))
+        XCTAssertTrue(line.contains("DEMOViewController.status() + 140"))
     }
 
     func testSymbolicateWithoutDsymsPreservesClassicContent() async {

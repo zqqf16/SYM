@@ -35,9 +35,10 @@ struct StackFrame: Equatable {
     var sourceLine: Int?
 
     var formattedLine: String {
+        // Match classic Apple text: "%-4d%-30s\t0x… symbol"
         let paddedIndex = String(index).padding(length: 4)
-        let paddedImage = imageName.padding(length: 39)
-        var line = "\(paddedIndex)\(paddedImage)\(address.crashHexString) "
+        let paddedImage = imageName.padding(length: 30)
+        var line = "\(paddedIndex)\(paddedImage)\t\(address.crashHexString) "
         if let symbol = symbol, !symbol.isEmpty {
             if let location = symbolLocation {
                 line += "\(symbol) + \(location)"
@@ -56,10 +57,16 @@ struct StackFrame: Equatable {
     }
 
     var isSymbolicated: Bool {
-        guard let symbol = symbol?.trimmingCharacters(in: .whitespacesAndNewlines) else {
+        guard let symbol = symbol?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !symbol.isEmpty
+        else {
             return false
         }
-        return !symbol.isEmpty
+        // Hex address + offset is still unresolved (common in Keep/Umeng placeholders).
+        if symbol.range(of: #"^0[xX][0-9A-Fa-f]+\s*\+\s*\d+$"#, options: .regularExpression) != nil {
+            return false
+        }
+        return true
     }
 }
 
