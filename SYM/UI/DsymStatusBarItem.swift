@@ -58,10 +58,10 @@ final class DsymToolbarButton: NSButton {
         image = .symDsymMissing
     }
 
-    private func update(withDsymFiles dsymFiles: [String: DsymFile]) {
+    private func update(withDsymFiles _: [String: DsymFile]) {
         if let crash = dsymManager?.crash,
            let uuid = crash.uuid,
-           dsymFiles[uuid] != nil
+           dsymManager?.dsymFile(withUuid: uuid) != nil
         {
             image = .symDsymFound
             toolTip = NSLocalizedString("dSYM file found", comment: "")

@@ -184,20 +184,28 @@ class DsymDownloadTask {
             return
         }
 
-        var uuids: [String] = [crashInfo.uuid ?? ""]
-        if crashInfo.embeddedBinaries.count > 0 {
-            uuids = crashInfo.embeddedBinaries.compactMap { binary -> String? in
-                binary.uuid
-            }
+        var uuids: [String] = []
+        if let main = CrashUUID.normalize(crashInfo.uuid) {
+            uuids.append(main)
         }
+        if !crashInfo.embeddedBinaries.isEmpty {
+            uuids = crashInfo.embeddedBinaries.compactMap { CrashUUID.normalize($0.uuid) }
+        }
+        let needed = Set(uuids)
 
         var dsymFiles: [DsymFile] = []
         for match in matches {
-            let uuid = match.captures![0]
-            if !uuids.contains(uuid) {
+            guard let captures = match.captures, captures.count >= 3 else {
                 continue
             }
-            let path = match.captures![1]
+            // captures[0] = full match; UUID/path are groups 1/2.
+            guard let uuid = CrashUUID.normalize(captures[1]), needed.contains(uuid) else {
+                continue
+            }
+            let path = captures[2].trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !path.isEmpty else {
+                continue
+            }
             var name = ""
             for component in path.components(separatedBy: "/") {
                 if component.hasSuffix(".dSYM") {
@@ -205,8 +213,14 @@ class DsymDownloadTask {
                     break
                 }
             }
-            let file = DsymFile(name: name, path: path, binaryPath: path,
-                                uuids: [uuid], isApp: uuid == crashInfo.uuid)
+            let binaryPath = DsymLocator.resolveDwarfBinaryPath(from: path) ?? path
+            let file = DsymFile(
+                name: name.isEmpty ? (path as NSString).lastPathComponent : name,
+                path: path,
+                binaryPath: binaryPath,
+                uuids: [uuid],
+                isApp: uuid == CrashUUID.normalize(crashInfo.uuid)
+            )
             dsymFiles.append(file)
         }
         self.dsymFiles = dsymFiles
@@ -258,7 +272,7 @@ class DsymDownloader {
 
     @discardableResult
     func download(crashInfo: CrashReport, fileURL: URL?) -> DsymDownloadTask? {
-        guard let uuid = crashInfo.uuid, canDownload() else {
+        guard let uuid = CrashUUID.normalize(crashInfo.uuid), canDownload() else {
             return nil
         }
 

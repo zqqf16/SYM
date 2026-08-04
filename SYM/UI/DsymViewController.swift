@@ -259,7 +259,7 @@ class DsymViewController: NSViewController {
 
     private func dsymFile(forBinary binary: BinaryImage) -> DsymFile? {
         guard let uuid = binary.uuid else { return nil }
-        return dsymFiles[uuid] ?? dsymManager?.dsymFile(withUuid: uuid)
+        return dsymManager?.dsymFile(withUuid: uuid) ?? dsymFiles[CrashUUID.normalize(uuid) ?? uuid]
     }
 
     @objc private func didClickDownloadButton(_: NSButton) {

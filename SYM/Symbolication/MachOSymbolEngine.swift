@@ -99,10 +99,12 @@ struct MachOSymbolEngine: SymbolEngine {
     }
 
     private func uuidMatches(path: String, expectedUUID: String) -> Bool {
-        guard let pairs = SubProcess.dwarfdump([path]) else {
-            return true
+        guard let expected = CrashUUID.normalize(expectedUUID),
+              let pairs = SubProcess.dwarfdump([path])
+        else {
+            return false
         }
-        return pairs.contains { $0.0.uppercased() == expectedUUID }
+        return pairs.contains { CrashUUID.normalize($0.0) == expected }
     }
 
     private func matchesArch(_ machO: MachOFile, arch: String) -> Bool {

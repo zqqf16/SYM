@@ -111,11 +111,12 @@ extension SubProcess {
             // captures[0] is the full match; UUID/arch are groups 1 and 2.
             return matches.compactMap { match -> (String, String)? in
                 guard let captures = match.captures,
-                      captures.count >= 3
+                      captures.count >= 3,
+                      let uuid = CrashUUID.normalize(captures[1])
                 else {
                     return nil
                 }
-                return (captures[1], captures[2])
+                return (uuid, captures[2])
             }
         }
 

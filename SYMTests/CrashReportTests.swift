@@ -353,4 +353,53 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(CrashDecoding.decode(appleDemo).appName, "demo")
         XCTAssertTrue(CrashDecoding.decode(umeng).needsUmengAddressFix)
     }
+
+    func testDsymLocatorConditionQuotesUUIDsAndOrdersExecutableFirst() {
+        let images = [
+            BinaryImage(
+                name: "FooKit",
+                uuid: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+                arch: "arm64",
+                loadAddress: 0x1,
+                isExecutable: false,
+                inApp: true
+            ),
+            BinaryImage(
+                name: "Demo",
+                uuid: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+                arch: "arm64",
+                loadAddress: 0x2,
+                isExecutable: true,
+                inApp: true
+            ),
+        ]
+        let ordered = DsymLocator.orderedUUIDs(from: images)
+        XCTAssertEqual(ordered.first, "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB")
+        XCTAssertEqual(ordered.count, 2)
+
+        let condition = DsymLocator.createCondition(bundleID: "im.zorro.demo", binaries: images)
+        XCTAssertNotNil(condition)
+        XCTAssertTrue(condition!.contains("com_apple_xcode_dsym_uuids == \"BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB\""))
+        XCTAssertTrue(condition!.contains("kMDItemCFBundleIdentifier == \"im.zorro.demo\""))
+        XCTAssertTrue(condition!.hasPrefix("com_apple_xcode_dsym_uuids == \"BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB\""))
+    }
+
+    func testDsymFilesMapNormalizesUUIDKeys() {
+        let file = DsymFile(
+            name: "Demo.dSYM",
+            path: "/tmp/Demo.dSYM",
+            binaryPath: "/tmp/Demo.dSYM/Contents/Resources/DWARF/Demo",
+            uuids: ["42fd89f730be3ac5a40a4c1a99438dfb"]
+        )
+        let map = DsymLocator.dsymFilesMap(from: [file])
+        XCTAssertNotNil(map["42FD89F7-30BE-3AC5-A40A-4C1A99438DFB"])
+        XCTAssertEqual(map.count, 1)
+    }
+
+    func testDwarfdumpDownloadRegexCaptureIndexes() {
+        let line = "UUID: F9E72B35-ACE9-3B64-8D8C-6A59BE609683 (arm64) /tmp/Demo.dSYM/Contents/Resources/DWARF/Demo\n"
+        let match = Regex.dwarfdump.firstMatch(in: line)
+        XCTAssertEqual(match?.captures?[1].uppercased(), "F9E72B35-ACE9-3B64-8D8C-6A59BE609683")
+        XCTAssertEqual(match?.captures?[2], "/tmp/Demo.dSYM/Contents/Resources/DWARF/Demo")
+    }
 }

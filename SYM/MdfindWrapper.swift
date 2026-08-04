@@ -32,28 +32,36 @@ class MdfindWrapper {
 
     init() {
         let nc = NotificationCenter.default
-        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidFinishGathering, object: nil)
-        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidUpdate, object: nil)
+        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidFinishGathering, object: query)
+        nc.addObserver(self, selector: #selector(handleResult(_:)), name: .NSMetadataQueryDidUpdate, object: query)
     }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
+        query.stop()
     }
 
-    func start(withCondition condition: String) {
+    func start(withCondition condition: String, scopes: [Any]? = nil) {
         stop()
 
         query.predicate = NSPredicate(fromMetadataQueryString: condition)
+        query.searchScopes = scopes ?? []
         query.start()
     }
 
     func stop() {
-        query.stop()
+        if query.isStarted {
+            query.stop()
+        }
     }
 
-    @objc func handleResult(_ notification: NSNotification) {
-        if let query = notification.object as? NSMetadataQuery, query == self.query {
-            delegate?.mdfindWrapper(self, didFindResult: query.results as? [NSMetadataItem])
+    @objc private func handleResult(_ notification: Notification) {
+        guard let query = notification.object as? NSMetadataQuery, query === self.query else {
+            return
         }
+        query.disableUpdates()
+        let results = query.results as? [NSMetadataItem]
+        query.enableUpdates()
+        delegate?.mdfindWrapper(self, didFindResult: results)
     }
 }
