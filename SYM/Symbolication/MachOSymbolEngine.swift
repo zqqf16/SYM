@@ -106,12 +106,12 @@ struct MachOSymbolEngine: SymbolEngine {
     }
 
     private func matchesArch(_ machO: MachOFile, arch: String) -> Bool {
-        let normalized = arch.lowercased()
+        let normalized = CrashArch.normalize(arch)?.lowercased() ?? arch.lowercased()
         let cpuType = machO.header.cpuType
         switch normalized {
         case "arm64", "arm64e":
             return cpuType == .arm64
-        case "arm", "armv7", "armv7s":
+        case "arm", "armv7", "armv7s", "armv6":
             return cpuType == .arm
         case "x86_64":
             return cpuType == .x86_64

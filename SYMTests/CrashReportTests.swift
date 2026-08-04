@@ -47,10 +47,17 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(report.osVersion, "iPhone OS 15.2.1 (19C63)")
         XCTAssertEqual(report.appVersion, "1.0 (4)")
         XCTAssertEqual(report.crashedThreadIndex, 1)
+        // JSON IPS writes cpuType as "ARM-64"; normalize for symbolication tools.
+        XCTAssertEqual(report.arch, "arm64")
         XCTAssertFalse(report.binaryImages.isEmpty)
         XCTAssertFalse(report.threads.isEmpty)
+        let crashed = report.threads.first(where: \.crashed)
+        XCTAssertNotNil(crashed)
+        XCTAssertEqual(crashed?.index, 1)
+        XCTAssertEqual(crashed?.queue, "com.apple.root.default-qos")
         XCTAssertTrue(report.formattedContent.contains("Binary Images:"))
         XCTAssertTrue(report.formattedContent.contains("Thread 1 Crashed:"))
+        XCTAssertTrue(report.formattedContent.contains("Identifier:          im.zorro.demo"))
         XCTAssertNotNil(report.crashedThreadRange)
     }
 
@@ -185,6 +192,27 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(plain?.index, 12)
         XCTAssertFalse(plain?.crashed == true)
 
+        // Console / recent macOS-translated headers use "::" and may embed the queue.
+        let modernCrashed = ClassicCrashLineParser.parseThreadHeader(
+            "Thread 0 Crashed::  Dispatch queue: com.apple.main-thread"
+        )
+        XCTAssertEqual(modernCrashed?.index, 0)
+        XCTAssertTrue(modernCrashed?.crashed == true)
+        XCTAssertEqual(modernCrashed?.queue, "com.apple.main-thread")
+
+        let modernPlain = ClassicCrashLineParser.parseThreadHeader(
+            "Thread 3::  Dispatch queue: com.apple.root.default-qos"
+        )
+        XCTAssertEqual(modernPlain?.index, 3)
+        XCTAssertFalse(modernPlain?.crashed == true)
+        XCTAssertEqual(modernPlain?.queue, "com.apple.root.default-qos")
+
+        let mixedNameQueue = ClassicCrashLineParser.parseThreadNameFields(
+            "Worker Dispatch Queue: com.example.worker"
+        )
+        XCTAssertEqual(mixedNameQueue.name, "Worker")
+        XCTAssertEqual(mixedNameQueue.queue, "com.example.worker")
+
         let frame = ClassicCrashLineParser.parseStackFrameLine(
             "0   demo                          \t0x0000000100125780 DEMOViewController.status() + 140"
         )
@@ -227,6 +255,38 @@ final class CrashReportTests: XCTestCase {
         )
         XCTAssertEqual(markedBundle?.name, "com.example.Demo")
         XCTAssertEqual(markedBundle?.arch, "arm64")
+        XCTAssertTrue(markedBundle?.inApp == true)
+
+        // macOS Console style: version in parentheses, no arch token.
+        let macOSVersioned = ClassicCrashLineParser.parseBinaryImageLine(
+            "       0x1025e5000 -        0x1025e6ffb +com.example.Demo (1.0 - 1) <5ED9BD63-2A55-3DDD-B3FF-EFCF61382F6F> /Users/USER/*/Demo.app/Contents/MacOS/Demo"
+        )
+        XCTAssertEqual(macOSVersioned?.name, "com.example.Demo")
+        XCTAssertNil(macOSVersioned?.arch)
+        XCTAssertEqual(macOSVersioned?.uuid, "5ED9BD63-2A55-3DDD-B3FF-EFCF61382F6F")
+        XCTAssertTrue(macOSVersioned?.inApp == true)
+
+        let macOSStar = ClassicCrashLineParser.parseBinaryImageLine(
+            "0x104f44000 - 0x105257fff bdlli-bind (*) <18e247a7-aa91-3530-bb56-8be40b25fcbb> /Users/USER/*/bdlli-bind"
+        )
+        XCTAssertEqual(macOSStar?.name, "bdlli-bind")
+        XCTAssertNil(macOSStar?.arch)
+        XCTAssertEqual(macOSStar?.uuid, "18E247A7-AA91-3530-BB56-8BE40B25FCBB")
+    }
+
+    func testCrashArchNormalize() {
+        XCTAssertEqual(CrashArch.normalize("ARM-64"), "arm64")
+        XCTAssertEqual(CrashArch.normalize("arm64e"), "arm64e")
+        XCTAssertEqual(CrashArch.normalize("X86-64"), "x86_64")
+        XCTAssertTrue(CrashArch.looksLikeArch("arm64"))
+        XCTAssertFalse(CrashArch.looksLikeArch("Demo"))
+    }
+
+    func testBinaryImageInAppPaths() {
+        XCTAssertTrue(BinaryImage.isInApp(path: "/var/containers/Bundle/Application/ABC/Demo.app/Demo"))
+        XCTAssertTrue(BinaryImage.isInApp(path: "/Users/USER/*/Demo.app/Contents/MacOS/Demo"))
+        XCTAssertTrue(BinaryImage.isInApp(path: "/Applications/Demo.app/Contents/MacOS/Demo"))
+        XCTAssertFalse(BinaryImage.isInApp(path: "/System/Library/Frameworks/Foundation.framework/Foundation"))
     }
 
     func testFormattedLineMatchesClassicColumns() {

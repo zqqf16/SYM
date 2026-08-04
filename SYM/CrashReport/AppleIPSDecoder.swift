@@ -37,7 +37,14 @@ struct AppleIPSDecoder: CrashDecoder {
 
         let usedImages = payload["usedImages"] as? [[String: Any]] ?? []
         let binaryImages = usedImages.map { parseBinaryImage($0, appName: payload["procName"] as? String) }
-        let threads = parseThreads(payload["threads"] as? [[String: Any]] ?? [], usedImages: usedImages)
+        let faultingThread = payload["faultingThread"] as? Int
+        let legacyQueue = ((payload["legacyInfo"] as? [String: Any])?["threadTriggered"] as? [String: Any])?["queue"] as? String
+        let threads = parseThreads(
+            payload["threads"] as? [[String: Any]] ?? [],
+            usedImages: usedImages,
+            faultingThread: faultingThread,
+            legacyQueue: legacyQueue
+        )
         let lastExceptionBacktrace = parseFrames(
             payload["lastExceptionBacktrace"] as? [[String: Any]],
             usedImages: usedImages
@@ -47,21 +54,25 @@ struct AppleIPSDecoder: CrashDecoder {
         let header = components.header
         let appName = payload["procName"] as? String ?? header?["app_name"] as? String
         let mainBinary = binaryImages.first { $0.isExecutable }
-            ?? binaryImages.first { $0.name == appName }
+            ?? binaryImages.first { $0.name == appName?.crashStrip() }
+        // Prefer the real bundle id; coalitionName can differ for extensions / system helpers.
+        let bundleID = (bundleInfo?["CFBundleIdentifier"] as? String)
+            ?? (header?["bundleID"] as? String)
+            ?? (payload["coalitionName"] as? String)
 
         var report = CrashReport(
             rawContent: content,
             appName: appName?.crashStrip(),
             device: payload["modelCode"] as? String,
-            bundleID: (payload["coalitionName"] as? String) ?? (bundleInfo?["CFBundleIdentifier"] as? String),
-            arch: payload["cpuType"] as? String,
+            bundleID: bundleID,
+            arch: CrashArch.normalize(payload["cpuType"] as? String) ?? mainBinary?.arch,
             uuid: mainBinary?.uuid,
             osVersion: header?["os_version"] as? String ?? formatOSVersion(payload["osVersion"] as? [String: Any]),
             appVersion: formatAppVersion(header: header, bundleInfo: bundleInfo),
             binaryImages: binaryImages,
             threads: threads,
             lastExceptionBacktrace: lastExceptionBacktrace,
-            crashedThreadIndex: payload["faultingThread"] as? Int,
+            crashedThreadIndex: faultingThread ?? threads.first(where: \.crashed)?.index,
             exceptionType: formatExceptionType(payload["exception"] as? [String: Any]),
             exceptionCodes: (payload["exception"] as? [String: Any])?["codes"] as? String
         )
@@ -127,7 +138,7 @@ struct AppleIPSDecoder: CrashDecoder {
         return BinaryImage(
             name: name,
             uuid: CrashUUID.normalize(image["uuid"] as? String),
-            arch: image["arch"] as? String,
+            arch: CrashArch.normalize(image["arch"] as? String),
             loadAddress: base,
             size: size,
             path: path,
@@ -136,14 +147,24 @@ struct AppleIPSDecoder: CrashDecoder {
         )
     }
 
-    private func parseThreads(_ threads: [[String: Any]], usedImages: [[String: Any]]) -> [CrashThread] {
+    private func parseThreads(
+        _ threads: [[String: Any]],
+        usedImages: [[String: Any]],
+        faultingThread: Int?,
+        legacyQueue: String?
+    ) -> [CrashThread] {
         threads.enumerated().map { index, thread in
             let frames = parseFrames(thread["frames"] as? [[String: Any]], usedImages: usedImages) ?? []
+            let crashed = thread["triggered"] as? Bool == true || index == faultingThread
+            var queue = thread["queue"] as? String
+            if crashed, (queue == nil || queue?.isEmpty == true) {
+                queue = legacyQueue
+            }
             return CrashThread(
                 index: index,
                 name: thread["name"] as? String,
-                queue: thread["queue"] as? String,
-                crashed: thread["triggered"] as? Bool ?? false,
+                queue: queue,
+                crashed: crashed,
                 frames: frames
             )
         }
@@ -159,7 +180,7 @@ struct AppleIPSDecoder: CrashDecoder {
             let image = imageIndex < usedImages.count ? usedImages[imageIndex] : [:]
             let base = (image["base"] as? NSNumber)?.uint64Value ?? 0
             let offset = (frame["imageOffset"] as? NSNumber)?.uint64Value ?? 0
-            let address = base + offset
+            let address = base &+ offset
 
             return StackFrame(
                 index: index,

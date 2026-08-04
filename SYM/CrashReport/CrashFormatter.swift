@@ -88,12 +88,12 @@ enum CrashFormatter {
         appendLine("Hardware Model:      \(string(payload["modelCode"]))", to: &content)
         appendLine("Process:             \(string(payload["procName"])) [\(string(payload["pid"]))]", to: &content)
         appendLine("Path:                \(string(payload["procPath"]))", to: &content)
-        appendLine("Identifier:          \(string(payload["coalitionName"]))", to: &content)
+        appendLine("Identifier:          \(string(report.bundleID ?? payload["coalitionName"]))", to: &content)
         appendLine(
             "Version:             \(string(header?["app_version"])) (\(string(header?["build_version"])))",
             to: &content
         )
-        appendLine("Code Type:           \(string(payload["cpuType"]))", to: &content)
+        appendLine("Code Type:           \(string(report.arch ?? payload["cpuType"]))", to: &content)
         appendLine("Role:                \(string(payload["procRole"]))", to: &content)
         appendLine(
             "Parent Process:      \(string(payload["parentProc"])) [\(string(payload["parentPid"]))]",

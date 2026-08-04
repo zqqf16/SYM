@@ -48,6 +48,12 @@ enum ClassicCrashLineParser {
                 continue
             }
 
+            // Modern Console / iOS text: "Triggered by Thread: 0, Dispatch Queue: …"
+            if section == .seeking, trimmed.hasPrefix("Triggered by Thread:") {
+                applyTriggeredByThread(trimmed, report: &report)
+                continue
+            }
+
             if let header = parseThreadHeader(trimmed) {
                 section = .inThread
                 applyThreadHeader(
@@ -154,8 +160,16 @@ enum ClassicCrashLineParser {
             return nil
         }
 
-        if rest.hasPrefix(" Crashed:") || rest == " Crashed:" {
-            return ThreadHeader(index: index, crashed: true, name: nil, queue: nil)
+        // Modern Console / macOS translated:
+        //   Thread 0 Crashed::
+        //   Thread 0 Crashed::  Dispatch queue: com.apple.main-thread
+        // Classic iOS:
+        //   Thread 0 Crashed:
+        if rest.hasPrefix(" Crashed") {
+            rest = rest.dropFirst(" Crashed".count)
+            consumeThreadHeaderSeparators(&rest)
+            let (name, queue) = parseThreadNameFields(String(rest).trimmingCharacters(in: .whitespacesAndNewlines))
+            return ThreadHeader(index: index, crashed: true, name: name, queue: queue)
         }
 
         if rest.hasPrefix(" name:") {
@@ -164,20 +178,53 @@ enum ClassicCrashLineParser {
             return ThreadHeader(index: index, crashed: false, name: name, queue: queue)
         }
 
-        // "Thread N:" or "Thread N: …"
+        // Modern: "Thread N::  Dispatch queue: …"
+        // Classic: "Thread N:" / "Thread N: …"
+        if rest.hasPrefix("::") {
+            rest = rest.dropFirst(2)
+            let (name, queue) = parseThreadNameFields(String(rest).trimmingCharacters(in: .whitespacesAndNewlines))
+            return ThreadHeader(index: index, crashed: false, name: name, queue: queue)
+        }
+
         if rest.hasPrefix(":") {
-            let after = rest.dropFirst().trimmingCharacters(in: .whitespacesAndNewlines)
+            rest = rest.dropFirst()
+            let after = rest.trimmingCharacters(in: .whitespacesAndNewlines)
             if after.isEmpty {
                 return ThreadHeader(index: index, crashed: false, name: nil, queue: nil)
             }
-            if after == "Crashed" || after.hasPrefix("Crashed:") {
-                return ThreadHeader(index: index, crashed: true, name: nil, queue: nil)
+            if after == "Crashed" || after.hasPrefix("Crashed:") || after.hasPrefix("Crashed::") {
+                var crashedRest = Substring(after.dropFirst("Crashed".count))
+                consumeThreadHeaderSeparators(&crashedRest)
+                let (name, queue) = parseThreadNameFields(String(crashedRest).trimmingCharacters(in: .whitespacesAndNewlines))
+                return ThreadHeader(index: index, crashed: true, name: name, queue: queue)
             }
-            // Unknown trailer after colon — treat as a plain thread start.
-            return ThreadHeader(index: index, crashed: false, name: nil, queue: nil)
+            let (name, queue) = parseThreadNameFields(after)
+            return ThreadHeader(index: index, crashed: false, name: name, queue: queue)
         }
 
         return nil
+    }
+
+    /// Skip `:` / `::` separators used by classic and Console-translated headers.
+    private static func consumeThreadHeaderSeparators(_ rest: inout Substring) {
+        if rest.hasPrefix("::") {
+            rest = rest.dropFirst(2)
+        } else if rest.hasPrefix(":") {
+            rest = rest.dropFirst()
+        }
+    }
+
+    private static func applyTriggeredByThread(_ line: String, report: inout CrashReport) {
+        let raw = line.dropFirst("Triggered by Thread:".count)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        // "0" or "0, Dispatch Queue: com.apple.main-thread"
+        let numberText = raw.prefix(while: { $0.isNumber })
+        guard let index = Int(numberText) else {
+            return
+        }
+        if report.crashedThreadIndex == nil {
+            report.crashedThreadIndex = index
+        }
     }
 
     private static func applyThreadHeader(
@@ -230,10 +277,17 @@ enum ClassicCrashLineParser {
         guard !trimmed.isEmpty else {
             return (nil, nil)
         }
-        let queuePrefix = "Dispatch queue:"
-        if trimmed.hasPrefix(queuePrefix) {
-            let queue = trimmed.dropFirst(queuePrefix.count).trimmingCharacters(in: .whitespacesAndNewlines)
-            return (nil, queue.isEmpty ? nil : queue)
+
+        // Accept both classic "Dispatch queue:" and newer "Dispatch Queue:".
+        for marker in ["Dispatch queue:", "Dispatch Queue:"] {
+            if let range = trimmed.range(of: marker) {
+                let before = trimmed[..<range.lowerBound].trimmingCharacters(in: .whitespacesAndNewlines)
+                let after = trimmed[range.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+                return (
+                    before.isEmpty ? nil : String(before),
+                    after.isEmpty ? nil : String(after)
+                )
+            }
         }
         return (trimmed, nil)
     }
@@ -287,7 +341,10 @@ enum ClassicCrashLineParser {
 
     // MARK: - Binary images
 
-    /// `0x1000 - 0x2000 name arch <uuid> /path`
+    /// Binary Images line variants:
+    /// - iOS: `0x1000 - 0x2000 name arch <uuid> /path`
+    /// - macOS: `0x1000 - 0x2000 +name (1.0 - 1) <uuid> /path`
+    /// - macOS (no version): `0x1000 - 0x2000 name (*) <uuid> /path`
     static func parseBinaryImageLine(_ line: String) -> BinaryImage? {
         var s = Substring(line)
         skipWhitespace(&s)
@@ -318,11 +375,24 @@ enum ClassicCrashLineParser {
         }
         skipWhitespace(&s)
 
-        let arch = takeNonWhitespace(&s)
-        guard !arch.isEmpty else {
-            return nil
+        // Optional macOS version: `(1.0 - 1)`, `(*)`, `(???)`
+        if s.first == "(" {
+            guard skipParenthetical(&s) else {
+                return nil
+            }
+            skipWhitespace(&s)
         }
-        skipWhitespace(&s)
+
+        // Optional architecture (iOS / some macOS lines).
+        var arch: String?
+        if s.first != "<" {
+            let token = takeNonWhitespace(&s)
+            guard !token.isEmpty, CrashArch.looksLikeArch(token) else {
+                return nil
+            }
+            arch = CrashArch.normalize(token)
+            skipWhitespace(&s)
+        }
 
         guard s.first == "<" else {
             return nil
@@ -359,6 +429,28 @@ enum ClassicCrashLineParser {
         while let ch = s.first, ch.isWhitespace {
             s.removeFirst()
         }
+    }
+
+    /// Consume a balanced `(…)` group (macOS Binary Images version field).
+    @discardableResult
+    private static func skipParenthetical(_ s: inout Substring) -> Bool {
+        guard s.first == "(" else {
+            return false
+        }
+        s.removeFirst()
+        var depth = 1
+        while let ch = s.first {
+            s.removeFirst()
+            if ch == "(" {
+                depth += 1
+            } else if ch == ")" {
+                depth -= 1
+                if depth == 0 {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     private static func takeNonWhitespace(_ s: inout Substring) -> String {

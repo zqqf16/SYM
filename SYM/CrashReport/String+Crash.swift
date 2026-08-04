@@ -47,6 +47,39 @@ extension String {
     }
 }
 
+/// Normalize CPU / image architecture tokens from modern Apple crash reports.
+/// JSON IPS uses values like `ARM-64`; classic text uses `arm64` / `arm64e`.
+enum CrashArch {
+    static func normalize(_ raw: String?) -> String? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return nil
+        }
+        switch raw.lowercased() {
+        case "arm-64", "arm64":
+            return "arm64"
+        case "arm64e":
+            return "arm64e"
+        case "x86-64", "x86_64":
+            return "x86_64"
+        case "i386":
+            return "i386"
+        case "arm", "armv6", "armv7", "armv7s":
+            return raw.lowercased()
+        default:
+            return raw
+        }
+    }
+
+    static func looksLikeArch(_ token: String) -> Bool {
+        let normalized = token.lowercased()
+        return [
+            "arm64", "arm64e", "arm-64",
+            "arm", "armv6", "armv7", "armv7s",
+            "x86_64", "x86-64", "i386",
+        ].contains(normalized)
+    }
+}
+
 extension UInt64 {
     var crashHexString: String {
         String(format: "0x%llx", self)

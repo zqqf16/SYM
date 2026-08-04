@@ -81,11 +81,25 @@ struct BinaryImage: Equatable {
     var inApp: Bool
 
     static func isInApp(path: String?) -> Bool {
-        guard let path = path else {
+        guard let path = path, !path.isEmpty else {
             return false
         }
-        return path.contains("/var/containers/Bundle/Application")
-            || path.hasPrefix("/var/mobile/Containers/Bundle/Application")
+        // iOS / iPadOS / tvOS / visionOS app bundles
+        if path.contains("/var/containers/Bundle/Application")
+            || path.contains("/var/mobile/Containers/Bundle/Application")
+            || path.contains("/private/var/containers/Bundle/Application")
+        {
+            return true
+        }
+        // macOS app bundles (incl. privacy-redacted `/Users/USER/*/App.app/...`)
+        if path.contains(".app/Contents/MacOS/")
+            || path.contains(".app/Contents/Frameworks/")
+            || (path.contains(".app/") && path.contains("/Users/"))
+            || (path.hasPrefix("/Applications/") && path.contains(".app/"))
+        {
+            return true
+        }
+        return false
     }
 }
 

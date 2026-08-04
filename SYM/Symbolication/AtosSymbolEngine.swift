@@ -52,7 +52,7 @@ struct AtosSymbolEngine: SymbolEngine {
                 continue
             }
 
-            let arch = image.arch ?? report.arch ?? "arm64"
+            let arch = CrashArch.normalize(image.arch) ?? CrashArch.normalize(report.arch) ?? "arm64"
             let addresses = frames.map { $0.address.crashHexString }
             guard let results = SubProcess.atos(
                 loadAddress: loadAddress.crashHexString,
