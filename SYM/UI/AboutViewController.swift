@@ -14,6 +14,7 @@ class AboutViewController: NSViewController {
     private let nameField = NSTextField(labelWithString: "SYM")
     private let versionField = NSTextField(labelWithString: "")
     private let copyrightField = NSTextField(wrappingLabelWithString: "")
+    private let githubButton = NSButton(title: "GitHub", target: nil, action: nil)
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -25,7 +26,7 @@ class AboutViewController: NSViewController {
     }
 
     override func loadView() {
-        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 280))
+        view = NSView(frame: NSRect(x: 0, y: 0, width: 360, height: 260))
 
         nameField.font = .boldSystemFont(ofSize: 18)
         nameField.alignment = .center
@@ -33,20 +34,24 @@ class AboutViewController: NSViewController {
         copyrightField.alignment = .center
         copyrightField.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
 
-        let websiteButton = NSButton(title: "Website", target: self, action: #selector(gotoWebsite(sender:)))
-        websiteButton.bezelStyle = .rounded
-        let githubButton = NSButton(title: "GitHub", target: self, action: #selector(gotoGithub(_:)))
+        githubButton.target = self
+        githubButton.action = #selector(gotoGithub(_:))
         githubButton.bezelStyle = .rounded
 
-        view.addSubview(iconView)
-        view.addSubview(nameField)
-        view.addSubview(versionField)
-        view.addSubview(copyrightField)
-        view.addSubview(websiteButton)
-        view.addSubview(githubButton)
+        let content = NSView()
+        view.addSubview(content)
+        content.addSubview(iconView)
+        content.addSubview(nameField)
+        content.addSubview(versionField)
+        content.addSubview(copyrightField)
+        content.addSubview(githubButton)
 
+        content.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+        }
         iconView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
+            make.top.equalToSuperview()
             make.centerX.equalToSuperview()
             make.width.height.equalTo(64)
         }
@@ -62,13 +67,10 @@ class AboutViewController: NSViewController {
             make.top.equalTo(versionField.snp.bottom).offset(8)
             make.leading.trailing.equalTo(nameField)
         }
-        websiteButton.snp.makeConstraints { make in
-            make.top.equalTo(copyrightField.snp.bottom).offset(16)
-            make.trailing.equalTo(view.snp.centerX).offset(-6)
-        }
         githubButton.snp.makeConstraints { make in
-            make.centerY.equalTo(websiteButton)
-            make.leading.equalTo(view.snp.centerX).offset(6)
+            make.top.equalTo(copyrightField.snp.bottom).offset(16)
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
     }
 
@@ -80,12 +82,6 @@ class AboutViewController: NSViewController {
             let buildVersion = infoDict["CFBundleVersion"] as? String ?? ""
             versionField.stringValue = "\(shortVersion) (\(buildVersion))"
             copyrightField.stringValue = infoDict["NSHumanReadableCopyright"] as? String ?? ""
-        }
-    }
-
-    @objc func gotoWebsite(sender _: AnyObject) {
-        if let url = URL(string: "https://zorro.im?utm_source=sym&utm_medium=referral") {
-            NSWorkspace.shared.open(url)
         }
     }
 

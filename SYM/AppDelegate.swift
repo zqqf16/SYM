@@ -98,7 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = AboutWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
             window.contentViewController = vc
             window.title = NSLocalizedString("About SYM", comment: "About")
-            window.setContentSize(NSSize(width: 360, height: 280))
+            window.setContentSize(NSSize(width: 360, height: 260))
             window.center()
             aboutWindow = window
         }
