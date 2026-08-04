@@ -312,7 +312,9 @@ enum CrashFormatter {
 
     private static func formatBinaryImage(_ image: BinaryImage) -> String {
         let base = image.loadAddress ?? 0
-        let end = base + (image.size ?? 0) - (image.size == nil ? 0 : 1)
+        let size = image.size ?? 0
+        // Avoid UInt64 overflow when size is 0 or base+size exceeds .max
+        let end: UInt64 = size == 0 ? base : base &+ (size &- 1)
         let uuid = (image.uuid ?? "").replacingOccurrences(of: "-", with: "")
         return String(format: "0x%llx - 0x%llx ", base, end)
             + String(format: "%@ %@ ", image.name, image.arch ?? "arm64")
