@@ -174,22 +174,31 @@ enum DsymLocator {
                 if ext == "dSYM" {
                     visited += 1
                     enumerator.skipDescendants()
+                    var matched: [DsymFile] = []
                     if let item = NSMetadataItem(url: itemURL) {
-                        found.append(contentsOf: parseDsymFile(item, neededUUIDs: neededUUIDs))
-                    } else if let probed = probeDsymBundle(at: itemURL.path, neededUUIDs: neededUUIDs) {
-                        found.append(probed)
+                        matched = parseDsymFile(item, neededUUIDs: neededUUIDs)
                     }
+                    // init(url:) often lacks Xcode Spotlight importer attrs — probe DWARF.
+                    if matched.isEmpty, let probed = probeDsymBundle(at: itemURL.path, neededUUIDs: neededUUIDs) {
+                        matched = [probed]
+                    }
+                    found.append(contentsOf: matched)
                     if covers(neededUUIDs, files: found) {
                         return found
                     }
                 } else if ext == "xcarchive" {
                     visited += 1
                     enumerator.skipDescendants()
+                    var matched: [DsymFile] = []
                     if let item = NSMetadataItem(url: itemURL),
                        let parsed = parseXcarchiveFile(item, uuids: Array(neededUUIDs))
                     {
-                        found.append(contentsOf: parsed)
+                        matched = parsed
                     }
+                    if matched.isEmpty {
+                        matched = probeXcarchive(at: itemURL.path, neededUUIDs: neededUUIDs)
+                    }
+                    found.append(contentsOf: matched)
                     if covers(neededUUIDs, files: found) {
                         return found
                     }
@@ -225,11 +234,44 @@ enum DsymLocator {
         )
     }
 
+    /// Walk `*.xcarchive/dSYMs/*.dSYM` when Spotlight Xcode attrs are missing.
+    private static func probeXcarchive(at path: String, neededUUIDs: Set<String>) -> [DsymFile] {
+        let dsymsDir = (path as NSString).appendingPathComponent("dSYMs")
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: dsymsDir) else {
+            return []
+        }
+        let archiveName = (path as NSString).lastPathComponent
+        var found: [DsymFile] = []
+        for name in names where name.hasSuffix(".dSYM") {
+            let dsymPath = (dsymsDir as NSString).appendingPathComponent(name)
+            guard let probed = probeDsymBundle(at: dsymPath, neededUUIDs: neededUUIDs) else {
+                continue
+            }
+            found.append(DsymFile(
+                name: archiveName,
+                path: dsymPath,
+                binaryPath: probed.binaryPath,
+                uuids: probed.uuids
+            ))
+        }
+        return found
+    }
+
+    /// Prefer `value(forAttribute:)` — KVC `value(forKey:)` throws NSUnknownKeyException
+    /// when `NSMetadataItem(url:)` lacks Xcode importer attributes.
+    private static func metadataString(_ item: NSMetadataItem, _ key: String) -> String? {
+        item.value(forAttribute: key) as? String
+    }
+
+    private static func metadataStringArray(_ item: NSMetadataItem, _ key: String) -> [String]? {
+        item.value(forAttribute: key) as? [String]
+    }
+
     static func parseDsymFile(_ item: NSMetadataItem, neededUUIDs: Set<String>? = nil) -> [DsymFile] {
-        guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
-              let path = item.value(forKey: NSMetadataItemPathKey) as? String,
-              let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
-              let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String]
+        guard let name = metadataString(item, NSMetadataItemFSNameKey),
+              let path = metadataString(item, NSMetadataItemPathKey),
+              let dsymPaths = metadataStringArray(item, "com_apple_xcode_dsym_paths"),
+              let dsymUUIDs = metadataStringArray(item, "com_apple_xcode_dsym_uuids")
         else {
             return []
         }
@@ -259,10 +301,10 @@ enum DsymLocator {
     }
 
     static func parseXcarchiveFile(_ item: NSMetadataItem, uuids: [String]) -> [DsymFile]? {
-        guard let name = item.value(forKey: NSMetadataItemFSNameKey) as? String,
-              let path = item.value(forKey: NSMetadataItemPathKey) as? String,
-              let dsymPaths = item.value(forKey: "com_apple_xcode_dsym_paths") as? [String],
-              let dsymUUIDs = item.value(forKey: "com_apple_xcode_dsym_uuids") as? [String],
+        guard let name = metadataString(item, NSMetadataItemFSNameKey),
+              let path = metadataString(item, NSMetadataItemPathKey),
+              let dsymPaths = metadataStringArray(item, "com_apple_xcode_dsym_paths"),
+              let dsymUUIDs = metadataStringArray(item, "com_apple_xcode_dsym_uuids"),
               dsymPaths.count == dsymUUIDs.count
         else {
             return nil
@@ -305,13 +347,13 @@ enum DsymLocator {
     }
 
     static func parseAppBundle(_ item: NSMetadataItem, binaries: [BinaryImage]) -> [DsymFile]? {
-        guard let path = item.value(forKey: NSMetadataItemPathKey) as? String,
+        guard let path = metadataString(item, NSMetadataItemPathKey),
               let bundle = Bundle(path: path)
         else {
             return nil
         }
 
-        let name = item.value(forKey: NSMetadataItemFSNameKey) as? String
+        let name = metadataString(item, NSMetadataItemFSNameKey)
         guard let executable = binaries.first(where: \.isExecutable),
               let mainDsym = parseBinary(executable, bundle: bundle, name: name)
         else {
@@ -516,7 +558,7 @@ extension DsymManager: MdfindWrapperDelegate {
         var dsyms = [DsymFile]()
 
         for item in result {
-            guard let type = item.value(forKey: NSMetadataItemContentTypeKey) as? String else {
+            guard let type = item.value(forAttribute: NSMetadataItemContentTypeKey) as? String else {
                 continue
             }
             if type == "com.apple.xcode.dsym" {
