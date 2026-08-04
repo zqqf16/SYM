@@ -249,14 +249,12 @@ private struct EditorSettingsPane: View {
                     .foregroundStyle(.secondary)
 
                 LabeledContent(NSLocalizedString("Highlight Color", comment: "")) {
+                    // Menu pickers on macOS only reliably show Image/Text — SwiftUI
+                    // shapes (RoundedRectangle) render blank or as black templates.
                     Picker("", selection: highlightBinding) {
                         ForEach(Config.highlightColors, id: \.self) { code in
-                            HStack {
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color(nsColor: NSColor(hexString: code) ?? .red))
-                                    .frame(width: 28, height: 12)
-                            }
-                            .tag(code)
+                            Image(nsImage: HighlightColorSwatch.image(for: code))
+                                .tag(code)
                         }
                     }
                     .labelsHidden()
@@ -361,6 +359,30 @@ private struct EditorSettingsPane: View {
         // Ensure font changes apply through Config.
         NSApp.sendAction(#selector(NSFontManager.orderFrontFontPanel(_:)), to: manager, from: nil)
         PreferencesFontChangeRelay.shared.installIfNeeded()
+    }
+}
+
+/// Pre-rendered color chips for the highlight `Picker` (menu style needs bitmaps).
+private enum HighlightColorSwatch {
+    private static var cache: [String: NSImage] = [:]
+
+    static func image(for hex: String) -> NSImage {
+        if let cached = cache[hex] {
+            return cached
+        }
+        let size = NSSize(width: 36, height: 12)
+        let image = NSImage(size: size, flipped: false) { bounds in
+            (NSColor(hexString: hex) ?? .systemRed).setFill()
+            NSBezierPath(roundedRect: bounds, xRadius: 2, yRadius: 2).fill()
+            NSColor.separatorColor.setStroke()
+            let stroke = NSBezierPath(roundedRect: bounds.insetBy(dx: 0.5, dy: 0.5), xRadius: 2, yRadius: 2)
+            stroke.lineWidth = 1
+            stroke.stroke()
+            return true
+        }
+        image.isTemplate = false
+        cache[hex] = image
+        return image
     }
 }
 
