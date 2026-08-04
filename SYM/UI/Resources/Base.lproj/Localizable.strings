@@ -78,6 +78,12 @@
 "Custom shell script used to fetch dSYMs." = "Custom shell script used to fetch dSYMs.";
 "Choose…" = "Choose…";
 "Edit Download Script…" = "Edit Download Script…";
+"Remove Script" = "Remove Script";
+"Remove Download Script?" = "Remove Download Script?";
+"This deletes the configured download.sh. You can paste a new script later." = "This deletes the configured download.sh. You can paste a new script later.";
+"Could Not Save Script" = "Could Not Save Script";
+"Could not create the Application Support folder for download.sh." = "Could not create the Application Support folder for download.sh.";
+"OK" = "OK";
 "Documents" = "Documents";
 "Remove all items from the Open Recent menu." = "Remove all items from the Open Recent menu.";
 "About" = "About";

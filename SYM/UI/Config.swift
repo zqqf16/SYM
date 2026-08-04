@@ -47,6 +47,39 @@ enum Config {
         return url
     }
 
+    /// Blank, whitespace-only, or comment/shebang-only scripts count as missing.
+    static func isDownloadScriptEmpty(_ script: String) -> Bool {
+        for line in script.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty || trimmed.hasPrefix("#") {
+                continue
+            }
+            return false
+        }
+        return true
+    }
+
+    /// Delete `download.sh` when empty so callers treat it as “no script configured”.
+    @discardableResult
+    static func sanitizeDownloadScriptFile() -> Bool {
+        let url = downloadScriptURL
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: url.path) else {
+            return false
+        }
+        guard let script = try? String(contentsOf: url, encoding: .utf8),
+              !isDownloadScriptEmpty(script)
+        else {
+            try? fileManager.removeItem(at: url)
+            return false
+        }
+        return true
+    }
+
+    static func removeDownloadScript() {
+        try? FileManager.default.removeItem(at: downloadScriptURL)
+    }
+
     static func prepareDsymDownloadDirectory() {
         let path = dsymDownloadDirectory
         UserDefaults.standard.set(path, forKey: .downloadFolderKey)

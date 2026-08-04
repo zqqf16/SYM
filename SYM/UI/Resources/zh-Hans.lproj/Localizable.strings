@@ -33,6 +33,12 @@
 "Custom shell script used to fetch dSYMs." = "用于拉取 dSYM 的自定义脚本。";
 "Choose…" = "选择…";
 "Edit Download Script…" = "编辑下载脚本…";
+"Remove Script" = "删除脚本";
+"Remove Download Script?" = "删除下载脚本？";
+"This deletes the configured download.sh. You can paste a new script later." = "将删除当前配置的 download.sh，之后可以再粘贴新脚本。";
+"Could Not Save Script" = "无法保存脚本";
+"Could not create the Application Support folder for download.sh." = "无法创建用于存放 download.sh 的 Application Support 目录。";
+"OK" = "好";
 "Documents" = "文稿";
 "Remove all items from the Open Recent menu." = "清除「打开最近使用」菜单中的全部项目。";
 "About" = "关于";

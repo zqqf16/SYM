@@ -241,32 +241,26 @@ class DsymDownloader {
         let scriptPath = scriptURL.path
         let fileManager = FileManager.default
 
-        defer {
-            if fileManager.fileExists(atPath: scriptPath) {
-                fileManager.chmod(scriptPath, permissions: 0o777)
-            }
+        // Empty / comment-only files are not a real script — remove them.
+        if Config.sanitizeDownloadScriptFile() {
+            fileManager.chmod(scriptPath, permissions: 0o777)
+            return
         }
 
-        // check user imported script
-        if fileManager.fileExists(atPath: scriptPath) {
-            let script = try? String(contentsOf: scriptURL, encoding: .utf8)
-            if script != nil, script!.count > 0 {
-                return
-            }
-        }
-
-        // check buildin script
+        // Optional build-time bundled download.sh (BUILDIN_DOWNLOAD_SCRIPT_PATH).
         if let buildinPath = Bundle.main.path(forResource: "download", ofType: "sh") {
             fileManager.cp(fromPath: buildinPath, toPath: scriptPath)
+            if Config.sanitizeDownloadScriptFile() {
+                fileManager.chmod(scriptPath, permissions: 0o777)
+            }
         }
     }
 
     func canDownload() -> Bool {
-        let script = try? String(contentsOf: scriptURL, encoding: .utf8)
-        if script == nil || script!.count == 0 {
+        prepareDownloadScript()
+        guard Config.sanitizeDownloadScriptFile() else {
             return false
         }
-
         return FileManager.default.chmod(scriptURL.path, permissions: 0o777)
     }
 

@@ -88,6 +88,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.center()
             downloadScriptWindow = window
         }
+        // Window is reused — reload from disk every time so edits/saves stick
+        // and the Remove button reflects whether download.sh exists.
+        if let vc = downloadScriptWindow?.contentViewController as? DownloadScriptViewController {
+            vc.reloadFromDisk()
+        }
         downloadScriptWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }

@@ -78,6 +78,7 @@
 		B59B327022E0113300013B67 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B59B327122E0113600013B67 /* MDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = B53E2F7922D4710C003BC45C /* MDUtil.m */; };
 		B5AF3E0327A243AC0037AAAD /* template.sh in Resources */ = {isa = PBXBuildFile; fileRef = B5AF3E0227A243AC0037AAAD /* template.sh */; };
+		B5AF3E0527A243AC0037AAAE /* template.zh-Hans.sh in Resources */ = {isa = PBXBuildFile; fileRef = B5AF3E0427A243AC0037AAAE /* template.zh-Hans.sh */; };
 		B5B97AEF22DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5B97AF022DC737900F5DDF2 /* MDInstProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */; };
 		B5D551EC27F4436600862C48 /* TextStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D551EB27F4436600862C48 /* TextStorage.swift */; };
@@ -202,6 +203,7 @@
 		B5847A8C2569419600B674CA /* DeviceContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContentViewController.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
 		B5AF3E0227A243AC0037AAAD /* template.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = template.sh; path = SYM/dSYM/template.sh; sourceTree = SOURCE_ROOT; };
+		B5AF3E0427A243AC0037AAAE /* template.zh-Hans.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "template.zh-Hans.sh"; path = "SYM/dSYM/template.zh-Hans.sh"; sourceTree = SOURCE_ROOT; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
 		B5D551EB27F4436600862C48 /* TextStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStorage.swift; sourceTree = "<group>"; };
@@ -507,6 +509,7 @@
 			children = (
 				F49E2D49214BB2D6001A6A88 /* DsymDownloader.swift */,
 				B5AF3E0227A243AC0037AAAD /* template.sh */,
+				B5AF3E0427A243AC0037AAAE /* template.zh-Hans.sh */,
 			);
 			path = Dsym;
 			sourceTree = "<group>";
@@ -804,6 +807,7 @@
 				B5F357B522C5E90C00111FF3 /* Localizable.strings in Resources */,
 				B5MENU0227F600010000002 /* MainMenu.xib in Resources */,
 				B5AF3E0327A243AC0037AAAD /* template.sh in Resources */,
+				B5AF3E0527A243AC0037AAAE /* template.zh-Hans.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
