@@ -50,11 +50,24 @@ extension NSTextStorage {
         style.lineBreakMode = .byCharWrapping
         attributes[.paragraphStyle] = style
         if let font = font, let familyName = font.familyName {
-            // .font: NSFontManager.shared.font(withFamily: "Menlo", traits: .boldFontMask, weight: 0, size: 11)!
             attributes[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)
         }
         for range in ranges {
-            setAttributes(attributes, range: range)
+            // Preserve crashed-thread background (and other attributes) on overlapping spans.
+            addAttributes(attributes, range: range)
         }
+    }
+
+    /// Soft wash over the crashed thread section so the faulting stack is always visible while reading.
+    func highlightCrashedThread(at range: NSRange) {
+        guard range.location != NSNotFound,
+              range.length > 0,
+              NSMaxRange(range) <= string.utf16.count,
+              let base = NSColor(hexString: Config.highlightColor)
+        else {
+            return
+        }
+        let wash = base.withAlphaComponent(0.12)
+        addAttribute(.backgroundColor, value: wash, range: range)
     }
 }

@@ -24,16 +24,11 @@ import Cocoa
 
 extension NSTextView {
     func setAttributeString(attributeString: NSAttributedString) {
-        // self.undoManager?.removeAllActions()
-        // self.textStorage?.beginEditing()
         textStorage?.setAttributedString(attributeString)
-        // self.textStorage?.endEditing()
     }
 }
 
 class TextView: NSTextView {
-    private var highlightBorderView: NSView?
-
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard
         let filenameType = NSPasteboard.PasteboardType(rawValue: "NSFilenamesPboardType")
@@ -48,42 +43,5 @@ class TextView: NSTextView {
             return true
         }
         return super.performDragOperation(sender)
-    }
-
-    func highlight(_ range: NSRange) {
-        guard highlightBorderView == nil,
-              let textContainer = layoutManager?.textContainers.first,
-              let glyphRange = layoutManager?.characterRange(forGlyphRange: range, actualGlyphRange: nil),
-              let rect = layoutManager?.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-        else {
-            return
-        }
-
-        let viewRect = NSRect(x: max(rect.minX - 5.0, 0),
-                              y: rect.minY,
-                              width: rect.width + 10.0,
-                              height: rect.height + 10.0)
-        let borderView = NSView(frame: viewRect)
-        borderView.wantsLayer = true
-        borderView.layer?.borderWidth = 4.0
-        borderView.layer?.borderColor = NSColor(hexString: Config.highlightColor)!.cgColor
-        borderView.layer?.cornerRadius = 4.0
-        borderView.alphaValue = 0
-        addSubview(borderView)
-        highlightBorderView = borderView
-
-        let animation = CABasicAnimation(keyPath: "opacity")
-        animation.fromValue = 0
-        animation.toValue = 0.6
-        animation.repeatCount = 2
-        animation.duration = 0.3
-
-        NSAnimationContext.beginGrouping()
-        NSAnimationContext.current.completionHandler = {
-            self.highlightBorderView?.removeFromSuperview()
-            self.highlightBorderView = nil
-        }
-        borderView.layer?.add(animation, forKey: "twinkle")
-        NSAnimationContext.endGrouping()
     }
 }

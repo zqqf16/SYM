@@ -98,7 +98,11 @@
 "View" = "显示";
 "Zoom In" = "放大";
 "Zoom Out" = "缩小";
-"Scroll to Crashed Thread" = "滚动到崩溃线程";
+"Scroll to Crashed Thread" = "跳到崩溃线程";
+"Jump to Crashed Thread" = "跳到崩溃线程";
+"Crashed Thread" = "崩溃线程";
+"↑ Crashed Thread" = "↑ 崩溃线程";
+"↓ Crashed Thread" = "↓ 崩溃线程";
 "Show Toolbar" = "显示工具栏";
 "Customize Toolbar…" = "自定工具栏…";
 "Window" = "窗口";

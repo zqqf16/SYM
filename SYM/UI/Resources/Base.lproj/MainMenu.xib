@@ -214,8 +214,8 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="view-sep"/>
-                            <menuItem title="Scroll to Crashed Thread" id="scroll-item">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                            <menuItem title="Jump to Crashed Thread" keyEquivalent="j" id="scroll-item">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES" shift="YES"/>
                                 <connections>
                                     <action selector="scrollToTarget:" target="-1" id="scroll-act"/>
                                 </connections>

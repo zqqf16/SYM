@@ -173,7 +173,12 @@ enum MenuBuilder {
         viewMenu.addItem(withTitle: L("Zoom In"), action: #selector(ContentViewController.zoomIn(_:)), keyEquivalent: "+")
         viewMenu.addItem(withTitle: L("Zoom Out"), action: #selector(ContentViewController.zoomOut(_:)), keyEquivalent: "-")
         viewMenu.addItem(.separator())
-        viewMenu.addItem(withTitle: L("Scroll to Crashed Thread"), action: #selector(ContentViewController.scrollToTarget(_:)), keyEquivalent: "")
+        let jumpItem = viewMenu.addItem(
+            withTitle: L("Jump to Crashed Thread"),
+            action: #selector(ContentViewController.scrollToTarget(_:)),
+            keyEquivalent: "j"
+        )
+        jumpItem.keyEquivalentModifierMask = [.command, .shift]
         viewMenu.addItem(.separator())
         viewMenu.addItem(withTitle: L("Show Toolbar"), action: #selector(NSWindow.toggleToolbarShown(_:)), keyEquivalent: "")
         viewMenu.addItem(withTitle: L("Customize Toolbar…"), action: #selector(NSWindow.runToolbarCustomizationPalette(_:)), keyEquivalent: "")

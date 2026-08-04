@@ -39,7 +39,11 @@
 "View" = "View";
 "Zoom In" = "Zoom In";
 "Zoom Out" = "Zoom Out";
-"Scroll to Crashed Thread" = "Scroll to Crashed Thread";
+"Scroll to Crashed Thread" = "Jump to Crashed Thread";
+"Jump to Crashed Thread" = "Jump to Crashed Thread";
+"Crashed Thread" = "Crashed Thread";
+"↑ Crashed Thread" = "↑ Crashed Thread";
+"↓ Crashed Thread" = "↓ Crashed Thread";
 "Show Toolbar" = "Show Toolbar";
 "Customize Toolbar…" = "Customize Toolbar…";
 "Window" = "Window";

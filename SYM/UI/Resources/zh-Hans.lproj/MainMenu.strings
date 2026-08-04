@@ -51,7 +51,7 @@
 "view-menu.title" = "显示";
 "zoomin-item.title" = "放大";
 "zoomout-item.title" = "缩小";
-"scroll-item.title" = "滚动到崩溃线程";
+"scroll-item.title" = "跳到崩溃线程";
 
 /* Window */
 "window-item.title" = "窗口";
