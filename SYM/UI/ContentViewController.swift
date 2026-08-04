@@ -274,10 +274,13 @@ class ContentViewController: NSViewController {
         }
         textStorage.beginEditing()
         textStorage.applyStyle(textFont: font)
-        if let range = crashInfo?.crashedThreadRange {
+        // Highlight ranges are computed against formattedContent; skip when the
+        // editor still shows raw JSON (IPS / Keep) to avoid wrong offsets.
+        let rangesMatchEditor = crashInfo.map { textView.string == $0.formattedContent } ?? false
+        if rangesMatchEditor, let range = crashInfo?.crashedThreadRange {
             textStorage.highlightCrashedThread(at: range)
         }
-        if let ranges = crashInfo?.appBacktraceRanges, !ranges.isEmpty {
+        if rangesMatchEditor, let ranges = crashInfo?.appBacktraceRanges, !ranges.isEmpty {
             textStorage.highlight(at: ranges)
         }
         textStorage.endEditing()
@@ -367,7 +370,9 @@ class ContentViewController: NSViewController {
     }
 
     private func validCrashedThreadRange() -> NSRange? {
-        guard let range = document?.crashInfo?.crashedThreadRange,
+        guard let crashInfo = document?.crashInfo,
+              textView.string == crashInfo.formattedContent,
+              let range = crashInfo.crashedThreadRange,
               range.location != NSNotFound,
               range.length > 0,
               NSMaxRange(range) <= (textView.string as NSString).length

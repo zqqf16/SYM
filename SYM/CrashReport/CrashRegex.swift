@@ -88,8 +88,16 @@ enum CrashHighlightParser {
     static func applyRanges(to report: inout CrashReport, frameRegex: (String) -> Regex?) {
         let content = report.formattedContent
 
-        if let match = CrashRegex.threadCrashed.firstMatch(in: content) {
+        // Crashed-thread navigation ranges are offsets into formattedContent.
+        // JSON IPS / Keep keep raw JSON in the editor until Symbolicate — applying
+        // synthesized classic-text offsets would scroll/highlight the wrong place.
+        // Only classic layouts (editor text == formattedContent) get this range.
+        if report.rawContent == report.formattedContent,
+           let match = CrashRegex.threadCrashed.firstMatch(in: content)
+        {
             report.crashedThreadRange = match.range
+        } else {
+            report.crashedThreadRange = nil
         }
 
         report.appBacktraceRanges = []

@@ -58,7 +58,9 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(report.formattedContent.contains("Binary Images:"))
         XCTAssertTrue(report.formattedContent.contains("Thread 1 Crashed:"))
         XCTAssertTrue(report.formattedContent.contains("Identifier:          im.zorro.demo"))
-        XCTAssertNotNil(report.crashedThreadRange)
+        // Editor keeps raw JSON until Symbolicate; do not locate crashed thread.
+        XCTAssertNil(report.crashedThreadRange)
+        XCTAssertNotEqual(report.rawContent, report.formattedContent)
     }
 
     func testLegacyIPSDecodesAsAppleText() {
