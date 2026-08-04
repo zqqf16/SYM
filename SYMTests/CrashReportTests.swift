@@ -212,6 +212,21 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(spaced?.name, "Foundation")
         XCTAssertEqual(spaced?.arch, "arm64e")
         XCTAssertEqual(spaced?.loadAddress, 0x1823_2f000)
+
+        // Non-OS marker: leading '+' must not become part of the binary name.
+        let marked = ClassicCrashLineParser.parseBinaryImageLine(
+            "0x100e88000 -        0x101e2bfff +Demo arm64  <42fd89f730be3ac5a40a4c1a99438dfb> /var/containers/Bundle/Application/Demo.app/Demo"
+        )
+        XCTAssertEqual(marked?.name, "Demo")
+        XCTAssertEqual(marked?.arch, "arm64")
+        XCTAssertEqual(marked?.uuid, "42FD89F7-30BE-3AC5-A40A-4C1A99438DFB")
+        XCTAssertTrue(marked?.inApp == true)
+
+        let markedBundle = ClassicCrashLineParser.parseBinaryImageLine(
+            "       0x1025e5000 -        0x1025e6ffb +com.example.Demo arm64  <5ed9bd632a553dddb3ffefcf61382f6f> /Users/USER/*/Demo.app/Contents/MacOS/Demo"
+        )
+        XCTAssertEqual(markedBundle?.name, "com.example.Demo")
+        XCTAssertEqual(markedBundle?.arch, "arm64")
     }
 
     func testFormattedLineMatchesClassicColumns() {

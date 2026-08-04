@@ -306,7 +306,13 @@ enum ClassicCrashLineParser {
         }
         skipWhitespace(&s)
 
-        let name = takeNonWhitespace(&s)
+        let rawName = takeNonWhitespace(&s)
+        guard !rawName.isEmpty else {
+            return nil
+        }
+        // Apple marks non-OS binaries with a leading '+' (e.g. "+Demo", "+com.example.app").
+        // Strip it so the name matches Process: / stack frames / appName.
+        let name = rawName.hasPrefix("+") ? String(rawName.dropFirst()) : rawName
         guard !name.isEmpty else {
             return nil
         }
