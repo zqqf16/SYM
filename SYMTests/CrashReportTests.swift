@@ -58,9 +58,45 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(report.formattedContent.contains("Binary Images:"))
         XCTAssertTrue(report.formattedContent.contains("Thread 1 Crashed:"))
         XCTAssertTrue(report.formattedContent.contains("Identifier:          im.zorro.demo"))
-        // Editor keeps raw JSON until Symbolicate; do not locate crashed thread.
-        XCTAssertNil(report.crashedThreadRange)
+        XCTAssertTrue(report.formattedContent.contains("Translated Report"))
+        XCTAssertTrue(report.formattedContent.contains("\n-----------\nFull Report\n-----------\n"))
+        XCTAssertTrue(report.formattedContent.contains(report.rawContent))
+        XCTAssertNotNil(report.crashedThreadRange)
         XCTAssertNotEqual(report.rawContent, report.formattedContent)
+        // Highlight ranges must stay in the translated section.
+        if let range = report.crashedThreadRange {
+            XCTAssertLessThanOrEqual(NSMaxRange(range), report.formattedContent.crashTranslatedSection.utf16.count)
+        }
+    }
+
+    func testFullReportAppendixIsIgnoredByFramePatching() {
+        let content = crashContent(fromFile: "AppleJson", ofType: "ips")
+        let report = AppleIPSDecoder().decode(content)
+        var before = report
+        var after = report
+        guard var frame = after.threads.first(where: \.crashed)?.frames.first else {
+            XCTFail("expected crashed frame")
+            return
+        }
+        frame.symbol = "SYMTestSymbol"
+        frame.symbolLocation = 42
+        after.threads = after.threads.map { thread in
+            guard thread.crashed, !thread.frames.isEmpty else { return thread }
+            var updated = thread
+            updated.frames[0] = frame
+            return updated
+        }
+
+        let patched = CrashFormatter.patchResolvedFrames(
+            in: report.formattedContent,
+            before: before,
+            after: after
+        )
+        let parts = patched.crashSplitTranslatedAndFullReport()
+        XCTAssertNotNil(parts.appendix)
+        XCTAssertTrue(parts.translated.contains("SYMTestSymbol"))
+        XCTAssertFalse(parts.appendix?.contains("SYMTestSymbol") == true)
+        XCTAssertTrue(parts.appendix?.contains("\"usedImages\"") == true || parts.appendix?.contains("usedImages") == true)
     }
 
     func testLegacyIPSDecodesAsAppleText() {

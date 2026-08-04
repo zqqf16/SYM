@@ -45,6 +45,23 @@ extension String {
         }
         return padding(toLength: length, withPad: " ", startingAt: 0)
     }
+
+    /// Console.app / SYM marker before the original JSON appendix.
+    static let crashFullReportMarker = "\n-----------\nFull Report\n-----------"
+
+    /// Translated classic text only — excludes the Full Report JSON appendix.
+    var crashTranslatedSection: String {
+        crashSplitTranslatedAndFullReport().translated
+    }
+
+    /// Split so symbolication / classic parsing never touch the raw JSON appendix.
+    /// `appendix` includes the leading marker through EOF when present.
+    func crashSplitTranslatedAndFullReport() -> (translated: String, appendix: String?) {
+        if let range = range(of: String.crashFullReportMarker) {
+            return (String(self[..<range.lowerBound]), String(self[range.lowerBound...]))
+        }
+        return (self, nil)
+    }
 }
 
 /// Normalize CPU / image architecture tokens from modern Apple crash reports.

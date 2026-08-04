@@ -33,10 +33,10 @@ enum ClassicCrashLineParser {
         var currentFrames: [StackFrame] = []
         var section: ThreadScanSection = .seeking
 
-        for line in content.components(separatedBy: "\n") {
+        for line in content.crashTranslatedSection.components(separatedBy: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
-            if trimmed.hasPrefix("Binary Images:") {
+            if trimmed.hasPrefix("Binary Images:") || trimmed == "Full Report" {
                 break
             }
             if trimmed.hasPrefix("Thread ") && trimmed.contains(" crashed with ") {
@@ -87,8 +87,11 @@ enum ClassicCrashLineParser {
     static func parseBinaryImages(_ content: String, report: inout CrashReport) {
         var inSection = false
 
-        for line in content.components(separatedBy: "\n") {
+        for line in content.crashTranslatedSection.components(separatedBy: "\n") {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed == "Full Report" {
+                break
+            }
             if trimmed.hasPrefix("Binary Images:") {
                 inSection = true
                 continue

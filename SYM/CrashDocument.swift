@@ -43,6 +43,8 @@ class CrashDocument: NSDocument {
 
     private var contentPublisher = PassthroughSubject<String, Never>()
     private var cancellable: AnyCancellable?
+    /// Suppress parse while swapping raw JSON for synthesized classic text.
+    private var isApplyingPresentation = false
 
     override init() {
         super.init()
@@ -80,7 +82,13 @@ class CrashDocument: NSDocument {
 
     private func readCrash(from data: Data) throws {
         let content = String(data: data, encoding: .utf8) ?? ""
-        replaceContent(content)
+        // Decode synchronously so JSON IPS / Keep open already translated,
+        // matching Console.app’s “Translated Report” presentation.
+        let report = CrashFormatter.format(CrashDecoding.decode(content))
+        isApplyingPresentation = true
+        replaceContent(report.formattedContent)
+        isApplyingPresentation = false
+        crashInfo = report
     }
 
     private func readPlist(from data: Data) throws {
@@ -110,14 +118,30 @@ extension CrashDocument: NSTextStorageDelegate {
     func parseCrashInfo(_ content: String) {
         let report = CrashFormatter.format(CrashDecoding.decode(content))
         DispatchQueue.main.async {
-            self.crashInfo = report
+            self.applyParsedReport(report, parsedFrom: content)
         }
     }
 
-    func textStorage(_: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range _: NSRange, changeInLength _: Int) {
-        if editedMask.contains(.editedCharacters) {
-            contentPublisher.send(textStorage.string)
+    /// Publish model; when content is JSON IPS/Keep, swap editor to classic text.
+    private func applyParsedReport(_ report: CrashReport, parsedFrom content: String) {
+        crashInfo = report
+        guard report.formattedContent != content,
+              textStorage.string == content
+        else {
+            return
         }
+        isApplyingPresentation = true
+        undoManager?.disableUndoRegistration()
+        replaceContent(report.formattedContent)
+        undoManager?.enableUndoRegistration()
+        isApplyingPresentation = false
+    }
+
+    func textStorage(_: NSTextStorage, didProcessEditing editedMask: NSTextStorageEditActions, range _: NSRange, changeInLength _: Int) {
+        guard !isApplyingPresentation, editedMask.contains(.editedCharacters) else {
+            return
+        }
+        contentPublisher.send(textStorage.string)
     }
 }
 

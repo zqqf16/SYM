@@ -86,15 +86,10 @@ extension Array where Element == String {
 
 enum CrashHighlightParser {
     static func applyRanges(to report: inout CrashReport, frameRegex: (String) -> Regex?) {
-        let content = report.formattedContent
+        // Ranges must stay within the translated section — never the Full Report JSON.
+        let content = report.formattedContent.crashTranslatedSection
 
-        // Crashed-thread navigation ranges are offsets into formattedContent.
-        // JSON IPS / Keep keep raw JSON in the editor until Symbolicate — applying
-        // synthesized classic-text offsets would scroll/highlight the wrong place.
-        // Only classic layouts (editor text == formattedContent) get this range.
-        if report.rawContent == report.formattedContent,
-           let match = CrashRegex.threadCrashed.firstMatch(in: content)
-        {
+        if let match = CrashRegex.threadCrashed.firstMatch(in: content) {
             report.crashedThreadRange = match.range
         } else {
             report.crashedThreadRange = nil

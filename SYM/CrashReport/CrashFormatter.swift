@@ -33,6 +33,7 @@ enum CrashFormatter {
     }
 
     /// Replace stack-frame lines in-place when symbolication produced new symbols.
+    /// Only rewrites the translated section — Full Report JSON is left untouched.
     static func patchResolvedFrames(
         in content: String,
         before: CrashReport,
@@ -62,7 +63,8 @@ enum CrashFormatter {
             return content
         }
 
-        var lines = content.components(separatedBy: "\n")
+        let parts = content.crashSplitTranslatedAndFullReport()
+        var lines = parts.translated.components(separatedBy: "\n")
         for (index, line) in lines.enumerated() {
             guard let match = CrashRegex.stackFrame.firstMatch(in: line),
                   let captures = match.captures,
@@ -74,26 +76,65 @@ enum CrashFormatter {
             }
             lines[index] = frame.formattedLine
         }
-        return lines.joined(separator: "\n")
+        var result = lines.joined(separator: "\n")
+        if let appendix = parts.appendix {
+            result += appendix
+        }
+        return result
     }
 
+    /// Console.app-style “Translated Report” for modern JSON IPS.
     static func formatAppleIPS(
         report: CrashReport,
         header: [String: Any]?,
         payload: [String: Any]
     ) -> String {
+        let bundleInfo = payload["bundleInfo"] as? [String: Any]
+        let storeInfo = payload["storeInfo"] as? [String: Any]
+        let osVersion = payload["osVersion"] as? [String: Any]
+        let crashedThread = report.threads.first(where: \.crashed)
+            ?? report.threads.first(where: { $0.index == report.crashedThreadIndex })
+
         var content = ""
-        appendLine("Incident Identifier: \(string(header?["incident_id"]))", to: &content)
-        appendLine("CrashReporter Key:   \(string(payload["crashReporterKey"]))", to: &content)
-        appendLine("Hardware Model:      \(string(payload["modelCode"]))", to: &content)
-        appendLine("Process:             \(string(payload["procName"])) [\(string(payload["pid"]))]", to: &content)
-        appendLine("Path:                \(string(payload["procPath"]))", to: &content)
-        appendLine("Identifier:          \(string(report.bundleID ?? payload["coalitionName"]))", to: &content)
+        appendLine("-------------------------------------", to: &content)
+        appendLine("Translated Report (Full Report Below)", to: &content)
+        appendLine("-------------------------------------", to: &content)
+
         appendLine(
-            "Version:             \(string(header?["app_version"])) (\(string(header?["build_version"])))",
+            "Process:             \(string(payload["procName"])) [\(string(payload["pid"]))]",
             to: &content
         )
-        appendLine("Code Type:           \(string(report.arch ?? payload["cpuType"]))", to: &content)
+        appendLine("Path:                \(string(payload["procPath"]))", to: &content)
+        appendLine(
+            "Identifier:          \(string(report.bundleID ?? payload["coalitionName"]))",
+            to: &content
+        )
+        let shortVersion = nonEmpty(
+            string(header?["app_version"]),
+            string(bundleInfo?["CFBundleShortVersionString"])
+        )
+        let buildVersion = nonEmpty(
+            string(header?["build_version"]),
+            string(bundleInfo?["CFBundleVersion"])
+        )
+        appendLine("Version:             \(shortVersion) (\(buildVersion))", to: &content)
+        if let tools = bundleInfo?["DTAppStoreToolsBuild"] as? String, !tools.isEmpty {
+            appendLine("AppStoreTools:       \(tools)", to: &content)
+        }
+        if let variant = storeInfo?["applicationVariant"] as? String, !variant.isEmpty {
+            appendLine("AppVariant:          \(variant)", to: &content)
+        }
+        let isBeta = (header?["is_beta"] as? NSNumber)?.boolValue == true
+            || payload["isBeta"] as? Bool == true
+            || storeInfo?["entitledBeta"] as? Bool == true
+        if isBeta {
+            appendLine("Beta:                YES", to: &content)
+        }
+        let codeType = nonEmpty(string(payload["cpuType"]), string(report.arch))
+        appendLine(
+            "Code Type:           \(codeType.isEmpty ? "ARM-64" : codeType) (Native)",
+            to: &content
+        )
         appendLine("Role:                \(string(payload["procRole"]))", to: &content)
         appendLine(
             "Parent Process:      \(string(payload["parentProc"])) [\(string(payload["parentPid"]))]",
@@ -103,24 +144,57 @@ enum CrashFormatter {
             "Coalition:           \(string(payload["coalitionName"])) [\(string(payload["coalitionID"]))]",
             to: &content
         )
+        if payload["userID"] != nil {
+            appendLine("User ID:             \(string(payload["userID"]))", to: &content)
+        }
         appendLine("", to: &content)
+
         appendLine("Date/Time:           \(string(payload["captureTime"]))", to: &content)
         appendLine("Launch Time:         \(string(payload["procLaunch"]))", to: &content)
-        appendLine("OS Version:          \(string(header?["os_version"]))", to: &content)
+        appendLine("Hardware Model:      \(string(payload["modelCode"]))", to: &content)
+        let train = string(osVersion?["train"])
+        let build = string(osVersion?["build"])
+        let osFromPayload = build.isEmpty ? train : "\(train) (\(build))"
+        let osText = nonEmpty(string(header?["os_version"]), osFromPayload)
+        appendLine("OS Version:          \(osText)", to: &content)
+        if let releaseType = osVersion?["releaseType"] as? String, !releaseType.isEmpty {
+            appendLine("Release Type:        \(releaseType)", to: &content)
+        }
+        if let baseband = payload["basebandVersion"] as? String, !baseband.isEmpty {
+            appendLine("Baseband Version:    \(baseband)", to: &content)
+        }
+        appendLine("", to: &content)
+
+        if let betaID = storeInfo?["deviceIdentifierForVendor"] as? String, !betaID.isEmpty {
+            appendLine("Beta Identifier:     \(betaID)", to: &content)
+        }
         appendLine(
-            "Release Type:        \(string((payload["osVersion"] as? [String: Any])?["releaseType"]))",
+            "Incident Identifier: \(nonEmpty(string(header?["incident_id"]), string(payload["incident"])))",
             to: &content
         )
-        appendLine("Baseband Version:    \(string(payload["basebandVersion"]))", to: &content)
-        appendLine("Report Version:      104", to: &content)
+        appendLine("", to: &content)
+
+        if let uptime = payload["uptime"] as? NSNumber {
+            appendLine("Time Awake Since Boot: \(uptime.stringValue) seconds", to: &content)
+            appendLine("", to: &content)
+        }
+
+        var triggered = "Triggered by Thread: \(string(payload["faultingThread"]))"
+        if let queue = crashedThread?.queue, !queue.isEmpty {
+            triggered += ", Dispatch Queue: \(queue)"
+        }
+        appendLine(triggered, to: &content)
         appendLine("", to: &content)
 
         if let exception = payload["exception"] as? [String: Any] {
             appendLine(
-                "Exception Type:  \(string(exception["type"])) (\(string(exception["signal"])))",
+                "Exception Type:    \(string(exception["type"])) (\(string(exception["signal"])))",
                 to: &content
             )
-            appendLine("Exception Codes: \(string(exception["codes"]))", to: &content)
+            appendLine(
+                "Exception Codes:   \(formatExceptionCodes(exception))",
+                to: &content
+            )
         }
 
         if payload["isCorpse"] as? Bool == true {
@@ -129,15 +203,19 @@ enum CrashFormatter {
 
         if let termination = payload["termination"] as? [String: Any] {
             appendLine(
-                "Termination Reason: \(string(termination["namespace"])) \(string(termination["code"]))",
+                "Termination Reason:  Namespace \(string(termination["namespace"])), Code \(string(termination["code"])), \(string(termination["indicator"]))",
                 to: &content
             )
+            if let byProc = termination["byProc"] as? String, !byProc.isEmpty {
+                appendLine(
+                    "Terminating Process: \(byProc) [\(string(termination["byPid"]))]",
+                    to: &content
+                )
+            }
             if let details = termination["details"] as? [String], let first = details.first {
                 appendLine(first, to: &content)
             }
         }
-
-        appendLine("Triggered by Thread:  \(string(payload["faultingThread"]))", to: &content)
 
         if let asi = payload["asi"] as? [String: Any] {
             appendLine("", to: &content)
@@ -151,13 +229,14 @@ enum CrashFormatter {
 
         if let ktriageinfo = payload["ktriageinfo"] as? String {
             appendLine("", to: &content)
-            appendLine("Kernel Triage: \n\(ktriageinfo)", to: &content)
+            appendLine("Kernel Triage:", to: &content)
+            appendLine(ktriageinfo, to: &content)
         }
 
         appendLine("", to: &content)
+        appendLine("", to: &content)
 
         if let backtrace = report.lastExceptionBacktrace, !backtrace.isEmpty {
-            appendLine("", to: &content)
             appendLine("Last Exception Backtrace:", to: &content)
             for frame in backtrace {
                 appendLine(frame.formattedLine, to: &content)
@@ -169,23 +248,21 @@ enum CrashFormatter {
             content.append(threadSection(thread))
         }
 
-        appendLine("", to: &content)
         content.append(formatRegisters(payload))
         appendLine("", to: &content)
 
-        if let vmSummary = payload["vmSummary"] as? String {
-            appendLine("", to: &content)
-            appendLine("VM Region Info: \n\(vmSummary)", to: &content)
-        }
-
-        appendLine("", to: &content)
         appendLine("Binary Images:", to: &content)
         for image in report.binaryImages {
             appendLine(formatBinaryImage(image), to: &content)
         }
-        appendLine("", to: &content)
-        appendLine("EOF", to: &content)
-        appendLine("", to: &content)
+
+        if let vmSummary = payload["vmSummary"] as? String, !vmSummary.isEmpty {
+            appendLine("", to: &content)
+            appendLine("VM Region Info:", to: &content)
+            appendLine(vmSummary, to: &content)
+        }
+
+        appendFullReport(raw: report.rawContent, to: &content)
         return content
     }
 
@@ -255,10 +332,26 @@ enum CrashFormatter {
         for image in report.binaryImages {
             appendLine(formatBinaryImage(image), to: &content)
         }
-        appendLine("", to: &content)
-        appendLine("EOF", to: &content)
-        appendLine("", to: &content)
+        appendFullReport(raw: report.rawContent, to: &content)
         return content
+    }
+
+    /// Console.app-style original payload appendix (excluded from parse / symbolicate patching).
+    private static func appendFullReport(raw: String, to content: inout String) {
+        guard !raw.isEmpty else {
+            return
+        }
+        if !content.hasSuffix("\n") {
+            content.append("\n")
+        }
+        appendLine("-----------", to: &content)
+        appendLine("Full Report", to: &content)
+        appendLine("-----------", to: &content)
+        appendLine("", to: &content)
+        content.append(raw)
+        if !raw.hasSuffix("\n") {
+            content.append("\n")
+        }
     }
 
     private static func appendLine(_ line: String, to content: inout String) {
@@ -315,10 +408,17 @@ enum CrashFormatter {
         let size = image.size ?? 0
         // Avoid UInt64 overflow when size is 0 or base+size exceeds .max
         let end: UInt64 = size == 0 ? base : base &+ (size &- 1)
-        let uuid = (image.uuid ?? "").replacingOccurrences(of: "-", with: "")
-        return String(format: "0x%llx - 0x%llx ", base, end)
-            + String(format: "%@ %@ ", image.name, image.arch ?? "arm64")
-            + String(format: "<%@> %@", uuid, image.path ?? "")
+        let uuid = (image.uuid ?? "").replacingOccurrences(of: "-", with: "").lowercased()
+        // Console.app padding: leading spaces + wide end-address column.
+        return String(
+            format: "       0x%llx -        0x%llx %@ %@  <%@> %@",
+            base,
+            end,
+            image.name,
+            image.arch ?? "arm64",
+            uuid,
+            image.path ?? ""
+        )
     }
 
     private static func formatRegisters(_ payload: [String: Any]) -> String {
@@ -328,37 +428,56 @@ enum CrashFormatter {
         }
 
         let triggeredIndex = payload["faultingThread"] as? Int ?? 0
-        let cpu = payload["cpuType"] as? String ?? ""
-        var content = "Thread \(triggeredIndex) crashed with ARM Thread State (\(cpu)):\n"
+        var content = "Thread \(triggeredIndex) crashed with ARM Thread State (64-bit):\n"
 
         let threadState = triggeredThread["threadState"] as? [String: Any] ?? [:]
         let x = threadState["x"] as? [[String: Any]] ?? []
         for (index, reg) in x.enumerated() {
-            let id = "x\(index)".crashPadding(length: 6, atLeft: true)
+            let id = "x\(index)".crashPadding(length: 5, atLeft: true)
             let value = (reg["value"] as? NSNumber)?.uint64Value ?? 0
-            content.append("\(id): \(String(format: "0x%016X", value))")
+            content.append(" \(id): \(String(format: "0x%016llx", value))")
             if index % 4 == 3 {
                 content.append("\n")
             }
         }
 
-        var registerIndex = x.count % 4
-        for name in ["fp", "lr", "sp", "pc", "cpsr", "far", "esr"] {
-            let reg = threadState[name] as? [String: Any] ?? [:]
+        let named: [(String, String)] = [
+            ("fp", "fp"), ("lr", "lr"), ("sp", "sp"), ("pc", "pc"),
+            ("cpsr", "cpsr"), ("far", "far"), ("esr", "esr"),
+        ]
+        var column = x.count % 4
+        for (key, label) in named {
+            let reg = threadState[key] as? [String: Any] ?? [:]
             let value = (reg["value"] as? NSNumber)?.uint64Value ?? 0
             let desc = reg["description"] as? String ?? ""
-            let id = name.crashPadding(length: 6, atLeft: true)
-            content.append("\(id): \(String(format: "0x%016X", value))")
+            let id = label.crashPadding(length: 5, atLeft: true)
+            content.append(" \(id): \(String(format: "0x%016llx", value))")
             if !desc.isEmpty {
                 content.append(" \(desc)")
             }
-            if registerIndex % 3 == 2 {
+            column += 1
+            if key == "lr" || key == "cpsr" || key == "esr" || column % 4 == 0 {
                 content.append("\n")
+                column = 0
             }
-            registerIndex += 1
         }
-        content.append("\n")
+        if !content.hasSuffix("\n") {
+            content.append("\n")
+        }
         return content
+    }
+
+    private static func formatExceptionCodes(_ exception: [String: Any]) -> String {
+        if let rawCodes = exception["rawCodes"] as? [Any], rawCodes.count >= 2 {
+            let values = rawCodes.prefix(2).map { value -> String in
+                let number = (value as? NSNumber)?.uint64Value
+                    ?? UInt64("\(value)")
+                    ?? 0
+                return String(format: "0x%016llx", number)
+            }
+            return values.joined(separator: ", ")
+        }
+        return string(exception["codes"])
     }
 
     private static func string(_ value: Any?) -> String {
@@ -374,5 +493,9 @@ enum CrashFormatter {
         default:
             return ""
         }
+    }
+
+    private static func nonEmpty(_ primary: String, _ fallback: @autoclosure () -> String) -> String {
+        primary.isEmpty ? fallback() : primary
     }
 }
