@@ -169,6 +169,51 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(resolved.isSymbolicated)
     }
 
+    func testClassicLineParserThreadHeadersAndFrames() {
+        XCTAssertNil(ClassicCrashLineParser.parseThreadHeader("Thread 0 crashed with ARM Thread State (64-bit):"))
+
+        let nameHeader = ClassicCrashLineParser.parseThreadHeader("Thread 0 name:  Dispatch queue: com.apple.main-thread")
+        XCTAssertEqual(nameHeader?.index, 0)
+        XCTAssertEqual(nameHeader?.queue, "com.apple.main-thread")
+        XCTAssertFalse(nameHeader?.crashed == true)
+
+        let crashedHeader = ClassicCrashLineParser.parseThreadHeader("Thread 0 Crashed:")
+        XCTAssertEqual(crashedHeader?.index, 0)
+        XCTAssertTrue(crashedHeader?.crashed == true)
+
+        let plain = ClassicCrashLineParser.parseThreadHeader("Thread 12:")
+        XCTAssertEqual(plain?.index, 12)
+        XCTAssertFalse(plain?.crashed == true)
+
+        let frame = ClassicCrashLineParser.parseStackFrameLine(
+            "0   demo                          \t0x0000000100125780 DEMOViewController.status() + 140"
+        )
+        XCTAssertEqual(frame?.index, 0)
+        XCTAssertEqual(frame?.imageName, "demo")
+        XCTAssertEqual(frame?.address, 0x0000_0001_0012_5780)
+        XCTAssertEqual(frame?.symbol, "DEMOViewController.status() + 140")
+    }
+
+    func testClassicLineParserBinaryImageLine() {
+        let image = ClassicCrashLineParser.parseBinaryImageLine(
+            "0x100070000 - 0x101607fff demo        arm64  <42fd89f730be3ac5a40a4c1a99438dfb> /var/containers/Bundle/Application/demo.app/demo"
+        )
+        XCTAssertEqual(image?.name, "demo")
+        XCTAssertEqual(image?.arch, "arm64")
+        XCTAssertEqual(image?.loadAddress, 0x1000_70000)
+        XCTAssertEqual(image?.uuid, "42FD89F7-30BE-3AC5-A40A-4C1A99438DFB")
+        XCTAssertEqual(image?.path, "/var/containers/Bundle/Application/demo.app/demo")
+        XCTAssertEqual(image?.size, 0x1016_07fff - 0x1000_70000 + 1)
+        XCTAssertTrue(image?.inApp == true)
+
+        let spaced = ClassicCrashLineParser.parseBinaryImageLine(
+            "       0x18232f000 -        0x182635fff Foundation arm64e  <9618b2f2a4c23e07b7eed8d9e1bdeaec> /System/Library/Frameworks/Foundation.framework/Foundation"
+        )
+        XCTAssertEqual(spaced?.name, "Foundation")
+        XCTAssertEqual(spaced?.arch, "arm64e")
+        XCTAssertEqual(spaced?.loadAddress, 0x1823_2f000)
+    }
+
     func testFormattedLineMatchesClassicColumns() {
         let frame = StackFrame(
             index: 0,

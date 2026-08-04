@@ -23,9 +23,8 @@
 import Foundation
 
 enum CrashRegex {
+    /// Still used by `CrashFormatter.patchResolvedFrames` when rewriting symbolicated lines.
     static let stackFrame = try! Regex("^\\s*(\\d{1,3})\\s+([^ ]+)\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: .anchorsMatchLines)
-    static let image = try! Regex("\\s*(0[xX][A-Fa-f0-9]+)\\s+-\\s+\\w+\\s+([^\\s]+)\\s*(\\w+)\\s*<(.*)> (.*)")
-    static let thread = try! Regex("Thread (\\d{1,3})(?:[: ])(?:(?:(Crashed):)|(?:name:\\s+(.*)))*$")
     static let process = try! Regex("^Process:\\s*([^\\s]+)\\s*\\[*", options: .anchorsMatchLines)
     static let identifier = try! Regex("^Identifier:\\s*([^\\s]+)", options: .anchorsMatchLines)
     static let hardware = try! Regex("Hardware Model:\\s*([^\\s]+)", options: .caseInsensitive)
@@ -136,107 +135,9 @@ enum TextCrashParser {
         }
     }
 
-    static func parseMainBinaryUUID(_ content: String, report: inout CrashReport) {
-        guard let appName = report.appName,
-              let imageRegex = CrashRegex.image(appName, options: []),
-              let captures = imageRegex.firstMatch(in: content)?.captures,
-              let uuid = captures.crashCapture(4),
-              let arch = captures.crashCapture(3)
-        else {
-            return
-        }
-
-        report.uuid = uuid.crashUUIDFormat()
-        report.arch = arch
-    }
-
     static func parseThreads(_ content: String, report: inout CrashReport) {
-        var threads: [CrashThread] = []
-        var currentThread: CrashThread?
-        var currentFrames: [StackFrame] = []
-
-        for line in content.components(separatedBy: "\n") {
-            if let match = CrashRegex.thread.firstMatch(in: line), let captures = match.captures,
-               let indexString = captures.crashCapture(1)
-            {
-                let index = Int(indexString) ?? threads.count
-                let crashed = captures.crashCapture(2) == "Crashed"
-                let (name, queue) = parseThreadNameFields(captures.crashCapture(3))
-
-                // Classic Apple logs often emit two headers for one thread:
-                //   Thread 0 name:  Dispatch queue: …
-                //   Thread 0 Crashed:
-                // Merge them instead of creating an empty name-only stub.
-                if let existing = currentThread,
-                   existing.index == index,
-                   currentFrames.isEmpty
-                {
-                    currentThread = CrashThread(
-                        index: index,
-                        name: name ?? existing.name,
-                        queue: queue ?? existing.queue,
-                        crashed: crashed || existing.crashed,
-                        frames: []
-                    )
-                    if crashed {
-                        report.crashedThreadIndex = index
-                    }
-                    continue
-                }
-
-                if var thread = currentThread {
-                    thread.frames = currentFrames
-                    threads.append(thread)
-                }
-
-                currentThread = CrashThread(index: index, name: name, queue: queue, crashed: crashed, frames: [])
-                currentFrames = []
-                if crashed {
-                    report.crashedThreadIndex = index
-                }
-                continue
-            }
-
-            if let match = CrashRegex.stackFrame.firstMatch(in: line), let captures = match.captures,
-               let indexString = captures.crashCapture(1),
-               let imageName = captures.crashCapture(2),
-               let addressString = captures.crashCapture(3),
-               let address = addressString.crashHexAddress
-            {
-                let symbolText = captures.crashCapture(4)?
-                    .trimmingCharacters(in: .whitespacesAndNewlines)
-                let frame = StackFrame(
-                    index: Int(indexString) ?? currentFrames.count,
-                    imageName: imageName,
-                    address: address,
-                    symbol: (symbolText?.isEmpty == false) ? symbolText : nil
-                )
-                currentFrames.append(frame)
-            }
-        }
-
-        if var thread = currentThread {
-            thread.frames = currentFrames
-            threads.append(thread)
-        }
-
-        report.threads = threads
-        linkFramesToBinaryImages(&report)
+        ClassicCrashLineParser.parseThreads(content, report: &report)
     }
-
-    /// Split `Thread N name:` payload into thread name / dispatch queue when present.
-    private static func parseThreadNameFields(_ raw: String?) -> (name: String?, queue: String?) {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return (nil, nil)
-        }
-        let queuePrefix = "Dispatch queue:"
-        if raw.hasPrefix(queuePrefix) {
-            let queue = raw.dropFirst(queuePrefix.count).trimmingCharacters(in: .whitespacesAndNewlines)
-            return (nil, queue.isEmpty ? nil : queue)
-        }
-        return (raw, nil)
-    }
-
 
     static func linkFramesToBinaryImages(_ report: inout CrashReport) {
         let imagesByName = Dictionary(grouping: report.binaryImages, by: \.name)

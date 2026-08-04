@@ -38,22 +38,10 @@ struct AppleTextDecoder: CrashDecoder {
             \.appVersion: CrashRegex.version,
         ]
         TextCrashParser.parseBaseInfo(content, report: &report, map: regexMap)
-        TextCrashParser.parseMainBinaryUUID(content, report: &report)
 
-        TextCrashParser.parseBinaries(content, report: &report, regex: CrashRegex.image) { captures in
-            let path = captures.crashCapture(5) ?? ""
-            return BinaryImage(
-                name: captures.crashCapture(2) ?? "",
-                uuid: captures.crashCapture(4)?.crashUUIDFormat(),
-                arch: captures.crashCapture(3),
-                loadAddress: captures.crashCapture(1)?.crashHexAddress,
-                path: path,
-                isExecutable: false,
-                inApp: BinaryImage.isInApp(path: path)
-            )
-        }
-
-        TextCrashParser.parseThreads(content, report: &report)
+        ClassicCrashLineParser.parseBinaryImages(content, report: &report)
+        ClassicCrashLineParser.applyMainBinaryMetadata(to: &report)
+        ClassicCrashLineParser.parseThreads(content, report: &report)
         CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frame(for: $0) })
 
         return report

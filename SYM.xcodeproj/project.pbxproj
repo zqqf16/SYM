@@ -19,6 +19,7 @@
 		B5CR001A27F20001000000A /* UmengDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000A27F20001000000A /* UmengDecoder.swift */; };
 		B5CR001B27F20001000000B /* KeepJSONDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000B27F20001000000B /* KeepJSONDecoder.swift */; };
 		B5CR001C27F20001000000C /* CrashFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000C27F20001000000C /* CrashFormatter.swift */; };
+		B5CR001E27F20001000000E /* ClassicCrashLineParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000F27F20001000000F /* ClassicCrashLineParser.swift */; };
 		B5CR001D27F20001000000D /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000D27F20001000000D /* CrashReportTests.swift */; };
 		B5SY002127F300010000001 /* SymbolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5SY001127F300010000001 /* SymbolEngine.swift */; };
 		B5SY002227F300010000002 /* MachOSymbolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5SY001227F300010000002 /* MachOSymbolEngine.swift */; };
@@ -158,6 +159,7 @@
 		B5CR000A27F20001000000A /* UmengDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UmengDecoder.swift; sourceTree = "<group>"; };
 		B5CR000B27F20001000000B /* KeepJSONDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepJSONDecoder.swift; sourceTree = "<group>"; };
 		B5CR000C27F20001000000C /* CrashFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashFormatter.swift; sourceTree = "<group>"; };
+		B5CR000F27F20001000000F /* ClassicCrashLineParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassicCrashLineParser.swift; sourceTree = "<group>"; };
 		B5CR000D27F20001000000D /* CrashReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportTests.swift; sourceTree = "<group>"; };
 		B5SY001127F300010000001 /* SymbolEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolEngine.swift; sourceTree = "<group>"; };
 		B5SY001227F300010000002 /* MachOSymbolEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachOSymbolEngine.swift; sourceTree = "<group>"; };
@@ -643,6 +645,7 @@
 				B5CR000127F200010000001 /* CrashReport.swift */,
 				B5CR000227F200010000002 /* String+Crash.swift */,
 				B5CR000327F200010000003 /* CrashRegex.swift */,
+				B5CR000F27F20001000000F /* ClassicCrashLineParser.swift */,
 				B5CR000427F200010000004 /* CrashContentBuilder.swift */,
 				B5CR000527F200010000005 /* CrashDecoding.swift */,
 				B5CR000627F200010000006 /* AppleIPSDecoder.swift */,
@@ -907,6 +910,7 @@
 				B5CR001127F200010000001 /* CrashReport.swift in Sources */,
 				B5CR001227F200010000002 /* String+Crash.swift in Sources */,
 				B5CR001327F200010000003 /* CrashRegex.swift in Sources */,
+				B5CR001E27F20001000000E /* ClassicCrashLineParser.swift in Sources */,
 				B5CR001427F200010000004 /* CrashContentBuilder.swift in Sources */,
 				B5CR001527F200010000005 /* CrashDecoding.swift in Sources */,
 				B5CR001627F200010000006 /* AppleIPSDecoder.swift in Sources */,

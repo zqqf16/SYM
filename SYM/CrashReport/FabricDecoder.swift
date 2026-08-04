@@ -44,20 +44,9 @@ struct FabricDecoder: CrashDecoder {
             report.osVersion = "\(platform) \(osVersion)"
         }
 
-        TextCrashParser.parseBinaries(content, report: &report, regex: CrashRegex.image) { captures in
-            let path = captures[5]
-            return BinaryImage(
-                name: captures[2],
-                uuid: captures[4].crashUUIDFormat(),
-                arch: captures[3],
-                loadAddress: captures[1].crashHexAddress,
-                path: path,
-                isExecutable: false,
-                inApp: BinaryImage.isInApp(path: path)
-            )
-        }
-
-        TextCrashParser.parseThreads(content, report: &report)
+        ClassicCrashLineParser.parseBinaryImages(content, report: &report)
+        ClassicCrashLineParser.applyMainBinaryMetadata(to: &report)
+        ClassicCrashLineParser.parseThreads(content, report: &report)
         CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frame(for: $0) })
 
         return report
