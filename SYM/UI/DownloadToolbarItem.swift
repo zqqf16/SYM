@@ -71,7 +71,9 @@ class DownloadToolbarItem: NSToolbarItem {
         indicator.isDisplayedWhenStopped = false
         indicator.isHidden = true
 
-        let container = NSView(frame: NSRect(x: 0, y: 0, width: 36, height: 28))
+        // Size via Auto Layout — NSToolbarItem.minSize/maxSize are deprecated and
+        // can clip; the toolbar measures this custom view from constraints.
+        let container = NSView()
         container.addSubview(button)
         container.addSubview(indicator)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -81,13 +83,13 @@ class DownloadToolbarItem: NSToolbarItem {
             button.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             button.topAnchor.constraint(equalTo: container.topAnchor),
             button.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            button.widthAnchor.constraint(equalToConstant: 36),
+            button.heightAnchor.constraint(equalToConstant: 28),
             indicator.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             indicator.centerYAnchor.constraint(equalTo: container.centerYAnchor),
         ])
 
         view = container
-        minSize = NSSize(width: 36, height: 28)
-        maxSize = NSSize(width: 40, height: 32)
     }
 
     func refreshToolTip() {
