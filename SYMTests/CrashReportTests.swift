@@ -490,4 +490,10 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(match?.captures?[1].uppercased(), "F9E72B35-ACE9-3B64-8D8C-6A59BE609683")
         XCTAssertEqual(match?.captures?[2], "/tmp/Demo.dSYM/Contents/Resources/DWARF/Demo")
     }
+
+    func testVersionHintsParseBuildInParentheses() {
+        let hints = DsymLocator.versionHints(from: "6.1.0 (20260804173156)")
+        XCTAssertEqual(hints.marketing, "6.1.0")
+        XCTAssertEqual(hints.build, "20260804173156")
+    }
 }

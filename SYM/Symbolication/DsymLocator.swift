@@ -142,16 +142,28 @@ enum DsymLocator {
     }
 
     /// Fast path: walk known dirs and read metadata / dwarfdump without waiting for Spotlight.
-    static func scanKnownDirectories(neededUUIDs: Set<String>, maxItems: Int = 400) -> [DsymFile] {
+    ///
+    /// Archives are scored by `Info.plist` ApplicationProperties (bundle ID + build) so Debug
+    /// builds (DWARF in Products/*.app, empty dSYMs/) are probed before unrelated archives.
+    static func scanKnownDirectories(
+        neededUUIDs: Set<String>,
+        bundleID: String? = nil,
+        appVersion: String? = nil,
+        priorityUUIDs: Set<String> = [],
+        maxItems: Int = 400
+    ) -> [DsymFile] {
         guard !neededUUIDs.isEmpty else {
             return []
         }
+        let stopUUIDs = priorityUUIDs.isEmpty ? neededUUIDs : priorityUUIDs
+        let versionHints = versionHints(from: appVersion)
         let roots = [
             (NSHomeDirectory() as NSString).appendingPathComponent("Library/Developer/Xcode/Archives"),
             Config.dsymDownloadDirectory,
         ]
-        var found: [DsymFile] = []
-        var visited = 0
+
+        var dsymURLs: [URL] = []
+        var archiveCandidates: [(url: URL, score: Int, modified: Date)] = []
 
         for root in roots {
             guard FileManager.default.fileExists(atPath: root) else {
@@ -160,55 +172,160 @@ enum DsymLocator {
             let url = URL(fileURLWithPath: root, isDirectory: true)
             guard let enumerator = FileManager.default.enumerator(
                 at: url,
-                includingPropertiesForKeys: [.isDirectoryKey],
+                includingPropertiesForKeys: [.contentModificationDateKey],
                 options: [.skipsHiddenFiles, .skipsPackageDescendants]
             ) else {
                 continue
             }
 
             for case let itemURL as URL in enumerator {
-                if visited >= maxItems {
-                    return found
-                }
                 let ext = itemURL.pathExtension
                 if ext == "dSYM" {
-                    visited += 1
                     enumerator.skipDescendants()
-                    var matched: [DsymFile] = []
-                    if let item = NSMetadataItem(url: itemURL) {
-                        matched = parseDsymFile(item, neededUUIDs: neededUUIDs)
-                    }
-                    // init(url:) often lacks Xcode Spotlight importer attrs — probe DWARF.
-                    if matched.isEmpty, let probed = probeDsymBundle(at: itemURL.path, neededUUIDs: neededUUIDs) {
-                        matched = [probed]
-                    }
-                    found.append(contentsOf: matched)
-                    if covers(neededUUIDs, files: found) {
-                        return found
-                    }
+                    dsymURLs.append(itemURL)
                 } else if ext == "xcarchive" {
-                    visited += 1
                     enumerator.skipDescendants()
-                    var matched: [DsymFile] = []
-                    if let item = NSMetadataItem(url: itemURL),
-                       let parsed = parseXcarchiveFile(item, uuids: Array(neededUUIDs))
-                    {
-                        matched = parsed
+                    let score = archiveMatchScore(
+                        at: itemURL.path,
+                        bundleID: bundleID,
+                        versionHints: versionHints
+                    )
+                    // Wrong bundle ID → skip expensive Products dwarfdump later (score == -1).
+                    if score < 0 {
+                        continue
                     }
-                    if matched.isEmpty {
-                        matched = probeXcarchive(at: itemURL.path, neededUUIDs: neededUUIDs)
-                    }
-                    found.append(contentsOf: matched)
-                    if covers(neededUUIDs, files: found) {
-                        return found
-                    }
+                    let modified = (try? itemURL.resourceValues(forKeys: [.contentModificationDateKey])
+                        .contentModificationDate) ?? .distantPast
+                    archiveCandidates.append((itemURL, score, modified))
                 }
+            }
+        }
+
+        archiveCandidates.sort {
+            if $0.score != $1.score {
+                return $0.score > $1.score
+            }
+            return $0.modified > $1.modified
+        }
+
+        var found: [DsymFile] = []
+        var remaining = neededUUIDs
+        var visited = 0
+
+        func ingest(_ matched: [DsymFile]) -> Bool {
+            guard !matched.isEmpty else {
+                return false
+            }
+            found.append(contentsOf: matched)
+            for file in matched {
+                remaining.subtract(file.uuids)
+            }
+            return covers(stopUUIDs, files: found) || remaining.isEmpty
+        }
+
+        for itemURL in dsymURLs {
+            if visited >= maxItems {
+                return found
+            }
+            visited += 1
+            var matched: [DsymFile] = []
+            if let item = NSMetadataItem(url: itemURL) {
+                matched = parseDsymFile(item, neededUUIDs: remaining)
+            }
+            if matched.isEmpty, let probed = probeDsymBundle(at: itemURL.path, neededUUIDs: remaining) {
+                matched = [probed]
+            }
+            if ingest(matched) {
+                return found
+            }
+        }
+
+        for candidate in archiveCandidates {
+            if visited >= maxItems {
+                return found
+            }
+            visited += 1
+            var matched: [DsymFile] = []
+            if let item = NSMetadataItem(url: candidate.url),
+               let parsed = parseXcarchiveFile(item, uuids: Array(remaining))
+            {
+                matched = parsed
+            }
+            // Debug archives: DWARF lives in Products/*.app (dSYMs/ often empty).
+            if !covers(remaining, files: matched) {
+                let stillNeeded = remaining.subtracting(Set(matched.flatMap(\.uuids)))
+                matched.append(contentsOf: probeXcarchive(
+                    at: candidate.url.path,
+                    neededUUIDs: stillNeeded.isEmpty ? remaining : stillNeeded
+                ))
+            }
+            if ingest(matched) {
+                return found
             }
         }
         return found
     }
 
-    private static func covers(_ needed: Set<String>, files: [DsymFile]) -> Bool {
+    /// Parse `"6.1.0 (20260804173156)"` / bare build strings into match hints.
+    static func versionHints(from appVersion: String?) -> (marketing: String?, build: String?) {
+        guard let appVersion, !appVersion.isEmpty else {
+            return (nil, nil)
+        }
+        let trimmed = appVersion.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let open = trimmed.firstIndex(of: "("),
+           let close = trimmed.firstIndex(of: ")"),
+           open < close
+        {
+            let marketing = trimmed[..<open].trimmingCharacters(in: .whitespaces)
+            let build = trimmed[trimmed.index(after: open) ..< close]
+                .trimmingCharacters(in: .whitespaces)
+            return (
+                marketing.isEmpty ? nil : String(marketing),
+                build.isEmpty ? nil : String(build)
+            )
+        }
+        return (trimmed, trimmed)
+    }
+
+    /// Higher is better. `-1` means a different bundle ID (skip). `0` means unknown plist.
+    private static func archiveMatchScore(
+        at path: String,
+        bundleID: String?,
+        versionHints: (marketing: String?, build: String?)
+    ) -> Int {
+        let infoPath = (path as NSString).appendingPathComponent("Info.plist")
+        guard let plist = NSDictionary(contentsOfFile: infoPath) as? [String: Any],
+              let props = plist["ApplicationProperties"] as? [String: Any]
+        else {
+            return 0
+        }
+
+        let archiveBundleID = props["CFBundleIdentifier"] as? String
+        if let bundleID, !bundleID.isEmpty, let archiveBundleID, archiveBundleID != bundleID {
+            return -1
+        }
+
+        var score = 0
+        if let bundleID, !bundleID.isEmpty, archiveBundleID == bundleID {
+            score += 50
+        }
+        let archiveBuild = props["CFBundleVersion"] as? String
+        let archiveMarketing = props["CFBundleShortVersionString"] as? String
+        if let build = versionHints.build, !build.isEmpty, archiveBuild == build {
+            score += 100
+        } else if let marketing = versionHints.marketing,
+                  !marketing.isEmpty,
+                  archiveMarketing == marketing
+        {
+            score += 20
+        }
+        return score
+    }
+
+    static func covers(_ needed: Set<String>, files: [DsymFile]) -> Bool {
+        guard !needed.isEmpty else {
+            return true
+        }
         var matched = Set<String>()
         for file in files {
             matched.formUnion(file.uuids)
@@ -234,24 +351,117 @@ enum DsymLocator {
         )
     }
 
-    /// Walk `*.xcarchive/dSYMs/*.dSYM` when Spotlight Xcode attrs are missing.
-    private static func probeXcarchive(at path: String, neededUUIDs: Set<String>) -> [DsymFile] {
-        let dsymsDir = (path as NSString).appendingPathComponent("dSYMs")
-        guard let names = try? FileManager.default.contentsOfDirectory(atPath: dsymsDir) else {
-            return []
-        }
+    /// Probe an xcarchive for matching UUIDs via `dSYMs/*.dSYM`, then fall back to
+    /// `Products/Applications/*.app` executables (Debug builds keep DWARF in the binary).
+    static func probeXcarchive(at path: String, neededUUIDs: Set<String>) -> [DsymFile] {
         let archiveName = (path as NSString).lastPathComponent
         var found: [DsymFile] = []
-        for name in names where name.hasSuffix(".dSYM") {
-            let dsymPath = (dsymsDir as NSString).appendingPathComponent(name)
-            guard let probed = probeDsymBundle(at: dsymPath, neededUUIDs: neededUUIDs) else {
+
+        let dsymsDir = (path as NSString).appendingPathComponent("dSYMs")
+        if let names = try? FileManager.default.contentsOfDirectory(atPath: dsymsDir) {
+            for name in names where name.hasSuffix(".dSYM") {
+                let dsymPath = (dsymsDir as NSString).appendingPathComponent(name)
+                guard let probed = probeDsymBundle(at: dsymPath, neededUUIDs: neededUUIDs) else {
+                    continue
+                }
+                found.append(DsymFile(
+                    name: archiveName,
+                    path: dsymPath,
+                    binaryPath: probed.binaryPath,
+                    uuids: probed.uuids
+                ))
+            }
+        }
+
+        if !covers(neededUUIDs, files: found) {
+            found.append(contentsOf: probeXcarchiveProducts(
+                at: path,
+                neededUUIDs: neededUUIDs,
+                archiveName: archiveName
+            ))
+        }
+        return found
+    }
+
+    /// Debug / no-dSYM archives: match UUID against the app (and embedded frameworks) under Products.
+    private static func probeXcarchiveProducts(
+        at archivePath: String,
+        neededUUIDs: Set<String>,
+        archiveName: String
+    ) -> [DsymFile] {
+        let appsDir = (archivePath as NSString).appendingPathComponent("Products/Applications")
+        guard let appNames = try? FileManager.default.contentsOfDirectory(atPath: appsDir) else {
+            return []
+        }
+
+        var found: [DsymFile] = []
+        for appName in appNames where appName.hasSuffix(".app") {
+            let appPath = (appsDir as NSString).appendingPathComponent(appName)
+            found.append(contentsOf: probeAppBundleBinaries(
+                at: appPath,
+                neededUUIDs: neededUUIDs,
+                displayName: archiveName
+            ))
+            if covers(neededUUIDs, files: found) {
+                break
+            }
+        }
+        return found
+    }
+
+    /// dwarfdump the main executable first, then `Frameworks/*.framework` for remaining UUIDs.
+    private static func probeAppBundleBinaries(
+        at appPath: String,
+        neededUUIDs: Set<String>,
+        displayName: String
+    ) -> [DsymFile] {
+        var remaining = neededUUIDs
+        guard !remaining.isEmpty else {
+            return []
+        }
+
+        var candidates: [String] = []
+        if let bundle = Bundle(path: appPath), let exe = bundle.executablePath {
+            candidates.append(exe)
+        }
+
+        let frameworksDir = (appPath as NSString).appendingPathComponent("Frameworks")
+        if let frameworkNames = try? FileManager.default.contentsOfDirectory(atPath: frameworksDir) {
+            for name in frameworkNames where name.hasSuffix(".framework") {
+                let frameworkPath = (frameworksDir as NSString).appendingPathComponent(name)
+                if let framework = Bundle(path: frameworkPath), let exe = framework.executablePath {
+                    candidates.append(exe)
+                    continue
+                }
+                let bareName = (name as NSString).deletingPathExtension
+                let barePath = (frameworkPath as NSString).appendingPathComponent(bareName)
+                if FileManager.default.isExecutableFile(atPath: barePath)
+                    || FileManager.default.fileExists(atPath: barePath)
+                {
+                    candidates.append(barePath)
+                }
+            }
+        }
+
+        var found: [DsymFile] = []
+        for binaryPath in candidates {
+            guard !remaining.isEmpty else {
+                break
+            }
+            guard let pairs = SubProcess.dwarfdump([binaryPath]) else {
                 continue
             }
+            let matched = pairs.compactMap { CrashUUID.normalize($0.0) }.filter { remaining.contains($0) }
+            guard !matched.isEmpty else {
+                continue
+            }
+            remaining.subtract(matched)
             found.append(DsymFile(
-                name: archiveName,
-                path: dsymPath,
-                binaryPath: probed.binaryPath,
-                uuids: probed.uuids
+                name: displayName,
+                path: appPath,
+                binaryPath: binaryPath,
+                uuids: matched,
+                isApp: true
             ))
         }
         return found
@@ -432,10 +642,22 @@ class DsymManager {
 
     private func start(_ crash: CrashReport, generation: Int) {
         let needed = neededUUIDs
+        let priority = Set(
+            crash.embeddedBinaries
+                .filter(\.isExecutable)
+                .compactMap { CrashUUID.normalize($0.uuid) }
+        )
+        let bundleID = crash.bundleID
+        let appVersion = crash.appVersion
 
         operationQueue.async { [weak self] in
             guard let self else { return }
-            let local = DsymLocator.scanKnownDirectories(neededUUIDs: needed)
+            let local = DsymLocator.scanKnownDirectories(
+                neededUUIDs: needed,
+                bundleID: bundleID,
+                appVersion: appVersion,
+                priorityUUIDs: priority
+            )
             DispatchQueue.main.async {
                 guard generation == self.searchGeneration else { return }
                 if !local.isEmpty {
@@ -564,8 +786,15 @@ extension DsymManager: MdfindWrapperDelegate {
             if type == "com.apple.xcode.dsym" {
                 dsyms.append(contentsOf: DsymLocator.parseDsymFile(item, neededUUIDs: needed.isEmpty ? nil : needed))
             } else if type == "com.apple.xcode.archive" {
-                if let results = DsymLocator.parseXcarchiveFile(item, uuids: uuids) {
-                    dsyms.append(contentsOf: results)
+                let archiveResults = DsymLocator.parseXcarchiveFile(item, uuids: uuids) ?? []
+                if !archiveResults.isEmpty {
+                    dsyms.append(contentsOf: archiveResults)
+                }
+                // Metadata misses Debug archives (DWARF lives in Products/*.app).
+                if !DsymLocator.covers(needed, files: archiveResults),
+                   let path = item.value(forAttribute: NSMetadataItemPathKey) as? String
+                {
+                    dsyms.append(contentsOf: DsymLocator.probeXcarchive(at: path, neededUUIDs: needed))
                 }
             } else if type == "com.apple.application-bundle" {
                 appItems.append(item)
