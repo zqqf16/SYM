@@ -57,6 +57,18 @@ struct Regex {
         var range: NSRange {
             return result.range
         }
+
+        /// NSRange for capture group `index` (0 = full match), or `nil` if unmatched.
+        func range(at index: Int) -> NSRange? {
+            guard index >= 0, index < result.numberOfRanges else {
+                return nil
+            }
+            let range = result.range(at: index)
+            guard range.location != NSNotFound else {
+                return nil
+            }
+            return range
+        }
     }
 
     fileprivate let _regex: NSRegularExpression

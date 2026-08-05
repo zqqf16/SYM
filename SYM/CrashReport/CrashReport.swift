@@ -35,25 +35,37 @@ struct StackFrame: Equatable {
     var sourceLine: Int?
 
     var formattedLine: String {
-        // Match classic Apple text: "%-4d%-30s\t0x… symbol"
+        // Match classic Apple text: "%-4d%-30s\t0x%016llx symbol"
         let paddedIndex = String(index).padding(length: 4)
         let paddedImage = imageName.padding(length: 30)
-        var line = "\(paddedIndex)\(paddedImage)\t\(address.crashHexString) "
-        if let symbol = symbol, !symbol.isEmpty {
-            if let location = symbolLocation {
-                line += "\(symbol) + \(location)"
-            } else {
-                line += symbol
-            }
+        var line = "\(paddedIndex)\(paddedImage)\t\(address.crashHexString16) "
+        if let symbolText = symbolDescription, !symbolText.isEmpty {
+            line += symbolText
         } else if let loadAddress = loadAddress, let offset = imageOffset {
-            line += "\(loadAddress.crashHexString) + \(offset)"
+            line += "\(loadAddress.crashHexString16) + \(offset)"
         } else if let offset = imageOffset {
-            line += "\(address.crashHexString) + \(offset)"
-        }
-        if let sourceFile = sourceFile, let sourceLine = sourceLine {
-            line += " (\(sourceFile):\(sourceLine))"
+            line += "\(address.crashHexString16) + \(offset)"
         }
         return line
+    }
+
+    /// Symbol / source text after the PC address (no leading space).
+    var symbolDescription: String? {
+        guard let symbol = symbol?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !symbol.isEmpty
+        else {
+            return nil
+        }
+        var text: String
+        if let location = symbolLocation {
+            text = "\(symbol) + \(location)"
+        } else {
+            text = symbol
+        }
+        if let sourceFile = sourceFile, let sourceLine = sourceLine {
+            text += " (\(sourceFile):\(sourceLine))"
+        }
+        return text
     }
 
     var isSymbolicated: Bool {

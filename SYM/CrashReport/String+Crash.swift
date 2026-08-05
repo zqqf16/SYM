@@ -101,6 +101,11 @@ extension UInt64 {
     var crashHexString: String {
         String(format: "0x%llx", self)
     }
+
+    /// Classic crash-log PC / load-address column (`0x` + 16 zero-padded hex digits).
+    var crashHexString16: String {
+        String(format: "0x%016llx", self)
+    }
 }
 
 extension Optional where Wrapped == String {

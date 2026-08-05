@@ -70,11 +70,17 @@ enum CrashFormatter {
                   let captures = match.captures,
                   let addressString = captures.crashCapture(3),
                   let address = addressString.crashHexAddress,
-                  let frame = resolvedByAddress[address]
+                  let frame = resolvedByAddress[address],
+                  let symbolText = frame.symbolDescription,
+                  let addressRange = match.range(at: 3)
             else {
                 continue
             }
-            lines[index] = frame.formattedLine
+            // Keep the original index / image / address columns (spaces or tabs).
+            // Replacing the whole line with `formattedLine` retargets the address
+            // column under NSTextView’s tab stops and visibly shifts it left.
+            let prefix = (line as NSString).substring(to: NSMaxRange(addressRange))
+            lines[index] = prefix + " " + symbolText
         }
         var result = lines.joined(separator: "\n")
         if let appendix = parts.appendix {

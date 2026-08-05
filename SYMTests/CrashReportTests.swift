@@ -339,7 +339,53 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(line.contains("\t"), "classic Apple frames separate image and address with a tab")
         XCTAssertEqual(line.firstIndex(of: "\t").map { line.distance(from: line.startIndex, to: $0) }, 34)
         XCTAssertTrue(line.hasPrefix("0   demo"))
+        XCTAssertTrue(line.contains("0x0000000100125780"), "PC must be zero-padded to 16 hex digits")
+        XCTAssertTrue(line.contains("\t0x0000000100125780 "))
         XCTAssertTrue(line.contains("DEMOViewController.status() + 140"))
+    }
+
+    func testPatchResolvedFramesPreservesAddressColumn() {
+        let before = StackFrame(
+            index: 4,
+            imageName: "UnicomWoCloud",
+            address: 0x0000_0001_0415_8f84,
+            imageOffset: 0x158f84,
+            loadAddress: 0x1_0400_0000
+        )
+        var after = before
+        after.symbol = "handleExceptions"
+        after.symbolLocation = 220
+
+        // Space-padded KSCrash-style column (PC starts at index 40).
+        let original =
+            "4   UnicomWoCloud                       0x0000000104158f84 0x104000000 + 1410948"
+        let reportBefore = CrashReport(
+            rawContent: original,
+            threads: [CrashThread(index: 3, name: nil, queue: nil, crashed: false, frames: [before])]
+        )
+        let reportAfter = CrashReport(
+            rawContent: original,
+            threads: [CrashThread(index: 3, name: nil, queue: nil, crashed: false, frames: [after])]
+        )
+
+        let patched = CrashFormatter.patchResolvedFrames(
+            in: original,
+            before: reportBefore,
+            after: reportAfter
+        )
+        let pc = "0x0000000104158f84"
+        guard let originalPC = original.range(of: pc),
+              let patchedPC = patched.range(of: pc)
+        else {
+            return XCTFail("expected PC in original and patched lines")
+        }
+        XCTAssertEqual(
+            original.distance(from: original.startIndex, to: originalPC.lowerBound),
+            patched.distance(from: patched.startIndex, to: patchedPC.lowerBound),
+            "address column must stay put after symbolicate"
+        )
+        XCTAssertTrue(patched.contains("handleExceptions + 220"))
+        XCTAssertFalse(patched.contains("0x104000000 + 1410948"))
     }
 
     func testSymbolicateWithoutDsymsPreservesClassicContent() async {
