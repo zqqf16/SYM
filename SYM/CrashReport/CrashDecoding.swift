@@ -32,7 +32,6 @@ enum CrashDecoding {
     private static let decoders: [CrashDecoder.Type] = [
         AppleIPSDecoder.self,
         KeepJSONDecoder.self,
-        UmengDecoder.self,
         CPUUsageDecoder.self,
         FabricDecoder.self,
         AppleTextDecoder.self,

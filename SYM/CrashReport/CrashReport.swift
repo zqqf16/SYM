@@ -74,7 +74,7 @@ struct StackFrame: Equatable {
         else {
             return false
         }
-        // Hex address + offset is still unresolved (common in Keep/Umeng placeholders).
+        // Hex address + offset is still unresolved (common in Keep placeholders).
         if symbol.range(of: #"^0[xX][0-9A-Fa-f]+\s*\+\s*\d+$"#, options: .regularExpression) != nil {
             return false
         }
@@ -141,7 +141,6 @@ struct CrashReport: Equatable {
     var exceptionCodes: String?
     var crashedThreadRange: NSRange?
     var appBacktraceRanges: [NSRange]
-    var needsUmengAddressFix: Bool
 
     var embeddedBinaries: [BinaryImage] {
         binaryImages.filter(\.inApp)
@@ -164,8 +163,7 @@ struct CrashReport: Equatable {
         exceptionType: String? = nil,
         exceptionCodes: String? = nil,
         crashedThreadRange: NSRange? = nil,
-        appBacktraceRanges: [NSRange] = [],
-        needsUmengAddressFix: Bool = false
+        appBacktraceRanges: [NSRange] = []
     ) {
         self.rawContent = rawContent
         self.formattedContent = formattedContent ?? rawContent
@@ -184,7 +182,6 @@ struct CrashReport: Equatable {
         self.exceptionCodes = exceptionCodes
         self.crashedThreadRange = crashedThreadRange
         self.appBacktraceRanges = appBacktraceRanges
-        self.needsUmengAddressFix = needsUmengAddressFix
     }
 }
 

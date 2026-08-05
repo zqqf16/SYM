@@ -12,7 +12,6 @@
 		51B8D7051D4F620100F2C24C /* CrashDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7041D4F620100F2C24C /* CrashDocument.swift */; };
 		51B8D7281D4F6A0000F2C24C /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B8D7271D4F6A0000F2C24C /* ContentViewController.swift */; };
 		51BF9C4A1D66AB8800379BFC /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BF9C491D66AB8800379BFC /* TextView.swift */; };
-		51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */ = {isa = PBXBuildFile; fileRef = 51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */; };
 		51CBD2801FE79F7C00C1F91D /* HardwareModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */; };
 		B5089463258C838D0074254E /* MDScreenShotr.m in Sources */ = {isa = PBXBuildFile; fileRef = B5089462258C838D0074254E /* MDScreenShotr.m */; };
 		B50FE44A25693ABF0031E62E /* DeviceHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50FE44925693ABF0031E62E /* DeviceHomeViewController.swift */; };
@@ -63,7 +62,6 @@
 		B5CR001727F200010000007 /* AppleTextDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000727F200010000007 /* AppleTextDecoder.swift */; };
 		B5CR001827F200010000008 /* CPUUsageDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000827F200010000008 /* CPUUsageDecoder.swift */; };
 		B5CR001927F200010000009 /* FabricDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000927F200010000009 /* FabricDecoder.swift */; };
-		B5CR001A27F20001000000A /* UmengDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000A27F20001000000A /* UmengDecoder.swift */; };
 		B5CR001B27F20001000000B /* KeepJSONDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000B27F20001000000B /* KeepJSONDecoder.swift */; };
 		B5CR001C27F20001000000C /* CrashFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000C27F20001000000C /* CrashFormatter.swift */; };
 		B5CR001D27F20001000000D /* CrashReportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000D27F20001000000D /* CrashReportTests.swift */; };
@@ -147,7 +145,6 @@
 		51BF9C491D66AB8800379BFC /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		51BF9C4F1D6C7A1C00379BFC /* SYMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SYMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		51BF9C531D6C7A1C00379BFC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UmengDemo.crash; sourceTree = "<group>"; };
 		51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareModel.swift; sourceTree = "<group>"; };
 		B5089461258C838D0074254E /* MDScreenShotr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDScreenShotr.h; sourceTree = "<group>"; };
 		B5089462258C838D0074254E /* MDScreenShotr.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDScreenShotr.m; sourceTree = "<group>"; };
@@ -188,7 +185,6 @@
 		B5CR000727F200010000007 /* AppleTextDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleTextDecoder.swift; sourceTree = "<group>"; };
 		B5CR000827F200010000008 /* CPUUsageDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUUsageDecoder.swift; sourceTree = "<group>"; };
 		B5CR000927F200010000009 /* FabricDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FabricDecoder.swift; sourceTree = "<group>"; };
-		B5CR000A27F20001000000A /* UmengDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UmengDecoder.swift; sourceTree = "<group>"; };
 		B5CR000B27F20001000000B /* KeepJSONDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepJSONDecoder.swift; sourceTree = "<group>"; };
 		B5CR000C27F20001000000C /* CrashFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashFormatter.swift; sourceTree = "<group>"; };
 		B5CR000D27F20001000000D /* CrashReportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportTests.swift; sourceTree = "<group>"; };
@@ -360,7 +356,6 @@
 			children = (
 				B5F935F527E4827C00C2D0C6 /* AppleConverted.log */,
 				B5F935F427E4827C00C2D0C6 /* AppleJson.ips */,
-				51BF9C591D6C7ACC00379BFC /* UmengDemo.crash */,
 				510777781EFBA4C30055E8BD /* AppleDemo.ips */,
 				B5EC56D127759AE5007EB567 /* ConfigTests.swift */,
 				B5CR000D27F20001000000D /* CrashReportTests.swift */,
@@ -437,7 +432,6 @@
 				B5CR000727F200010000007 /* AppleTextDecoder.swift */,
 				B5CR000827F200010000008 /* CPUUsageDecoder.swift */,
 				B5CR000927F200010000009 /* FabricDecoder.swift */,
-				B5CR000A27F20001000000A /* UmengDecoder.swift */,
 				B5CR000B27F20001000000B /* KeepJSONDecoder.swift */,
 				B5CR000C27F20001000000C /* CrashFormatter.swift */,
 			);
@@ -780,7 +774,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				510777791EFBA4E20055E8BD /* AppleDemo.ips in Resources */,
-				51BF9C5A1D6C7ACC00379BFC /* UmengDemo.crash in Resources */,
 				B5F935F727E4827C00C2D0C6 /* AppleConverted.log in Resources */,
 				B5F935F627E4827C00C2D0C6 /* AppleJson.ips in Resources */,
 			);
@@ -903,7 +896,6 @@
 				B5CR001727F200010000007 /* AppleTextDecoder.swift in Sources */,
 				B5CR001827F200010000008 /* CPUUsageDecoder.swift in Sources */,
 				B5CR001927F200010000009 /* FabricDecoder.swift in Sources */,
-				B5CR001A27F20001000000A /* UmengDecoder.swift in Sources */,
 				B5CR001B27F20001000000B /* KeepJSONDecoder.swift in Sources */,
 				B5CR001C27F20001000000C /* CrashFormatter.swift in Sources */,
 				B5SY002127F300010000001 /* SymbolEngine.swift in Sources */,

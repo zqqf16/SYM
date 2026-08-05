@@ -399,24 +399,6 @@ final class CrashReportTests: XCTestCase {
         XCTAssertTrue(symbolicated.formattedContent.contains("Incident Identifier:"))
     }
 
-    func testUmengDecoder() {
-        let content = crashContent(fromFile: "UmengDemo", ofType: "crash")
-        XCTAssertTrue(UmengDecoder.match(content))
-
-        let report = UmengDecoder().decode(content)
-        XCTAssertEqual(report.appName, "DemoApp")
-        XCTAssertNil(report.device)
-        XCTAssertEqual(report.uuid, "E5B0A378-6816-3D90-86FD-2AEF15894A85")
-        XCTAssertTrue(report.needsUmengAddressFix)
-        XCTAssertTrue(report.appBacktraceRanges.count > 0)
-
-        let binary = report.binaryImages.first
-        XCTAssertNotNil(binary)
-        XCTAssertEqual(binary?.name, "DemoApp")
-        XCTAssertEqual(binary?.loadAddress, 0x0000000100000000)
-        XCTAssertEqual(report.embeddedBinaries.first?.name, "DemoApp")
-    }
-
     func testCrashUUIDNormalize() {
         XCTAssertEqual(
             CrashUUID.normalize("42fd89f730be3ac5a40a4c1a99438dfb"),
@@ -481,11 +463,11 @@ final class CrashReportTests: XCTestCase {
     func testCrashDecodingDispatcher() {
         let appleJson = crashContent(fromFile: "AppleJson", ofType: "ips")
         let appleDemo = crashContent(fromFile: "AppleDemo", ofType: "ips")
-        let umeng = crashContent(fromFile: "UmengDemo", ofType: "crash")
 
         XCTAssertFalse(CrashDecoding.decode(appleJson).formattedContent.isEmpty)
         XCTAssertEqual(CrashDecoding.decode(appleDemo).appName, "demo")
-        XCTAssertTrue(CrashDecoding.decode(umeng).needsUmengAddressFix)
+        XCTAssertTrue(AppleIPSDecoder.match(appleJson))
+        XCTAssertFalse(AppleIPSDecoder.match(appleDemo))
     }
 
     func testDsymLocatorConditionQuotesUUIDsAndOrdersExecutableFirst() {

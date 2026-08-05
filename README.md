@@ -10,7 +10,7 @@ Download the latest version from [here](https://github.com/zqqf16/SYM/releases/l
 
 ## Features
 
-- Structured parsing for Apple IPS/JSON, classic `.crash`, Umeng, Fabric/Crashlytics plaintext, CPU usage, and Keep JSON reports
+- Structured parsing for Apple IPS/JSON, classic `.crash`, Fabric/Crashlytics plaintext, CPU usage, and Keep JSON reports
 - In-process symbolication via Mach-O symbol tables (MachOKit) with `atos` fallback — no Perl `symbolicatecrash`
 - Automatic dSYM discovery via Spotlight, plus customizable download scripts
 - On-device crash report import
@@ -56,7 +56,7 @@ cd SYM/Device && ./build.sh
 
 ## 主要功能
 
-- 结构化解析：Apple IPS/JSON、经典 `.crash`、友盟、Fabric、CPU usage、Keep JSON
+- 结构化解析：Apple IPS/JSON、经典 `.crash`、Fabric、CPU usage、Keep JSON
 - 进程内符号化（MachOKit + `atos` 兜底），不再依赖 Perl `symbolicatecrash`
 - 自动查找 dSYM，支持自定义下载脚本
 - 从设备导入崩溃日志

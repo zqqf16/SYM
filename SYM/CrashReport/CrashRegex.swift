@@ -47,11 +47,6 @@ enum CrashRegex {
     static let hashOSVersion = try! Regex("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
     static let hashBundleID = try! Regex("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
 
-    static let binaryImage = try! Regex("Binary Image:\\s*([^\\s]+)")
-    static let dsymUUID = try! Regex("dSYM UUID:\\s*([^\\s]+)")
-    static let slideAddress = try! Regex("Slide Address:\\s*([^\\s]+)")
-    static let cpuType = try! Regex("CPU Type:\\s*([^\\s]+)")
-
     static func frame(for binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
         try? Regex("^\\s*(\\d{1,3})\\s+(\(binary))\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: options)
     }

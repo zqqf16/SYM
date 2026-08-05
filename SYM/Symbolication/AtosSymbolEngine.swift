@@ -57,10 +57,7 @@ struct AtosSymbolEngine: SymbolEngine {
             }
 
             for (frame, output) in zip(frames, results) {
-                var resolved = parseAtosOutput(output, frame: frame)
-                if updated.needsUmengAddressFix, let load = image.loadAddress {
-                    resolved = applyUmengAddressFix(resolved, loadAddress: load)
-                }
+                let resolved = parseAtosOutput(output, frame: frame)
                 resolvedByAddress[frame.address] = resolved
             }
         }
@@ -115,26 +112,6 @@ struct AtosSymbolEngine: SymbolEngine {
 
         resolved.symbol = trimmed
         return resolved
-    }
-
-    private func applyUmengAddressFix(_ frame: StackFrame, loadAddress: UInt64) -> StackFrame {
-        guard frame.address == loadAddress,
-              let symbol = frame.symbol,
-              symbol.hasPrefix("+")
-        else {
-            return frame
-        }
-
-        let parts = symbol.split(separator: " ")
-        guard parts.count >= 2, let offset = Int(parts[1]) else {
-            return frame
-        }
-
-        var fixed = frame
-        fixed.address = loadAddress &+ UInt64(offset)
-        fixed.symbol = "+ 0"
-        fixed.symbolLocation = 0
-        return fixed
     }
 }
 
