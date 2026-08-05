@@ -278,7 +278,8 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
             }
         }()
         if shouldStart {
-            startDownloading()
+            // Missing script opens the editor instead of a status popover.
+            guard startDownloading() else { return }
         }
 
         if downloadStatusViewController == nil {
@@ -319,6 +320,7 @@ extension MainWindowController: NSToolbarItemValidation {
         case .dsym:
             return dsymManager.crash != nil
         case .download:
+            downloadItem.refreshToolTip()
             return dsymManager.crash != nil
         case .device:
             return MDDeviceMonitor.shared().deviceConnected
@@ -339,10 +341,14 @@ extension MainWindowController: DownloadStatusViewControllerDelegate {
         }
     }
 
-    func startDownloading() {
-        if let crash = dsymManager.crash {
-            DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+    @discardableResult
+    func startDownloading() -> Bool {
+        guard let crash = dsymManager.crash else { return false }
+        guard (NSApp.delegate as? AppDelegate)?.ensureDownloadScriptConfigured() == true else {
+            return false
         }
+        DsymDownloader.shared.download(crashInfo: crash, fileURL: nil)
+        return true
     }
 
     func cancelDownload() {

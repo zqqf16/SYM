@@ -4,7 +4,8 @@ import SnapKit
 
 protocol DownloadStatusViewControllerDelegate: AnyObject {
     func cancelDownload()
-    func startDownloading()
+    @discardableResult
+    func startDownloading() -> Bool
     func currentDownloadTask() -> DsymDownloadTask?
 }
 

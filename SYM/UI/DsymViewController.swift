@@ -187,6 +187,7 @@ class DsymViewController: NSViewController {
 
         downloadButton.target = self
         downloadButton.action = #selector(didClickDownloadButton(_:))
+        downloadButton.toolTip = DsymDownloader.downloadActionToolTip
         downloadButton.setContentHuggingPriority(.required, for: .horizontal)
 
         doneButton.target = self
@@ -222,6 +223,12 @@ class DsymViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         downloadButton.isEnabled = dsymManager?.crash != nil
+        downloadButton.toolTip = DsymDownloader.downloadActionToolTip
+    }
+
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        downloadButton.toolTip = DsymDownloader.downloadActionToolTip
     }
 
     override func viewDidLayout() {
@@ -263,9 +270,11 @@ class DsymViewController: NSViewController {
     }
 
     @objc private func didClickDownloadButton(_: NSButton) {
-        if let crashInfo = dsymManager?.crash {
-            DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
+        guard let crashInfo = dsymManager?.crash else { return }
+        guard (NSApp.delegate as? AppDelegate)?.ensureDownloadScriptConfigured() == true else {
+            return
         }
+        DsymDownloader.shared.download(crashInfo: crashInfo, fileURL: nil)
     }
 
     @objc private func didClickDoneButton(_: NSButton) {

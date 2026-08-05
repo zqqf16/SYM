@@ -106,6 +106,8 @@
 "The property list is not a valid crash report container." = "The property list is not a valid crash report container.";
 "The property list does not contain crash report text." = "The property list does not contain crash report text.";
 "Download Script" = "Download Script";
+"Download dSYM file" = "Download dSYM file";
+"Configure download script first…" = "Configure download script first…";
 "About SYM" = "About SYM";
 "Select a device item in the sidebar" = "Select a device item in the sidebar";
 "Unnamed device" = "Unnamed device";

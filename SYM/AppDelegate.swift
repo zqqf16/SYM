@@ -97,6 +97,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
+    /// Returns `true` when a usable download script is ready; otherwise opens the editor.
+    @discardableResult
+    func ensureDownloadScriptConfigured() -> Bool {
+        if DsymDownloader.shared.canDownload() {
+            return true
+        }
+        showDownloadScript(nil)
+        return false
+    }
+
     @objc func showAboutPanel(_: Any?) {
         if aboutWindow == nil {
             let vc = AboutViewController()

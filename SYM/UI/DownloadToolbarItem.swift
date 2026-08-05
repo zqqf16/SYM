@@ -57,7 +57,6 @@ class DownloadToolbarItem: NSToolbarItem {
     private func setupView() {
         label = "Download"
         paletteLabel = "Download"
-        toolTip = NSLocalizedString("Download dSYM file", comment: "")
         isBordered = true
 
         button.image = NSImage.sfSymbol("arrow.down.circle", accessibilityDescription: "Download")
@@ -65,6 +64,7 @@ class DownloadToolbarItem: NSToolbarItem {
         button.bezelStyle = .toolbar
         button.isBordered = true
         button.setButtonType(.momentaryPushIn)
+        refreshToolTip()
 
         indicator.style = .spinning
         indicator.controlSize = .small
@@ -90,8 +90,15 @@ class DownloadToolbarItem: NSToolbarItem {
         maxSize = NSSize(width: 40, height: 32)
     }
 
+    func refreshToolTip() {
+        let tip = DsymDownloader.downloadActionToolTip
+        toolTip = tip
+        button.toolTip = tip
+    }
+
     func bind(task: DsymDownloadTask?) {
         cancellable?.cancel()
+        refreshToolTip()
         guard let task else {
             running = false
             return

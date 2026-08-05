@@ -55,4 +55,14 @@ class ConfigTests: XCTestCase {
         let newPath = Config.dsymDownloadDirectory
         XCTAssertEqual(newPath, target)
     }
+
+    func testDownloadScriptEmptyTreatsTemplateStubAsMissing() {
+        XCTAssertTrue(Config.isDownloadScriptEmpty(""))
+        XCTAssertTrue(Config.isDownloadScriptEmpty("#!/bin/bash\n\n# only comments\n"))
+        XCTAssertTrue(Config.isDownloadScriptEmpty("#!/bin/bash\n# docs\nexit 1\n"))
+        XCTAssertTrue(Config.isDownloadScriptEmpty("#!/bin/bash\nexit 1"))
+
+        XCTAssertFalse(Config.isDownloadScriptEmpty("#!/bin/bash\ncurl -O https://example.com/a.zip\n"))
+        XCTAssertFalse(Config.isDownloadScriptEmpty("#!/bin/bash\nexit 1\necho hi\n"))
+    }
 }

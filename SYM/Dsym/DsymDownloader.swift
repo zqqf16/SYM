@@ -268,6 +268,19 @@ class DsymDownloader {
         return FileManager.default.chmod(scriptURL.path, permissions: 0o700)
     }
 
+    /// Tooltip for toolbar / dSYM Download controls.
+    /// Uses sanitize only — do not call `prepareDownloadScript` here, or toolbar
+    /// validation would reinstall a bundled download.sh after the user removed it.
+    static var downloadActionToolTip: String {
+        if Config.isDownloadScriptConfigured() {
+            return NSLocalizedString("Download dSYM file", comment: "Download button tooltip")
+        }
+        return NSLocalizedString(
+            "Configure download script first…",
+            comment: "Download button tooltip when no script is configured"
+        )
+    }
+
     @discardableResult
     func download(crashInfo: CrashReport, fileURL: URL?) -> DsymDownloadTask? {
         guard let uuid = CrashUUID.normalize(crashInfo.uuid), canDownload() else {

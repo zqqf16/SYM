@@ -47,11 +47,16 @@ enum Config {
         return url
     }
 
-    /// Blank, whitespace-only, or comment/shebang-only scripts count as missing.
+    /// Blank, whitespace-only, comment/shebang-only, or `exit N` stub-only scripts
+    /// count as missing (matches the shipped editor template).
     static func isDownloadScriptEmpty(_ script: String) -> Bool {
         for line in script.components(separatedBy: .newlines) {
             let trimmed = line.trimmingCharacters(in: .whitespaces)
             if trimmed.isEmpty || trimmed.hasPrefix("#") {
+                continue
+            }
+            // Unfinished template stubs like a lone `exit 1`.
+            if trimmed == "exit" || trimmed.hasPrefix("exit ") {
                 continue
             }
             return false
@@ -74,6 +79,11 @@ enum Config {
             return false
         }
         return true
+    }
+
+    /// Whether a real user/builtin download script is on disk (sanitizes stubs first).
+    static func isDownloadScriptConfigured() -> Bool {
+        sanitizeDownloadScriptFile()
     }
 
     static func removeDownloadScript() {

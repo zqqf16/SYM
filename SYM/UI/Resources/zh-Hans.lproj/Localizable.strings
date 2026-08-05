@@ -60,6 +60,8 @@
 "The remote hardware model database was empty." = "远程硬件型号数据库为空。";
 "Could not save the hardware model database." = "无法保存硬件型号数据库。";
 "Download Script" = "下载脚本";
+"Download dSYM file" = "下载 dSYM 文件";
+"Configure download script first…" = "请先配置下载脚本…";
 "About SYM" = "关于 SYM";
 "Select a device item in the sidebar" = "在边栏中选择设备项目";
 "Unnamed device" = "未命名设备";

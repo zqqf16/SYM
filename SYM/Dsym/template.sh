@@ -84,6 +84,6 @@
 #   - Spotlight may still pick up new .dSYM packages later; dwarfdump output is faster.
 #
 
-# Replace the stub below with your download logic (see Example above).
-# Exit 1 until configured so an unfinished template is not reported as success.
-exit 1
+# Replace this placeholder with your download logic (see Example above).
+# Until then, leave only comments here — SYM treats comment-only scripts as
+# “not configured” and will not save them as download.sh.

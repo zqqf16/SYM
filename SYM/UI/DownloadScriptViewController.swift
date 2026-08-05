@@ -177,7 +177,8 @@ class DownloadScriptViewController: NSViewController {
     }
 
     private func updateRemoveButtonState() {
-        removeButton.isEnabled = FileManager.default.fileExists(atPath: Config.downloadScriptURL.path)
+        // Only enable when a real (non-stub) script is configured.
+        removeButton.isEnabled = Config.isDownloadScriptConfigured()
     }
 
     private func presentSaveError(_ message: String) {
