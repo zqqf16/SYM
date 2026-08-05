@@ -111,8 +111,13 @@ class DsymDownloadTask {
     }
 
     func run() {
+        let ownsTemporaryCrashFile = fileURL == nil
+        let crashPath = fileURL?.path ?? FileManager.default.temporaryPath()
         defer {
             self.process = nil
+            if ownsTemporaryCrashFile {
+                try? FileManager.default.removeItem(atPath: crashPath)
+            }
         }
 
         if process != nil {
@@ -120,7 +125,6 @@ class DsymDownloadTask {
             process = nil
         }
 
-        let crashPath = fileURL?.path ?? FileManager.default.temporaryPath()
         do {
             try crashInfo.formattedContent.write(toFile: crashPath, atomically: true, encoding: .utf8)
         } catch {
@@ -243,7 +247,7 @@ class DsymDownloader {
 
         // Empty / comment-only files are not a real script — remove them.
         if Config.sanitizeDownloadScriptFile() {
-            fileManager.chmod(scriptPath, permissions: 0o777)
+            fileManager.chmod(scriptPath, permissions: 0o700)
             return
         }
 
@@ -251,7 +255,7 @@ class DsymDownloader {
         if let buildinPath = Bundle.main.path(forResource: "download", ofType: "sh") {
             fileManager.cp(fromPath: buildinPath, toPath: scriptPath)
             if Config.sanitizeDownloadScriptFile() {
-                fileManager.chmod(scriptPath, permissions: 0o777)
+                fileManager.chmod(scriptPath, permissions: 0o700)
             }
         }
     }
@@ -261,7 +265,7 @@ class DsymDownloader {
         guard Config.sanitizeDownloadScriptFile() else {
             return false
         }
-        return FileManager.default.chmod(scriptURL.path, permissions: 0o777)
+        return FileManager.default.chmod(scriptURL.path, permissions: 0o700)
     }
 
     @discardableResult

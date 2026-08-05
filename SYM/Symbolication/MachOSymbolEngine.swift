@@ -26,14 +26,7 @@ import MachOKit
 struct MachOSymbolEngine: SymbolEngine {
     func symbolicate(_ report: CrashReport, dsymPaths: [String: String]) async -> CrashReport {
         var updated = report
-        let imagesByUUID = Dictionary(
-            uniqueKeysWithValues: report.binaryImages.compactMap { image -> (String, BinaryImage)? in
-                guard let uuid = CrashUUID.normalize(image.uuid) else {
-                    return nil
-                }
-                return (uuid, image)
-            }
-        )
+        let imagesByUUID = CrashUUID.imagesByUUID(report.binaryImages)
 
         var machOCache = [String: MachOFile]()
 

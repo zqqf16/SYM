@@ -183,16 +183,51 @@ enum CrashUUID {
         }
 
         if uuid.contains("-") {
-            return uuid.uppercased()
+            uuid = uuid.uppercased()
+        } else {
+            var formatted = ""
+            for (index, char) in uuid.enumerated() {
+                if [8, 12, 16, 20].contains(index) {
+                    formatted.append("-")
+                }
+                formatted.append(char)
+            }
+            uuid = formatted.uppercased()
         }
 
-        var formatted = ""
-        for (index, char) in uuid.enumerated() {
-            if [8, 12, 16, 20].contains(index) {
-                formatted.append("-")
-            }
-            formatted.append(char)
+        let hex = uuid.replacingOccurrences(of: "-", with: "")
+        guard hex.count == 32, hex.allSatisfy(\.isHexDigit) else {
+            return nil
         }
-        return formatted.uppercased()
+        // Canonical 8-4-4-4-12 form.
+        let parts = [
+            hex.prefix(8),
+            hex.dropFirst(8).prefix(4),
+            hex.dropFirst(12).prefix(4),
+            hex.dropFirst(16).prefix(4),
+            hex.dropFirst(20).prefix(12),
+        ]
+        return parts.map(String.init).joined(separator: "-")
+    }
+
+    /// Build a UUID → image map without trapping on duplicate keys.
+    /// Prefer the executable (or in-app) image when UUIDs collide.
+    static func imagesByUUID(_ images: [BinaryImage]) -> [String: BinaryImage] {
+        var map = [String: BinaryImage]()
+        for image in images {
+            guard let uuid = normalize(image.uuid) else {
+                continue
+            }
+            if let existing = map[uuid] {
+                let preferNew = (image.isExecutable && !existing.isExecutable)
+                    || (image.inApp && !existing.inApp && !existing.isExecutable)
+                if preferNew {
+                    map[uuid] = image
+                }
+            } else {
+                map[uuid] = image
+            }
+        }
+        return map
     }
 }

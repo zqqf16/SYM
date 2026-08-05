@@ -30,8 +30,21 @@ class DocumentController: NSDocumentController {
             super.openDocument(withContentsOf: url, display: displayDocument, completionHandler: completionHandler)
             return
         }
-        let type = (try? typeForContents(of: url)) ?? url.pathExtension
-        try? doc.read(from: url, ofType: type)
+
+        let type: String
+        do {
+            type = try typeForContents(of: url)
+        } catch {
+            type = url.pathExtension
+        }
+
+        do {
+            try doc.read(from: url, ofType: type)
+        } catch {
+            completionHandler(nil, false, error)
+            return
+        }
+
         doc.fileURL = url
         if displayDocument {
             doc.showWindows()

@@ -380,6 +380,56 @@ final class CrashReportTests: XCTestCase {
             CrashUUID.normalize("E5B0A378-6816-3D90-86FD-2AEF15894A85"),
             "E5B0A378-6816-3D90-86FD-2AEF15894A85"
         )
+        XCTAssertNil(CrashUUID.normalize("not-a-uuid"))
+        XCTAssertNil(CrashUUID.normalize("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"))
+        XCTAssertNil(CrashUUID.normalize("42fd89f730be3ac5a40a4c1a99438d")) // too short
+    }
+
+    func testImagesByUUIDPrefersExecutableOnDuplicate() {
+        let uuid = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+        let framework = BinaryImage(
+            name: "FooKit",
+            uuid: uuid,
+            arch: "arm64",
+            loadAddress: 0x1000,
+            size: 0x100,
+            path: "/App.app/Frameworks/FooKit.framework/FooKit",
+            isExecutable: false,
+            inApp: true
+        )
+        let executable = BinaryImage(
+            name: "Demo",
+            uuid: uuid,
+            arch: "arm64",
+            loadAddress: 0x100000000,
+            size: 0x1000,
+            path: "/App.app/Demo",
+            isExecutable: true,
+            inApp: true
+        )
+        // Must not trap (unlike Dictionary(uniqueKeysWithValues:)).
+        let map = CrashUUID.imagesByUUID([framework, executable])
+        XCTAssertEqual(map.count, 1)
+        XCTAssertEqual(map[uuid]?.name, "Demo")
+        XCTAssertTrue(map[uuid]?.isExecutable == true)
+    }
+
+    func testCrashDocumentReadRejectsInvalidUTF8AndPlist() {
+        let doc = CrashDocument()
+        XCTAssertThrowsError(try doc.read(from: Data([0xFF, 0xFE, 0xFD]), ofType: CrashFileType.crash)) { error in
+            XCTAssertEqual(error as? CrashDocumentError, .invalidEncoding)
+        }
+        XCTAssertThrowsError(try doc.read(from: Data("not a plist".utf8), ofType: CrashFileType.plist)) { error in
+            XCTAssertEqual(error as? CrashDocumentError, .invalidPlist)
+        }
+        let emptyPlist = try! PropertyListSerialization.data(
+            fromPropertyList: ["other": "value"],
+            format: .xml,
+            options: 0
+        )
+        XCTAssertThrowsError(try doc.read(from: emptyPlist, ofType: CrashFileType.plist)) { error in
+            XCTAssertEqual(error as? CrashDocumentError, .missingCrashDescription)
+        }
     }
 
     func testCrashDecodingDispatcher() {

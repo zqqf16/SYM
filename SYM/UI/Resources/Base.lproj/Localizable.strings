@@ -102,6 +102,9 @@
 "The remote hardware model database was empty." = "The remote hardware model database was empty.";
 "Could not save the hardware model database." = "Could not save the hardware model database.";
 "Done" = "Done";
+"The crash report is not valid UTF-8 text." = "The crash report is not valid UTF-8 text.";
+"The property list is not a valid crash report container." = "The property list is not a valid crash report container.";
+"The property list does not contain crash report text." = "The property list does not contain crash report text.";
 "Download Script" = "Download Script";
 "About SYM" = "About SYM";
 "Select a device item in the sidebar" = "Select a device item in the sidebar";

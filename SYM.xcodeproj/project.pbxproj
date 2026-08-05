@@ -202,8 +202,8 @@
 		B56BAA5523A8ECDB00049491 /* MdfindWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MdfindWrapper.swift; sourceTree = "<group>"; };
 		B5847A8C2569419600B674CA /* DeviceContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContentViewController.swift; sourceTree = "<group>"; };
 		B597FE1422DC8A9400BE439A /* FileBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserViewController.swift; sourceTree = "<group>"; };
-		B5AF3E0227A243AC0037AAAD /* template.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = template.sh; path = SYM/dSYM/template.sh; sourceTree = SOURCE_ROOT; };
-		B5AF3E0427A243AC0037AAAE /* template.zh-Hans.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "template.zh-Hans.sh"; path = "SYM/dSYM/template.zh-Hans.sh"; sourceTree = SOURCE_ROOT; };
+		B5AF3E0227A243AC0037AAAD /* template.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = template.sh; path = SYM/Dsym/template.sh; sourceTree = SOURCE_ROOT; };
+		B5AF3E0427A243AC0037AAAE /* template.zh-Hans.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "template.zh-Hans.sh"; path = "SYM/Dsym/template.zh-Hans.sh"; sourceTree = SOURCE_ROOT; };
 		B5B97AED22DC737900F5DDF2 /* MDInstProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDInstProxy.h; sourceTree = "<group>"; };
 		B5B97AEE22DC737900F5DDF2 /* MDInstProxy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MDInstProxy.m; sourceTree = "<group>"; };
 		B5D551EB27F4436600862C48 /* TextStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStorage.swift; sourceTree = "<group>"; };
@@ -840,14 +840,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5CR001D27F20001000000D /* CrashReportTests.swift in Sources */,
-				B59B327022E0113300013B67 /* MDInstProxy.m in Sources */,
-				B59B326F22E0113100013B67 /* MDHouseArrest.m in Sources */,
-				B59B327122E0113600013B67 /* MDUtil.m in Sources */,
-				B59B326C22E0112800013B67 /* MDLockdown.m in Sources */,
 				B5EC56D227759AE5007EB567 /* ConfigTests.swift in Sources */,
-				B59B326E22E0112E00013B67 /* MDAfcClient.m in Sources */,
-				B59B326D22E0112B00013B67 /* MDDeviceFile.m in Sources */,
-				B59B326B22E0112400013B67 /* MDDeviceMonitor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

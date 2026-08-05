@@ -124,7 +124,7 @@ class DownloadScriptViewController: NSViewController {
 
         do {
             try toSave.write(to: url, atomically: true, encoding: .utf8)
-            _ = FileManager.default.chmod(url.path, permissions: 0o777)
+            _ = FileManager.default.chmod(url.path, permissions: 0o700)
             updateRemoveButtonState()
             close(sender)
         } catch {

@@ -11,6 +11,9 @@
 "Canceled" = "已取消";
 "Download" = "下载";
 "Done" = "完成";
+"The crash report is not valid UTF-8 text." = "崩溃报告不是有效的 UTF-8 文本。";
+"The property list is not a valid crash report container." = "该属性列表不是有效的崩溃报告容器。";
+"The property list does not contain crash report text." = "该属性列表不包含崩溃报告文本。";
 "Cancel" = "取消";
 "Font" = "字体";
 "Highlight Color" = "高亮颜色";

@@ -28,6 +28,32 @@ struct CrashFileType {
     static let plist = "com.apple.property-list"
 }
 
+enum CrashDocumentError: LocalizedError, Equatable {
+    case invalidEncoding
+    case invalidPlist
+    case missingCrashDescription
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidEncoding:
+            return NSLocalizedString(
+                "The crash report is not valid UTF-8 text.",
+                comment: "CrashDocument read error"
+            )
+        case .invalidPlist:
+            return NSLocalizedString(
+                "The property list is not a valid crash report container.",
+                comment: "CrashDocument read error"
+            )
+        case .missingCrashDescription:
+            return NSLocalizedString(
+                "The property list does not contain crash report text.",
+                comment: "CrashDocument read error"
+            )
+        }
+    }
+}
+
 class CrashDocument: NSDocument {
     let textStorage = NSTextStorage()
 
@@ -41,19 +67,29 @@ class CrashDocument: NSDocument {
         return fileURL == nil && textStorage.string.count == 0
     }
 
-    private var contentPublisher = PassthroughSubject<String, Never>()
+    /// Monotonic token so stale background parse/symbolicate results are dropped.
+    private(set) var contentRevision: UInt64 = 0
+
+    private var contentPublisher = PassthroughSubject<(content: String, revision: UInt64), Never>()
     private var cancellable: AnyCancellable?
     /// Suppress parse while swapping raw JSON for synthesized classic text.
     private var isApplyingPresentation = false
+    private var symbolicationTask: Task<Void, Never>?
+    private var symbolicationGeneration: UInt64 = 0
 
     override init() {
         super.init()
         textStorage.delegate = self
         cancellable = contentPublisher
             .debounce(for: 0.5, scheduler: DispatchQueue.global())
-            .sink { [weak self] content in
-                self?.parseCrashInfo(content)
+            .sink { [weak self] payload in
+                self?.parseCrashInfo(payload.content, revision: payload.revision)
             }
+    }
+
+    deinit {
+        symbolicationTask?.cancel()
+        cancellable?.cancel()
     }
 
     override func makeWindowControllers() {
@@ -81,10 +117,13 @@ class CrashDocument: NSDocument {
     }
 
     private func readCrash(from data: Data) throws {
-        let content = String(data: data, encoding: .utf8) ?? ""
+        guard let content = String(data: data, encoding: .utf8) else {
+            throw CrashDocumentError.invalidEncoding
+        }
         // Decode synchronously so JSON IPS / Keep open already translated,
         // matching Console.app’s “Translated Report” presentation.
         let report = CrashFormatter.format(CrashDecoding.decode(content))
+        contentRevision &+= 1
         isApplyingPresentation = true
         replaceContent(report.formattedContent)
         isApplyingPresentation = false
@@ -92,17 +131,21 @@ class CrashDocument: NSDocument {
     }
 
     private func readPlist(from data: Data) throws {
-        guard let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: AnyObject] else {
-            return
+        let plist: Any
+        do {
+            plist = try PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+        } catch {
+            throw CrashDocumentError.invalidPlist
         }
-
-        guard let content = plist["description"] as? String,
-              let data = content.data(using: .utf8)
+        guard let dictionary = plist as? [String: AnyObject] else {
+            throw CrashDocumentError.invalidPlist
+        }
+        guard let content = dictionary["description"] as? String,
+              let contentData = content.data(using: .utf8)
         else {
-            return
+            throw CrashDocumentError.missingCrashDescription
         }
-
-        try readCrash(from: data)
+        try readCrash(from: contentData)
     }
 
     override class var autosavesInPlace: Bool {
@@ -115,21 +158,30 @@ class CrashDocument: NSDocument {
 }
 
 extension CrashDocument: NSTextStorageDelegate {
-    func parseCrashInfo(_ content: String) {
+    func parseCrashInfo(_ content: String, revision: UInt64) {
         let report = CrashFormatter.format(CrashDecoding.decode(content))
-        DispatchQueue.main.async {
-            self.applyParsedReport(report, parsedFrom: content)
+        DispatchQueue.main.async { [weak self] in
+            self?.applyParsedReport(report, parsedFrom: content, revision: revision)
         }
     }
 
     /// Publish model; when content is JSON IPS/Keep, swap editor to classic text.
-    private func applyParsedReport(_ report: CrashReport, parsedFrom content: String) {
-        crashInfo = report
-        guard report.formattedContent != content,
-              textStorage.string == content
-        else {
+    private func applyParsedReport(_ report: CrashReport, parsedFrom content: String, revision: UInt64) {
+        // Drop stale work: user edited (or another parse finished) after this job started.
+        guard revision == contentRevision else {
             return
         }
+        // Editor must still show the text we parsed (or its auto-translated form later).
+        guard textStorage.string == content else {
+            return
+        }
+
+        crashInfo = report
+
+        guard report.formattedContent != content else {
+            return
+        }
+
         isApplyingPresentation = true
         undoManager?.disableUndoRegistration()
         replaceContent(report.formattedContent)
@@ -141,7 +193,8 @@ extension CrashDocument: NSTextStorageDelegate {
         guard !isApplyingPresentation, editedMask.contains(.editedCharacters) else {
             return
         }
-        contentPublisher.send(textStorage.string)
+        contentRevision &+= 1
+        contentPublisher.send((textStorage.string, contentRevision))
     }
 }
 
@@ -151,17 +204,35 @@ extension CrashDocument {
             return
         }
 
-        Task {
-            await MainActor.run {
-                self.isSymbolicating = true
+        symbolicationTask?.cancel()
+        symbolicationGeneration &+= 1
+        let generation = symbolicationGeneration
+        let revision = contentRevision
+        let expectedContent = textStorage.string
+
+        isSymbolicating = true
+        symbolicationTask = Task { [weak self] in
+            defer {
+                Task { @MainActor [weak self] in
+                    guard let self, generation == self.symbolicationGeneration else { return }
+                    self.isSymbolicating = false
+                    self.symbolicationTask = nil
+                }
             }
 
             let engine = CompositeSymbolEngine()
             let symbolicated = await crash.symbolicated(using: engine, dsyms: dsyms ?? [:])
 
-            await MainActor.run {
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard generation == self.symbolicationGeneration,
+                      !Task.isCancelled,
+                      revision == self.contentRevision,
+                      self.textStorage.string == expectedContent
+                else {
+                    return
+                }
                 self.applySymbolicated(symbolicated)
-                self.isSymbolicating = false
             }
         }
     }
@@ -177,8 +248,13 @@ extension CrashDocument {
         }
 
         registerSymbolicationUndo(content: previousContent, report: previousReport)
+        // Presentation replace must not schedule a parse of the just-written content
+        // as a "user edit" that races the model we are applying.
+        contentRevision &+= 1
+        isApplyingPresentation = true
         crashInfo = report
         replaceContent(newContent)
+        isApplyingPresentation = false
         updateChangeCount(.changeDone)
     }
 
@@ -197,7 +273,10 @@ extension CrashDocument {
         let currentContent = textStorage.string
         let currentReport = crashInfo
         registerSymbolicationUndo(content: currentContent, report: currentReport)
+        contentRevision &+= 1
+        isApplyingPresentation = true
         crashInfo = report
         replaceContent(content)
+        isApplyingPresentation = false
     }
 }
