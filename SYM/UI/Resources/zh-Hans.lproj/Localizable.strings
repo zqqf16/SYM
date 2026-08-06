@@ -11,6 +11,18 @@
 "Canceled" = "已取消";
 "Download" = "下载";
 "Done" = "完成";
+
+/* Toolbar / button tooltips */
+"Symbolicate crash log" = "将崩溃日志中的地址解析为符号";
+"dSYM files" = "管理 dSYM 符号文件";
+"dSYM file found" = "已找到匹配的 dSYM — 点击管理";
+"No matching dSYM — click to manage" = "未找到匹配的 dSYM — 点击管理";
+"Connected devices" = "浏览已连接的设备";
+"Go back" = "返回上一页";
+"Go forward" = "前进到下一页";
+"Choose a dSYM file to import" = "选择要导入的 dSYM 文件";
+"Show this dSYM in Finder" = "在 Finder 中显示此 dSYM";
+"Jump to the crashed thread" = "跳到发生崩溃的线程";
 "The crash report is not valid UTF-8 text." = "崩溃报告不是有效的 UTF-8 文本。";
 "The property list is not a valid crash report container." = "该属性列表不是有效的崩溃报告容器。";
 "The property list does not contain crash report text." = "该属性列表不包含崩溃报告文本。";
@@ -60,8 +72,8 @@
 "The remote hardware model database was empty." = "远程硬件型号数据库为空。";
 "Could not save the hardware model database." = "无法保存硬件型号数据库。";
 "Download Script" = "下载脚本";
-"Download dSYM file" = "下载 dSYM 文件";
-"Configure download script first…" = "请先配置下载脚本…";
+"Download dSYM file" = "使用脚本下载 dSYM 文件";
+"Configure download script first…" = "请先设置下载脚本…";
 "About SYM" = "关于 SYM";
 "Select a device item in the sidebar" = "在边栏中选择设备项目";
 "Unnamed device" = "未命名设备";

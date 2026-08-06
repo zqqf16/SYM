@@ -169,7 +169,7 @@ class ContentViewController: NSViewController {
         revealButton.target = self
         revealButton.action = #selector(scrollToTarget(_:))
         revealButton.isHidden = true
-        revealButton.toolTip = NSLocalizedString("Jump to Crashed Thread", comment: "Menu / summary tooltip")
+        revealButton.toolTip = NSLocalizedString("Jump to the crashed thread", comment: "Summary bar tooltip")
     }
 
     private func configureJumpPillButton() {
@@ -179,7 +179,7 @@ class ContentViewController: NSViewController {
         jumpPillButton.target = self
         jumpPillButton.action = #selector(scrollToTarget(_:))
         jumpPillButton.isHidden = true
-        jumpPillButton.toolTip = NSLocalizedString("Jump to Crashed Thread", comment: "Menu / summary tooltip")
+        jumpPillButton.toolTip = NSLocalizedString("Jump to the crashed thread", comment: "Jump pill tooltip")
     }
 
     private func toggleBottomBar(_ show: Bool) {

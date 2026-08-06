@@ -54,7 +54,7 @@ final class DsymToolbarButton: NSButton {
         isBordered = true
         imagePosition = .imageOnly
         setButtonType(.momentaryPushIn)
-        toolTip = NSLocalizedString("dSYM files", comment: "")
+        toolTip = NSLocalizedString("dSYM files", comment: "Toolbar tooltip")
         image = .symDsymMissing
     }
 
@@ -64,10 +64,13 @@ final class DsymToolbarButton: NSButton {
            dsymManager?.dsymFile(withUuid: uuid) != nil
         {
             image = .symDsymFound
-            toolTip = NSLocalizedString("dSYM file found", comment: "")
+            toolTip = NSLocalizedString("dSYM file found", comment: "Toolbar tooltip when dSYM is available")
         } else {
             image = .symDsymMissing
-            toolTip = NSLocalizedString("dsym_file_not_found", comment: "")
+            toolTip = NSLocalizedString(
+                "No matching dSYM — click to manage",
+                comment: "Toolbar tooltip when dSYM is missing"
+            )
         }
     }
 }

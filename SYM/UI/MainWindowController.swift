@@ -209,7 +209,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
                 identifier: itemIdentifier,
                 symbolName: "wand.and.stars",
                 label: "Symbolicate",
-                toolTip: NSLocalizedString("Symbolicate crash log", comment: ""),
+                toolTip: NSLocalizedString("Symbolicate crash log", comment: "Toolbar tooltip"),
                 target: self,
                 action: #selector(symbolicate(_:))
             )
@@ -218,7 +218,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
             let item = NSToolbarItem(itemIdentifier: itemIdentifier)
             item.label = "dSYM"
             item.paletteLabel = "dSYM"
-            item.toolTip = NSLocalizedString("dSYM files", comment: "")
+            item.toolTip = NSLocalizedString("dSYM files", comment: "Toolbar tooltip")
             item.isBordered = true
             dsymButton.target = self
             dsymButton.action = #selector(showDsymInfo(_:))
@@ -235,7 +235,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
                 identifier: itemIdentifier,
                 symbolName: "iphone",
                 label: "Device",
-                toolTip: NSLocalizedString("Connected devices", comment: ""),
+                toolTip: NSLocalizedString("Connected devices", comment: "Toolbar tooltip"),
                 target: self,
                 action: #selector(showDevices(_:))
             )

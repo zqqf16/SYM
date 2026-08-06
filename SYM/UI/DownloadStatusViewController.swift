@@ -43,6 +43,7 @@ class DownloadStatusViewController: NSViewController {
         downloadButton.bezelStyle = .rounded
         downloadButton.target = self
         downloadButton.action = #selector(startDownloading(_:))
+        downloadButton.toolTip = DsymDownloader.downloadActionToolTip
 
         progressIndicator.isIndeterminate = true
 
@@ -94,6 +95,7 @@ class DownloadStatusViewController: NSViewController {
             progressIndicator.isHidden = true
             cancelButton.isHidden = true
             downloadButton.isHidden = false
+            downloadButton.toolTip = DsymDownloader.downloadActionToolTip
             return
         }
 

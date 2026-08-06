@@ -98,8 +98,8 @@ class DeviceWindowController: NSWindowController, NSToolbarDelegate, FileBrowser
             let item = NSToolbarItem.systemSymbolItem(
                 identifier: .deviceFileBack,
                 symbolName: "chevron.backward",
-                label: NSLocalizedString("Back", comment: ""),
-                toolTip: NSLocalizedString("Back", comment: ""),
+                label: NSLocalizedString("Back", comment: "Toolbar label"),
+                toolTip: NSLocalizedString("Go back", comment: "Toolbar tooltip"),
                 target: fileBrowser,
                 action: #selector(FileBrowserViewController.goBack(_:))
             )
@@ -109,8 +109,8 @@ class DeviceWindowController: NSWindowController, NSToolbarDelegate, FileBrowser
             let item = NSToolbarItem.systemSymbolItem(
                 identifier: .deviceFileForward,
                 symbolName: "chevron.forward",
-                label: NSLocalizedString("Forward", comment: ""),
-                toolTip: NSLocalizedString("Forward", comment: ""),
+                label: NSLocalizedString("Forward", comment: "Toolbar label"),
+                toolTip: NSLocalizedString("Go forward", comment: "Toolbar tooltip"),
                 target: fileBrowser,
                 action: #selector(FileBrowserViewController.goForward(_:))
             )

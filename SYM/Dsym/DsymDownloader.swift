@@ -273,11 +273,11 @@ class DsymDownloader {
     /// validation would reinstall a bundled download.sh after the user removed it.
     static var downloadActionToolTip: String {
         if Config.isDownloadScriptConfigured() {
-            return NSLocalizedString("Download dSYM file", comment: "Download button tooltip")
+            return NSLocalizedString("Download dSYM file", comment: "Download toolbar / button tooltip")
         }
         return NSLocalizedString(
             "Configure download script first…",
-            comment: "Download button tooltip when no script is configured"
+            comment: "Download toolbar / button tooltip when no script is configured"
         )
     }
 

@@ -91,10 +91,18 @@ private class DsymTableRowView: NSTableCellView {
             pathField.stringValue = path
             statusImage.image = .symDsymFound
             actionButton.title = NSLocalizedString("Reveal", comment: "Reveal in Finder")
+            actionButton.toolTip = NSLocalizedString(
+                "Show this dSYM in Finder",
+                comment: "dSYM sheet Reveal button tooltip"
+            )
         } else {
             pathField.stringValue = NSLocalizedString("dsym_file_not_found", comment: "Dsym file not found")
             statusImage.image = .symDsymMissing
             actionButton.title = NSLocalizedString("Import", comment: "Import a dSYM file")
+            actionButton.toolTip = NSLocalizedString(
+                "Choose a dSYM file to import",
+                comment: "dSYM sheet Import button tooltip"
+            )
         }
         actionButton.isHidden = false
         actionButton.sizeToFit()

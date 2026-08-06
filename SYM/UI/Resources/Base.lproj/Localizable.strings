@@ -1,6 +1,18 @@
 "dsym_file_not_found" = "dSYM not found";
 "download_prefix" = "Downloading ...";
 
+/* Toolbar / button tooltips */
+"Symbolicate crash log" = "Resolve symbols in this crash log";
+"dSYM files" = "Manage dSYM symbol files";
+"dSYM file found" = "Matching dSYM found — click to manage";
+"No matching dSYM — click to manage" = "No matching dSYM — click to manage";
+"Connected devices" = "Browse connected devices";
+"Go back" = "Go back";
+"Go forward" = "Go forward";
+"Choose a dSYM file to import" = "Choose a dSYM file to import";
+"Show this dSYM in Finder" = "Show this dSYM in Finder";
+"Jump to the crashed thread" = "Jump to the crashed thread";
+
 /* Menu (MenuBuilder fallback) */
 "About %@" = "About %@";
 "Settings…" = "Settings…";
@@ -106,8 +118,8 @@
 "The property list is not a valid crash report container." = "The property list is not a valid crash report container.";
 "The property list does not contain crash report text." = "The property list does not contain crash report text.";
 "Download Script" = "Download Script";
-"Download dSYM file" = "Download dSYM file";
-"Configure download script first…" = "Configure download script first…";
+"Download dSYM file" = "Download dSYM files with your script";
+"Configure download script first…" = "Set up a download script first…";
 "About SYM" = "About SYM";
 "Select a device item in the sidebar" = "Select a device item in the sidebar";
 "Unnamed device" = "Unnamed device";
