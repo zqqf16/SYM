@@ -524,4 +524,13 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(hints.marketing, "6.1.0")
         XCTAssertEqual(hints.build, "20260804173156")
     }
+
+    func testUUIDsOfBinaryReadsMachOHeaderWithoutDwarfdump() throws {
+        let path = "/usr/bin/dwarfdump"
+        try XCTSkipUnless(FileManager.default.isExecutableFile(atPath: path))
+        let uuids = DsymLocator.uuidsOfBinary(at: path)
+        XCTAssertFalse(uuids.isEmpty, "expected LC_UUID from \(path)")
+        XCTAssertEqual(uuids.first?.count, 36)
+        XCTAssertEqual(uuids.first, CrashUUID.normalize(uuids.first))
+    }
 }

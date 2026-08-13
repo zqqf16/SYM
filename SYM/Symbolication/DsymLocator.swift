@@ -22,6 +22,7 @@
 
 import Combine
 import Foundation
+import MachOKit
 
 class DsymFile: Hashable {
     let name: String
@@ -211,6 +212,8 @@ enum DsymLocator {
         var found: [DsymFile] = []
         var remaining = neededUUIDs
         var visited = 0
+        var productsProbes = 0
+        let maxProductsProbes = 8
 
         func ingest(_ matched: [DsymFile]) -> Bool {
             guard !matched.isEmpty else {
@@ -251,14 +254,30 @@ enum DsymLocator {
             {
                 matched = parsed
             }
-            // Debug archives: DWARF lives in Products/*.app (dSYMs/ often empty).
-            if !covers(remaining, files: matched) {
-                let stillNeeded = remaining.subtracting(Set(matched.flatMap(\.uuids)))
-                matched.append(contentsOf: probeXcarchive(
-                    at: candidate.url.path,
-                    neededUUIDs: stillNeeded.isEmpty ? remaining : stillNeeded
-                ))
+            if covers(remaining, files: matched) {
+                if ingest(matched) {
+                    return found
+                }
+                continue
             }
+
+            let stillNeeded = remaining.subtracting(Set(matched.flatMap(\.uuids)))
+            let needed = stillNeeded.isEmpty ? remaining : stillNeeded
+            let dsymsEmpty = archiveDsymsAreEmpty(at: candidate.url.path)
+            // Exact build (score >= 100) or empty dSYMs/ Debug archives: look in Products.
+            // Same-bundle Release archives with non-matching dSYMs skip Products —
+            // spawning dwarfdump on every framework was burning CPU for minutes.
+            let exactBuild = candidate.score >= 100
+            let includeProducts = exactBuild
+                || (dsymsEmpty && productsProbes < maxProductsProbes)
+            if includeProducts, !exactBuild, dsymsEmpty {
+                productsProbes += 1
+            }
+            matched.append(contentsOf: probeXcarchive(
+                at: candidate.url.path,
+                neededUUIDs: needed,
+                includeProducts: includeProducts
+            ))
             if ingest(matched) {
                 return found
             }
@@ -333,13 +352,52 @@ enum DsymLocator {
         return needed.isSubset(of: matched)
     }
 
+    /// LC_UUID from the Mach-O header — no `dwarfdump` process.
+    static func uuidsOfBinary(at path: String) -> [String] {
+        let url = URL(fileURLWithPath: path)
+        guard let loaded = try? MachOKit.loadFromFile(url: url) else {
+            return SubProcess.dwarfdump([path])?.compactMap { CrashUUID.normalize($0.0) } ?? []
+        }
+
+        func uuid(from machO: MachOFile) -> String? {
+            guard let command = machO.loadCommands.info(of: LoadCommand.uuid) else {
+                return nil
+            }
+            return CrashUUID.normalize(command.uuid.uuidString)
+        }
+
+        switch loaded {
+        case let .machO(file):
+            return uuid(from: file).map { [$0] } ?? []
+        case let .fat(fat):
+            guard let slices = try? fat.machOFiles() else {
+                return []
+            }
+            var seen = Set<String>()
+            var result: [String] = []
+            for slice in slices {
+                guard let value = uuid(from: slice), seen.insert(value).inserted else {
+                    continue
+                }
+                result.append(value)
+            }
+            return result
+        }
+    }
+
+    private static func archiveDsymsAreEmpty(at archivePath: String) -> Bool {
+        let dsymsDir = (archivePath as NSString).appendingPathComponent("dSYMs")
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: dsymsDir) else {
+            return true
+        }
+        return !names.contains { $0.hasSuffix(".dSYM") }
+    }
+
     private static func probeDsymBundle(at path: String, neededUUIDs: Set<String>) -> DsymFile? {
-        guard let dwarf = resolveDwarfBinaryPath(from: path),
-              let pairs = SubProcess.dwarfdump([dwarf])
-        else {
+        guard let dwarf = resolveDwarfBinaryPath(from: path) else {
             return nil
         }
-        let matched = pairs.compactMap { CrashUUID.normalize($0.0) }.filter { neededUUIDs.contains($0) }
+        let matched = uuidsOfBinary(at: dwarf).filter { neededUUIDs.contains($0) }
         guard !matched.isEmpty else {
             return nil
         }
@@ -351,9 +409,13 @@ enum DsymLocator {
         )
     }
 
-    /// Probe an xcarchive for matching UUIDs via `dSYMs/*.dSYM`, then fall back to
-    /// `Products/Applications/*.app` executables (Debug builds keep DWARF in the binary).
-    static func probeXcarchive(at path: String, neededUUIDs: Set<String>) -> [DsymFile] {
+    /// Probe an xcarchive for matching UUIDs via `dSYMs/*.dSYM`, then optionally
+    /// `Products/Applications/*.app` (Debug builds keep DWARF in the binary).
+    static func probeXcarchive(
+        at path: String,
+        neededUUIDs: Set<String>,
+        includeProducts: Bool = true
+    ) -> [DsymFile] {
         let archiveName = (path as NSString).lastPathComponent
         var found: [DsymFile] = []
 
@@ -373,7 +435,7 @@ enum DsymLocator {
             }
         }
 
-        if !covers(neededUUIDs, files: found) {
+        if includeProducts, !covers(neededUUIDs, files: found) {
             found.append(contentsOf: probeXcarchiveProducts(
                 at: path,
                 neededUUIDs: neededUUIDs,
@@ -444,14 +506,19 @@ enum DsymLocator {
         }
 
         var found: [DsymFile] = []
+        var isMainExecutable = true
         for binaryPath in candidates {
             guard !remaining.isEmpty else {
                 break
             }
-            guard let pairs = SubProcess.dwarfdump([binaryPath]) else {
-                continue
+            let matched = uuidsOfBinary(at: binaryPath).filter { remaining.contains($0) }
+            if isMainExecutable {
+                isMainExecutable = false
+                // Wrong build: this archive's frameworks share the same version.
+                if matched.isEmpty {
+                    return []
+                }
             }
-            let matched = pairs.compactMap { CrashUUID.normalize($0.0) }.filter { remaining.contains($0) }
             guard !matched.isEmpty else {
                 continue
             }
@@ -542,14 +609,13 @@ enum DsymLocator {
     static func parseBinary(_ binary: BinaryImage, bundle: Bundle, name: String?) -> DsymFile? {
         guard let path = binary.relativePath,
               let absPath = bundle.path(forResource: path, ofType: nil),
-              let uuidMap = SubProcess.dwarfdump([absPath]),
               let expected = CrashUUID.normalize(binary.uuid)
         else {
             return nil
         }
 
         let dsymName = name ?? path
-        let uuids = uuidMap.compactMap { CrashUUID.normalize($0.0) }
+        let uuids = uuidsOfBinary(at: absPath)
         guard uuids.contains(expected) else {
             return nil
         }
@@ -791,10 +857,16 @@ extension DsymManager: MdfindWrapperDelegate {
                     dsyms.append(contentsOf: archiveResults)
                 }
                 // Metadata misses Debug archives (DWARF lives in Products/*.app).
+                // Wrong-version Release archives already listed non-matching UUIDs —
+                // skip Products; the main-exe UUID check is cheap if we do probe.
                 if !DsymLocator.covers(needed, files: archiveResults),
                    let path = item.value(forAttribute: NSMetadataItemPathKey) as? String
                 {
-                    dsyms.append(contentsOf: DsymLocator.probeXcarchive(at: path, neededUUIDs: needed))
+                    dsyms.append(contentsOf: DsymLocator.probeXcarchive(
+                        at: path,
+                        neededUUIDs: needed,
+                        includeProducts: archiveResults.isEmpty
+                    ))
                 }
             } else if type == "com.apple.application-bundle" {
                 appItems.append(item)
