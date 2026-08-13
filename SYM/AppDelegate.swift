@@ -44,6 +44,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         ensureMainMenu()
         MDDeviceMonitor.shared().start()
+        Config.applyAppearance()
         NSApp.activate(ignoringOtherApps: true)
 
         if NSDocumentController.shared.documents.isEmpty {

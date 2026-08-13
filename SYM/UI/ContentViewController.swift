@@ -42,7 +42,7 @@ class ContentViewController: NSViewController {
             }
 
             textView.layoutManager?.replaceTextStorage(document.textStorage)
-            syncTextViewWidthToClipView(forceLayout: true)
+            applyWrapPreference(forceLayout: true)
             textView.needsDisplay = true
             gutterView.needsDisplay = true
 
@@ -79,7 +79,7 @@ class ContentViewController: NSViewController {
         bottomBar.addSubview(revealButton)
 
         scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalScroller = false
+        scrollView.hasHorizontalScroller = !Config.wrapCrashText
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
         scrollView.drawsBackground = true
@@ -90,9 +90,9 @@ class ContentViewController: NSViewController {
         textView.minSize = .zero
         textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
         textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        textView.textContainer?.widthTracksTextView = true
+        textView.isHorizontallyResizable = !Config.wrapCrashText
+        textView.autoresizingMask = Config.wrapCrashText ? [.width] : []
+        textView.textContainer?.widthTracksTextView = Config.wrapCrashText
         textView.textContainer?.containerSize = NSSize(
             width: 0,
             height: CGFloat.greatestFiniteMagnitude
@@ -145,6 +145,7 @@ class ContentViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(configFontDidChanged(_:)), name: .configColorChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(lineNumbersPreferenceDidChange(_:)), name: .configLineNumbersChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(crashSummaryPreferenceDidChange(_:)), name: .configCrashSummaryChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(wrapPreferenceDidChange(_:)), name: .configWrapChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hardwareModelsDidUpdate(_:)), name: .hardwareModelsDidUpdate, object: nil)
         NotificationCenter.default.addObserver(
             self,
@@ -156,7 +157,7 @@ class ContentViewController: NSViewController {
 
     override func viewDidLayout() {
         super.viewDidLayout()
-        syncTextViewWidthToClipView()
+        applyWrapPreference(forceLayout: true)
         gutterView.needsDisplay = true
         updateJumpPillVisibility()
     }
@@ -186,7 +187,7 @@ class ContentViewController: NSViewController {
         bottomBar.isHidden = !show
         bottomBarHeightConstraint?.update(offset: show ? 24 : 0)
         view.layoutSubtreeIfNeeded()
-        syncTextViewWidthToClipView()
+        applyWrapPreference()
     }
 
     private func setupTextView() {
@@ -204,11 +205,24 @@ class ContentViewController: NSViewController {
         textView.layoutManager?.allowsNonContiguousLayout = false
         textView.usesFindBar = true
         gutterView.attach(textView: textView, scrollView: scrollView)
-        syncTextViewWidthToClipView(forceLayout: true)
+        applyWrapPreference(forceLayout: true)
+    }
+
+    private func applyWrapPreference(forceLayout: Bool = false) {
+        let wrap = Config.wrapCrashText
+        scrollView.hasHorizontalScroller = !wrap
+        textView.isHorizontallyResizable = !wrap
+        textView.textContainer?.widthTracksTextView = wrap
+        textView.autoresizingMask = wrap ? [.width] : []
+        if wrap {
+            syncWrappedTextWidth(forceLayout: forceLayout)
+        } else {
+            syncUnwrappedTextWidth(forceLayout: forceLayout)
+        }
     }
 
     /// Keep the text container wrapped to the clip-view width.
-    private func syncTextViewWidthToClipView(forceLayout: Bool = false) {
+    private func syncWrappedTextWidth(forceLayout: Bool = false) {
         let clipView = scrollView.contentView
         let width = max(clipView.bounds.width, 1)
 
@@ -241,6 +255,55 @@ class ContentViewController: NSViewController {
         }
     }
 
+    /// Size the container to the longest line so the clip view can scroll horizontally.
+    private func syncUnwrappedTextWidth(forceLayout: Bool = false) {
+        let clipView = scrollView.contentView
+        let clipWidth = max(clipView.bounds.width, 1)
+        guard let container = textView.textContainer,
+              let layoutManager = textView.layoutManager
+        else {
+            return
+        }
+
+        var frame = textView.frame
+        if frame.origin.x != 0 {
+            frame.origin.x = 0
+            textView.frame = frame
+        }
+
+        container.widthTracksTextView = false
+        if !forceLayout,
+           container.containerSize.width.isFinite,
+           container.containerSize.width >= clipWidth,
+           abs(textView.frame.width - container.containerSize.width) <= 0.5
+        {
+            return
+        }
+
+        container.containerSize = NSSize(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+        layoutManager.ensureLayout(for: container)
+        let used = layoutManager.usedRect(for: container)
+        let inset = textView.textContainerInset.width * 2
+        let contentWidth = ceil(used.maxX + inset + 8)
+        let width = max(clipWidth, contentWidth)
+
+        let widthChanged = abs((container.containerSize.width) - width) > 0.5
+            || abs(textView.frame.width - width) > 0.5
+        if widthChanged {
+            container.containerSize = NSSize(width: width, height: CGFloat.greatestFiniteMagnitude)
+            frame = textView.frame
+            frame.size.width = width
+            frame.origin.x = 0
+            textView.frame = frame
+        }
+        if forceLayout || widthChanged {
+            layoutManager.ensureLayout(for: container)
+        }
+    }
+
     private func infoString(fromCrash crash: CrashReport) -> String {
         var info = ""
         var divider = ""
@@ -259,6 +322,7 @@ class ContentViewController: NSViewController {
 
     func update(crashInfo: CrashReport?) {
         updateHighlighting(crashInfo)
+        applyWrapPreference(forceLayout: true)
         updateSummary(crashInfo)
         gutterView.needsDisplay = true
         let willAutoReveal = !didAutoRevealCrashedThread && crashInfo?.crashedThreadRange != nil
@@ -312,7 +376,7 @@ class ContentViewController: NSViewController {
         gutterView.isHidden = !show
         gutterWidthConstraint?.update(offset: show ? LineNumberGutterView.defaultWidth : 0)
         view.layoutSubtreeIfNeeded()
-        syncTextViewWidthToClipView(forceLayout: true)
+        applyWrapPreference(forceLayout: true)
         gutterView.needsDisplay = true
     }
 
@@ -334,7 +398,7 @@ class ContentViewController: NSViewController {
             return
         }
 
-        syncTextViewWidthToClipView(forceLayout: true)
+        applyWrapPreference(forceLayout: true)
         guard let layoutManager = textView.layoutManager,
               let textContainer = textView.textContainer
         else {
@@ -351,7 +415,10 @@ class ContentViewController: NSViewController {
         let padding = min(48, max(16, visibleHeight * 0.12))
         let targetY = max(0, rect.minY - padding)
         let maxY = max(0, textView.bounds.height - visibleHeight)
-        let origin = NSPoint(x: 0, y: min(targetY, maxY))
+        let origin = NSPoint(
+            x: Config.wrapCrashText ? 0 : clipView.bounds.origin.x,
+            y: min(targetY, maxY)
+        )
 
         if animated {
             NSAnimationContext.runAnimationGroup { context in
@@ -462,6 +529,11 @@ class ContentViewController: NSViewController {
 
     @objc private func crashSummaryPreferenceDidChange(_: Notification) {
         updateSummary(document?.crashInfo)
+    }
+
+    @objc private func wrapPreferenceDidChange(_: Notification) {
+        update(crashInfo: document?.crashInfo)
+        applyWrapPreference(forceLayout: true)
     }
 
     @objc private func hardwareModelsDidUpdate(_: Notification) {

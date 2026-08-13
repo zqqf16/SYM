@@ -41,6 +41,14 @@
 "Color for app frames in the backtrace." = "堆栈中 App 帧的高亮颜色。";
 "Show line numbers" = "显示行号";
 "Show crash summary bar" = "显示崩溃摘要栏";
+"Wrap lines" = "折行显示";
+"Symbolicate on open" = "打开时自动符号化";
+"Automatically symbolicate when matching dSYMs are found. Undo with ⌘Z." = "找到匹配的 dSYM 后自动符号化，可用 ⌘Z 撤销。";
+"Theme" = "主题";
+"System" = "跟随系统";
+"Light" = "浅色";
+"Dark" = "深色";
+"Window chrome and editor background." = "窗口与编辑器背景。";
 "dSYM Downloads" = "dSYM 下载";
 "Folder" = "文件夹";
 "Where downloaded dSYM archives are stored." = "下载的 dSYM 文件存放位置。";

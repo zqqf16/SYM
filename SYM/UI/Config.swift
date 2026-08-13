@@ -29,6 +29,9 @@ extension String {
     static let editorHighlightColorKey = "editorHighlightColorKey"
     static let showLineNumbersKey = "showLineNumbers"
     static let showCrashSummaryKey = "showCrashSummary"
+    static let autoSymbolicateOnOpenKey = "autoSymbolicateOnOpen"
+    static let wrapCrashTextKey = "wrapCrashText"
+    static let appearanceKey = "appAppearance"
 }
 
 extension Notification.Name {
@@ -37,6 +40,26 @@ extension Notification.Name {
     static let configLineNumbersChanged = Notification.Name("sym.config.lineNumbersChanged")
     static let configCrashSummaryChanged = Notification.Name("sym.config.crashSummaryChanged")
     static let configDownloadFolderChanged = Notification.Name("sym.config.downloadFolderChanged")
+    static let configAutoSymbolicateChanged = Notification.Name("sym.config.autoSymbolicateChanged")
+    static let configWrapChanged = Notification.Name("sym.config.wrapChanged")
+    static let configAppearanceChanged = Notification.Name("sym.config.appearanceChanged")
+}
+
+enum AppAppearance: String, CaseIterable, Hashable {
+    case system
+    case light
+    case dark
+
+    var nsAppearance: NSAppearance? {
+        switch self {
+        case .system:
+            return nil
+        case .light:
+            return NSAppearance(named: .aqua)
+        case .dark:
+            return NSAppearance(named: .darkAqua)
+        }
+    }
 }
 
 enum Config {
@@ -209,5 +232,55 @@ enum Config {
             UserDefaults.standard.set(newValue, forKey: .showCrashSummaryKey)
             NotificationCenter.default.post(name: .configCrashSummaryChanged, object: newValue)
         }
+    }
+
+    /// Symbolicate automatically once matching dSYMs are found. Default off.
+    static var autoSymbolicateOnOpen: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: .autoSymbolicateOnOpenKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: .autoSymbolicateOnOpenKey)
+            NotificationCenter.default.post(name: .configAutoSymbolicateChanged, object: newValue)
+        }
+    }
+
+    /// Wrap crash text to the editor width. Default on (current layout).
+    static var wrapCrashText: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: .wrapCrashTextKey) == nil {
+                return true
+            }
+            return UserDefaults.standard.bool(forKey: .wrapCrashTextKey)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: .wrapCrashTextKey)
+            NotificationCenter.default.post(name: .configWrapChanged, object: newValue)
+        }
+    }
+
+    static var editorLineBreakMode: NSLineBreakMode {
+        wrapCrashText ? .byCharWrapping : .byClipping
+    }
+
+    /// Light / dark override. Default follows the system.
+    static var appearance: AppAppearance {
+        get {
+            guard let raw = UserDefaults.standard.string(forKey: .appearanceKey),
+                  let value = AppAppearance(rawValue: raw)
+            else {
+                return .system
+            }
+            return value
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: .appearanceKey)
+            applyAppearance()
+            NotificationCenter.default.post(name: .configAppearanceChanged, object: newValue.rawValue)
+        }
+    }
+
+    static func applyAppearance() {
+        NSApp.appearance = appearance.nsAppearance
     }
 }

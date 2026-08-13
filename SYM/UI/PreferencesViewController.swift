@@ -95,6 +95,7 @@ struct SYMSettingsRootView: View {
 // MARK: - Panes
 
 private struct GeneralSettingsPane: View {
+    @AppStorage(String.autoSymbolicateOnOpenKey) private var autoSymbolicateOnOpen = false
     @State private var modelEntryCount = HardwareModelStore.shared.entryCount
     @State private var modelLastUpdated = HardwareModelStore.shared.lastUpdated
     @State private var isCheckingModels = false
@@ -109,6 +110,11 @@ private struct GeneralSettingsPane: View {
                     }
                 }
                 Text(NSLocalizedString("Remove all items from the Open Recent menu.", comment: "Settings help"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Toggle(NSLocalizedString("Symbolicate on open", comment: "Settings"), isOn: autoSymbolicateBinding)
+                Text(NSLocalizedString("Automatically symbolicate when matching dSYMs are found. Undo with ⌘Z.", comment: "Settings help"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
@@ -159,6 +165,16 @@ private struct GeneralSettingsPane: View {
         .onReceive(NotificationCenter.default.publisher(for: .hardwareModelsDidUpdate)) { _ in
             refreshModelStatus()
         }
+    }
+
+    private var autoSymbolicateBinding: Binding<Bool> {
+        Binding(
+            get: { autoSymbolicateOnOpen },
+            set: { newValue in
+                autoSymbolicateOnOpen = newValue
+                Config.autoSymbolicateOnOpen = newValue
+            }
+        )
     }
 
     private var modelDatabaseSummary: String {
@@ -219,6 +235,8 @@ private struct GeneralSettingsPane: View {
 private struct EditorSettingsPane: View {
     @AppStorage(String.showLineNumbersKey) private var showLineNumbers = true
     @AppStorage(String.showCrashSummaryKey) private var showCrashSummary = true
+    @AppStorage(String.wrapCrashTextKey) private var wrapCrashText = true
+    @AppStorage(String.appearanceKey) private var appearanceRaw = AppAppearance.system.rawValue
     @AppStorage(String.editorHighlightColorKey) private var highlightColor = Config.highlightColors[0]
     @AppStorage(String.editorFontNameKey) private var fontName = ""
     @AppStorage(String.editorFontSizeKey) private var fontSize = 12
@@ -264,6 +282,16 @@ private struct EditorSettingsPane: View {
                 Text(NSLocalizedString("Color for app frames in the backtrace.", comment: "Settings help"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+
+                Picker(NSLocalizedString("Theme", comment: "Appearance picker"), selection: appearanceBinding) {
+                    Text(NSLocalizedString("System", comment: "Follow system appearance")).tag(AppAppearance.system)
+                    Text(NSLocalizedString("Light", comment: "Light appearance")).tag(AppAppearance.light)
+                    Text(NSLocalizedString("Dark", comment: "Dark appearance")).tag(AppAppearance.dark)
+                }
+                .pickerStyle(.segmented)
+                Text(NSLocalizedString("Window chrome and editor background.", comment: "Settings help"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             } header: {
                 Text(NSLocalizedString("Appearance", comment: "Settings section"))
             }
@@ -271,6 +299,7 @@ private struct EditorSettingsPane: View {
             Section {
                 Toggle(NSLocalizedString("Show line numbers", comment: "Settings"), isOn: lineNumbersBinding)
                 Toggle(NSLocalizedString("Show crash summary bar", comment: "Settings"), isOn: crashSummaryBinding)
+                Toggle(NSLocalizedString("Wrap lines", comment: "Settings"), isOn: wrapBinding)
             } header: {
                 Text(NSLocalizedString("Display", comment: "Settings section"))
             }
@@ -289,6 +318,8 @@ private struct EditorSettingsPane: View {
             if highlightColor.isEmpty {
                 highlightColor = Config.highlightColor
             }
+            wrapCrashText = Config.wrapCrashText
+            appearanceRaw = Config.appearance.rawValue
         }
         .onReceive(NotificationCenter.default.publisher(for: .configFontChanged)) { _ in
             fontName = Config.editorFont.fontName
@@ -346,6 +377,26 @@ private struct EditorSettingsPane: View {
             set: { newValue in
                 showCrashSummary = newValue
                 Config.showCrashSummary = newValue
+            }
+        )
+    }
+
+    private var wrapBinding: Binding<Bool> {
+        Binding(
+            get: { wrapCrashText },
+            set: { newValue in
+                wrapCrashText = newValue
+                Config.wrapCrashText = newValue
+            }
+        )
+    }
+
+    private var appearanceBinding: Binding<AppAppearance> {
+        Binding(
+            get: { AppAppearance(rawValue: appearanceRaw) ?? .system },
+            set: { newValue in
+                appearanceRaw = newValue.rawValue
+                Config.appearance = newValue
             }
         )
     }

@@ -21,15 +21,74 @@
 // SOFTWARE.
 
 @testable import SYM
+import AppKit
 import XCTest
 
 class ConfigTests: XCTestCase {
+    private var savedAutoSymbolicate: Any?
+    private var savedWrap: Any?
+    private var savedAppearance: Any?
+    private var savedAppearanceObject: NSAppearance?
+
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        savedAutoSymbolicate = UserDefaults.standard.object(forKey: .autoSymbolicateOnOpenKey)
+        savedWrap = UserDefaults.standard.object(forKey: .wrapCrashTextKey)
+        savedAppearance = UserDefaults.standard.object(forKey: .appearanceKey)
+        savedAppearanceObject = NSApp.appearance
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        restore(.autoSymbolicateOnOpenKey, savedAutoSymbolicate)
+        restore(.wrapCrashTextKey, savedWrap)
+        restore(.appearanceKey, savedAppearance)
+        NSApp.appearance = savedAppearanceObject
+    }
+
+    private func restore(_ key: String, _ value: Any?) {
+        if let value {
+            UserDefaults.standard.set(value, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+    }
+
+    func testEditorPreferenceDefaults() {
+        UserDefaults.standard.removeObject(forKey: .autoSymbolicateOnOpenKey)
+        UserDefaults.standard.removeObject(forKey: .wrapCrashTextKey)
+        UserDefaults.standard.removeObject(forKey: .appearanceKey)
+
+        XCTAssertFalse(Config.autoSymbolicateOnOpen)
+        XCTAssertTrue(Config.wrapCrashText)
+        XCTAssertEqual(Config.appearance, .system)
+        XCTAssertEqual(Config.editorLineBreakMode, .byCharWrapping)
+    }
+
+    func testAutoSymbolicateAndWrapRoundTrip() {
+        Config.autoSymbolicateOnOpen = true
+        XCTAssertTrue(Config.autoSymbolicateOnOpen)
+        Config.autoSymbolicateOnOpen = false
+        XCTAssertFalse(Config.autoSymbolicateOnOpen)
+
+        Config.wrapCrashText = false
+        XCTAssertFalse(Config.wrapCrashText)
+        XCTAssertEqual(Config.editorLineBreakMode, .byClipping)
+        Config.wrapCrashText = true
+        XCTAssertTrue(Config.wrapCrashText)
+        XCTAssertEqual(Config.editorLineBreakMode, .byCharWrapping)
+    }
+
+    func testAppearanceRoundTrip() {
+        Config.appearance = .dark
+        XCTAssertEqual(Config.appearance, .dark)
+        XCTAssertEqual(NSApp.appearance?.name, NSAppearance.Name.darkAqua)
+
+        Config.appearance = .light
+        XCTAssertEqual(Config.appearance, .light)
+        XCTAssertEqual(NSApp.appearance?.name, NSAppearance.Name.aqua)
+
+        Config.appearance = .system
+        XCTAssertEqual(Config.appearance, .system)
+        XCTAssertNil(NSApp.appearance)
     }
 
     func testDownloadDir() throws {

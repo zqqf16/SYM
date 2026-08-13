@@ -31,7 +31,7 @@ extension NSTextStorage {
     {
         let font = textFont ?? self.font ?? layoutManagers.first?.firstTextView?.font
         let style = NSMutableParagraphStyle()
-        style.lineBreakMode = .byCharWrapping
+        style.lineBreakMode = Config.editorLineBreakMode
         var attributes: [NSAttributedString.Key: AnyObject] = [
             .foregroundColor: textColor,
             .paragraphStyle: style,
@@ -47,7 +47,7 @@ extension NSTextStorage {
         var attributes: [NSAttributedString.Key: AnyObject] = [:]
         attributes[.foregroundColor] = NSColor(hexString: Config.highlightColor)!
         let style = NSMutableParagraphStyle()
-        style.lineBreakMode = .byCharWrapping
+        style.lineBreakMode = Config.editorLineBreakMode
         attributes[.paragraphStyle] = style
         if let font = font, let familyName = font.familyName {
             attributes[.font] = NSFontManager.shared.font(withFamily: familyName, traits: .boldFontMask, weight: 0, size: font.pointSize)

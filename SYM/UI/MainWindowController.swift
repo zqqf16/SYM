@@ -51,6 +51,8 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
     private var downloaderCancellable: AnyCancellable?
     private var downloadTask: DsymDownloadTask?
     private weak var downloadStatusViewController: DownloadStatusViewController?
+    /// Auto-symbolicate at most once per crash `rawContent`.
+    private var autoSymbolicatedRawContent: String?
 
     var crashContentViewController: ContentViewController? {
         contentViewController as? ContentViewController
@@ -120,6 +122,13 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
         )
         updateDeviceEnabled(MDDeviceMonitor.shared().deviceConnected)
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(autoSymbolicatePreferenceDidChange(_:)),
+            name: .configAutoSymbolicateChanged,
+            object: nil
+        )
+
         downloaderCancellable = DsymDownloader.shared.$tasks
             .receive(on: DispatchQueue.main)
             .map { [weak self] tasks -> DsymDownloadTask? in
@@ -147,6 +156,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
                 return
             }
             crashContentViewController?.document = document
+            autoSymbolicatedRawContent = nil
 
             document.$crashInfo
                 .receive(on: DispatchQueue.main)
@@ -156,6 +166,14 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
                     } else {
                         self?.dsymManager.update(nil)
                     }
+                    self?.maybeAutoSymbolicate()
+                }
+                .store(in: &crashCancellable)
+
+            dsymManager.$dsymFiles
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    self?.maybeAutoSymbolicate()
                 }
                 .store(in: &crashCancellable)
 
@@ -170,6 +188,12 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
         updateDeviceEnabled(MDDeviceMonitor.shared().deviceConnected)
     }
 
+    @objc private func autoSymbolicatePreferenceDidChange(_: Notification) {
+        if Config.autoSymbolicateOnOpen {
+            maybeAutoSymbolicate()
+        }
+    }
+
     private func updateDeviceEnabled(_ enabled: Bool) {
         deviceToolbarItem?.isEnabled = enabled
     }
@@ -179,8 +203,26 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
         if content.strip().isEmpty {
             return
         }
-        isSymbolicating = true
+        guard crashDocument?.crashInfo != nil else {
+            return
+        }
         crashDocument?.symbolicate(withDsymPaths: dsymManager.dsymPathMap)
+    }
+
+    private func maybeAutoSymbolicate() {
+        guard Config.autoSymbolicateOnOpen else { return }
+        guard let document = crashDocument, !document.isSymbolicating else { return }
+        guard let crash = document.crashInfo else { return }
+        let content = document.textStorage.string
+        guard !content.strip().isEmpty else { return }
+        guard autoSymbolicatedRawContent != crash.rawContent else { return }
+        guard crash.allFrames.contains(where: { !$0.isSymbolicated }) else { return }
+
+        let paths = dsymManager.dsymPathMap
+        guard !paths.isEmpty else { return }
+
+        autoSymbolicatedRawContent = crash.rawContent
+        document.symbolicate(withDsymPaths: paths)
     }
 
     @objc func showDsymInfo(_: Any?) {

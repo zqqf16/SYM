@@ -83,6 +83,14 @@
 "Color for app frames in the backtrace." = "Color for app frames in the backtrace.";
 "Show line numbers" = "Show line numbers";
 "Show crash summary bar" = "Show crash summary bar";
+"Wrap lines" = "Wrap lines";
+"Symbolicate on open" = "Symbolicate on open";
+"Automatically symbolicate when matching dSYMs are found. Undo with ⌘Z." = "Automatically symbolicate when matching dSYMs are found. Undo with ⌘Z.";
+"Theme" = "Theme";
+"System" = "System";
+"Light" = "Light";
+"Dark" = "Dark";
+"Window chrome and editor background." = "Window chrome and editor background.";
 "dSYM Downloads" = "dSYM Downloads";
 "Folder" = "Folder";
 "Where downloaded dSYM archives are stored." = "Where downloaded dSYM archives are stored.";
