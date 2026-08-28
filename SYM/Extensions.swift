@@ -36,147 +36,20 @@ extension NSRange {
 // MARK: - String
 
 extension String {
-    var hexaToDecimal: Int {
-        var hex = self
-        if hex.hasPrefix("0x") {
-            let startIndex = index(self.startIndex, offsetBy: 2)
-            hex = String(self[startIndex...])
-        }
-
-        return Int(hex, radix: 16) ?? 0
-    }
-
-    subscript(r: Range<Int>) -> String? {
-        let nsRange = NSRange(r)
-        return substring(with: nsRange)
-    }
-
     func strip() -> String {
         return trimmingCharacters(
             in: CharacterSet.whitespacesAndNewlines
         )
     }
 
-    func matchGroups(fromResult result: NSTextCheckingResult) -> [String] {
-        let number = result.numberOfRanges
-        if number == 1 {
-            if let range = Range(result.range(at: 0)) {
-                if let subString = self[range] {
-                    return [subString]
-                }
-            }
-            return []
-        }
-
-        var groups = [String]()
-
-        for index in 1 ..< number {
-            if let range = Range(result.range(at: index)) {
-                groups.append(self[range] ?? "")
-            }
-        }
-
-        return groups
-    }
-
-    func leftPadding(toLength: Int, withPad character: Character) -> String {
-        let newLength = count
-        if newLength < toLength {
-            return String(repeatElement(character, count: toLength - newLength)) + self
-        } else {
-            return self[0 ..< newLength - toLength]!
-            // return self.substring(from: index(self.startIndex, offsetBy: newLength - toLength))
-        }
-    }
-
-    func padding(length: Int, atLeft: Bool = false) -> String {
-        if atLeft {
-            return String(repeatElement(" ", count: length - count)) + self
-        }
+    /// Right-pad (truncate if longer) to `length` columns, matching Foundation's
+    /// `NSString.padding(toLength:withPad:startingAt:)`.
+    func padding(length: Int) -> String {
         return padding(toLength: length, withPad: " ", startingAt: 0)
-    }
-
-    func extendToLength(_ length: Int, withString padString: String = " ", atRight _: Bool = true) -> String {
-        return padding(toLength: length, withPad: padString, startingAt: 0)
-    }
-
-    func uuidFormat() -> String {
-        if contains("-") {
-            return uppercased()
-        }
-
-        var uuid = ""
-        for (index, char) in enumerated() {
-            if [8, 12, 16, 20].contains(index) {
-                uuid.append("-" as Character)
-            }
-            uuid.append(char)
-        }
-
-        return uuid.uppercased()
-    }
-
-    func parseKeyValue(separatedBy: String) -> (String, String)? {
-        let list = components(separatedBy: separatedBy)
-        if list.count != 2 {
-            return nil
-        }
-
-        let name = list[0].strip()
-        let value = list[1].strip()
-        if value.count == 0 {
-            return nil
-        }
-
-        return (name, value)
-    }
-
-    func separatedValue() -> String? {
-        let list = components(separatedBy: ":")
-        if list.count != 2 {
-            return nil
-        }
-
-        let value = list[1].strip()
-        if value.count == 0 {
-            return nil
-        }
-
-        return value
-    }
-
-    func separate(by _: String = ":") -> (String, String)? {
-        let list = components(separatedBy: ":")
-        if list.count != 2 {
-            return nil
-        }
-
-        return (list[0].strip(), list[1].strip())
-    }
-
-    func rangeFromNSRange(nsRange: NSRange) -> Range<String.Index>? {
-        return Range(nsRange, in: self)
     }
 
     var nsRange: NSRange {
         return NSRange(startIndex ..< endIndex, in: self)
-    }
-
-    func substring(with nsrange: NSRange) -> String? {
-        guard let range = Range(nsrange, in: self) else { return nil }
-        return String(self[range])
-    }
-}
-
-// MARK: - Dictionary
-
-extension Dictionary {
-    init(keys: [Key], values: [Value]) {
-        self.init()
-
-        for (key, value) in zip(keys, values) {
-            self[key] = value
-        }
     }
 }
 
@@ -324,6 +197,36 @@ extension UInt {
         }
 
         return "\(String(format: "%.2f", value))\(units[index])"
+    }
+}
+
+extension NSViewController {
+    /// Sheet-modal delete confirmation shared by the Devices file lists.
+    /// Deletion on a connected device is immediate and unrecoverable.
+    func confirmDeletion(count: Int, completion: @escaping () -> Void) {
+        guard let window = view.window else {
+            return
+        }
+        let alert = NSAlert()
+        alert.messageText = String(
+            format: NSLocalizedString(
+                "Delete %lld selected item(s) from the device?",
+                comment: "Delete confirmation in Devices file lists"
+            ),
+            Int64(count)
+        )
+        alert.informativeText = NSLocalizedString(
+            "This cannot be undone.",
+            comment: "Delete confirmation in Devices file lists"
+        )
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: NSLocalizedString("Delete", comment: "Delete confirmation button"))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        alert.beginSheetModal(for: window) { response in
+            if response == .alertFirstButtonReturn {
+                completion()
+            }
+        }
     }
 }
 

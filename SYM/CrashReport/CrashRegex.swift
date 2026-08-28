@@ -47,8 +47,13 @@ enum CrashRegex {
     static let hashOSVersion = try! Regex("^# OS Version:\\s*([^\\(]+)", options: .anchorsMatchLines)
     static let hashBundleID = try! Regex("^# Bundle Identifier:\\s*(.*)", options: .anchorsMatchLines)
 
-    static func frame(for binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
-        try? Regex("^\\s*(\\d{1,3})\\s+(\(binary))\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: options)
+    /// One combined frame regex for every embedded binary (single pass over the text
+    /// instead of one full-content scan per binary). Binary names are escaped and
+    /// ordered longest-first so a shorter name never shadows a longer one.
+    static func frames(forBinaries binaries: [String], options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
+        let alternation = alternation(for: binaries)
+        guard !alternation.isEmpty else { return nil }
+        return try? Regex("^\\s*(\\d{1,3})\\s+(\(alternation))\\s+(0[xX][A-Fa-f0-9]+)\\s+(.*)", options: options)
     }
 
     static func image(_ binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
@@ -59,8 +64,17 @@ enum CrashRegex {
         try? Regex("\\s*(0[xX][A-Fa-f0-9]+)\\s+-.*<(.*)>\\s+\(path)", options: options)
     }
 
-    static func cpuUsageFrame(for binary: String, options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
-        try? Regex("^\\s*\\d+.*(\(binary)).*\\[(0[xX][A-Fa-f0-9]+)\\].*", options: options)
+    static func cpuUsageFrames(forBinaries binaries: [String], options: NSRegularExpression.Options = .anchorsMatchLines) -> Regex? {
+        let alternation = alternation(for: binaries)
+        guard !alternation.isEmpty else { return nil }
+        return try? Regex("^\\s*\\d+.*(\(alternation)).*\\[(0[xX][A-Fa-f0-9]+)\\].*", options: options)
+    }
+
+    private static func alternation(for binaries: [String]) -> String {
+        Set(binaries)
+            .sorted { $0.count > $1.count }
+            .map { NSRegularExpression.escapedPattern(for: $0) }
+            .joined(separator: "|")
     }
 }
 
@@ -80,7 +94,7 @@ extension Array where Element == String {
 }
 
 enum CrashHighlightParser {
-    static func applyRanges(to report: inout CrashReport, frameRegex: (String) -> Regex?) {
+    static func applyRanges(to report: inout CrashReport, frameRegex: ([String]) -> Regex?) {
         // Ranges must stay within the translated section — never the Full Report JSON.
         let content = report.formattedContent.crashTranslatedSection
 
@@ -91,13 +105,12 @@ enum CrashHighlightParser {
         }
 
         report.appBacktraceRanges = []
-        for binary in report.embeddedBinaries {
-            guard let regex = frameRegex(binary.name) else {
-                continue
-            }
-            regex.matches(in: content)?.forEach { match in
-                report.appBacktraceRanges.append(match.range)
-            }
+        let names = report.embeddedBinaries.map(\.name)
+        guard !names.isEmpty, let regex = frameRegex(names) else {
+            return
+        }
+        regex.matches(in: content)?.forEach { match in
+            report.appBacktraceRanges.append(match.range)
         }
     }
 }

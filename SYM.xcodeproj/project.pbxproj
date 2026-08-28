@@ -56,7 +56,6 @@
 		B5CR001127F200010000001 /* CrashReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000127F200010000001 /* CrashReport.swift */; };
 		B5CR001227F200010000002 /* String+Crash.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000227F200010000002 /* String+Crash.swift */; };
 		B5CR001327F200010000003 /* CrashRegex.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000327F200010000003 /* CrashRegex.swift */; };
-		B5CR001427F200010000004 /* CrashContentBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000427F200010000004 /* CrashContentBuilder.swift */; };
 		B5CR001527F200010000005 /* CrashDecoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000527F200010000005 /* CrashDecoding.swift */; };
 		B5CR001627F200010000006 /* AppleIPSDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000627F200010000006 /* AppleIPSDecoder.swift */; };
 		B5CR001727F200010000007 /* AppleTextDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CR000727F200010000007 /* AppleTextDecoder.swift */; };
@@ -100,7 +99,6 @@
 		F405436A1D321E37009B2923 /* Window.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40543691D321E37009B2923 /* Window.swift */; };
 		F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */; };
 		F40A36A41D3FBB7200F3B00C /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40A36A31D3FBB7200F3B00C /* Regex.swift */; };
-		F422C7C31D36A66800066837 /* FileFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F422C7C21D36A66800066837 /* FileFinder.swift */; };
 		F45321041D30CC4600639917 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321031D30CC4600639917 /* Extensions.swift */; };
 		F453210A1D30CCBF00639917 /* SubProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45321091D30CCBF00639917 /* SubProcess.swift */; };
 		F45B68F31E227B8100128D8D /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45B68F21E227B8100128D8D /* MainWindowController.swift */; };
@@ -113,6 +111,7 @@
 		F4CD14651D39D5B7006BAB2B /* file.icns in Resources */ = {isa = PBXBuildFile; fileRef = F4CD14641D39D5B7006BAB2B /* file.icns */; };
 		F4EFE90B2125583700E9EDA9 /* MDDeviceMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE90A2125583700E9EDA9 /* MDDeviceMonitor.m */; };
 		F4EFE91A2126D0B600E9EDA9 /* CrashImporterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EFE9192126D0B600E9EDA9 /* CrashImporterViewController.swift */; };
+		FA8EF1F34905F84797ECF00A /* DsymIndexStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD37DB0E9D677DDA481CFD98 /* DsymIndexStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -179,7 +178,6 @@
 		B5CR000127F200010000001 /* CrashReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReport.swift; sourceTree = "<group>"; };
 		B5CR000227F200010000002 /* String+Crash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Crash.swift"; sourceTree = "<group>"; };
 		B5CR000327F200010000003 /* CrashRegex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashRegex.swift; sourceTree = "<group>"; };
-		B5CR000427F200010000004 /* CrashContentBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashContentBuilder.swift; sourceTree = "<group>"; };
 		B5CR000527F200010000005 /* CrashDecoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashDecoding.swift; sourceTree = "<group>"; };
 		B5CR000627F200010000006 /* AppleIPSDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIPSDecoder.swift; sourceTree = "<group>"; };
 		B5CR000727F200010000007 /* AppleTextDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleTextDecoder.swift; sourceTree = "<group>"; };
@@ -250,11 +248,11 @@
 		B5UI7091C1A72F0B4082AE82 /* MenuBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBuilder.swift; sourceTree = "<group>"; };
 		B5UI7092C1A72F0B4082AE83 /* SFSymbols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SFSymbols.swift; sourceTree = "<group>"; };
 		B5UI7093C1A72F0B4082AE84 /* DeviceWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceWindowController.swift; sourceTree = "<group>"; };
+		DD37DB0E9D677DDA481CFD98 /* DsymIndexStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DsymIndexStore.swift; sourceTree = "<group>"; };
 		F400154721539E8500267818 /* Automator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Automator.framework; path = System/Library/Frameworks/Automator.framework; sourceTree = SDKROOT; };
 		F40543691D321E37009B2923 /* Window.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Window.swift; sourceTree = "<group>"; };
 		F40A369A1D3B5DCA00F3B00C /* AboutViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutViewController.swift; sourceTree = "<group>"; };
 		F40A36A31D3FBB7200F3B00C /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
-		F422C7C21D36A66800066837 /* FileFinder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileFinder.swift; sourceTree = "<group>"; };
 		F45321031D30CC4600639917 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		F45321091D30CCBF00639917 /* SubProcess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubProcess.swift; sourceTree = "<group>"; };
 		F45B68F21E227B8100128D8D /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
@@ -426,7 +424,6 @@
 				B5CR000227F200010000002 /* String+Crash.swift */,
 				B5CR000327F200010000003 /* CrashRegex.swift */,
 				B5CR000F27F20001000000F /* ClassicCrashLineParser.swift */,
-				B5CR000427F200010000004 /* CrashContentBuilder.swift */,
 				B5CR000527F200010000005 /* CrashDecoding.swift */,
 				B5CR000627F200010000006 /* AppleIPSDecoder.swift */,
 				B5CR000727F200010000007 /* AppleTextDecoder.swift */,
@@ -524,6 +521,7 @@
 				B5SY001227F300010000002 /* MachOSymbolEngine.swift */,
 				B5SY001327F300010000003 /* AtosSymbolEngine.swift */,
 				B5SY001427F300010000004 /* DsymLocator.swift */,
+				DD37DB0E9D677DDA481CFD98 /* DsymIndexStore.swift */,
 			);
 			path = Symbolication;
 			sourceTree = "<group>";
@@ -560,7 +558,6 @@
 				F40A36A31D3FBB7200F3B00C /* Regex.swift */,
 				F45321031D30CC4600639917 /* Extensions.swift */,
 				F45321091D30CCBF00639917 /* SubProcess.swift */,
-				F422C7C21D36A66800066837 /* FileFinder.swift */,
 				51CBD27F1FE79F7C00C1F91D /* HardwareModel.swift */,
 				B5F3578622C30B7C00111FF3 /* Color.swift */,
 				B5F3578822C3121200111FF3 /* Image.swift */,
@@ -852,7 +849,6 @@
 				B5SYMM0227F500010000002 /* main.swift in Sources */,
 				F49BD1F01D2FF46300024AAE /* AppDelegate.swift in Sources */,
 				B53E2F8022D477A3003BC45C /* MDAfcClient.m in Sources */,
-				F422C7C31D36A66800066837 /* FileFinder.swift in Sources */,
 				B5D551EC27F4436600862C48 /* TextStorage.swift in Sources */,
 				B5F2732525691658001BDE21 /* DeviceSidebarViewController.swift in Sources */,
 				F40A369C1D3B5DCA00F3B00C /* AboutViewController.swift in Sources */,
@@ -890,7 +886,6 @@
 				B5CR001227F200010000002 /* String+Crash.swift in Sources */,
 				B5CR001327F200010000003 /* CrashRegex.swift in Sources */,
 				B5CR001E27F20001000000E /* ClassicCrashLineParser.swift in Sources */,
-				B5CR001427F200010000004 /* CrashContentBuilder.swift in Sources */,
 				B5CR001527F200010000005 /* CrashDecoding.swift in Sources */,
 				B5CR001627F200010000006 /* AppleIPSDecoder.swift in Sources */,
 				B5CR001727F200010000007 /* AppleTextDecoder.swift in Sources */,
@@ -906,6 +901,7 @@
 				B5UI7095C1A72F0B4082AE86 /* SFSymbols.swift in Sources */,
 				B5UI7096C1A72F0B4082AE87 /* DeviceWindowController.swift in Sources */,
 				B56B9B8D23A3869100049491 /* DsymViewController.swift in Sources */,
+				FA8EF1F34905F84797ECF00A /* DsymIndexStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

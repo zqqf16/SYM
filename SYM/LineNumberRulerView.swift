@@ -107,12 +107,13 @@ final class LineNumberGutterView: NSView {
         }
 
         let firstVisibleCharacterIndex = layoutManager.characterIndexForGlyph(at: visibleGlyphRange.location)
-        let newLineRegex = try! NSRegularExpression(pattern: "\n", options: [])
-        var lineNumber = newLineRegex.numberOfMatches(
-            in: textView.string,
-            options: [],
-            range: NSRange(location: 0, length: firstVisibleCharacterIndex)
-        ) + 1
+        // Count newlines before the first visible character. This runs on every
+        // draw (i.e. every scroll frame) — a plain UTF-16 scan avoids compiling
+        // a regex and bridging the whole string each time.
+        var lineNumber = 1
+        for unit in textView.string.utf16.prefix(firstVisibleCharacterIndex) where unit == 0x0A {
+            lineNumber += 1
+        }
 
         var glyphIndexForStringLine = visibleGlyphRange.location
         let visibleGlyphEnd = NSMaxRange(visibleGlyphRange)

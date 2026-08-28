@@ -33,14 +33,13 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
 
     var isSymbolicating: Bool = false {
         didSet {
-            DispatchQueue.main.async {
-                if self.isSymbolicating {
-                    self.indicator.startAnimation(nil)
-                    self.indicator.isHidden = false
-                } else {
-                    self.indicator.stopAnimation(nil)
-                    self.indicator.isHidden = true
-                }
+            guard isSymbolicating != oldValue else { return }
+            if isSymbolicating {
+                indicator.startAnimation(nil)
+                indicator.isHidden = false
+            } else {
+                indicator.stopAnimation(nil)
+                indicator.isHidden = true
             }
         }
     }
@@ -177,9 +176,13 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
                 }
                 .store(in: &crashCancellable)
 
+            // keyPath `assign(to:on:)` would retain this controller inside its own
+            // subscription — use a weak sink so the window controller can deinit.
             document.$isSymbolicating
                 .receive(on: DispatchQueue.main)
-                .assign(to: \.isSymbolicating, on: self)
+                .sink { [weak self] isSymbolicating in
+                    self?.isSymbolicating = isSymbolicating
+                }
                 .store(in: &crashCancellable)
         }
     }
@@ -250,7 +253,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
             return .systemSymbolItem(
                 identifier: itemIdentifier,
                 symbolName: "wand.and.stars",
-                label: "Symbolicate",
+                label: NSLocalizedString("Symbolicate", comment: "Toolbar label"),
                 toolTip: NSLocalizedString("Symbolicate crash log", comment: "Toolbar tooltip"),
                 target: self,
                 action: #selector(symbolicate(_:))
@@ -258,8 +261,8 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
 
         case .dsym:
             let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-            item.label = "dSYM"
-            item.paletteLabel = "dSYM"
+            item.label = NSLocalizedString("dSYM", comment: "Toolbar label")
+            item.paletteLabel = NSLocalizedString("dSYM", comment: "Toolbar label")
             item.toolTip = NSLocalizedString("dSYM files", comment: "Toolbar tooltip")
             item.isBordered = true
             dsymButton.target = self
@@ -276,7 +279,7 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
             let item = NSToolbarItem.systemSymbolItem(
                 identifier: itemIdentifier,
                 symbolName: "iphone",
-                label: "Device",
+                label: NSLocalizedString("Device", comment: "Toolbar label"),
                 toolTip: NSLocalizedString("Connected devices", comment: "Toolbar tooltip"),
                 target: self,
                 action: #selector(showDevices(_:))
@@ -287,8 +290,8 @@ class MainWindowController: NSWindowController, NSToolbarDelegate {
 
         case .progress:
             let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-            item.label = "Progress"
-            item.paletteLabel = "Progress"
+            item.label = NSLocalizedString("Progress", comment: "Toolbar label")
+            item.paletteLabel = NSLocalizedString("Progress", comment: "Toolbar label")
             indicator.style = .spinning
             indicator.controlSize = .small
             indicator.isDisplayedWhenStopped = false

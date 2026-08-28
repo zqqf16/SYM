@@ -23,6 +23,10 @@
 "Choose a dSYM file to import" = "选择要导入的 dSYM 文件";
 "Show this dSYM in Finder" = "在 Finder 中显示此 dSYM";
 "Jump to the crashed thread" = "跳到发生崩溃的线程";
+"dSYM" = "dSYM";
+"Device" = "设备";
+"Progress" = "进度";
+"Symbolicated %lld of %lld frames" = "已符号化 %lld / %lld 帧";
 "The crash report is not valid UTF-8 text." = "崩溃报告不是有效的 UTF-8 文本。";
 "The property list is not a valid crash report container." = "该属性列表不是有效的崩溃报告容器。";
 "The property list does not contain crash report text." = "该属性列表不包含崩溃报告文本。";
@@ -149,3 +153,7 @@
 "Bring All to Front" = "前置全部窗口";
 "Help" = "帮助";
 "%@ Help" = "%@ 帮助";
+"Delete %lld selected item(s) from the device?" = "要删除设备上选中的 %lld 个项目吗？";
+"This cannot be undone." = "此操作无法撤销。";
+"Failed to list directory." = "读取目录失败。";
+"Could not refresh the directory; showing the previous contents." = "目录刷新失败，当前显示的是上一次的内容。";

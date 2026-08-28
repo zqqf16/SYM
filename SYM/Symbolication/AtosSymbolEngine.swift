@@ -23,7 +23,24 @@
 import Foundation
 
 struct AtosSymbolEngine: SymbolEngine {
+    private struct FrameKey: Hashable {
+        let uuid: String
+        let address: UInt64
+    }
+
     func symbolicate(_ report: CrashReport, dsymPaths: [String: String]) async -> CrashReport {
+        // `SubProcess.atos` blocks on `waitUntilExit` — keep it off the Swift
+        // cooperative pool (several documents symbolicating at once would
+        // otherwise starve pool threads for the duration of each atos run).
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                continuation.resume(returning: Self.performSymbolication(report, dsymPaths: dsymPaths))
+            }
+        }
+    }
+
+    /// Blocking implementation; one atos process per image, images in parallel.
+    static func performSymbolication(_ report: CrashReport, dsymPaths: [String: String]) -> CrashReport {
         var updated = report
         let imagesByUUID = CrashUUID.imagesByUUID(report.binaryImages)
 
@@ -34,7 +51,18 @@ struct AtosSymbolEngine: SymbolEngine {
             }
         }
 
-        var resolvedByAddress = [UInt64: StackFrame]()
+        guard !framesByUUID.isEmpty else {
+            return updated
+        }
+
+        let lock = NSLock()
+        var resolvedByKey = [FrameKey: StackFrame]()
+        let group = DispatchGroup()
+        let atosQueue = DispatchQueue(
+            label: "im.zorro.SYM.atos",
+            qos: .userInitiated,
+            attributes: .concurrent
+        )
 
         for (uuid, frames) in framesByUUID {
             guard let image = imagesByUUID[uuid],
@@ -47,22 +75,36 @@ struct AtosSymbolEngine: SymbolEngine {
 
             let arch = CrashArch.normalize(image.arch) ?? CrashArch.normalize(report.arch) ?? "arm64"
             let addresses = frames.map { $0.address.crashHexString }
-            guard let results = SubProcess.atos(
-                loadAddress: loadAddress.crashHexString,
-                addresses: addresses,
-                dsym: dwarfPath,
-                arch: arch
-            ) else {
-                continue
-            }
+            group.enter()
+            atosQueue.async {
+                defer { group.leave() }
+                guard let results = SubProcess.atos(
+                    loadAddress: loadAddress.crashHexString,
+                    addresses: addresses,
+                    dsym: dwarfPath,
+                    arch: arch
+                ) else {
+                    return
+                }
 
-            for (frame, output) in zip(frames, results) {
-                let resolved = parseAtosOutput(output, frame: frame)
-                resolvedByAddress[frame.address] = resolved
+                var parsed = [FrameKey: StackFrame]()
+                // Map by index (not zip) so a short/empty atos result can't shift
+                // later frames onto the wrong addresses.
+                for (index, frame) in frames.enumerated() {
+                    guard index < results.count else { break }
+                    let resolved = parseAtosOutput(results[index], frame: frame)
+                    parsed[FrameKey(uuid: uuid, address: frame.address)] = resolved
+                }
+                lock.lock()
+                for (key, value) in parsed {
+                    resolvedByKey[key] = value
+                }
+                lock.unlock()
             }
         }
+        group.wait()
 
-        guard !resolvedByAddress.isEmpty else {
+        guard !resolvedByKey.isEmpty else {
             return updated
         }
 
@@ -70,16 +112,28 @@ struct AtosSymbolEngine: SymbolEngine {
             if frame.isSymbolicated {
                 return frame
             }
-            return resolvedByAddress[frame.address] ?? frame
+            guard let uuid = CrashUUID.normalize(frame.imageUUID) else {
+                return frame
+            }
+            return resolvedByKey[FrameKey(uuid: uuid, address: frame.address)] ?? frame
         }
 
         return updated
     }
 
-    private func parseAtosOutput(_ output: String, frame: StackFrame) -> StackFrame {
-        var resolved = frame
+    static func parseAtosOutput(_ output: String, frame: StackFrame) -> StackFrame {
         let trimmed = output.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
+            return frame
+        }
+
+        // atos echoes the bare load-adjusted address when it cannot resolve a
+        // symbol — keep the frame unresolved instead of storing hex garbage
+        // that would count as "symbolicated".
+        if AtosPatterns.unresolvedAddress.firstMatch(
+            in: trimmed,
+            range: NSRange(trimmed.startIndex..., in: trimmed)
+        ) != nil {
             return frame
         }
 
@@ -88,6 +142,7 @@ struct AtosSymbolEngine: SymbolEngine {
            let fileRange = Range(match.range(at: 2), in: trimmed),
            let lineRange = Range(match.range(at: 3), in: trimmed)
         {
+            var resolved = frame
             resolved.symbol = String(trimmed[symbolRange])
             resolved.sourceFile = String(trimmed[fileRange])
             resolved.sourceLine = Int(trimmed[lineRange])
@@ -98,6 +153,7 @@ struct AtosSymbolEngine: SymbolEngine {
            let symbolRange = Range(match.range(at: 1), in: trimmed),
            let offsetRange = Range(match.range(at: 2), in: trimmed)
         {
+            var resolved = frame
             resolved.symbol = String(trimmed[symbolRange])
             resolved.symbolLocation = Int(trimmed[offsetRange])
             return resolved
@@ -106,10 +162,12 @@ struct AtosSymbolEngine: SymbolEngine {
         if let match = AtosPatterns.inImage.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)),
            let symbolRange = Range(match.range(at: 1), in: trimmed)
         {
+            var resolved = frame
             resolved.symbol = String(trimmed[symbolRange])
             return resolved
         }
 
+        var resolved = frame
         resolved.symbol = trimmed
         return resolved
     }
@@ -124,5 +182,9 @@ private enum AtosPatterns {
     )
     static let inImage = try! NSRegularExpression(
         pattern: #"^(.+?) \(in .+\)$"#
+    )
+    /// atos unresolved output: the address it was asked to resolve, e.g. `0x1023c4a20`.
+    static let unresolvedAddress = try! NSRegularExpression(
+        pattern: #"^0[xX][0-9A-Fa-f]+$"#
     )
 }

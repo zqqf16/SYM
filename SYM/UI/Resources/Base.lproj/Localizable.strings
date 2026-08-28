@@ -13,6 +13,14 @@
 "Show this dSYM in Finder" = "Show this dSYM in Finder";
 "Jump to the crashed thread" = "Jump to the crashed thread";
 
+/* Toolbar labels */
+"dSYM" = "dSYM";
+"Device" = "Device";
+"Progress" = "Progress";
+
+/* Symbolication result */
+"Symbolicated %lld of %lld frames" = "Symbolicated %lld of %lld frames";
+
 /* Menu (MenuBuilder fallback) */
 "About %@" = "About %@";
 "Settings…" = "Settings…";
@@ -136,3 +144,8 @@
 "Back" = "Back";
 "Forward" = "Forward";
 "No files" = "No files";
+"Cancel" = "Cancel";
+"Delete %lld selected item(s) from the device?" = "Delete %lld selected item(s) from the device?";
+"This cannot be undone." = "This cannot be undone.";
+"Failed to list directory." = "Failed to list directory.";
+"Could not refresh the directory; showing the previous contents." = "Could not refresh the directory; showing the previous contents.";

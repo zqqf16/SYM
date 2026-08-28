@@ -25,6 +25,8 @@ class ContentViewController: NSViewController {
 
     private var font: NSFont = Config.editorFont
     private var cancellable: AnyCancellable?
+    private var symbolicationSummaryCancellable: AnyCancellable?
+    private var symbolicationSummaryRevert: DispatchWorkItem?
     private var gutterWidthConstraint: Constraint?
     private var bottomBarHeightConstraint: Constraint?
     private var didAutoRevealCrashedThread = false
@@ -33,6 +35,8 @@ class ContentViewController: NSViewController {
     var document: CrashDocument? {
         didSet {
             cancellable?.cancel()
+            symbolicationSummaryCancellable?.cancel()
+            symbolicationSummaryRevert?.cancel()
             didAutoRevealCrashedThread = false
             jumpPillPlacement = .hidden
             jumpPillButton.isHidden = true
@@ -50,6 +54,11 @@ class ContentViewController: NSViewController {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] crashInfo in
                     self?.update(crashInfo: crashInfo)
+                }
+            symbolicationSummaryCancellable = document.$symbolicationSummary
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] summary in
+                    self?.showSymbolicationSummary(summary)
                 }
             update(crashInfo: document.crashInfo)
         }
@@ -371,6 +380,23 @@ class ContentViewController: NSViewController {
         toggleBottomBar(true)
     }
 
+    /// Show a transient symbolication result in the summary bar, then revert to the
+    /// normal device / OS / app summary after a few seconds.
+    private func showSymbolicationSummary(_ summary: String?) {
+        guard let summary, Config.showCrashSummary else {
+            updateSummary(document?.crashInfo)
+            return
+        }
+        infoLabel.stringValue = summary
+        toggleBottomBar(true)
+        symbolicationSummaryRevert?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.updateSummary(self?.document?.crashInfo)
+        }
+        symbolicationSummaryRevert = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: work)
+    }
+
     private func applyLineNumbersPreference() {
         let show = Config.showLineNumbers
         gutterView.isHidden = !show
@@ -574,12 +600,25 @@ class ContentViewController: NSViewController {
 }
 
 extension ContentViewController: NSTextViewDelegate {
-    func textView(_: NSTextView, menu _: NSMenu, for _: NSEvent, at _: Int) -> NSMenu? {
-        let menu = NSMenu(title: "dSYM")
-        let showItem = NSMenuItem(title: "Symbolicate", action: #selector(symbolicate(_:)), keyEquivalent: "")
-        showItem.target = self
-        menu.addItem(showItem)
-        menu.allowsContextMenuPlugIns = true
+    func textView(
+        _: NSTextView,
+        menu menu: NSMenu,
+        for _: NSEvent,
+        at _: Int
+    ) -> NSMenu? {
+        // Keep the standard edit menu (copy / paste / lookup / …) and just add
+        // Symbolicate on top. Remove any previous item first in case AppKit
+        // hands us a reused menu.
+        let action = #selector(symbolicate(_:))
+        menu.items.removeAll { $0.action == action }
+        let symbolicateItem = NSMenuItem(
+            title: NSLocalizedString("Symbolicate", comment: "Context menu item"),
+            action: action,
+            keyEquivalent: ""
+        )
+        symbolicateItem.target = self
+        menu.insertItem(symbolicateItem, at: 0)
+        menu.insertItem(.separator(), at: 1)
         return menu
     }
 }

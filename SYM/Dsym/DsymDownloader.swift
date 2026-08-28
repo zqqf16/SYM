@@ -89,7 +89,6 @@ class DsymDownloadTask {
             downloadedSize = items[3]
             timeLeft = items[10]
             speed = items[11]
-            // print(self)
         }
     }
 
@@ -100,9 +99,17 @@ class DsymDownloadTask {
     var message: String?
     var dsymFiles: [DsymFile]?
 
-    private var process: SubProcess!
+    /// Guards `process` / `isCanceled`: `run()` executes on a global queue while
+    /// `cancel()` comes from the main thread.
+    private let stateLock = NSLock()
+    private var isCanceled = false
+    private var process: SubProcess?
     private var fileURL: URL?
-    private var scriptURL: URL
+    private let scriptURL: URL
+    /// curl progress chunks arrive on the subprocess IO queue; accumulate on a
+    /// serial queue and publish the parsed value on the main thread.
+    private let progressQueue = DispatchQueue(label: "im.zorro.SYM.download.progress", qos: .userInitiated)
+    private var progressOutput = ""
 
     init(crashInfo: CrashReport, scriptURL: URL, fileURL: URL?) {
         self.crashInfo = crashInfo
@@ -110,54 +117,95 @@ class DsymDownloadTask {
         self.scriptURL = scriptURL
     }
 
+    /// `@Published` is not thread-safe: every write hops to the main thread so
+    /// `run()` (global queue) and `cancel()` (caller thread) can't race.
+    private func publishStatus(_ newStatus: Status) {
+        if Thread.isMainThread {
+            status = newStatus
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.status = newStatus
+            }
+        }
+    }
+
     func run() {
         let ownsTemporaryCrashFile = fileURL == nil
         let crashPath = fileURL?.path ?? FileManager.default.temporaryPath()
         defer {
-            self.process = nil
+            stateLock.lock()
+            process = nil
+            stateLock.unlock()
             if ownsTemporaryCrashFile {
                 try? FileManager.default.removeItem(atPath: crashPath)
             }
-        }
-
-        if process != nil {
-            process?.terminate()
-            process = nil
         }
 
         do {
             try crashInfo.formattedContent.write(toFile: crashPath, atomically: true, encoding: .utf8)
         } catch {
             statusCode = -1001
-            status = .failed(code: statusCode, message: "Failed to save file")
+            publishStatus(.failed(code: statusCode, message: "Failed to save file"))
             return
         }
 
         let dir = Config.dsymDownloadDirectory
         let env = crashInfoToEnv(crashInfo)
-        process = SubProcess(cmd: scriptURL.path, args: [crashPath, dir], env: env)
-        process.errorHandler = { [weak self] _ in
-            if let this = self {
-                this.progress.update(fromConsoleOutput: this.process.error)
-            }
+        let task = SubProcess(cmd: scriptURL.path, args: [crashPath, dir], env: env)
+        task.errorHandler = { [weak self] chunk in
+            self?.consumeProgressChunk(chunk)
         }
-        status = .running
-        process.run()
+        stateLock.lock()
+        process = task
+        stateLock.unlock()
 
-        parse(output: process.output)
-        statusCode = process.exitCode
-        message = process.output
+        publishStatus(.running)
+        task.run()
+
+        // A cancel mid-run terminates the script; don't let the completion path
+        // overwrite `.canceled` with `.failed` / `.success`.
+        stateLock.lock()
+        let canceled = isCanceled
+        stateLock.unlock()
+        if canceled {
+            return
+        }
+
+        parse(output: task.output)
+        statusCode = task.exitCode
+        message = task.output
 
         if statusCode != 0 {
-            status = .failed(code: statusCode, message: message)
+            publishStatus(.failed(code: statusCode, message: message))
         } else {
-            status = .success
+            publishStatus(.success)
         }
     }
 
     func cancel() {
-        process?.terminate()
-        status = .canceled
+        stateLock.lock()
+        isCanceled = true
+        let task = process
+        stateLock.unlock()
+        task?.terminate()
+        publishStatus(.canceled)
+    }
+
+    private func consumeProgressChunk(_ chunk: String) {
+        guard !chunk.isEmpty else {
+            return
+        }
+        progressQueue.async { [weak self] in
+            guard let self else {
+                return
+            }
+            self.progressOutput += chunk
+            var value = Progress()
+            value.update(fromConsoleOutput: self.progressOutput)
+            DispatchQueue.main.async { [weak self] in
+                self?.progress = value
+            }
+        }
     }
 
     private func crashInfoToEnv(_ crashInfo: CrashReport) -> [String: String] {
@@ -286,6 +334,10 @@ class DsymDownloader {
         guard let uuid = CrashUUID.normalize(crashInfo.uuid), canDownload() else {
             return nil
         }
+
+        // Terminal tasks only ever get replaced on the next download — drop them
+        // so they stop retaining crash reports and subprocess output forever.
+        tasks = tasks.filter { !$0.value.status.shouldRetry() }
 
         if let task = tasks[uuid], !task.status.shouldRetry() {
             return task

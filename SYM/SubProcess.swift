@@ -48,19 +48,29 @@ class SubProcess {
     func run() -> Bool {
         let outputPipe = Pipe()
         let errorPipe = Pipe()
+        // Serialize accumulation so the readabilityHandler (system queue) and the
+        // final drain below never race on `output` / `error`.
+        let ioQueue = DispatchQueue(label: "sym.subprocess.io", qos: .userInitiated)
+
         outputPipe.fileHandleForReading.readabilityHandler = { handle in
-            guard let string = String(data: handle.availableData, encoding: .utf8) else {
-                return
+            let data = handle.availableData
+            ioQueue.async { [weak self] in
+                guard let self, let string = String(data: data, encoding: .utf8) else {
+                    return
+                }
+                self.output += string
+                self.outputHandler?(string)
             }
-            self.output += string
-            self.outputHandler?(string)
         }
         errorPipe.fileHandleForReading.readabilityHandler = { handle in
-            guard let string = String(data: handle.availableData, encoding: .utf8) else {
-                return
+            let data = handle.availableData
+            ioQueue.async { [weak self] in
+                guard let self, let string = String(data: data, encoding: .utf8) else {
+                    return
+                }
+                self.error += string
+                self.errorHandler?(string)
             }
-            self.error += string
-            self.errorHandler?(string)
         }
 
         let task = Process()
@@ -86,8 +96,24 @@ class SubProcess {
         }
         task.waitUntilExit()
 
+        // Close the parent's write ends so the read ends see EOF, then drain any
+        // bytes the handlers had not consumed yet. `waitUntilExit()` guarantees the
+        // process is gone, not that the last chunk has reached the handler — without
+        // this, trailing output (the final atos line / dwarfdump UUID) could be dropped.
+        try? outputPipe.fileHandleForWriting.close()
+        try? errorPipe.fileHandleForWriting.close()
         outputPipe.fileHandleForReading.readabilityHandler = nil
         errorPipe.fileHandleForReading.readabilityHandler = nil
+        let trailingOutput = try? outputPipe.fileHandleForReading.readToEnd()
+        let trailingError = try? errorPipe.fileHandleForReading.readToEnd()
+        ioQueue.sync {
+            if let data = trailingOutput, let string = String(data: data, encoding: .utf8), !string.isEmpty {
+                self.output += string
+            }
+            if let data = trailingError, let string = String(data: data, encoding: .utf8), !string.isEmpty {
+                self.error += string
+            }
+        }
 
         exitCode = Int(task.terminationStatus)
         return exitCode == 0

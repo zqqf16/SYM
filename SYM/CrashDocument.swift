@@ -63,6 +63,10 @@ class CrashDocument: NSDocument {
     @Published
     var isSymbolicating: Bool = false
 
+    /// Set after a symbolicate pass; the editor shows it transiently (e.g. "Symbolicated 12 of 20 frames").
+    @Published
+    private(set) var symbolicationSummary: String?
+
     var isReplaceable: Bool {
         return fileURL == nil && textStorage.string.count == 0
     }
@@ -256,6 +260,17 @@ extension CrashDocument {
         replaceContent(newContent)
         isApplyingPresentation = false
         updateChangeCount(.changeDone)
+        symbolicationSummary = Self.makeSymbolicationSummary(after: report)
+    }
+
+    private static func makeSymbolicationSummary(after report: CrashReport) -> String {
+        let frames = report.allFrames
+        let resolved = frames.filter(\.isSymbolicated).count
+        return String(
+            format: NSLocalizedString("Symbolicated %lld of %lld frames", comment: "Symbolication result summary"),
+            Int64(resolved),
+            Int64(frames.count)
+        )
     }
 
     private func registerSymbolicationUndo(content: String, report: CrashReport?) {
@@ -278,5 +293,6 @@ extension CrashDocument {
         crashInfo = report
         replaceContent(content)
         isApplyingPresentation = false
+        symbolicationSummary = nil
     }
 }

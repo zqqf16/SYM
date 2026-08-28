@@ -255,9 +255,22 @@ class FileBrowserViewController: NSViewController, LoadingAble {
 
         showLoading()
         afcQueue.async {
-            let children = dir.reloadChildren() ?? dir.children ?? []
+            // nil = the AFC listing failed; `reloadChildren` kept the previous
+            // contents, so fall back to them instead of blanking the list.
+            let listed = dir.reloadChildren()
+            let children = listed ?? dir.children
             DispatchQueue.main.async {
-                self.displayedFiles = children
+                if listed == nil {
+                    self.errorMessage = (children == nil)
+                        ? NSLocalizedString("Failed to list directory.", comment: "File browser listing error")
+                        : NSLocalizedString(
+                            "Could not refresh the directory; showing the previous contents.",
+                            comment: "File browser stale listing notice"
+                        )
+                } else {
+                    self.errorMessage = nil
+                }
+                self.displayedFiles = children ?? []
                 self.applySortAndReload()
                 self.updatePathBar()
                 self.hideLoading()
@@ -267,7 +280,7 @@ class FileBrowserViewController: NSViewController, LoadingAble {
 
     private func applySortAndReload() {
         if !tableView.sortDescriptors.isEmpty {
-            displayedFiles = (displayedFiles as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
+            displayedFiles = (displayedFiles as NSArray).sortedArray(using: tableView.sortDescriptors) as? [MDDeviceFile] ?? displayedFiles
         }
         updateEmptyState()
         tableView.reloadData()
@@ -306,12 +319,35 @@ class FileBrowserViewController: NSViewController, LoadingAble {
             return [(title: "/", file: root)]
         }
 
-        let display = displayPath(for: dir)
-        let parts = display.split(separator: "/").map(String.init).filter { !$0.isEmpty }
+        // Build the whole ancestor chain from the raw AFC path
+        // ("." → "./A" → "./A/B") so every crumb navigates to its folder.
+        let rawPath = dir.path
+        // AFC listing paths look like "./Documents/foo"; treat anything else
+        // as absolute.
+        let prefix = rawPath.hasPrefix("/") ? "" : "."
+        var parts = rawPath.split(separator: "/").map(String.init).filter { !$0.isEmpty }
+        if prefix == ".", parts.first == "." {
+            parts.removeFirst()
+        }
+
         var components: [(title: String, file: MDDeviceFile?)] = [(title: "/", file: root)]
+        var accumulated = prefix
         for (index, part) in parts.enumerated() {
-            let isLast = index == parts.count - 1
-            components.append((title: part, file: isLast ? dir : nil))
+            accumulated += "/" + part
+            let file: MDDeviceFile?
+            if index == parts.count - 1 {
+                file = dir
+            } else if let client = afcClient {
+                // Intermediate level: construct a directory handle for the
+                // ancestor path (children are listed lazily on navigation).
+                let ancestor = MDDeviceFile(afcClient: client)
+                ancestor.path = accumulated
+                ancestor.isDirectory = true
+                file = ancestor
+            } else {
+                file = nil
+            }
+            components.append((title: part, file: file))
         }
         return components
     }
@@ -339,20 +375,24 @@ class FileBrowserViewController: NSViewController, LoadingAble {
     @objc func removeFile(_: AnyObject?) {
         let indexes = tableView.selectedRowIndexes
         guard !indexes.isEmpty else { return }
-        showLoading()
-        let files = indexes.map { displayedFiles[$0] }
-        afcQueue.async {
-            var removed = false
-            for file in files {
-                if file.remove() {
-                    removed = true
+        // Files are deleted from the device immediately — confirm first.
+        confirmDeletion(count: indexes.count) { [weak self] in
+            guard let self else { return }
+            self.showLoading()
+            let files = indexes.map { self.displayedFiles[$0] }
+            self.afcQueue.async {
+                var removed = false
+                for file in files {
+                    if file.remove() {
+                        removed = true
+                    }
                 }
-            }
-            DispatchQueue.main.async {
-                if removed {
-                    self.reloadDirectoryListing()
-                } else {
-                    self.hideLoading()
+                DispatchQueue.main.async { [weak self] in
+                    if removed {
+                        self?.reloadDirectoryListing()
+                    } else {
+                        self?.hideLoading()
+                    }
                 }
             }
         }
@@ -372,14 +412,15 @@ class FileBrowserViewController: NSViewController, LoadingAble {
             exportFile(atIndex: indexes.first!)
             return
         }
+        guard let window = view.window else { return }
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.canCreateDirectories = true
         panel.prompt = NSLocalizedString("Export", comment: "")
         panel.message = NSLocalizedString("Choose export folder", comment: "")
-        panel.beginSheetModal(for: view.window!) { [weak panel] result in
-            guard result == .OK, let url = panel?.url else { return }
+        panel.beginSheetModal(for: window) { [weak self, weak panel] result in
+            guard result == .OK, let url = panel?.url, let self else { return }
             let files = indexes.map { self.displayedFiles[$0] }
             self.exportFiles(files, toDirectory: url)
         }
@@ -388,14 +429,15 @@ class FileBrowserViewController: NSViewController, LoadingAble {
     private func exportFile(atIndex index: Int) {
         guard index >= 0, index < displayedFiles.count else { return }
         let file = displayedFiles[index]
+        guard let window = view.window else { return }
         let savePanel = NSSavePanel()
         savePanel.canCreateDirectories = true
         savePanel.nameFieldStringValue = file.name
-        savePanel.beginSheetModal(for: view.window!) { [weak savePanel] result in
-            guard result == .OK, let url = savePanel?.url else { return }
+        savePanel.beginSheetModal(for: window) { [weak self, weak savePanel] result in
+            guard result == .OK, let self else { return }
             var name = savePanel?.nameFieldStringValue ?? file.name
             if name.isEmpty { name = file.name }
-            let dest = URL(fileURLWithPath: name, relativeTo: url)
+            let dest = URL(fileURLWithPath: name, relativeTo: savePanel?.url)
             self.exportFile(file, toURL: dest)
         }
     }

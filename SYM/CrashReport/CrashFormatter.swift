@@ -28,7 +28,7 @@ enum CrashFormatter {
         // Never rebuild classic / already-rendered text from the frame model —
         // that drops headers, Binary Images, registers, and rich symbol text.
         // JSON decoders already synthesize formattedContent at decode time.
-        CrashHighlightParser.applyRanges(to: &updated, frameRegex: { CrashRegex.frame(for: $0) })
+        CrashHighlightParser.applyRanges(to: &updated, frameRegex: { CrashRegex.frames(forBinaries: $0) })
         return updated
     }
 
@@ -45,7 +45,15 @@ enum CrashFormatter {
             return content
         }
 
-        var resolvedByAddress = [UInt64: StackFrame]()
+        // Key by (image, address): the same address can appear in different
+        // images (ASLR collisions / repeated PCs), and image+address is what
+        // identifies a frame line — address alone can patch the wrong image.
+        struct FrameLineKey: Hashable {
+            let imageName: String
+            let address: UInt64
+        }
+
+        var resolvedByLine = [FrameLineKey: StackFrame]()
         for (old, new) in zip(beforeFrames, afterFrames) {
             let changed = old.symbol != new.symbol
                 || old.symbolLocation != new.symbolLocation
@@ -55,11 +63,11 @@ enum CrashFormatter {
             guard changed, new.isSymbolicated else {
                 continue
             }
-            resolvedByAddress[old.address] = new
-            resolvedByAddress[new.address] = new
+            resolvedByLine[FrameLineKey(imageName: old.imageName, address: old.address)] = new
+            resolvedByLine[FrameLineKey(imageName: new.imageName, address: new.address)] = new
         }
 
-        guard !resolvedByAddress.isEmpty else {
+        guard !resolvedByLine.isEmpty else {
             return content
         }
 
@@ -68,9 +76,10 @@ enum CrashFormatter {
         for (index, line) in lines.enumerated() {
             guard let match = CrashRegex.stackFrame.firstMatch(in: line),
                   let captures = match.captures,
+                  let imageName = captures.crashCapture(2),
                   let addressString = captures.crashCapture(3),
                   let address = addressString.crashHexAddress,
-                  let frame = resolvedByAddress[address],
+                  let frame = resolvedByLine[FrameLineKey(imageName: imageName, address: address)],
                   let symbolText = frame.symbolDescription,
                   let addressRange = match.range(at: 3)
             else {

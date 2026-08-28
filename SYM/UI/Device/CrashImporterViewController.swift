@@ -57,6 +57,7 @@ extension MDAfcClient {
 
 class DeviceFileProvider: NSFilePromiseProvider {
     var file: MDDeviceFile?
+    var deviceID: String?
 }
 
 class CrashImporterViewController: NSViewController, LoadingAble {
@@ -72,6 +73,10 @@ class CrashImporterViewController: NSViewController, LoadingAble {
     private var errorMessage: String?
 
     var loadingIndicator: NSProgressIndicator!
+
+    /// All AFC traffic goes through one queue (mirrors FileBrowserViewController;
+    /// afc clients are not safe to use concurrently).
+    private let afcQueue = DispatchQueue(label: "im.zorro.SYM.crashImporter.afc")
 
     private var afcClient: MDAfcClient? {
         guard let deviceID = deviceID else { return nil }
@@ -186,15 +191,18 @@ class CrashImporterViewController: NSViewController, LoadingAble {
             updateEmptyState()
             return
         }
+        guard let deviceID else { return }
 
         showLoading()
-        DispatchQueue.global().async {
-            let lockdown = MDLockdown(udid: deviceID!)
+        afcQueue.async { [weak self] in
+            let lockdown = MDLockdown(udid: deviceID)
             if let moveService = lockdown.startService(withIdentifier: "com.apple.crashreportmover") {
                 moveService.ping()
             }
-            let crashList = self.afcClient?.crashFiles() ?? []
-            DispatchQueue.main.async {
+            let client: MDAfcClient? = MDAfcClient.crash(with: lockdown)
+            let crashList = client?.crashFiles() ?? []
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 self.fileList = crashList.filter { $0.isCrash }.sorted { $0.date > $1.date }
                 self.applyFilter(query: self.searchField.stringValue)
                 self.hideLoading()
@@ -204,26 +212,23 @@ class CrashImporterViewController: NSViewController, LoadingAble {
 
     func openCrash(atIndex index: Int) {
         guard index >= 0, index < filteredList.count else { return }
+        guard let udid = deviceID else { return }
         showLoading()
         let file = filteredList[index]
-        DispatchQueue.global().async {
-            guard let udid = self.deviceID else {
-                DispatchQueue.main.async { self.hideLoading() }
-                return
-            }
+        afcQueue.async { [weak self] in
             let path = FileManager.default.localCrashDirectory(udid) + "/\(file.localCrashFileName)"
             let url = URL(fileURLWithPath: path)
-            if self.afcClient?.copyCrashFile(file, to: url) != nil {
-                DispatchQueue.main.async {
-                    DocumentController.shared.openDocument(withContentsOf: url, display: true) { _, _, _ in
-                        self.hideLoading()
+            if self?.afcClient?.copyCrashFile(file, to: url) != nil {
+                DispatchQueue.main.async { [weak self] in
+                    DocumentController.shared.openDocument(withContentsOf: url, display: true) { [weak self] _, _, _ in
+                        self?.hideLoading()
                     }
                 }
             } else {
-                DispatchQueue.main.async {
-                    self.errorMessage = NSLocalizedString("Failed to copy crash log", comment: "")
-                    self.updateEmptyState()
-                    self.hideLoading()
+                DispatchQueue.main.async { [weak self] in
+                    self?.errorMessage = NSLocalizedString("Failed to copy crash log", comment: "")
+                    self?.updateEmptyState()
+                    self?.hideLoading()
                 }
             }
         }
@@ -240,17 +245,21 @@ class CrashImporterViewController: NSViewController, LoadingAble {
     }
 
     @objc func removeFile(_: AnyObject?) {
-        guard let afcClient = afcClient else { return }
         let selectedIndexes = tableView.selectedRowIndexes
-        if selectedIndexes.isEmpty { return }
+        guard !selectedIndexes.isEmpty else { return }
 
-        let files = selectedIndexes.map { filteredList[$0] }
-        showLoading()
-        DispatchQueue.global().async {
-            files.forEach { afcClient.remove($0.path) }
-            DispatchQueue.main.async {
-                self.reloadFiles(nil)
-                self.hideLoading()
+        // Files are deleted from the device immediately — confirm first.
+        confirmDeletion(count: selectedIndexes.count) { [weak self] in
+            guard let self else { return }
+            let files = selectedIndexes.map { self.filteredList[$0] }
+            guard let afcClient = self.afcClient else { return }
+            self.showLoading()
+            self.afcQueue.async {
+                files.forEach { afcClient.remove($0.path) }
+                DispatchQueue.main.async { [weak self] in
+                    self?.reloadFiles(nil)
+                    self?.hideLoading()
+                }
             }
         }
     }
@@ -298,13 +307,15 @@ extension CrashImporterViewController: NSTableViewDelegate, NSTableViewDataSourc
     }
 
     func tableView(_ tableView: NSTableView, sortDescriptorsDidChange _: [NSSortDescriptor]) {
-        filteredList = (filteredList as NSArray).sortedArray(using: tableView.sortDescriptors) as! [MDDeviceFile]
+        filteredList = (filteredList as NSArray).sortedArray(using: tableView.sortDescriptors) as? [MDDeviceFile] ?? filteredList
         tableView.reloadData()
     }
 
     func tableView(_: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
+        guard let deviceID else { return nil }
         let provider = DeviceFileProvider(fileType: "public.plain-text", delegate: self)
         provider.file = filteredList[row]
+        provider.deviceID = deviceID
         return provider
     }
 }
@@ -318,12 +329,19 @@ extension CrashImporterViewController: NSFilePromiseProviderDelegate {
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
         guard let provider = filePromiseProvider as? DeviceFileProvider,
               let file = provider.file,
-              let afcClient = afcClient
+              let deviceID = provider.deviceID
         else {
             completionHandler(FileError.createFailed)
             return
         }
-        _ = afcClient.copyCrashFile(file, to: url)
+        // Runs on the provider's own operation queue (background). The importer's
+        // AFC client is confined to its queue, so open a dedicated connection and
+        // report failures instead of silently promising an empty file.
+        let client: MDAfcClient? = MDAfcClient.crash(with: MDLockdown(udid: deviceID))
+        guard let client, client.copyCrashFile(file, to: url) != nil else {
+            completionHandler(FileError.createFailed)
+            return
+        }
         completionHandler(nil)
     }
 

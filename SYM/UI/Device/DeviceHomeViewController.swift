@@ -161,7 +161,14 @@ class DeviceHomeViewController: NSSplitViewController {
         contentVC.onFileBrowserVisibilityChange = { [weak self] browser in
             self?.onFileBrowserVisibilityChange?(browser)
         }
-        dataSource.$nodes.assign(to: \.nodes, on: self).store(in: &storage)
+        // keyPath `assign(to:on:)` would retain this controller inside its own
+        // subscription — use a weak sink so the view controller can deinit.
+        dataSource.$nodes
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] nodes in
+                self?.nodes = nodes
+            }
+            .store(in: &storage)
     }
 
     private func reloadData() {

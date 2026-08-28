@@ -25,6 +25,16 @@ import MachOKit
 
 struct MachOSymbolEngine: SymbolEngine {
     func symbolicate(_ report: CrashReport, dsymPaths: [String: String]) async -> CrashReport {
+        // MachO loads and closestSymbol() are blocking file/CPU work — keep them
+        // off the Swift cooperative pool so parallel documents don't starve it.
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                continuation.resume(returning: Self.performSymbolication(report, dsymPaths: dsymPaths))
+            }
+        }
+    }
+
+    static func performSymbolication(_ report: CrashReport, dsymPaths: [String: String]) -> CrashReport {
         var updated = report
         let imagesByUUID = CrashUUID.imagesByUUID(report.binaryImages)
 
@@ -68,7 +78,7 @@ struct MachOSymbolEngine: SymbolEngine {
         return updated
     }
 
-    private func loadMachO(path: String, expectedUUID: String, arch: String?) -> MachOFile? {
+    private static func loadMachO(path: String, expectedUUID: String, arch: String?) -> MachOFile? {
         let url = URL(fileURLWithPath: path)
         guard let loaded = try? MachOKit.loadFromFile(url: url) else {
             return nil
@@ -76,31 +86,31 @@ struct MachOSymbolEngine: SymbolEngine {
 
         switch loaded {
         case let .machO(machOFile):
-            guard uuidMatches(path: path, expectedUUID: expectedUUID) else {
-                return nil
-            }
-            return machOFile
+            return uuidMatches(machOFile, expectedUUID: expectedUUID) ? machOFile : nil
         case let .fat(fatFile):
             guard let machOFiles = try? fatFile.machOFiles() else {
                 return nil
             }
-            if let arch, let matched = machOFiles.first(where: { matchesArch($0, arch: arch) && uuidMatches(path: path, expectedUUID: expectedUUID) }) {
+            if let arch, let matched = machOFiles.first(where: { matchesArch($0, arch: arch) && uuidMatches($0, expectedUUID: expectedUUID) }) {
                 return matched
             }
-            return machOFiles.first { _ in uuidMatches(path: path, expectedUUID: expectedUUID) }
+            return machOFiles.first(where: { uuidMatches($0, expectedUUID: expectedUUID) })
         }
     }
 
-    private func uuidMatches(path: String, expectedUUID: String) -> Bool {
+    /// Read the slice's LC_UUID from the already-loaded Mach-O instead of spawning
+    /// `dwarfdump --uuid` for every binary (which was slow for fat binaries).
+    private static func uuidMatches(_ machO: MachOFile, expectedUUID: String) -> Bool {
         guard let expected = CrashUUID.normalize(expectedUUID),
-              let pairs = SubProcess.dwarfdump([path])
+              let command = machO.loadCommands.info(of: LoadCommand.uuid),
+              let actual = CrashUUID.normalize(command.uuid.uuidString)
         else {
             return false
         }
-        return pairs.contains { CrashUUID.normalize($0.0) == expected }
+        return actual == expected
     }
 
-    private func matchesArch(_ machO: MachOFile, arch: String) -> Bool {
+    private static func matchesArch(_ machO: MachOFile, arch: String) -> Bool {
         let normalized = CrashArch.normalize(arch)?.lowercased() ?? arch.lowercased()
         let cpuType = machO.header.cpuType
         switch normalized {

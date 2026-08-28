@@ -87,30 +87,47 @@ enum Config {
         return true
     }
 
+    /// Cached "download.sh is a real script" state (main thread only).
+    /// Toolbar validation polls `isDownloadScriptConfigured()` on every pass;
+    /// without the cache each check re-reads (and may delete) download.sh.
+    private static var downloadScriptConfiguredCache: Bool?
+
     /// Delete `download.sh` when empty so callers treat it as “no script configured”.
     @discardableResult
     static func sanitizeDownloadScriptFile() -> Bool {
         let url = downloadScriptURL
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: url.path) else {
+            downloadScriptConfiguredCache = false
             return false
         }
         guard let script = try? String(contentsOf: url, encoding: .utf8),
               !isDownloadScriptEmpty(script)
         else {
             try? fileManager.removeItem(at: url)
+            downloadScriptConfiguredCache = false
             return false
         }
+        downloadScriptConfiguredCache = true
         return true
     }
 
-    /// Whether a real user/builtin download script is on disk (sanitizes stubs first).
+    /// Whether a real user/builtin download script is on disk (cached; sanitizes stubs first).
     static func isDownloadScriptConfigured() -> Bool {
-        sanitizeDownloadScriptFile()
+        if let configured = downloadScriptConfiguredCache {
+            return configured
+        }
+        return sanitizeDownloadScriptFile()
+    }
+
+    /// Disk state changed outside Config — the next check re-reads download.sh.
+    static func invalidateDownloadScriptCache() {
+        downloadScriptConfiguredCache = nil
     }
 
     static func removeDownloadScript() {
         try? FileManager.default.removeItem(at: downloadScriptURL)
+        downloadScriptConfiguredCache = false
     }
 
     static func prepareDsymDownloadDirectory() {

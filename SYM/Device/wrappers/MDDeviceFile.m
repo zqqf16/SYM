@@ -86,8 +86,15 @@
 }
 
 - (NSArray<MDDeviceFile *> *)reloadChildren {
-    [self invalidateChildren];
-    return self.children;
+    NSArray *cached = _children;
+    _children = nil;
+    NSArray *listed = self.children;
+    if (!listed) {
+        // The listing failed. Restore the last good contents so callers can
+        // fall back to them instead of showing an empty directory.
+        _children = cached;
+    }
+    return listed;
 }
 
 - (NSData *)read {

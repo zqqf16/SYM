@@ -533,4 +533,179 @@ final class CrashReportTests: XCTestCase {
         XCTAssertEqual(uuids.first?.count, 36)
         XCTAssertEqual(uuids.first, CrashUUID.normalize(uuids.first))
     }
+
+    func testHighlightFramesMatchesMultipleBinariesInOnePass() {
+        let regex = CrashRegex.frames(forBinaries: ["Demo", "DemoKit", "com.example.App"])
+        XCTAssertNotNil(regex)
+        let content =
+            "0   Demo                           0x0000000100000000 main + 4\n"
+            + "0   DemoKit                        0x0000000100001000 start + 1\n"
+            + "0   com.example.App                0x0000000100002000 foo + 2\n"
+        let matches = regex?.matches(in: content) ?? []
+        XCTAssertEqual(matches.count, 3)
+    }
+
+    func testHighlightFramesEscapesBinaryNames() {
+        // '.' in a bundle-id style name is literal, not a wildcard.
+        let regex = CrashRegex.frames(forBinaries: ["com.example.App"])
+        let notMatch = "0   comXexampleXApp                0x0000000100002000 foo + 2\n"
+        XCTAssertNil(regex?.firstMatch(in: notMatch))
+
+        let literal = "0   com.example.App                0x0000000100002000 foo + 2\n"
+        XCTAssertNotNil(regex?.firstMatch(in: literal))
+    }
+
+    // MARK: - Atos output parsing
+
+    func testAtosOutputParsing() {
+        let frame = StackFrame(index: 0, imageName: "Demo", address: 0x1_0000_4000)
+
+        // "symbol (in image) (file:line)" — the informative form.
+        let withSource = AtosSymbolEngine.parseAtosOutput(
+            "DemoViewController.viewDidLoad() (in Demo) (/Users/x/DemoViewController.swift:42)",
+            frame: frame
+        )
+        XCTAssertEqual(withSource.symbol, "DemoViewController.viewDidLoad()")
+        XCTAssertEqual(withSource.sourceFile, "/Users/x/DemoViewController.swift")
+        XCTAssertEqual(withSource.sourceLine, 42)
+
+        // "symbol + offset" form.
+        let withOffset = AtosSymbolEngine.parseAtosOutput("main + 128", frame: frame)
+        XCTAssertEqual(withOffset.symbol, "main")
+        XCTAssertEqual(withOffset.symbolLocation, 128)
+
+        // "symbol (in image)" form.
+        let inImage = AtosSymbolEngine.parseAtosOutput("main (in Demo)", frame: frame)
+        XCTAssertEqual(inImage.symbol, "main")
+
+        // atos echoes the bare address when it cannot resolve — the frame must
+        // stay unsymbolicated (hex garbage would also inflate the summary count).
+        let unresolved = AtosSymbolEngine.parseAtosOutput("0x0000000102ba2000", frame: frame)
+        XCTAssertEqual(unresolved, frame)
+        XCTAssertFalse(unresolved.isSymbolicated)
+
+        // Empty output keeps the frame untouched.
+        let empty = AtosSymbolEngine.parseAtosOutput("  \n", frame: frame)
+        XCTAssertEqual(empty, frame)
+    }
+
+    // MARK: - patchResolvedFrames matching
+
+    func testPatchResolvedFramesKeysByImageAndAddress() {
+        // Same PC in two different images: only the resolved image's line may change.
+        let lineA = "0   AppA                          \t0x0000000100000000 0x100000000 + 12"
+        let lineB = "0   AppB                          \t0x0000000100000000 0x100000000 + 12"
+        let content = "Thread 0 Crashed:\n\(lineA)\n\(lineB)\n"
+
+        let frameA = StackFrame(index: 0, imageName: "AppA", address: 0x1_0000_0000, imageOffset: 12, loadAddress: 0x1_0000_0000)
+        let frameB = StackFrame(index: 0, imageName: "AppB", address: 0x1_0000_0000, imageOffset: 12, loadAddress: 0x1_0000_0000)
+
+        let reportBefore = CrashReport(
+            rawContent: content,
+            threads: [CrashThread(index: 0, name: nil, queue: nil, crashed: true, frames: [frameA, frameB])]
+        )
+
+        var resolvedA = frameA
+        resolvedA.symbol = "AppA.main"
+        resolvedA.symbolLocation = 12
+        let reportAfter = CrashReport(
+            rawContent: content,
+            threads: [CrashThread(index: 0, name: nil, queue: nil, crashed: true, frames: [resolvedA, frameB])]
+        )
+
+        let patched = CrashFormatter.patchResolvedFrames(in: content, before: reportBefore, after: reportAfter)
+        XCTAssertTrue(patched.contains("AppA.main + 12"), "resolved frame must be patched in place")
+        XCTAssertTrue(patched.contains(lineB), "same address in another image must keep its line")
+        XCTAssertFalse(patched.contains("AppB                          \t0x0000000100000000 AppA.main"))
+    }
+
+    // MARK: - dSYM index store
+
+    func testDsymIndexStorePersistsAndServesHits() throws {
+        let dir = URL(fileURLWithPath: FileManager.default.temporaryPath(), isDirectory: true)
+        try FileManager.default.createDirectory(atPath: dir.path, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(atPath: dir.path) }
+
+        let uuidA = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+        let uuidB = "BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"
+        let dwarfPath = dir.path + "/Demo.dSYM/Contents/Resources/DWARF/Demo"
+        try FileManager.default.createDirectory(
+            atPath: (dwarfPath as NSString).deletingLastPathComponent,
+            withIntermediateDirectories: true
+        )
+
+        let store = DsymIndexStore(directory: dir)
+        store.record([DsymFile(
+            name: "Demo.dSYM",
+            path: dir.path + "/Demo.dSYM",
+            binaryPath: dwarfPath,
+            uuids: [uuidA]
+        )])
+        store.save()
+
+        // Entries survive the process boundary.
+        let reloaded = DsymIndexStore(directory: dir)
+        XCTAssertEqual(reloaded.count, 1)
+        let needed: Set<String> = [uuidA]
+        let hit = reloaded.cachedFiles(neededUUIDs: needed, stopUUIDs: needed)
+        XCTAssertEqual(hit?.count, 1)
+        XCTAssertEqual(hit?.first?.binaryPath, dwarfPath)
+
+        // Partial coverage is a miss — the caller falls back to a full scan.
+        XCTAssertNil(reloaded.cachedFiles(neededUUIDs: [uuidA, uuidB], stopUUIDs: [uuidA, uuidB]))
+
+        // A vanished path is a miss even before save() prunes it.
+        try FileManager.default.removeItem(atPath: dir.path + "/Demo.dSYM")
+        XCTAssertNil(reloaded.cachedFiles(neededUUIDs: needed, stopUUIDs: needed))
+        reloaded.save()
+        XCTAssertEqual(reloaded.count, 0, "stale entries must be pruned on save")
+    }
+
+    // MARK: - Download progress parsing
+
+    func testDownloadProgressParsesCurlOutput() {
+        var progress = DsymDownloadTask.Progress()
+        let output = "% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current\n"
+            + "                                 Dload  Upload   Total   Spent    Left  Speed\n"
+            + " 10  286M   10 30.2M    0     0   830k      0  0:05:53  0:00:37  0:05:16  1660k\r"
+            + " 25  286M   25 71.5M    0     0  1890k      0  0:02:35  0:00:38  0:01:57  1930k\r"
+        progress.update(fromConsoleOutput: output)
+        XCTAssertEqual(progress.percentage, 25)
+        XCTAssertEqual(progress.totalSize, "286M")
+        XCTAssertEqual(progress.downloadedSize, "71.5M")
+        XCTAssertEqual(progress.timeLeft, "0:01:57")
+        XCTAssertEqual(progress.speed, "1930k")
+
+        // Output without a curl progress table leaves the values untouched.
+        var plain = DsymDownloadTask.Progress()
+        plain.update(fromConsoleOutput: "downloading...\ndone")
+        XCTAssertEqual(plain.percentage, 0)
+    }
+}
+
+/// Guards `SubProcess.run()` against dropped trailing output and races between the
+/// readability handler and the caller (regression tests for the readToEnd drain).
+final class SubProcessTests: XCTestCase {
+    func testCapturesOutputWithoutTrailingNewline() {
+        let process = SubProcess(cmd: "/bin/echo", args: ["-n", "hello world"])
+        XCTAssertTrue(process.run())
+        XCTAssertEqual(process.exitCode, 0)
+        XCTAssertEqual(process.output, "hello world")
+    }
+
+    func testCapturesStderr() {
+        let process = SubProcess(cmd: "/bin/sh", args: ["-c", "echo err >&2"])
+        XCTAssertTrue(process.run())
+        XCTAssertEqual(process.output, "")
+        XCTAssertEqual(process.error.trimmingCharacters(in: .whitespacesAndNewlines), "err")
+    }
+
+    func testCapturesLargeOutputWithoutDroppingTail() {
+        let lineCount = 10_000
+        let process = SubProcess(cmd: "/bin/sh", args: ["-c", "seq 1 \(lineCount)"])
+        XCTAssertTrue(process.run())
+        let lines = process.output.components(separatedBy: "\n").filter { !$0.isEmpty }
+        XCTAssertEqual(lines.count, lineCount)
+        XCTAssertEqual(lines.last, "\(lineCount)")
+    }
 }

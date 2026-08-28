@@ -82,7 +82,7 @@ struct AppleIPSDecoder: CrashDecoder {
             header: header,
             payload: payload
         )
-        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frame(for: $0) })
+        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frames(forBinaries: $0) })
         return report
     }
 

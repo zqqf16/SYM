@@ -47,7 +47,7 @@ struct FabricDecoder: CrashDecoder {
         ClassicCrashLineParser.parseBinaryImages(content, report: &report)
         ClassicCrashLineParser.applyMainBinaryMetadata(to: &report)
         ClassicCrashLineParser.parseThreads(content, report: &report)
-        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frame(for: $0) })
+        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.frames(forBinaries: $0) })
 
         return report
     }

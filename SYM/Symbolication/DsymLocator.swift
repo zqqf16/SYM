@@ -24,6 +24,19 @@ import Combine
 import Foundation
 import MachOKit
 
+/// Spotlight / NSMetadataItem attribute keys used by Xcode's dSYM importer.
+enum DsymMetadataKey {
+    static let uuids = "com_apple_xcode_dsym_uuids"
+    static let paths = "com_apple_xcode_dsym_paths"
+}
+
+/// Uniform Type Identifiers returned by Spotlight for dSYM / archive / app results.
+enum SpotlightContentType {
+    static let dsym = "com.apple.xcode.dsym"
+    static let archive = "com.apple.xcode.archive"
+    static let applicationBundle = "com.apple.application-bundle"
+}
+
 class DsymFile: Hashable {
     let name: String
     let path: String
@@ -115,7 +128,7 @@ enum DsymLocator {
     static func createCondition(bundleID: String?, binaries: [BinaryImage]?, includeBundleID: Bool = true) -> String? {
         var clauses: [String] = []
         for uuid in orderedUUIDs(from: binaries) {
-            clauses.append("com_apple_xcode_dsym_uuids == \"\(uuid)\"")
+            clauses.append("\(DsymMetadataKey.uuids) == \"\(uuid)\"")
         }
         if includeBundleID, let bundleID, !bundleID.isEmpty {
             let escaped = bundleID.replacingOccurrences(of: "\\", with: "\\\\")
@@ -146,16 +159,47 @@ enum DsymLocator {
     ///
     /// Archives are scored by `Info.plist` ApplicationProperties (bundle ID + build) so Debug
     /// builds (DWARF in Products/*.app, empty dSYMs/) are probed before unrelated archives.
+    ///
+    /// A persistent UUID index short-circuits the walk when previous scans already
+    /// mapped the needed UUIDs to dSYMs that are still on disk.
     static func scanKnownDirectories(
         neededUUIDs: Set<String>,
         bundleID: String? = nil,
         appVersion: String? = nil,
         priorityUUIDs: Set<String> = [],
-        maxItems: Int = 400
+        maxItems: Int = 400,
+        index: DsymIndexStore? = DsymIndexStore.shared
     ) -> [DsymFile] {
         guard !neededUUIDs.isEmpty else {
             return []
         }
+        let stopUUIDs = priorityUUIDs.isEmpty ? neededUUIDs : priorityUUIDs
+
+        if let index, let cached = index.cachedFiles(neededUUIDs: neededUUIDs, stopUUIDs: stopUUIDs) {
+            return cached
+        }
+
+        let found = scanKnownDirectoriesOnDisk(
+            neededUUIDs: neededUUIDs,
+            bundleID: bundleID,
+            appVersion: appVersion,
+            priorityUUIDs: priorityUUIDs,
+            maxItems: maxItems
+        )
+        if let index, !found.isEmpty {
+            index.record(found)
+            index.save()
+        }
+        return found
+    }
+
+    private static func scanKnownDirectoriesOnDisk(
+        neededUUIDs: Set<String>,
+        bundleID: String?,
+        appVersion: String?,
+        priorityUUIDs: Set<String>,
+        maxItems: Int
+    ) -> [DsymFile] {
         let stopUUIDs = priorityUUIDs.isEmpty ? neededUUIDs : priorityUUIDs
         let versionHints = versionHints(from: appVersion)
         let roots = [
@@ -547,8 +591,8 @@ enum DsymLocator {
     static func parseDsymFile(_ item: NSMetadataItem, neededUUIDs: Set<String>? = nil) -> [DsymFile] {
         guard let name = metadataString(item, NSMetadataItemFSNameKey),
               let path = metadataString(item, NSMetadataItemPathKey),
-              let dsymPaths = metadataStringArray(item, "com_apple_xcode_dsym_paths"),
-              let dsymUUIDs = metadataStringArray(item, "com_apple_xcode_dsym_uuids")
+              let dsymPaths = metadataStringArray(item, DsymMetadataKey.paths),
+              let dsymUUIDs = metadataStringArray(item, DsymMetadataKey.uuids)
         else {
             return []
         }
@@ -580,8 +624,8 @@ enum DsymLocator {
     static func parseXcarchiveFile(_ item: NSMetadataItem, uuids: [String]) -> [DsymFile]? {
         guard let name = metadataString(item, NSMetadataItemFSNameKey),
               let path = metadataString(item, NSMetadataItemPathKey),
-              let dsymPaths = metadataStringArray(item, "com_apple_xcode_dsym_paths"),
-              let dsymUUIDs = metadataStringArray(item, "com_apple_xcode_dsym_uuids"),
+              let dsymPaths = metadataStringArray(item, DsymMetadataKey.paths),
+              let dsymUUIDs = metadataStringArray(item, DsymMetadataKey.uuids),
               dsymPaths.count == dsymUUIDs.count
         else {
             return nil
@@ -835,6 +879,10 @@ class DsymManager {
 }
 
 extension DsymManager: MdfindWrapperDelegate {
+    /// Runs on the main thread (NSMetadataQuery delivers on its start run loop).
+    /// Metadata-only parsing is fine here; probing archives on disk
+    /// (MachO loads / dwarfdump) must be dispatched off the main thread or a
+    /// result batch freezes the UI for seconds.
     func mdfindWrapper(_: MdfindWrapper, didFindResult result: [NSMetadataItem]?) {
         let generation = searchGeneration
         guard let result else {
@@ -844,14 +892,15 @@ extension DsymManager: MdfindWrapperDelegate {
         let needed = neededUUIDs
         var appItems = [NSMetadataItem]()
         var dsyms = [DsymFile]()
+        var archiveProbes: [(path: String, neededUUIDs: Set<String>, includeProducts: Bool)] = []
 
         for item in result {
             guard let type = item.value(forAttribute: NSMetadataItemContentTypeKey) as? String else {
                 continue
             }
-            if type == "com.apple.xcode.dsym" {
+            if type == SpotlightContentType.dsym {
                 dsyms.append(contentsOf: DsymLocator.parseDsymFile(item, neededUUIDs: needed.isEmpty ? nil : needed))
-            } else if type == "com.apple.xcode.archive" {
+            } else if type == SpotlightContentType.archive {
                 let archiveResults = DsymLocator.parseXcarchiveFile(item, uuids: uuids) ?? []
                 if !archiveResults.isEmpty {
                     dsyms.append(contentsOf: archiveResults)
@@ -862,36 +911,42 @@ extension DsymManager: MdfindWrapperDelegate {
                 if !DsymLocator.covers(needed, files: archiveResults),
                    let path = item.value(forAttribute: NSMetadataItemPathKey) as? String
                 {
-                    dsyms.append(contentsOf: DsymLocator.probeXcarchive(
-                        at: path,
-                        neededUUIDs: needed,
-                        includeProducts: archiveResults.isEmpty
-                    ))
+                    archiveProbes.append((path, needed, archiveResults.isEmpty))
                 }
-            } else if type == "com.apple.application-bundle" {
+            } else if type == SpotlightContentType.applicationBundle {
                 appItems.append(item)
             }
         }
 
-        let binariesSnapshot = binaries
-        DispatchQueue.main.async { [weak self] in
-            guard let self, generation == self.searchGeneration else { return }
-            if !dsyms.isEmpty {
-                self.mergeDsymFiles(dsyms)
-            }
-            if self.hasCompleteCoverage || appItems.isEmpty {
-                return
-            }
+        if !dsyms.isEmpty {
+            mergeDsymFiles(dsyms)
+        }
 
-            self.operationQueue.async { [weak self] in
-                guard let self else { return }
-                for app in appItems {
-                    guard generation == self.searchGeneration else { return }
-                    if let found = DsymLocator.parseAppBundle(app, binaries: binariesSnapshot) {
-                        self.mergeDsymFiles(found)
-                        return
-                    }
+        guard !archiveProbes.isEmpty || !appItems.isEmpty, !hasCompleteCoverage else {
+            return
+        }
+
+        let binariesSnapshot = binaries
+        operationQueue.async { [weak self] in
+            guard let self else { return }
+            var probed = [DsymFile]()
+            for probe in archiveProbes {
+                guard generation == self.searchGeneration else { return }
+                probed.append(contentsOf: DsymLocator.probeXcarchive(
+                    at: probe.path,
+                    neededUUIDs: probe.neededUUIDs,
+                    includeProducts: probe.includeProducts
+                ))
+            }
+            for app in appItems {
+                guard generation == self.searchGeneration else { return }
+                if let found = DsymLocator.parseAppBundle(app, binaries: binariesSnapshot) {
+                    probed.append(contentsOf: found)
+                    break
                 }
+            }
+            if !probed.isEmpty {
+                self.mergeDsymFiles(probed)
             }
         }
     }

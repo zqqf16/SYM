@@ -66,7 +66,7 @@ struct CPUUsageDecoder: CrashDecoder {
         }
 
         TextCrashParser.parseThreads(content, report: &report)
-        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.cpuUsageFrame(for: $0) })
+        CrashHighlightParser.applyRanges(to: &report, frameRegex: { CrashRegex.cpuUsageFrames(forBinaries: $0) })
 
         return report
     }
